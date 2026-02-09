@@ -1,0 +1,9 @@
+{
+  "name": "sintaxe-da-luz",
+  "version": "1.0.0",
+  "dependencies": {
+    "stripe": "^14.0.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "micro": "^10.0.1"
+  }
+}

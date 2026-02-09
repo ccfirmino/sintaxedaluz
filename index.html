@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintaxe da Luz | Lighting Design & Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'paper-black': '#0e0e0e',
+                        'paper-dark': '#1a1a1a',
+                        'warm-gold': '#D4AF37',
+                        'chalk-white': '#f0f0f0',
+                        'tech-gray': '#333333'
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- ESTILOS GLOBAIS --- */
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #0e0e0e;
+            color: #f0f0f0;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%231a1a1a' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+            letter-spacing: 0.5px;
+        }
+
+        h1, h2, h3, h4, .nav-link, button, input { text-transform: uppercase !important; }
+
+        /* --- CUSTOM RANGE SLIDER --- */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #D4AF37; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); border: 2px solid #0e0e0e; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 2px; cursor: pointer; background: #555; border-radius: 2px; }
+
+        /* --- INPUTS NUMÉRICOS MINIMALISTAS --- */
+        input[type=number] { background-color: transparent; color: #f0f0f0; border: none; border-bottom: 1px solid #333; text-align: right; width: 80px; font-family: 'Manrope', sans-serif; font-weight: 300; -moz-appearance: textfield; }
+        input[type=number]:focus { outline: none; border-bottom: 1px solid #D4AF37; color: #D4AF37; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+        /* --- RADIO BUTTONS PERSONALIZADOS --- */
+        input[type="radio"] { appearance: none; background-color: transparent; margin: 0; font: inherit; color: #D4AF37; width: 1.15em; height: 1.15em; border: 2px solid #D4AF37; border-radius: 50%; display: grid; place-content: center; }
+        input[type="radio"]::before { content: ""; width: 0.65em; height: 0.65em; background-color: #D4AF37; border-radius: 50%; transform: scale(0); transition: 120ms transform ease-in-out; }
+        input[type="radio"]:checked::before { transform: scale(1); }
+
+        /* Efeito de navegação */
+        .nav-link { position: relative; font-size: 0.85rem; letter-spacing: 2px; color: #999; transition: color 0.3s; }
+        .nav-link:hover { color: #D4AF37; }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 1px; bottom: -4px; left: 0; background-color: #D4AF37; transition: width 0.3s; }
+        .nav-link:hover::after { width: 100%; }
+
+        .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        .canvas-container { background-image: radial-gradient(circle at center, #222 0%, #111 70%); }
+
+        /* Login Inputs */
+        .login-input { background-color: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px 16px; width: 100%; font-family: 'Manrope', sans-serif; transition: border-color 0.3s, box-shadow 0.3s; }
+        .login-input:focus { outline: none; border-color: #D4AF37; box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.2); }
+        .login-input::placeholder { color: #555; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+
+        .blur-lock { filter: blur(8px); pointer-events: none; opacity: 0.3; transition: all 0.5s ease; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="fixed w-full z-50 bg-[#0e0e0e]/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold tracking-[0.2em] text-warm-gold">
+                SINTAXE<span class="text-white font-light opacity-60">DALUZ</span>
+            </a>
+            <div class="hidden md:flex gap-8 items-center">
+                <a href="#conceito" class="nav-link text-warm-gold" data-i18n="nav_concepts">CONCEITOS</a>
+                <a href="#calculadora" class="nav-link"><span data-i18n="nav_calculator">CALCULADORA</span> <i class="fas fa-unlock text-[10px] ml-1 text-warm-gold" id="nav-lock-icon"></i></a>
+                
+                <!-- Language Toggle -->
+                <button onclick="toggleLanguage()" class="text-xs text-gray-400 hover:text-warm-gold transition-colors font-bold tracking-widest border-l border-gray-700 pl-4 ml-2">
+                    <span id="lang-display">PT / EN</span>
+                </button>
+
+                <button id="btn-logout" onclick="handleLogout()" class="text-xs text-gray-500 hover:text-warm-gold transition-colors tracking-widest ml-4 pl-4 border-l border-gray-700 hidden" data-i18n="nav_logout">
+                    LOGOUT
+                </button>
+            </div>
+            <div class="md:hidden text-warm-gold text-2xl cursor-pointer">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <section id="conceito" class="pt-32 pb-20 px-6 border-b border-gray-900 bg-[#0e0e0e]">
+        <div class="max-w-7xl mx-auto fade-in-up">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl text-warm-gold font-bold tracking-widest mb-4" data-i18n="concepts_title">CONCEITOS</h2>
+                <p class="text-gray-500 font-light max-w-2xl mx-auto leading-relaxed" data-i18n="concepts_desc">
+                    Baseada na trigonometria e fotometria clássica, apresentamos as equações fundamentais que garantem a fidelidade física desta simulação.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-calculator text-3xl"></i></div>
+                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card1_title">INTENSIDADE ABSOLUTA</h3>
+                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card1_desc">Converte dados fotométricos relativos (comuns em catálogos) para intensidade absoluta (Candelas), normalizando pelo fluxo total.</p>
+                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">I = (Φ · γ) / 1000</span></div>
+                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">I</span> <span data-i18n="card1_i">Intensidade (cd)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">Φ</span> <span data-i18n="card1_flux">Fluxo Luminoso (lm)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">γ</span> <span data-i18n="card1_gamma">Valor Tabela (cd/klm)</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-lightbulb text-3xl"></i></div>
+                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card2_title">LEI DO COSSENO CÚBICO</h3>
+                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card2_desc">Variação da Lei do Inverso do Quadrado. Determina a iluminância horizontal (E) considerando a inclinação e a altura da fonte.</p>
+                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">E = (I · cos³θ) / h²</span></div>
+                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">E</span> <span data-i18n="card2_e">Iluminância (Lux)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">I</span> <span data-i18n="card2_i">Intensidade (cd)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">θ</span> <span data-i18n="card2_theta">Ângulo Tilt (°)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">h</span> <span data-i18n="card2_h">Altura (m)</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-ruler-combined text-3xl"></i></div>
+                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card3_title">GEOMETRIA DO FACHO</h3>
+                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card3_desc">Cálculo trigonométrico do diâmetro da projeção (spot), considerando a distância real percorrida pela luz até o plano.</p>
+                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">Ø = 2 · d · tan(α/2)</span></div>
+                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">Ø</span> <span data-i18n="card3_dia">Diâmetro (m)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">d</span> <span data-i18n="card3_d">Distância (h/cosθ)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">α</span> <span data-i18n="card3_alpha">Abertura (°)</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="calculadora" class="py-20 px-4 md:px-8 bg-[#0a0a0a] relative min-h-[600px]">
+        
+        <div class="text-center mb-12 relative z-10">
+            <h1 class="text-base sm:text-2xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight whitespace-nowrap">
+                <span data-i18n="hero_title_pre">A CALCULADORA DO</span> <span class="text-warm-gold">LIGHTING DESIGNER</span>
+            </h1>
+            <h2 class="text-xl text-gray-500 font-bold tracking-widest mb-4" data-i18n="hero_subtitle">MÉTODO PONTO A PONTO</h2>
+            
+            <div id="license-status" class="hidden inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-green-900 bg-green-900/10 fade-in-up">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span class="text-[10px] text-green-500 font-bold tracking-widest uppercase" id="license-date-text">CARREGANDO...</span>
+            </div>
+        </div>
+
+        <!-- LOGIN / BLOCK CONTAINER -->
+        <div id="access-lock" class="absolute inset-0 z-20 flex flex-col items-center justify-center pt-32 bg-[#0a0a0a]/60 backdrop-blur-sm transition-all duration-500">
+            <div class="w-full max-w-sm bg-[#1a1a1a] p-8 md:p-10 border border-warm-gold/30 shadow-2xl relative">
+                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-warm-gold text-paper-black font-bold text-[10px] flex items-center justify-center tracking-widest uppercase">
+                    Premium Tool
+                </div>
+                
+                <div class="text-center mb-6">
+                    <i class="fas fa-lock text-3xl text-warm-gold mb-4"></i>
+                    <h3 class="text-white font-bold tracking-widest text-sm" data-i18n="lock_title">Ferramenta Restrita</h3>
+                    <p class="text-gray-500 text-[10px] mt-2 leading-relaxed" data-i18n="lock_desc">Faça login para acessar o simulador ponto a ponto.</p>
+                </div>
+
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <input id="email" type="email" required class="login-input text-xs" placeholder="E-mail">
+                    </div>
+                    <div>
+                        <input id="password" type="password" required class="login-input text-xs" placeholder="Senha" data-i18n-ph="ph_password">
+                    </div>
+                    <button type="submit" class="w-full bg-warm-gold text-[#0e0e0e] font-bold py-3 text-xs tracking-widest hover:bg-white transition-colors disabled:opacity-50" data-i18n="btn_login">
+                        ENTRAR / DESBLOQUEAR
+                    </button>
+                    <button type="button" onclick="handleSignUp()" class="w-full bg-transparent border border-gray-700 text-gray-400 font-bold py-2 text-[10px] tracking-widest hover:border-warm-gold hover:text-warm-gold transition-colors" data-i18n="btn_signup">
+                        CRIAR CONTA NOVA
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <a href="#" onclick="alert('Funcionalidade em desenvolvimento. Contate o suporte.')" class="text-[9px] text-gray-600 hover:text-warm-gold uppercase tracking-wide" data-i18n="btn_forgot">Esqueci minha senha</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAYMENT MODAL (NOVO) -->
+        <div id="payment-overlay" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center pt-32 bg-[#0a0a0a]/90 backdrop-blur-md transition-all duration-500">
+            <div class="w-full max-w-md bg-[#1a1a1a] border border-warm-gold/50 shadow-2xl relative fade-in-up p-8">
+                <div class="text-center">
+                    <h2 class="text-2xl text-warm-gold font-bold tracking-widest mb-2" data-i18n="pay_title">ASSINATURA PRO</h2>
+                    <p class="text-gray-400 text-xs mb-6" data-i18n="pay_desc">Desbloqueie a calculadora profissional por 1 ano.</p>
+                    
+                    <div class="bg-paper-black p-4 mb-6 border border-gray-800 text-left">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-white text-sm font-bold">Plano Anual</span>
+                            <span class="text-warm-gold text-lg font-bold">R$ 199,90</span>
+                        </div>
+                        <ul class="text-gray-500 text-[10px] space-y-1">
+                            <li>• Acesso ilimitado ao método ponto a ponto</li>
+                            <li>• Conversão automática de CD/KLM</li>
+                            <li>• Visualização gráfica em tempo real</li>
+                        </ul>
+                    </div>
+
+                    <button onclick="processPayment()" id="btn-pay" class="w-full bg-green-600 text-white font-bold py-3 text-xs tracking-widest hover:bg-green-500 transition-colors shadow-lg">
+                        <span data-i18n="pay_btn">ASSINAR AGORA</span>
+                    </button>
+                    <p id="pay-msg" class="text-[10px] text-gray-500 mt-4 h-4"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="calculator-interface" class="blur-lock">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl mx-auto w-full">
+
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    
+                    <div class="bg-[#1a1a1a] p-6 rounded-sm border-2 border-dashed border-gray-800 shadow-lg relative h-full">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-[#333] opacity-80 rotate-1 shadow-md"></div>
+
+                        <div class="mb-4">
+                            <h3 class="text-lg text-white mb-2 font-bold whitespace-nowrap text-center" data-i18n="calc_params">Parâmetros da Fonte</h3>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 p-3 mb-6 border-b border-gray-800 pb-4 justify-center">
+                                <label class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                                    <input type="radio" name="calc_mode" value="direct" checked onchange="toggleMode('direct')">
+                                    <span class="text-xs text-gray-300 font-bold" data-i18n="radio_intensity">Intensidade (cd)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                                    <input type="radio" name="calc_mode" value="photometric" onchange="toggleMode('photometric')">
+                                    <span class="text-xs text-gray-300 font-bold" data-i18n="radio_photo">Fotometria (cd/klm)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="mode-direct" class="mb-6 group">
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-xs text-warm-gold tracking-widest font-bold" data-i18n="label_intensity">Intensidade (I)</label>
+                                <div class="flex items-baseline gap-1">
+                                    <input type="number" id="num-intensity" min="0" max="100000" step="10" value="3000">
+                                    <span class="text-[10px] text-gray-500 font-bold">CD</span>
+                                </div>
+                            </div>
+                            <input type="range" id="range-intensity" min="0" max="20000" step="10" value="3000">
+                            <p class="text-[10px] text-gray-600 mt-1 font-light normal-case" data-i18n="desc_intensity">Intensidade no centro do facho (candelas).</p>
+                        </div>
+
+                        <div id="mode-photometric" class="hidden mb-6 space-y-4">
+                            <div class="group">
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs text-warm-gold tracking-widest font-bold" data-i18n="label_curve">Valor Curva</label>
+                                    <div class="flex items-baseline gap-1">
+                                        <input type="number" id="num-cdklm" min="0" max="100000" step="10" value="2000">
+                                        <span class="text-[10px] text-gray-500 font-bold">CD/KLM</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="range-cdklm" min="0" max="10000" step="10" value="2000">
+                            </div>
+
+                            <div class="group">
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs text-warm-gold tracking-widest font-bold" data-i18n="label_flux">Fluxo Luminoso</label>
+                                    <div class="flex items-baseline gap-1">
+                                        <input type="number" id="num-flux" min="0" max="100000" step="10" value="1500">
+                                        <span class="text-[10px] text-gray-500 font-bold">LM</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="range-flux" min="0" max="10000" step="10" value="1500">
+                            </div>
+
+                            <div class="border-t border-gray-800 pt-3 flex justify-between items-center">
+                                <span class="text-[10px] text-gray-500 font-light" data-i18n="label_calc_int">Intensidade Calculada</span>
+                                <span id="calc-intensity-result" class="text-sm text-warm-gold font-bold">3000 CD</span>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-800 my-6 border-dashed">
+
+                        <div class="mb-6 group">
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-xs text-warm-gold tracking-widest font-bold" data-i18n="label_height">Altura (h)</label>
+                                <div class="flex items-baseline gap-1">
+                                    <input type="number" id="num-height" min="0.5" max="20.0" step="0.1" value="3.0">
+                                    <span class="text-[10px] text-gray-500 font-bold">M</span>
+                                </div>
+                            </div>
+                            <input type="range" id="range-height" min="0.5" max="20.0" step="0.1" value="3.0">
+                        </div>
+
+                        <div class="mb-6 group">
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-xs text-warm-gold tracking-widest font-bold" data-i18n="label_beam">Abertura do Facho</label>
+                                <div class="flex items-baseline gap-1">
+                                    <input type="number" id="num-beam" min="5" max="120" step="1" value="30">
+                                    <span class="text-[10px] text-gray-500 font-bold">°</span>
+                                </div>
+                            </div>
+                            <input type="range" id="range-beam" min="5" max="120" step="1" value="30">
+                        </div>
+
+                        <div class="mb-2 group">
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-xs text-warm-gold tracking-widest font-bold" data-i18n="label_tilt">Orientação (Tilt)</label>
+                                <div class="flex items-baseline gap-1">
+                                    <input type="number" id="num-tilt" min="0" max="60" step="1" value="0">
+                                    <span class="text-[10px] text-gray-500 font-bold">°</span>
+                                </div>
+                            </div>
+                            <input type="range" id="range-tilt" min="0" max="60" step="1" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 flex flex-col gap-6">
+                    
+                    <div class="bg-[#1a1a1a] p-6 rounded-sm border-2 border-dashed border-gray-800 shadow-lg flex-grow flex flex-col relative h-full">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-[#333] opacity-80 -rotate-1 shadow-md"></div>
+                        
+                        <h3 class="text-lg text-white mb-6 border-b border-gray-800 pb-4" data-i18n="result_title">RESULTADO</h3>
+                        
+                        <div class="relative w-full h-[400px] bg-black border border-gray-800 rounded mb-6 overflow-hidden canvas-container">
+                            <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px); background-size: 40px 40px;"></div>
+                            <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
+                            <div class="absolute bottom-2 right-4 text-[10px] text-gray-600 font-mono" data-i18n="canvas_scale">ESCALA 1:50 APROX.</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <div class="bg-[#0e0e0e] p-4 border-l-2 border-warm-gold">
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1" data-i18n="res_lux_title">Iluminância no Centro (E)</div>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="result-lux" class="text-4xl text-white font-light">333</span>
+                                    <span class="text-sm text-warm-gold font-bold">LUX</span>
+                                </div>
+                                <p class="text-[10px] text-gray-600 mt-2 italic" data-i18n="res_lux_desc">Resultado baseado nos parâmetros indicados.</p>
+                            </div>
+
+                            <div class="bg-[#0e0e0e] p-4 border-l-2 border-gray-700">
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1" data-i18n="res_dia_title">Diâmetro Estimado (Ø)</div>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="result-diameter" class="text-4xl text-white font-light">1.61</span>
+                                    <span class="text-sm text-warm-gold font-bold">M</span>
+                                </div>
+                                <p class="text-[10px] text-gray-600 mt-2 italic" data-i18n="res_dia_desc">Projeção da mancha de luz no nível do piso.</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="bg-[#050505] py-12 px-6 border-t border-gray-900 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+            <div>
+                <a href="#" class="text-lg font-bold tracking-[0.2em] text-warm-gold">
+                    SINTAXE<span class="text-white font-light opacity-60">DALUZ</span>
+                </a>
+                <p class="text-gray-600 text-xs mt-2">© 2026 Sintaxe da Luz. All rights reserved.</p>
+            </div>
+            <div class="flex gap-6 text-gray-500">
+                <a href="#" class="hover:text-warm-gold transition-colors"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="hover:text-warm-gold transition-colors"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="hover:text-warm-gold transition-colors"><i class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- TRANSLATION DATA ---
+        let currentLang = 'pt';
+        
+        const translations = {
+            pt: {
+                nav_concepts: "CONCEITOS",
+                nav_calculator: "CALCULADORA",
+                nav_logout: "LOGOUT",
+                concepts_title: "CONCEITOS",
+                concepts_desc: "Baseada na trigonometria e fotometria clássica, apresentamos as equações fundamentais que garantem a fidelidade física desta simulação.",
+                card1_title: "INTENSIDADE ABSOLUTA",
+                card1_desc: "Converte dados fotométricos relativos (comuns em catálogos) para intensidade absoluta (Candelas), normalizando pelo fluxo total.",
+                card1_i: "Intensidade (cd)",
+                card1_flux: "Fluxo Luminoso (lm)",
+                card1_gamma: "Valor Tabela (cd/klm)",
+                card2_title: "LEI DO COSSENO CÚBICO",
+                card2_desc: "Variação da Lei do Inverso do Quadrado. Determina a iluminância horizontal (E) considerando a inclinação e a altura da fonte.",
+                card2_e: "Iluminância (Lux)",
+                card2_i: "Intensidade (cd)",
+                card2_theta: "Ângulo Tilt (°)",
+                card2_h: "Altura (m)",
+                card3_title: "GEOMETRIA DO FACHO",
+                card3_desc: "Cálculo trigonométrico do diâmetro da projeção (spot), considerando a distância real percorrida pela luz até o plano.",
+                card3_dia: "Diâmetro (m)",
+                card3_d: "Distância (h/cosθ)",
+                card3_alpha: "Abertura (°)",
+                hero_title_pre: "A CALCULADORA DO",
+                hero_subtitle: "MÉTODO PONTO A PONTO",
+                lock_title: "Ferramenta Restrita",
+                lock_desc: "Faça login para acessar o simulador ponto a ponto.",
+                ph_password: "Senha",
+                btn_login: "ENTRAR / DESBLOQUEAR",
+                btn_signup: "CRIAR CONTA NOVA",
+                btn_forgot: "Esqueci minha senha",
+                pay_title: "ASSINATURA PRO",
+                pay_desc: "Desbloqueie a calculadora profissional por 1 ano.",
+                pay_btn: "ASSINAR AGORA",
+                calc_params: "Parâmetros da Fonte",
+                radio_intensity: "Intensidade (cd)",
+                radio_photo: "Fotometria (cd/klm)",
+                label_intensity: "Intensidade (I)",
+                desc_intensity: "Intensidade no centro do facho (candelas).",
+                label_curve: "Valor Curva",
+                label_flux: "Fluxo Luminoso",
+                label_calc_int: "Intensidade Calculada",
+                label_height: "Altura (h)",
+                label_beam: "Abertura do Facho",
+                label_tilt: "Orientação (Tilt)",
+                result_title: "RESULTADO",
+                canvas_scale: "ESCALA 1:50 APROX.",
+                res_lux_title: "Iluminância no Centro (E)",
+                res_lux_desc: "Resultado baseado nos parâmetros indicados.",
+                res_dia_title: "Diâmetro Estimado (Ø)",
+                res_dia_desc: "Projeção da mancha de luz no nível do piso.",
+                lic_active_pre: "LICENÇA VÁLIDA ATÉ:",
+                lic_expired: "LICENÇA EXPIRADA",
+                lic_free: "VERSÃO GRATUITA (BLOQUEADA)",
+                loading: "CARREGANDO..."
+            },
+            en: {
+                nav_concepts: "CONCEPTS",
+                nav_calculator: "CALCULATOR",
+                nav_logout: "LOGOUT",
+                concepts_title: "CONCEPTS",
+                concepts_desc: "Based on classical trigonometry and photometry, we present the fundamental equations that ensure the physical fidelity of this simulation.",
+                card1_title: "ABSOLUTE INTENSITY",
+                card1_desc: "Converts relative photometric data (common in catalogs) to absolute intensity (Candelas), normalized by total flux.",
+                card1_i: "Intensity (cd)",
+                card1_flux: "Luminous Flux (lm)",
+                card1_gamma: "Table Value (cd/klm)",
+                card2_title: "CUBIC COSINE LAW",
+                card2_desc: "Variation of the Inverse Square Law. Determines horizontal illuminance (E) considering the source inclination and height.",
+                card2_e: "Illuminance (Lux)",
+                card2_i: "Intensity (cd)",
+                card2_theta: "Tilt Angle (°)",
+                card2_h: "Height (m)",
+                card3_title: "BEAM GEOMETRY",
+                card3_desc: "Trigonometric calculation of the projection diameter (spot), considering the actual distance traveled by light to the plane.",
+                card3_dia: "Diameter (m)",
+                card3_d: "Distance (h/cosθ)",
+                card3_alpha: "Beam Angle (°)",
+                hero_title_pre: "THE CALCULATOR FOR",
+                hero_subtitle: "POINT BY POINT METHOD",
+                lock_title: "Restricted Tool",
+                lock_desc: "Log in to access the point-by-point simulator.",
+                ph_password: "Password",
+                btn_login: "ENTER / UNLOCK",
+                btn_signup: "CREATE NEW ACCOUNT",
+                btn_forgot: "Forgot my password",
+                pay_title: "PRO SUBSCRIPTION",
+                pay_desc: "Unlock the professional calculator for 1 year.",
+                pay_btn: "SUBSCRIBE NOW",
+                calc_params: "Source Parameters",
+                radio_intensity: "Intensity (cd)",
+                radio_photo: "Photometry (cd/klm)",
+                label_intensity: "Intensity (I)",
+                desc_intensity: "Intensity at the center of the beam (candelas).",
+                label_curve: "Curve Value",
+                label_flux: "Luminous Flux",
+                label_calc_int: "Calculated Intensity",
+                label_height: "Height (h)",
+                label_beam: "Beam Angle",
+                label_tilt: "Tilt",
+                result_title: "RESULT",
+                canvas_scale: "APPROX SCALE 1:50",
+                res_lux_title: "Center Illuminance (E)",
+                res_lux_desc: "Result based on indicated parameters.",
+                res_dia_title: "Estimated Diameter (Ø)",
+                res_dia_desc: "Light spot projection at floor level.",
+                lic_active_pre: "LICENSE VALID UNTIL:",
+                lic_expired: "LICENSE EXPIRED",
+                lic_free: "FREE VERSION (LOCKED)",
+                loading: "LOADING..."
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'pt' ? 'en' : 'pt';
+            document.getElementById('lang-display').innerText = currentLang === 'pt' ? 'PT / EN' : 'EN / PT';
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.innerText = translations[currentLang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (translations[currentLang][key]) {
+                    el.placeholder = translations[currentLang][key];
+                }
+            });
+
+            if (state.profile) {
+                updateLicenseDisplay(state.profile);
+            }
+        }
+
+        // --- CREDENCIAIS DO SUPABASE ---
+        const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
+        const SUPABASE_KEY = 'sb_publishable_DSLOW6cRyUKlRj-k4MWZGw_2SGACdnh';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const state = {
+            user: null,
+            profile: null,
+            mode: 'direct', 
+            intensity: 3000,
+            cdKlm: 2000,
+            flux: 1500,
+            height: 3.0,
+            beamAngle: 30,
+            tilt: 0
+        };
+
+        // --- VALIDADE LICENÇA ---
+        function checkLicenseValidity(expiryDateString) {
+            if (!expiryDateString) return false;
+            const today = new Date();
+            const expiry = new Date(expiryDateString);
+            return today < expiry;
+        }
+
+        // --- AUTH & PROFILE ---
+        async function loadUserProfile(userId, animate = false) {
+            // MOCK PROFILE LOAD IF NEW USER (Para simular o fluxo sem backend real configurado com triggers)
+            // Em produção, isso viria do banco real.
+            // Aqui, se não achar perfil, assumimos que é um usuário novo gratuito.
+            
+            let profileData = null;
+            
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+            
+            if (data) {
+                profileData = data;
+            } else {
+                // Fallback para novo usuário (sem perfil no DB ainda)
+                profileData = { id: userId, is_pro: false, license_expiry: null };
+            }
+
+            const isValid = profileData.is_pro && checkLicenseValidity(profileData.license_expiry);
+            state.profile = { ...profileData, isValid: isValid };
+            
+            updateLicenseDisplay(state.profile);
+            
+            if (isValid) {
+                unlockInterface(animate);
+                hidePaymentScreen();
+            } else {
+                lockInterface(); // Mantém o fundo travado
+                showPaymentScreen(); // Mostra o modal de pagamento por cima
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.querySelector('#login-form button[type="submit"]');
+            const originalText = btn.innerText;
+
+            btn.innerText = "VERIFICANDO...";
+            btn.disabled = true;
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Erro: " + error.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            } else {
+                state.user = data.user;
+                await loadUserProfile(data.user.id, true);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function handleSignUp() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if(!email || !password) {
+                alert("Preencha E-mail e Senha para cadastrar.");
+                return;
+            }
+
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Erro ao cadastrar: " + error.message);
+            } else {
+                alert("Cadastro realizado! Verifique seu e-mail para confirmar.");
+            }
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            state.user = null;
+            state.profile = null;
+            hidePaymentScreen();
+            lockInterface();
+        }
+
+        // --- PAYMENT LOGIC (MOCK) ---
+        function showPaymentScreen() {
+            const payOverlay = document.getElementById('payment-overlay');
+            payOverlay.classList.remove('hidden');
+            document.getElementById('access-lock').classList.add('hidden'); // Esconde login
+        }
+
+        function hidePaymentScreen() {
+            const payOverlay = document.getElementById('payment-overlay');
+            payOverlay.classList.add('hidden');
+        }
+
+        function processPayment() {
+            const btn = document.getElementById('btn-pay');
+            const msg = document.getElementById('pay-msg');
+            
+            btn.disabled = true;
+            btn.innerText = currentLang === 'pt' ? "PROCESSANDO..." : "PROCESSING...";
+            msg.innerText = currentLang === 'pt' ? "Conectando ao gateway de pagamento..." : "Connecting to payment gateway...";
+
+            // Simulação de delay de pagamento
+            setTimeout(() => {
+                msg.innerText = currentLang === 'pt' ? "Pagamento Aprovado! Ativando licença..." : "Payment Approved! Activating license...";
+                msg.className = "text-[10px] text-green-500 mt-4 h-4 font-bold";
+                
+                setTimeout(() => {
+                    // Atualiza estado local para PRO (Mock)
+                    const today = new Date();
+                    const nextYear = new Date(today.setFullYear(today.getFullYear() + 1));
+                    const isoDate = nextYear.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                    state.profile.is_pro = true;
+                    state.profile.license_expiry = isoDate;
+                    state.profile.isValid = true;
+
+                    updateLicenseDisplay(state.profile);
+                    hidePaymentScreen();
+                    unlockInterface(true); // Animação de desbloqueio
+                    
+                    btn.disabled = false;
+                    btn.innerText = "ASSINAR AGORA";
+                    msg.innerText = "";
+                }, 1500);
+            }, 2000);
+        }
+
+        // --- UI CONTROL ---
+        function unlockInterface(animate) {
+            const interface = document.getElementById('calculator-interface');
+            const logoutBtn = document.getElementById('btn-logout');
+            const lockIcon = document.getElementById('nav-lock-icon');
+            const licenseStatus = document.getElementById('license-status');
+
+            if (animate) {
+                // Efeito visual opcional
+            }
+            
+            interface.classList.remove('blur-lock');
+            logoutBtn.classList.remove('hidden');
+            licenseStatus.classList.remove('hidden');
+            licenseStatus.classList.add('inline-flex');
+            lockIcon.className = "fas fa-unlock text-[10px] ml-1 text-warm-gold";
+            resizeCanvas();
+        }
+
+        function lockInterface() {
+            const lockScreen = document.getElementById('access-lock');
+            const interface = document.getElementById('calculator-interface');
+            const logoutBtn = document.getElementById('btn-logout');
+            const lockIcon = document.getElementById('nav-lock-icon');
+            const licenseStatus = document.getElementById('license-status');
+
+            lockScreen.classList.remove('hidden');
+            lockScreen.style.opacity = "1";
+            interface.classList.add('blur-lock');
+            logoutBtn.classList.add('hidden');
+            licenseStatus.classList.add('hidden');
+            licenseStatus.classList.remove('inline-flex');
+            lockIcon.className = "fas fa-lock text-[10px] ml-1 text-gray-500";
+        }
+
+        function updateLicenseDisplay(profile) {
+            const el = document.getElementById('license-date-text');
+            const statusDiv = document.getElementById('license-status');
+            const t = translations[currentLang];
+            
+            if (profile.isValid && profile.license_expiry) {
+                const dateParts = profile.license_expiry.split('-');
+                const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+                
+                el.innerText = `${t.lic_active_pre} ${formattedDate}`;
+                
+                statusDiv.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-green-900 bg-green-900/10 fade-in-up";
+                statusDiv.innerHTML = `
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-[10px] text-green-500 font-bold tracking-widest uppercase">${el.innerText}</span>
+                `;
+            } else if (profile.is_pro && !profile.isValid) {
+                statusDiv.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-red-900 bg-red-900/10 fade-in-up";
+                statusDiv.innerHTML = `
+                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                    <span class="text-[10px] text-red-500 font-bold tracking-widest uppercase">${t.lic_expired}</span>
+                `;
+            } else {
+                statusDiv.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gray-700 bg-gray-800/50 fade-in-up";
+                statusDiv.innerHTML = `
+                    <span class="text-[10px] text-gray-500 font-bold tracking-widest uppercase">${t.lic_free}</span>
+                `;
+            }
+            statusDiv.classList.remove('hidden');
+            statusDiv.classList.add('inline-flex');
+        }
+
+        // --- CORE CALCULATOR LOGIC ---
+        const els = {
+            modeDirect: document.getElementById('mode-direct'),
+            modePhoto: document.getElementById('mode-photometric'),
+            numIntensity: document.getElementById('num-intensity'),
+            rangeIntensity: document.getElementById('range-intensity'),
+            numCdKlm: document.getElementById('num-cdklm'),
+            rangeCdKlm: document.getElementById('range-cdklm'),
+            numFlux: document.getElementById('num-flux'),
+            rangeFlux: document.getElementById('range-flux'),
+            numHeight: document.getElementById('num-height'),
+            rangeHeight: document.getElementById('range-height'),
+            numBeam: document.getElementById('num-beam'),
+            rangeBeam: document.getElementById('range-beam'),
+            numTilt: document.getElementById('num-tilt'),
+            rangeTilt: document.getElementById('range-tilt'),
+            calcIntensity: document.getElementById('calc-intensity-result'),
+            resLux: document.getElementById('result-lux'),
+            resDia: document.getElementById('result-diameter'),
+            canvas: document.getElementById('beamCanvas')
+        };
+
+        const ctx = els.canvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+
+        function resizeCanvas() {
+            if (!els.canvas.offsetParent) return;
+            const container = els.canvas.parentElement;
+            canvasWidth = container.clientWidth;
+            canvasHeight = container.clientHeight;
+            els.canvas.width = canvasWidth;
+            els.canvas.height = canvasHeight;
+            draw();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function toggleMode(mode) {
+            state.mode = mode;
+            if (mode === 'direct') {
+                els.modeDirect.classList.remove('hidden');
+                els.modePhoto.classList.add('hidden');
+            } else {
+                els.modeDirect.classList.add('hidden');
+                els.modePhoto.classList.remove('hidden');
+            }
+            updateCalculations();
+        }
+
+        function calculateLux() {
+            let I = 0;
+            if (state.mode === 'direct') {
+                I = state.intensity;
+            } else {
+                I = (state.flux * state.cdKlm) / 1000;
+                els.calcIntensity.innerText = Math.round(I) + ' CD';
+            }
+
+            const tiltRad = state.tilt * (Math.PI / 180);
+            const cosTilt = Math.cos(tiltRad);
+            const lux = (I * Math.pow(cosTilt, 3)) / (state.height * state.height);
+            
+            const beamRad = state.beamAngle * (Math.PI / 180);
+            const distance = state.height / cosTilt;
+            const diameter = 2 * distance * Math.tan(beamRad / 2);
+
+            return {
+                lux: Math.round(lux),
+                diameter: diameter.toFixed(2)
+            };
+        }
+
+        function updateCalculations() {
+            const results = calculateLux();
+            els.resLux.innerText = results.lux;
+            els.resDia.innerText = results.diameter;
+            draw();
+        }
+
+        function draw() {
+            if (!ctx || !canvasWidth || !canvasHeight) return;
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            const floorY = canvasHeight - 70; 
+            const centerX = canvasWidth / 2;
+            
+            const tiltRad = state.tilt * (Math.PI / 180);
+            const beamRad = state.beamAngle * (Math.PI / 180);
+            
+            const angleL = tiltRad - beamRad / 2;
+            const angleR = tiltRad + beamRad / 2;
+            
+            const limitAngle = 85 * (Math.PI / 180);
+            const effAngleL = Math.max(-limitAngle, Math.min(limitAngle, angleL));
+            const effAngleR = Math.max(-limitAngle, Math.min(limitAngle, angleR));
+            
+            const distL_m = state.height * Math.tan(effAngleL);
+            const distR_m = state.height * Math.tan(effAngleR);
+            const maxWidthFromCenter_m = Math.max(Math.abs(distL_m), Math.abs(distR_m));
+            
+            const availableHeightPx = floorY - 60;
+            const scaleH = availableHeightPx / state.height;
+            const availableWidthPx = centerX - 40;
+            const scaleW = maxWidthFromCenter_m > 0.1 ? availableWidthPx / maxWidthFromCenter_m : 100;
+            
+            let scalePixelsPerMeter = Math.min(scaleH, scaleW);
+            scalePixelsPerMeter = Math.min(Math.max(scalePixelsPerMeter, 2), 40);
+            
+            const sourceY = floorY - (state.height * scalePixelsPerMeter);
+            
+            ctx.beginPath();
+            ctx.moveTo(0, floorY);
+            ctx.lineTo(canvasWidth, floorY);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.setLineDash([2, 4]);
+            ctx.moveTo(centerX - 100, sourceY);
+            ctx.lineTo(centerX - 10, sourceY);
+            ctx.strokeStyle = '#555';
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.font = "12px Manrope";
+            ctx.fillStyle = "#666";
+            ctx.fillText(`${state.height}m`, centerX - 130, sourceY + 3);
+
+            const h_px = floorY - sourceY;
+            const xL = h_px * Math.tan(effAngleL);
+            const xR = h_px * Math.tan(effAngleR);
+            
+            ctx.save();
+            ctx.translate(centerX, sourceY);
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, 5, 0, Math.PI*2);
+            ctx.fillStyle = '#D4AF37';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(xL, h_px);
+            ctx.lineTo(xR, h_px);
+            ctx.closePath();
+            
+            if (Number.isFinite(h_px)) {
+                const gradient = ctx.createLinearGradient(0, 0, 0, h_px);
+                gradient.addColorStop(0, "rgba(212, 175, 55, 0.8)");
+                gradient.addColorStop(1, "rgba(212, 175, 55, 0.1)");
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+            
+            const xC = h_px * Math.tan(tiltRad);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(xC, h_px);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+
+            ctx.restore();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX + xL, floorY);
+            ctx.lineTo(centerX + xR, floorY);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "rgba(212, 175, 55, 1)";
+            ctx.stroke();
+            
+            const spotCenter = centerX + (xL + xR) / 2;
+            
+            const currentLux = document.getElementById('result-lux').innerText;
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 10px Manrope";
+            ctx.textAlign = "center";
+            ctx.fillText(currentLux + " LUX", spotCenter, floorY - 8);
+
+            const currentDia = document.getElementById('result-diameter').innerText;
+            const dimY_Dia = floorY + 15;
+            const textDia = "Ø " + currentDia + "m";
+
+            ctx.beginPath();
+            ctx.strokeStyle = "#666";
+            ctx.lineWidth = 1;
+            ctx.setLineDash([]);
+            ctx.moveTo(centerX + xL, floorY + 5);
+            ctx.lineTo(centerX + xL, dimY_Dia + 5);
+            ctx.moveTo(centerX + xR, floorY + 5);
+            ctx.lineTo(centerX + xR, dimY_Dia + 5);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(centerX + xL, dimY_Dia);
+            ctx.lineTo(centerX + xR, dimY_Dia);
+            ctx.stroke();
+
+            ctx.font = "12px Manrope";
+            const widthDia = ctx.measureText(textDia).width;
+            ctx.fillStyle = "#000";
+            ctx.fillRect(spotCenter - widthDia/2 - 4, dimY_Dia - 6, widthDia + 8, 12);
+            ctx.fillStyle = "#666";
+            ctx.fillText(textDia, spotCenter, dimY_Dia + 4);
+
+            if (state.tilt > 0) {
+                const distM = state.height * Math.tan(tiltRad);
+                const dimY_Dist = floorY + 35;
+                const textDist = "d: " + distM.toFixed(2) + "m";
+                
+                const xC_scale = (state.height * scalePixelsPerMeter) * Math.tan(tiltRad);
+                
+                ctx.beginPath();
+                ctx.strokeStyle = "#666";
+                ctx.lineWidth = 1;
+
+                ctx.moveTo(centerX, floorY + 10);
+                ctx.lineTo(centerX, dimY_Dist + 5);
+                
+                ctx.moveTo(centerX + xC_scale, floorY + 10);
+                ctx.lineTo(centerX + xC_scale, dimY_Dist + 5);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, dimY_Dist);
+                ctx.lineTo(centerX + xC_scale, dimY_Dist);
+                ctx.stroke();
+
+                ctx.fillStyle = "#666";
+                ctx.beginPath();
+                ctx.arc(centerX, dimY_Dist, 2, 0, Math.PI * 2);
+                ctx.arc(centerX + xC_scale, dimY_Dist, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.font = "12px Manrope";
+                const widthDist = ctx.measureText(textDist).width;
+                ctx.fillStyle = "#000";
+                ctx.fillRect(centerX + (xC_scale / 2) - (widthDist / 2) - 4, dimY_Dist - 6, widthDist + 8, 12);
+                
+                ctx.fillStyle = "#666";
+                ctx.fillText(textDist, centerX + (xC_scale / 2), dimY_Dist + 4);
+            }
+        }
+
+        // --- Event Listeners Setup ---
+
+        function bindInput(numId, rangeId, key) {
+            const num = document.getElementById(numId);
+            const range = document.getElementById(rangeId);
+            
+            num.addEventListener('input', (e) => {
+                let val = parseFloat(e.target.value);
+                range.value = val;
+                state[key] = val;
+                updateCalculations();
+            });
+            
+            range.addEventListener('input', (e) => {
+                let val = parseFloat(e.target.value);
+                num.value = val;
+                state[key] = val;
+                updateCalculations();
+            });
+        }
+
+        bindInput('num-intensity', 'range-intensity', 'intensity');
+        bindInput('num-cdklm', 'range-cdklm', 'cdKlm');
+        bindInput('num-flux', 'range-flux', 'flux');
+        bindInput('num-height', 'range-height', 'height');
+        bindInput('num-beam', 'range-beam', 'beamAngle');
+        bindInput('num-tilt', 'range-tilt', 'tilt');
+
+        resizeCanvas(); 
+        updateCalculations();
+        
+        window.toggleMode = toggleMode;
+
+    </script>
+</body>
+</html>
