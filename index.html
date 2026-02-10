@@ -86,8 +86,9 @@
             
             <!-- Desktop Menu -->
             <div class="hidden md:flex gap-8 items-center">
-                <a href="#conceito" class="nav-link text-warm-gold" data-i18n="nav_concepts">CONCEITOS</a>
+                <!-- Ordem Alterada: Calculadora Primeiro -->
                 <a href="#calculadora" class="nav-link"><span data-i18n="nav_calculator">CALCULADORA</span> <i class="fas fa-unlock text-[10px] ml-1 text-warm-gold" id="nav-lock-icon"></i></a>
+                <a href="#conceito" class="nav-link text-warm-gold" data-i18n="nav_concepts">CONCEITOS</a>
                 
                 <!-- Language Toggle -->
                 <button onclick="toggleLanguage()" class="text-xs text-gray-400 hover:text-warm-gold transition-colors font-bold tracking-widest border-l border-gray-700 pl-4 ml-2">
@@ -107,8 +108,8 @@
 
         <!-- Mobile Menu Dropdown -->
         <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-[#0e0e0e]/95 backdrop-blur-md border-b border-gray-800 flex-col items-center py-6 space-y-6 shadow-2xl">
-            <a href="#conceito" class="text-sm tracking-widest text-warm-gold hover:text-white transition-colors" onclick="toggleMobileMenu()" data-i18n="nav_concepts">CONCEITOS</a>
             <a href="#calculadora" class="text-sm tracking-widest text-gray-300 hover:text-warm-gold transition-colors" onclick="toggleMobileMenu()"><span data-i18n="nav_calculator">CALCULADORA</span></a>
+            <a href="#conceito" class="text-sm tracking-widest text-warm-gold hover:text-white transition-colors" onclick="toggleMobileMenu()" data-i18n="nav_concepts">CONCEITOS</a>
             
             <button onclick="toggleLanguage(); toggleMobileMenu()" class="text-xs text-gray-400 hover:text-warm-gold transition-colors font-bold tracking-widest border-t border-gray-800 pt-4 w-1/2">
                 <span class="lang-display">PT / EN</span>
@@ -120,59 +121,11 @@
         </div>
     </nav>
 
-    <section id="conceito" class="pt-32 pb-20 px-6 border-b border-gray-900 bg-[#0e0e0e]">
-        <div class="max-w-7xl mx-auto fade-in-up">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl text-warm-gold font-bold tracking-widest mb-4" data-i18n="concepts_title">CONCEITOS</h2>
-                <p class="text-gray-500 font-light max-w-2xl mx-auto leading-relaxed" data-i18n="concepts_desc">
-                    Baseada na trigonometria e fotometria clássica, apresentamos as equações fundamentais que garantem a fidelidade física desta simulação.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-calculator text-3xl"></i></div>
-                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card1_title">INTENSIDADE ABSOLUTA</h3>
-                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card1_desc">Converte dados fotométricos relativos (comuns em catálogos) para intensidade absoluta (Candelas), normalizando pelo fluxo total.</p>
-                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">I = (Φ · γ) / 1000</span></div>
-                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">I</span> <span data-i18n="card1_i">Intensidade (cd)</span></li>
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">Φ</span> <span data-i18n="card1_flux">Fluxo Luminoso (lm)</span></li>
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">γ</span> <span data-i18n="card1_gamma">Valor Tabela (cd/klm)</span></li>
-                    </ul>
-                </div>
-
-                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-lightbulb text-3xl"></i></div>
-                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card2_title">LEI DO COSSENO CÚBICO</h3>
-                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card2_desc">Variação da Lei do Inverso do Quadrado. Determina a iluminância horizontal (E) considerando a inclinação e a altura da fonte.</p>
-                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">E = (I · cos³θ) / h²</span></div>
-                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">E</span> <span data-i18n="card2_e">Iluminância (Lux)</span></li>
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">I</span> <span data-i18n="card2_i">Intensidade (cd)</span></li>
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">θ</span> <span data-i18n="card2_theta">Ângulo Tilt (°)</span></li>
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">h</span> <span data-i18n="card2_h">Altura (m)</span></li>
-                    </ul>
-                </div>
-
-                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-ruler-combined text-3xl"></i></div>
-                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card3_title">GEOMETRIA DO FACHO</h3>
-                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card3_desc">Cálculo trigonométrico do diâmetro da projeção (spot), considerando a distância real percorrida pela luz até o plano.</p>
-                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">Ø = 2 · d · tan(α/2)</span></div>
-                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">Ø</span> <span data-i18n="card3_dia">Diâmetro (m)</span></li>
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">d</span> <span data-i18n="card3_d">Distância (h/cosθ)</span></li>
-                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">α</span> <span data-i18n="card3_alpha">Abertura (°)</span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="calculadora" class="py-20 px-4 md:px-8 bg-[#0a0a0a] relative min-h-[600px]">
+    <!-- SEÇÃO 1: CALCULADORA (MOVIDA PARA CIMA) -->
+    <!-- Ajuste de padding: pt-32 para compensar o header fixo -->
+    <section id="calculadora" class="pt-32 pb-20 px-4 md:px-8 bg-[#0a0a0a] relative min-h-[600px]">
         
-        <div class="text-center mb-12 relative z-10">
+        <div class="text-center mb-12 relative z-10 fade-in-up">
             <h1 class="text-base sm:text-2xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight whitespace-nowrap">
                 <span data-i18n="hero_title_pre">A CALCULADORA DO</span> <span class="text-warm-gold">LIGHTING DESIGNER</span>
             </h1>
@@ -384,6 +337,58 @@
 
             </div>
 
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: CONCEITOS (MOVIDA PARA BAIXO) -->
+    <!-- Ajuste de padding: py-20 (padrão) -->
+    <section id="conceito" class="py-20 px-6 border-b border-gray-900 border-t border-gray-900 bg-[#0e0e0e]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl text-warm-gold font-bold tracking-widest mb-4" data-i18n="concepts_title">CONCEITOS</h2>
+                <p class="text-gray-500 font-light max-w-2xl mx-auto leading-relaxed" data-i18n="concepts_desc">
+                    Baseada na trigonometria e fotometria clássica, apresentamos as equações fundamentais que garantem a fidelidade física desta simulação.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-calculator text-3xl"></i></div>
+                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card1_title">INTENSIDADE ABSOLUTA</h3>
+                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card1_desc">Converte dados fotométricos relativos (comuns em catálogos) para intensidade absoluta (Candelas), normalizando pelo fluxo total.</p>
+                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">I = (Φ · γ) / 1000</span></div>
+                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">I</span> <span data-i18n="card1_i">Intensidade (cd)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">Φ</span> <span data-i18n="card1_flux">Fluxo Luminoso (lm)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">γ</span> <span data-i18n="card1_gamma">Valor Tabela (cd/klm)</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-lightbulb text-3xl"></i></div>
+                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card2_title">LEI DO COSSENO CÚBICO</h3>
+                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card2_desc">Variação da Lei do Inverso do Quadrado. Determina a iluminância horizontal (E) considerando a inclinação e a altura da fonte.</p>
+                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">E = (I · cos³θ) / h²</span></div>
+                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">E</span> <span data-i18n="card2_e">Iluminância (Lux)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">I</span> <span data-i18n="card2_i">Intensidade (cd)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">θ</span> <span data-i18n="card2_theta">Ângulo Tilt (°)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">h</span> <span data-i18n="card2_h">Altura (m)</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-[#1a1a1a] p-8 border border-gray-800 relative group hover:border-warm-gold transition-colors duration-500">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-ruler-combined text-3xl"></i></div>
+                    <h3 class="text-white text-md font-bold mb-6 tracking-wider border-b border-warm-gold/30 pb-2 inline-block" data-i18n="card3_title">GEOMETRIA DO FACHO</h3>
+                    <p class="text-gray-400 text-xs mb-6 font-light leading-relaxed min-h-[60px]" data-i18n="card3_desc">Cálculo trigonométrico do diâmetro da projeção (spot), considerando a distância real percorrida pela luz até o plano.</p>
+                    <div class="bg-black p-4 rounded border border-gray-800 text-center mb-6 shadow-inner"><span class="text-xl font-serif text-warm-gold italic font-medium">Ø = 2 · d · tan(α/2)</span></div>
+                    <ul class="text-xs text-gray-500 space-y-3 font-mono">
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">Ø</span> <span data-i18n="card3_dia">Diâmetro (m)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">d</span> <span data-i18n="card3_d">Distância (h/cosθ)</span></li>
+                        <li class="flex justify-between border-b border-gray-800 pb-1"><span class="text-white">α</span> <span data-i18n="card3_alpha">Abertura (°)</span></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </section>
 
