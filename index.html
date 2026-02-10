@@ -83,21 +83,40 @@
             <a href="#" class="text-xl font-bold tracking-[0.2em] text-warm-gold">
                 SINTAXE<span class="text-white font-light opacity-60">DALUZ</span>
             </a>
+            
+            <!-- Desktop Menu -->
             <div class="hidden md:flex gap-8 items-center">
                 <a href="#conceito" class="nav-link text-warm-gold" data-i18n="nav_concepts">CONCEITOS</a>
                 <a href="#calculadora" class="nav-link"><span data-i18n="nav_calculator">CALCULADORA</span> <i class="fas fa-unlock text-[10px] ml-1 text-warm-gold" id="nav-lock-icon"></i></a>
                 
+                <!-- Language Toggle -->
                 <button onclick="toggleLanguage()" class="text-xs text-gray-400 hover:text-warm-gold transition-colors font-bold tracking-widest border-l border-gray-700 pl-4 ml-2">
-                    <span id="lang-display">PT / EN</span>
+                    <span class="lang-display">PT / EN</span>
                 </button>
 
                 <button id="btn-logout" onclick="handleLogout()" class="text-xs text-gray-500 hover:text-warm-gold transition-colors tracking-widest ml-4 pl-4 border-l border-gray-700 hidden" data-i18n="nav_logout">
                     LOGOUT
                 </button>
             </div>
-            <div class="md:hidden text-warm-gold text-2xl cursor-pointer">
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden text-warm-gold text-2xl cursor-pointer" onclick="toggleMobileMenu()">
                 <i class="fas fa-bars"></i>
             </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-[#0e0e0e]/95 backdrop-blur-md border-b border-gray-800 flex-col items-center py-6 space-y-6 shadow-2xl">
+            <a href="#conceito" class="text-sm tracking-widest text-warm-gold hover:text-white transition-colors" onclick="toggleMobileMenu()" data-i18n="nav_concepts">CONCEITOS</a>
+            <a href="#calculadora" class="text-sm tracking-widest text-gray-300 hover:text-warm-gold transition-colors" onclick="toggleMobileMenu()"><span data-i18n="nav_calculator">CALCULADORA</span></a>
+            
+            <button onclick="toggleLanguage(); toggleMobileMenu()" class="text-xs text-gray-400 hover:text-warm-gold transition-colors font-bold tracking-widest border-t border-gray-800 pt-4 w-1/2">
+                <span class="lang-display">PT / EN</span>
+            </button>
+
+            <button id="btn-logout-mobile" onclick="handleLogout(); toggleMobileMenu()" class="text-xs text-gray-500 hover:text-warm-gold transition-colors tracking-widest hidden" data-i18n="nav_logout">
+                LOGOUT
+            </button>
         </div>
     </nav>
 
@@ -170,11 +189,11 @@
                 <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-warm-gold text-paper-black font-bold text-[10px] flex items-center justify-center tracking-widest uppercase">
                     Premium Tool
                 </div>
-
+                
+                <!-- Pricing Card -->
                 <div class="bg-black/50 p-6 rounded mb-6 border border-gray-800 text-center">
                     <p class="text-white font-bold text-lg mb-2">Plano Anual</p>
                     <p class="text-warm-gold text-3xl font-bold">R$ 30,00</p> 
-                    
                     <ul class="text-left text-gray-400 text-xs mt-4 space-y-2">
                         <li>• Acesso ilimitado ao método ponto a ponto</li>
                         <li>• Conversão automática de CD/KLM</li>
@@ -182,12 +201,14 @@
                     </ul>
                 </div>
 
+                <!-- Stripe Link -->
                 <a href="https://buy.stripe.com/cNi7sNcdLambcUzgDL1oI01" 
                    target="_blank"
                    class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 mb-6 rounded transition-colors text-center uppercase tracking-widest text-xs">
                    QUERO ACESSO PRO
                 </a>
 
+                <!-- Instructions -->
                 <div class="mb-6 text-left text-[10px] text-gray-400 space-y-2 border border-gray-800 p-4 rounded bg-black/40">
                     <p class="font-bold text-warm-gold mb-1 tracking-widest">COMO ACESSAR:</p>
                     <ol class="list-decimal pl-4 space-y-1">
@@ -199,10 +220,10 @@
 
                 <div class="relative flex py-2 items-center mb-4">
                     <div class="flex-grow border-t border-gray-700"></div>
-                    <span class="flex-shrink-0 mx-4 text-gray-500 text-[9px] uppercase tracking-widest">Área de Login</span>
+                    <span class="flex-shrink-0 mx-4 text-gray-500 text-[9px] uppercase tracking-widest" data-i18n="lock_title">Área de Login</span>
                     <div class="flex-grow border-t border-gray-700"></div>
                 </div>
-                
+
                 <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                     <div>
                         <input id="email" type="email" required class="login-input text-xs" placeholder="E-mail">
@@ -375,9 +396,8 @@
                 <p class="text-gray-600 text-xs mt-2">© 2026 Sintaxe da Luz. All rights reserved.</p>
             </div>
             <div class="flex gap-6 text-gray-500">
-                <a href="#" class="hover:text-warm-gold transition-colors"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="hover:text-warm-gold transition-colors"><i class="fab fa-linkedin"></i></a>
-                <a href="#" class="hover:text-warm-gold transition-colors"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.instagram.com/sintaxedaluz/" target="_blank" class="hover:text-warm-gold transition-colors"><i class="fab fa-instagram"></i></a>
+                <a href="mailto:sintaxedalux@gmail.com" class="hover:text-warm-gold transition-colors"><i class="fas fa-envelope"></i></a>
             </div>
         </div>
     </footer>
@@ -411,7 +431,7 @@
                 card3_alpha: "Abertura (°)",
                 hero_title_pre: "A CALCULADORA DO",
                 hero_subtitle: "MÉTODO PONTO A PONTO",
-                lock_title: "Ferramenta Restrita",
+                lock_title: "Área de Login",
                 lock_desc: "Faça login para acessar o simulador ponto a ponto.",
                 ph_password: "Senha",
                 btn_login: "ENTRAR / DESBLOQUEAR",
@@ -464,7 +484,7 @@
                 card3_alpha: "Beam Angle (°)",
                 hero_title_pre: "THE LIGHTING DESIGNER'S",
                 hero_subtitle: "POINT BY POINT METHOD",
-                lock_title: "Restricted Tool",
+                lock_title: "Login Area",
                 lock_desc: "Log in to access the point-by-point simulator.",
                 ph_password: "Password",
                 btn_login: "ENTER / UNLOCK",
@@ -497,7 +517,7 @@
 
         function toggleLanguage() {
             currentLang = currentLang === 'pt' ? 'en' : 'pt';
-            document.getElementById('lang-display').innerText = currentLang === 'pt' ? 'PT / EN' : 'EN / PT';
+            document.querySelectorAll('.lang-display').forEach(el => el.innerText = currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
             
             // Update simple text elements
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -522,6 +542,12 @@
                 // Reset to loading or default state if no profile loaded yet
                 document.getElementById('license-date-text').innerText = translations[currentLang].loading;
             }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
         }
 
         // --- CREDENCIAIS DO SUPABASE ---
@@ -666,6 +692,7 @@
             const lockScreen = document.getElementById('access-lock');
             const interface = document.getElementById('calculator-interface');
             const logoutBtn = document.getElementById('btn-logout');
+            const logoutBtnMobile = document.getElementById('btn-logout-mobile');
             const lockIcon = document.getElementById('nav-lock-icon');
             const licenseStatus = document.getElementById('license-status');
 
@@ -680,6 +707,7 @@
                 lockScreen.classList.add('hidden');
                 interface.classList.remove('blur-lock');
                 logoutBtn.classList.remove('hidden');
+                logoutBtnMobile.classList.remove('hidden');
                 licenseStatus.classList.remove('hidden');
                 licenseStatus.classList.add('inline-flex');
                 lockIcon.className = "fas fa-unlock text-[10px] ml-1 text-warm-gold";
@@ -691,6 +719,7 @@
             const lockScreen = document.getElementById('access-lock');
             const interface = document.getElementById('calculator-interface');
             const logoutBtn = document.getElementById('btn-logout');
+            const logoutBtnMobile = document.getElementById('btn-logout-mobile');
             const lockIcon = document.getElementById('nav-lock-icon');
             const licenseStatus = document.getElementById('license-status');
 
@@ -698,6 +727,7 @@
             setTimeout(() => { lockScreen.style.opacity = "1"; }, 10);
             interface.classList.add('blur-lock');
             logoutBtn.classList.add('hidden');
+            logoutBtnMobile.classList.add('hidden');
             licenseStatus.classList.add('hidden');
             licenseStatus.classList.remove('inline-flex');
             lockIcon.className = "fas fa-lock text-[10px] ml-1 text-gray-500";
