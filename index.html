@@ -173,7 +173,6 @@
 
                 <div class="bg-black/50 p-6 rounded mb-6 border border-gray-800 text-center">
                     <p class="text-white font-bold text-lg mb-2">Plano Anual</p>
-                    
                     <p class="text-warm-gold text-3xl font-bold">R$ 30,00</p> 
                     
                     <ul class="text-left text-gray-400 text-xs mt-4 space-y-2">
@@ -189,9 +188,18 @@
                    QUERO ACESSO PRO
                 </a>
 
+                <div class="mb-6 text-left text-[10px] text-gray-400 space-y-2 border border-gray-800 p-4 rounded bg-black/40">
+                    <p class="font-bold text-warm-gold mb-1 tracking-widest">COMO ACESSAR:</p>
+                    <ol class="list-decimal pl-4 space-y-1">
+                        <li>Clique em <b class="text-white">CRIAR CONTA NOVA</b> abaixo e cadastre-se.</li>
+                        <li>Faça <b class="text-white">LOGIN</b> com seu e-mail e senha.</li>
+                        <li>Clique no botão verde acima para <b class="text-white">PAGAR</b>.</li>
+                    </ol>
+                </div>
+
                 <div class="relative flex py-2 items-center mb-4">
                     <div class="flex-grow border-t border-gray-700"></div>
-                    <span class="flex-shrink-0 mx-4 text-gray-500 text-[9px] uppercase tracking-widest">Já tenho conta</span>
+                    <span class="flex-shrink-0 mx-4 text-gray-500 text-[9px] uppercase tracking-widest">Área de Login</span>
                     <div class="flex-grow border-t border-gray-700"></div>
                 </div>
                 
@@ -210,7 +218,7 @@
                     </button>
                 </form>
                 <div class="mt-4 text-center">
-                    <a href="#" onclick="alert('Funcionalidade em desenvolvimento. Contate o suporte.')" class="text-[9px] text-gray-600 hover:text-warm-gold uppercase tracking-wide" data-i18n="btn_forgot">Esqueci minha senha</a>
+                    <a href="#" onclick="handleForgotPassword()" class="text-[9px] text-gray-600 hover:text-warm-gold uppercase tracking-wide" data-i18n="btn_forgot">Esqueci minha senha</a>
                 </div>
             </div>
         </div>
@@ -624,6 +632,24 @@
                 alert((currentLang === 'pt' ? "Erro ao cadastrar: " : "Registration error: ") + error.message);
             } else {
                 alert(currentLang === 'pt' ? "Cadastro realizado! Verifique seu e-mail para confirmar." : "Registration successful! Check your email to confirm.");
+            }
+        }
+
+        async function handleForgotPassword() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert(currentLang === 'pt' ? "Por favor, digite seu e-mail no campo acima para recuperar a senha." : "Please enter your email above to reset password.");
+                return;
+            }
+
+            const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.href, // Redireciona para a mesma página
+            });
+
+            if (error) {
+                alert((currentLang === 'pt' ? "Erro: " : "Error: ") + error.message);
+            } else {
+                alert(currentLang === 'pt' ? "Verifique seu e-mail! Enviamos um link para redefinir sua senha." : "Check your email! We sent a password reset link.");
             }
         }
 
