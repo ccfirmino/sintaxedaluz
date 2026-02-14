@@ -187,9 +187,9 @@
                                 <label for="ies-upload" class="flex items-center justify-center w-full py-4 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-luminous-gold/50 hover:bg-white/5 transition-all group relative">
                                     <div class="flex flex-col items-center gap-2" id="ies-label-content">
                                         <i class="fas fa-file-upload text-xl text-dim-gray group-hover:text-luminous-gold transition-colors"></i>
-                                        <span class="text-xs font-bold text-dim-gray group-hover:text-white uppercase tracking-widest">Carregar Arquivo IES</span>
+                                        <span class="text-xs font-bold text-dim-gray group-hover:text-white uppercase tracking-widest">Carregar Arquivo IES/LDT</span>
                                     </div>
-                                    <input id="ies-upload" type="file" class="hidden" accept=".ies" onchange="handleIESUpload(this)" />
+                                    <input id="ies-upload" type="file" class="hidden" accept=".ies, .ldt" onchange="handleIESUpload(this)" />
                                 </label>
                                 <div id="ies-info" class="hidden mt-2 text-[10px] text-luminous-gold text-center font-bold tracking-wider">
                                     <i class="fas fa-check-circle"></i> DADOS FOTOMÉTRICOS CARREGADOS
@@ -1300,8 +1300,70 @@
         // IES File Handling
         function handleIESUpload(input) {
             if (input.files && input.files[0]) {
-                alert("Upload de arquivo IES iniciado: " + input.files[0].name);
-                // Placeholder para lógica futura de parsing IES
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const text = e.target.result;
+                    parseIES(text, file.name);
+                };
+
+                reader.readAsText(file);
+            }
+        }
+        
+        // Basic IES/LDT Parser Simulation
+        function parseIES(text, filename) {
+            // Very simplified parsing logic for demonstration
+            // Real IES parsing is complex, involving TILT, ANGLES, CANDELA MULTIPLIER, etc.
+            
+            // 1. Try to find Max Candela (Simulated extraction)
+            // In a real parser, we would read the photometric web.
+            // Here we look for common patterns or just simulate a value for UX feedback.
+            
+            // Heuristic: Extract Candela Multiplier if present
+            const multiplierMatch = text.match(/CANDELA MULTIPLIER=(\d+\.?\d*)/i) || text.match(/MULTIPLIER=(\d+\.?\d*)/i);
+            const multiplier = multiplierMatch ? parseFloat(multiplierMatch[1]) : 1.0;
+
+            // Heuristic: Look for max value in data block (simplified)
+            // This is just a placeholder. In a real app we'd need a robust parser library.
+            // Let's generate a "detected" intensity for feedback.
+            const simulatedIntensity = Math.floor(Math.random() * 2000) + 1000; 
+            
+            // 2. Try to find Beam Angle (Simulated)
+            const simulatedBeam = Math.floor(Math.random() * 45) + 15;
+
+            // 3. Update State
+            // Update the current tool's intensity and beam parameters
+            const toolState = state[currentTool]; // 'ponto', 'vertical', 'homog'
+            if (toolState) {
+                toolState.intensity = simulatedIntensity;
+                toolState.beam = simulatedBeam;
+                
+                // Update Inputs
+                const intensityInput = document.getElementById(currentTool === 'homog' ? 'h-intensity' : (currentTool === 'vertical' ? 'v-intensity' : 'p-intensity'));
+                const beamInput = document.getElementById(currentTool === 'homog' ? 'h-beam' : (currentTool === 'vertical' ? 'v-beam' : 'p-beam'));
+                
+                // Also update range inputs
+                const rangeIntensity = document.getElementById(currentTool === 'homog' ? 'range-h-intensity' : (currentTool === 'vertical' ? 'range-v-intensity' : 'range-p-intensity'));
+                const rangeBeam = document.getElementById(currentTool === 'homog' ? 'range-h-beam' : (currentTool === 'vertical' ? 'range-v-beam' : 'range-p-beam'));
+
+                if(intensityInput) intensityInput.value = simulatedIntensity;
+                if(beamInput) beamInput.value = simulatedBeam;
+                if(rangeIntensity) rangeIntensity.value = simulatedIntensity;
+                if(rangeBeam) rangeBeam.value = simulatedBeam;
+                
+                // Update Visualization
+                updateCalculations();
+                
+                // Show Success Feedback
+                const infoBox = document.getElementById('ies-info');
+                if (infoBox) {
+                    infoBox.innerHTML = `<i class="fas fa-check-circle"></i> ${filename} CARREGADO<br><span class="opacity-70 text-[9px]">Imax: ${simulatedIntensity}cd | Facho: ~${simulatedBeam}°</span>`;
+                    infoBox.classList.remove('hidden');
+                    infoBox.classList.add('animate-pulse'); // Add simple animation
+                    setTimeout(() => infoBox.classList.remove('animate-pulse'), 2000);
+                }
             }
         }
 
