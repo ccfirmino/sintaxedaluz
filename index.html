@@ -184,13 +184,16 @@
                         <div class="glass-panel p-6 rounded-2xl relative h-full">
                             <!-- New IES Upload Button -->
                             <div class="mb-6">
-                                <label for="ies-upload" class="flex items-center justify-center w-full py-4 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-luminous-gold/50 hover:bg-white/5 transition-all group">
-                                    <div class="flex flex-col items-center gap-2">
+                                <label for="ies-upload" class="flex items-center justify-center w-full py-4 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-luminous-gold/50 hover:bg-white/5 transition-all group relative">
+                                    <div class="flex flex-col items-center gap-2" id="ies-label-content">
                                         <i class="fas fa-file-upload text-xl text-dim-gray group-hover:text-luminous-gold transition-colors"></i>
                                         <span class="text-xs font-bold text-dim-gray group-hover:text-white uppercase tracking-widest">Carregar Arquivo IES</span>
                                     </div>
                                     <input id="ies-upload" type="file" class="hidden" accept=".ies" onchange="handleIESUpload(this)" />
                                 </label>
+                                <div id="ies-info" class="hidden mt-2 text-[10px] text-luminous-gold text-center font-bold tracking-wider">
+                                    <i class="fas fa-check-circle"></i> DADOS FOTOMÉTRICOS CARREGADOS
+                                </div>
                             </div>
 
                             <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md" data-i18n="calc_params">Parâmetros da Fonte</h3>
