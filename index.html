@@ -772,10 +772,10 @@
     <section id="fundamentos" class="py-24 px-6 border-t border-white/5 bg-midnight">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-3xl text-luminous-gold font-bold tracking-widest mb-6 uppercase">SOBRE O PROJETO</h2>
+                <h2 class="text-3xl text-luminous-gold font-bold tracking-widest mb-6 uppercase">SOBRE</h2>
                 <p class="text-sm text-dim-line font-light max-w-4xl mx-auto leading-relaxed text-justify">
                     O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer e do Arquiteto. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>
-                    Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos a simulação de arquivos fotométricos reais (.IES) com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos, não em horas.<br><br>
+                    Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos, não em horas.<br><br>
                     <strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.
                 </p>
             </div>
@@ -835,8 +835,38 @@
                 <a href="#" class="text-lg font-bold tracking-[0.2em] text-luminous-gold uppercase">LuxSintax</a>
                 <p class="mt-2">© 2026 LuxSintax. All rights reserved.</p>
             </div>
+            <div>
+                <button onclick="openTerms()" class="hover:text-luminous-gold transition-colors border-b border-transparent hover:border-luminous-gold">Termo de Responsabilidade</button>
+            </div>
         </div>
     </footer>
+
+    <!-- MODAL DE TERMOS -->
+    <div id="terms-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="closeTerms()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-twilight border border-white/10 rounded-2xl shadow-2xl p-8 animate-fade-in-up">
+            <h3 class="text-luminous-gold font-bold tracking-widest text-lg mb-6 uppercase text-center">Termo de Responsabilidade</h3>
+            <div class="text-xs text-dim-gray leading-relaxed text-justify space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
+                <p>O <strong>LuxSintax</strong> é uma ferramenta desenvolvida para auxiliar arquitetos, designers de iluminação e estudantes em etapas de <strong>estudo preliminar e pré-dimensionamento</strong>.</p>
+                <p>Os cálculos apresentados utilizam métodos matemáticos simplificados (Ponto a Ponto e Lei do Cosseno) que consideram apenas a luz direta em um ambiente teórico ideal, <strong>desconsiderando</strong>:</p>
+                <ul class="list-disc pl-4 space-y-1 text-dim-line">
+                    <li>Reflexões de superfícies (teto, paredes, piso);</li>
+                    <li>Obstruções físicas e mobiliário;</li>
+                    <li>Fatores de manutenção e depreciação luminosa complexos;</li>
+                    <li>Contribuição de luz natural.</li>
+                </ul>
+                <p class="text-white font-bold border-l-2 border-luminous-gold pl-3 py-1 bg-white/5">
+                    Os resultados obtidos NÃO substituem simulações computacionais completas (como Dialux ou Relux) e NÃO devem ser utilizados como única fonte para projetos executivos ou laudos técnicos.
+                </p>
+                <p>O uso desta ferramenta e a aplicação dos dados gerados são de inteira responsabilidade do usuário. A equipe LuxSintax não se responsabiliza por discrepâncias entre a simulação teórica e a instalação real.</p>
+            </div>
+            <div class="mt-8 flex justify-center">
+                <button onclick="closeTerms()" class="px-8 py-3 bg-luminous-gold text-midnight font-bold rounded-full hover:bg-white transition-colors text-xs tracking-widest uppercase">
+                    Compreendo e Aceito
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const translations = {
