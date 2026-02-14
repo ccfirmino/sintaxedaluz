@@ -182,70 +182,79 @@
                     <!-- COLUNA ESQUERDA (INPUTS) -->
                     <div class="lg:col-span-4 flex flex-col gap-6">
                         <div class="glass-panel p-6 rounded-2xl relative h-full">
-                            <div class="mb-4">
-                                <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md" data-i18n="calc_params">Parâmetros da Fonte</h3>
-                                <div class="flex flex-col sm:flex-row gap-4 p-1 mb-6 border-b border-white/10 pb-4 justify-center">
-                                    <label class="flex items-center gap-2 cursor-pointer group">
-                                        <input type="radio" name="calc_mode" value="direct" checked onchange="updateCalcMode('direct')">
-                                        <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">INTENSIDADE (CD)</span>
-                                    </label>
-                                    <label class="flex items-center gap-2 cursor-pointer group">
-                                        <input type="radio" name="calc_mode" value="photometric" onchange="updateCalcMode('photometric')">
-                                        <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">FOTOMETRIA (CD/KLM)</span>
-                                    </label>
-                                </div>
+                            <!-- New IES Upload Button -->
+                            <div class="mb-6">
+                                <label for="ies-upload" class="flex items-center justify-center w-full py-4 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-luminous-gold/50 hover:bg-white/5 transition-all group">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <i class="fas fa-file-upload text-xl text-dim-gray group-hover:text-luminous-gold transition-colors"></i>
+                                        <span class="text-xs font-bold text-dim-gray group-hover:text-white uppercase tracking-widest">Carregar Arquivo IES</span>
+                                    </div>
+                                    <input id="ies-upload" type="file" class="hidden" accept=".ies" onchange="handleIESUpload(this)" />
+                                </label>
+                            </div>
+
+                            <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md" data-i18n="calc_params">Parâmetros da Fonte</h3>
+                            <div class="flex flex-col sm:flex-row gap-4 p-1 mb-6 border-b border-white/10 pb-4 justify-center">
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="radio" name="calc_mode" value="direct" checked onchange="updateCalcMode('direct')">
+                                    <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">INTENSIDADE (CD)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="radio" name="calc_mode" value="photometric" onchange="updateCalcMode('photometric')">
+                                    <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">FOTOMETRIA (CD/KLM)</span>
+                                </label>
                             </div>
 
                             <!-- MODO PONTO A PONTO -->
                             <div id="inputs-ponto" class="hidden">
                                  <div class="mode-direct-group mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">INTENSIDADE (I)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-muted-blue">CD</span></div>
                                     </div>
                                     <input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000">
                                 </div>
                                 <div class="mode-photo-group hidden space-y-6 mb-6">
                                     <div class="group">
                                         <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">VALOR FOTOMÉTRICO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div>
+                                            <label class="text-[10px] text-muted-blue font-bold">VALOR FOTOMÉTRICO</label>
+                                            <div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-muted-blue">CD/KLM</span></div>
                                         </div>
                                         <input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000">
                                     </div>
                                     <div class="group">
                                         <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">FLUXO LUMINOSO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div>
+                                            <label class="text-[10px] text-muted-blue font-bold">FLUXO LUMINOSO</label>
+                                            <div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-muted-blue">LM</span></div>
                                         </div>
                                         <input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500">
                                     </div>
                                 </div>
                                 <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">ALTURA DA FONTE (H)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue">M</span></div>
                                     </div>
                                     <input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0">
                                 </div>
                                 <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">ABERTURA DO FACHO</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue">°</span></div>
                                     </div>
                                     <input type="range" id="range-p-beam" min="5" max="120" step="1" value="30">
                                 </div>
                                 <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ORIENTAÇÃO (TILT)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">ORIENTAÇÃO (TILT)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue">°</span></div>
                                     </div>
                                     <input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0">
                                 </div>
                                 <div class="group border-t border-white/5 pt-4">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">PLANO DE TRABALHO (HP)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">PLANO DE TRABALHO (HP)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue">M</span></div>
                                     </div>
                                     <input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75">
                                 </div>
@@ -255,59 +264,59 @@
                             <div id="inputs-vertical" class="hidden">
                                  <div class="mode-direct-group mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">INTENSIDADE (I)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-muted-blue">CD</span></div>
                                     </div>
                                     <input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000">
                                 </div>
                                 <div class="mode-photo-group hidden space-y-6 mb-6">
                                     <div class="group">
                                         <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">VALOR FOTOMÉTRICO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div>
+                                            <label class="text-[10px] text-muted-blue font-bold">VALOR FOTOMÉTRICO</label>
+                                            <div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-muted-blue">CD/KLM</span></div>
                                         </div>
                                         <input type="range" id="range-v-cdklm" min="0" max="10000" step="10" value="2000">
                                     </div>
                                     <div class="group">
                                         <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">FLUXO LUMINOSO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div>
+                                            <label class="text-[10px] text-muted-blue font-bold">FLUXO LUMINOSO</label>
+                                            <div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-muted-blue">LM</span></div>
                                         </div>
                                         <input type="range" id="range-v-flux" min="0" max="10000" step="10" value="1500">
                                     </div>
                                 </div>
                                 <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">ALTURA DA FONTE (H)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue">M</span></div>
                                     </div>
                                     <input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0">
                                 </div>
                                 <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">DISTÂNCIA DA PAREDE (D)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">DISTÂNCIA DA PAREDE (D)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue">M</span></div>
                                     </div>
                                     <input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0">
                                 </div>
                                 <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">ABERTURA DO FACHO</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue">°</span></div>
                                     </div>
                                     <input type="range" id="range-v-beam" min="5" max="120" step="1" value="30">
                                 </div>
                                 <div class="mb-2 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ORIENTAÇÃO (TILT)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">ORIENTAÇÃO (TILT)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-muted-blue">°</span></div>
                                     </div>
                                     <input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30">
                                 </div>
                                 <div class="group border-t border-white/5 pt-4">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">EIXO DO QUADRO (hq)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">EIXO DO QUADRO (hq)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-muted-blue">M</span></div>
                                     </div>
                                     <input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6">
                                 </div>
@@ -318,23 +327,23 @@
                                 <!-- Luminous parameters for Homog -->
                                 <div class="mode-direct-group mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">INTENSIDADE (I)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-muted-blue">CD</span></div>
                                     </div>
                                     <input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000">
                                 </div>
                                 <div class="mode-photo-group hidden space-y-6 mb-6">
                                     <div class="group">
                                         <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">VALOR FOTOMÉTRICO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="h-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div>
+                                            <label class="text-[10px] text-muted-blue font-bold">VALOR FOTOMÉTRICO</label>
+                                            <div class="flex items-baseline gap-1"><input type="number" id="h-cdklm" value="2000"><span class="text-[9px] text-muted-blue">CD/KLM</span></div>
                                         </div>
                                         <input type="range" id="range-h-cdklm" min="0" max="10000" step="10" value="2000">
                                     </div>
                                     <div class="group">
                                         <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">FLUXO LUMINOSO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="h-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div>
+                                            <label class="text-[10px] text-muted-blue font-bold">FLUXO LUMINOSO</label>
+                                            <div class="flex items-baseline gap-1"><input type="number" id="h-flux" value="1500"><span class="text-[9px] text-muted-blue">LM</span></div>
                                         </div>
                                         <input type="range" id="range-h-flux" min="0" max="10000" step="10" value="1500">
                                     </div>
@@ -342,29 +351,29 @@
 
                                 <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">ALTURA DA FONTE (H)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue">M</span></div>
                                     </div>
                                     <input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0">
                                 </div>
                                 <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">DISTÂNCIA ENTRE FONTES (D)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue">M</span></div>
                                     </div>
                                     <input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0">
                                 </div>
                                  <div class="mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">ABERTURA DO FACHO</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue">°</span></div>
                                     </div>
                                     <input type="range" id="range-h-beam" min="5" max="120" step="1" value="30">
                                 </div>
                                 <div class="group border-t border-white/5 pt-4">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">PLANO DE TRABALHO (HP)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
+                                        <label class="text-[10px] text-muted-blue font-bold">PLANO DE TRABALHO (HP)</label>
+                                        <div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue">M</span></div>
                                     </div>
                                     <input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75">
                                 </div>
@@ -372,52 +381,46 @@
                         </div>
                     </div>
 
-                    <!-- COLUNA DIREITA (RESULTADOS + CANVAS) -->
+                    <!-- VISUALIZAÇÃO (Lado Direito) -->
                     <div class="lg:col-span-8 flex flex-col gap-6">
-                        <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full">
-                            <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 drop-shadow-md uppercase tracking-widest font-bold">Resultados</h3>
-                            
-                            <div class="relative w-full h-[500px] bg-twilight/50 border border-white/10 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner">
-                                <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 40px 40px;"></div>
+                        <div class="glass-panel p-6 rounded-2xl flex-grow">
+                            <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 uppercase tracking-widest font-bold">Simulação de Facho</h3>
+                            <div class="relative w-full h-[500px] bg-twilight/50 border border-white/10 rounded-2xl overflow-hidden canvas-container">
                                 <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
                             </div>
-                            
-                            <!-- RESULTADOS REMOVIDOS -->
                         </div>
                     </div>
                 </div>
 
-                <!-- CONSULTA (CENTRO DE CONSULTAS UNIFICADO) -->
-                <div id="query-tool" class="hidden w-full animate-fade-in-up col-span-12">
+                <!-- CONSULTA (CENTRO DE NORMAS) -->
+                <div id="query-tool" class="hidden w-full animate-fade-in-up">
                     <div class="glass-panel p-6 rounded-2xl">
-                        
                         <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-white/10 pb-4 gap-4">
                             <div>
-                                <!-- Alterado: cor roxa para luminous-gold -->
                                 <h3 class="text-lg text-luminous-gold font-bold tracking-widest flex items-center gap-2 uppercase">
-                                    <i class="fas fa-search"></i> Centro de Consultas
+                                    <i class="fas fa-book-open"></i> Inteligência Normativa
                                 </h3>
-                                <p class="text-xs text-muted-blue mt-1">Acesso rápido a normas e referências técnicas.</p>
+                                <p class="text-xs text-muted-blue mt-1">Dados auditados: NBR ISO/CIE 8995-1 e NBR 5101:2024.</p>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="switchQueryTab('nbr8995')" id="btn-q-nbr8995" class="query-tab-btn query-tab-active">Interiores (NBR 8995)</button>
-                                <button onclick="switchQueryTab('nbr5101')" id="btn-q-nbr5101" class="query-tab-btn">Viária (NBR 5101)</button>
+                                <button onclick="switchQueryTab('nbr8995')" id="btn-q-nbr8995" class="query-tab-btn query-tab-active">Interiores (8995-1)</button>
+                                <button onclick="switchQueryTab('nbr5101')" id="btn-q-nbr5101" class="query-tab-btn">Viária (5101:2024)</button>
                                 <button onclick="switchQueryTab('leed')" id="btn-q-leed" class="query-tab-btn">LEED / WELL</button>
                             </div>
                         </div>
 
+                        <!-- BUSCA -->
                         <div class="relative w-full mb-6">
                             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-blue text-sm"></i>
-                            <!-- Alterado: focus border roxo para luminous-gold -->
                             <input type="text" id="global-search" placeholder="Pesquisar ambiente, classe viária ou crédito..." 
-                                class="w-full bg-black/40 border border-white/10 rounded-full py-2 pl-9 pr-4 text-sm text-white focus:border-luminous-gold outline-none transition-all" 
+                                class="w-full bg-black/40 border border-white/10 rounded-full py-2.5 pl-10 pr-4 text-sm text-white focus:border-luminous-gold outline-none transition-all" 
                                 oninput="filterQueryContent()">
                         </div>
 
-                        <!-- Conteúdo: NBR 8995-1 -->
+                        <!-- NBR 8995-1 -->
                         <div id="content-nbr8995" class="query-content">
                             <div class="overflow-hidden rounded-xl border border-white/10">
-                                <div class="overflow-x-auto max-h-[350px] overflow-y-auto custom-scrollbar">
+                                <div class="overflow-x-auto max-h-[400px] overflow-y-auto custom-scrollbar">
                                     <table class="w-full text-left border-collapse">
                                         <thead class="bg-white/5 text-xs text-luminous-gold font-bold uppercase tracking-wider sticky top-0 bg-midnight z-10">
                                             <tr><th class="p-4 border-b border-white/10">Categoria</th><th class="p-4 border-b border-white/10">Ambiente / Tarefa</th><th class="p-4 border-b border-white/10 text-center text-white">Lux (Em)</th><th class="p-4 border-b border-white/10 text-center">UGR Máx</th><th class="p-4 border-b border-white/10 text-center">Ra Min</th></tr>
@@ -428,340 +431,117 @@
                             </div>
                         </div>
 
-                        <!-- Conteúdo: NBR 5101 - REVISADO CONFORME NBR 5101:2024 -->
+                        <!-- NBR 5101:2024 (TOTALMENTE REVISADA) -->
                         <div id="content-nbr5101" class="query-content hidden">
-                            
-                            <!-- GUIA TÉCNICO VIÁRIO -->
                             <div class="mb-6 bg-white/5 p-4 rounded-xl border border-white/10">
                                 <h4 class="text-sm font-bold text-luminous-gold mb-3 flex items-center gap-2">
                                     <i class="fas fa-road"></i> Como Selecionar a Classe de Iluminação (NBR 5101:2024)
                                 </h4>
-                                <p class="text-xs text-dim-gray mb-4 leading-relaxed">
+                                <p class="text-xs text-dim-line mb-4 leading-relaxed">
                                     A escolha da classe é baseada em um sistema de pontos (Ponderação $V_{p}$). A fórmula base é: <span class="text-white font-mono">Classe = 6 - Soma dos Pontos ($V_{ps}$)</span>.
                                 </p>
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-left">
-                                    <div class="bg-black/30 p-3 rounded border border-white/5">
-                                        <div class="text-[10px] font-bold text-tech-cyan mb-1 uppercase tracking-tighter">Critérios Classe M (Motorizados)</div>
-                                        <ul class="text-[9px] text-dim-gray leading-tight space-y-1">
-                                            <li>• Velocidade (>80km/h: +2 pts)</li>
-                                            <li>• Volume tráfego (>1200/h: +1 pt)</li>
-                                            <li>• Densidade interseções (>3/km: +1 pt)</li>
-                                            <li>• Luminância ambiente (Alta: +1 pt)</li>
-                                        </ul>
+                                    <div class="bg-black/40 p-3 rounded border border-white/5">
+                                        <span class="text-[10px] font-bold text-tech-cyan block mb-2 uppercase">Classe M (Veículos)</span>
+                                        <p class="text-[9px] text-dim-gray leading-tight">Volume de tráfego, velocidade, complexidade da via e luminância de entorno.</p>
                                     </div>
-                                    <div class="bg-black/30 p-3 rounded border border-white/5">
-                                        <div class="text-[10px] font-bold text-tech-cyan mb-1 uppercase tracking-tighter">Critérios Classe P (Pedestres)</div>
-                                        <ul class="text-[9px] text-dim-gray leading-tight space-y-1">
-                                            <li>• Fluxo de pedestres (Alto: +1 pt)</li>
-                                            <li>• Uso misto (Veículos+Pedestres: +1 pt)</li>
-                                            <li>• Reconhecimento facial necessário (+Pts)</li>
-                                            <li>• Luminância ambiente (Alta: +1 pt)</li>
-                                        </ul>
+                                    <div class="bg-black/40 p-3 rounded border border-white/5">
+                                        <span class="text-[10px] font-bold text-tech-cyan block mb-2 uppercase">Classe P (Pedestres)</span>
+                                        <p class="text-[9px] text-dim-gray leading-tight">Velocidade de pedestres, uso de bicicletas, segurança pública e entorno.</p>
                                     </div>
-                                    <div class="bg-black/30 p-3 rounded border border-white/5">
-                                        <div class="text-[10px] font-bold text-tech-cyan mb-1 uppercase tracking-tighter">Conceitos Chave</div>
-                                        <ul class="text-[9px] text-dim-gray leading-tight space-y-1">
-                                            <li>• <strong class="text-white">Lmed:</strong> O brilho do asfalto (visto pelo olho).</li>
-                                            <li>• <strong class="text-white">Emed:</strong> A luz no chão (medida com luxímetro).</li>
-                                            <li>• <strong class="text-white">EIR:</strong> Razão de iluminância nas bordas (calçadas).</li>
-                                        </ul>
+                                    <div class="bg-black/40 p-3 rounded border border-white/5">
+                                        <span class="text-[10px] font-bold text-tech-cyan block mb-2 uppercase">Áreas Ambientais</span>
+                                        <p class="text-[9px] text-dim-gray leading-tight">Zonas sensíveis requerem níveis mínimos de intrusão e baixo $T_{cp}$ (CCT).</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
-                                
-                                <!-- Tabela Classe M -->
-                                <div class="lg:col-span-12 bg-black/20 p-0 rounded-xl border border-white/5 overflow-hidden">
-                                    <div class="p-3 border-b border-white/10 bg-white/5 flex justify-between items-center">
-                                        <div>
-                                            <h4 class="text-xs font-bold text-leed-green uppercase tracking-widest">Classe M (Motorizados)</h4>
-                                            <p class="text-[10px] text-dim-gray mt-1">Vias exclusivas para veículos. Critério: <strong>Luminância (cd/m²)</strong>.</p>
-                                        </div>
-                                        <i class="fas fa-car text-white/20 text-xl"></i>
+                            <div class="grid grid-cols-1 gap-6 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                                <!-- TABELA CLASSE M -->
+                                <div class="bg-black/20 rounded-xl border border-white/5 overflow-hidden">
+                                    <div class="p-3 bg-white/5 border-b border-white/10 flex justify-between">
+                                        <h4 class="text-xs font-bold text-leed-green uppercase">Tabela 2: Requisitos para Classe M (Luminância)</h4>
+                                        <span class="text-[10px] text-muted-blue font-bold">NBR 5101:2024</span>
                                     </div>
-                                    <div class="overflow-x-auto">
-                                        <table class="w-full text-xs text-left">
-                                            <thead class="text-white bg-black/40 border-b border-white/5">
-                                                <tr>
-                                                    <th class="p-3">Classe</th>
-                                                    <th class="p-3">Aplicação Típica</th>
-                                                    <th class="p-3 text-center text-luminous-gold">Lmed (cd/m²)</th>
-                                                    <th class="p-3 text-center">U0 (Min)</th>
-                                                    <th class="p-3 text-center">UL (Min)</th>
-                                                    <th class="p-3 text-center">TI (Max%)</th>
-                                                    <th class="p-3 text-center">EIR (Min)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="text-dim-gray divide-y divide-white/5 font-medium">
-                                                <tr class="hover:bg-white/5 transition"><td class="p-3 font-bold text-white">M1</td><td>Vias Expressas / Alta Velocidade</td><td class="p-3 text-center text-white">2.0</td><td class="p-3 text-center">0.40</td><td class="p-3 text-center">0.65</td><td class="p-3 text-center">14</td><td class="p-3 text-center">0.45</td></tr>
-                                                <tr class="hover:bg-white/5 transition"><td class="p-3 font-bold text-white">M2</td><td>Avenidas Principais / Arteriais</td><td class="p-3 text-center text-white">1.5</td><td class="p-3 text-center">0.40</td><td class="p-3 text-center">0.65</td><td class="p-3 text-center">14</td><td class="p-3 text-center">0.45</td></tr>
-                                                <tr class="hover:bg-white/5 transition"><td class="p-3 font-bold text-white">M3</td><td>Vias Arteriais Secundárias</td><td class="p-3 text-center text-white">1.0</td><td class="p-3 text-center">0.40</td><td class="p-3 text-center">0.60</td><td class="p-3 text-center">15</td><td class="p-3 text-center">0.45</td></tr>
-                                                <tr class="hover:bg-white/5 transition"><td class="p-3 font-bold text-white">M4</td><td>Vias Coletoras</td><td class="p-3 text-center text-white">0.75</td><td class="p-3 text-center">0.40</td><td class="p-3 text-center">0.60</td><td class="p-3 text-center">16</td><td class="p-3 text-center">0.45</td></tr>
-                                                <tr class="hover:bg-white/5 transition"><td class="p-3 font-bold text-white">M5</td><td>Vias Locais Residenc. (Tráfego motorizado)</td><td class="p-3 text-center text-white">0.50</td><td class="p-3 text-center">0.35</td><td class="p-3 text-center">0.35</td><td class="p-3 text-center">16</td><td class="p-3 text-center">0.45</td></tr>
-                                                <tr class="hover:bg-white/5 transition"><td class="p-3 font-bold text-white">M6</td><td>Estradas e acessos rurais</td><td class="p-3 text-center text-white">0.30</td><td class="p-3 text-center">0.35</td><td class="p-3 text-center">0.35</td><td class="p-3 text-center">16</td><td class="p-3 text-center">0.45</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <!-- Classe P e C -->
-                                <div class="lg:col-span-6 bg-black/20 p-0 rounded-xl border border-white/5 overflow-hidden">
-                                    <div class="p-3 border-b border-white/10 bg-white/5">
-                                        <h4 class="text-xs font-bold text-leed-green uppercase">Classe P (Pedestres)</h4>
-                                        <p class="text-[9px] text-dim-gray mt-1">Critério: <strong>Iluminância Horizontal (Lux)</strong>.</p>
-                                    </div>
-                                    <table class="w-full text-xs">
-                                        <thead class="bg-black/40 border-b border-white/5">
-                                            <tr><th class="p-2">Classe</th><th class="p-2 text-center">Emed (lx)</th><th class="p-2 text-center">Emin (lx)</th><th class="p-2 text-center text-tech-cyan">Ev min (lx)*</th></tr>
+                                    <table class="w-full text-xs text-left">
+                                        <thead class="text-white bg-black/40 border-b border-white/10">
+                                            <tr><th class="p-3">Classe</th><th class="p-3 text-center text-luminous-gold">Lmed (cd/m²)</th><th class="p-3 text-center">U0 (min)</th><th class="p-3 text-center">UL (min)</th><th class="p-3 text-center">TI (max%)</th><th class="p-3 text-center text-tech-cyan">REI (min)</th></tr>
                                         </thead>
-                                        <tbody class="text-dim-gray divide-y divide-white/5">
-                                            <tr><td class="p-2 font-bold text-white">P1</td><td class="p-2 text-center text-white">20</td><td class="p-2 text-center">4.0</td><td class="p-2 text-center">6.0</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">P2</td><td class="p-2 text-center text-white">15</td><td class="p-2 text-center">3.0</td><td class="p-2 text-center">5.0</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">P3</td><td class="p-2 text-center text-white">10</td><td class="p-2 text-center">2.0</td><td class="p-2 text-center">3.0</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">P4</td><td class="p-2 text-center text-white">7.5</td><td class="p-2 text-center">1.5</td><td class="p-2 text-center">2.5</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">P5</td><td class="p-2 text-center text-white">5.0</td><td class="p-2 text-center">1.0</td><td class="p-2 text-center">1.5</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">P6</td><td class="p-2 text-center text-white">3.0</td><td class="p-2 text-center">0.6</td><td class="p-2 text-center">1.0</td></tr>
-                                        </tbody>
-                                    </table>
-                                    <p class="p-2 text-[8px] italic text-dim-gray">*Ev (Vertical) para reconhecimento facial se exigido.</p>
-                                </div>
-
-                                <div class="lg:col-span-6 bg-black/20 p-0 rounded-xl border border-white/5 overflow-hidden">
-                                    <div class="p-3 border-b border-white/10 bg-white/5">
-                                        <h4 class="text-xs font-bold text-leed-green uppercase">Classe C (Áreas de Conflito)</h4>
-                                        <p class="text-[9px] text-dim-gray mt-1">Interseções, rotatórias, pedágios.</p>
-                                    </div>
-                                    <table class="w-full text-xs">
-                                        <thead class="bg-black/40 border-b border-white/5">
-                                            <tr><th class="p-2">Classe</th><th class="p-2 text-center">Emed (lx)</th><th class="p-2 text-center">U0 (Min)</th><th class="p-2 text-center">TI (Max%)</th></tr>
-                                        </thead>
-                                        <tbody class="text-dim-gray divide-y divide-white/5">
-                                            <tr><td class="p-2 font-bold text-white">C0</td><td class="p-2 text-center text-white">50</td><td class="p-2 text-center">0.38</td><td class="p-2 text-center">14</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">C1</td><td class="p-2 text-center text-white">30</td><td class="p-2 text-center">0.38</td><td class="p-2 text-center">14</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">C2</td><td class="p-2 text-center text-white">20</td><td class="p-2 text-center">0.28</td><td class="p-2 text-center">14</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">C3</td><td class="p-2 text-center text-white">15</td><td class="p-2 text-center">0.18</td><td class="p-2 text-center">15</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">C4</td><td class="p-2 text-center text-white">10</td><td class="p-2 text-center">0.18</td><td class="p-2 text-center">16</td></tr>
-                                            <tr><td class="p-2 font-bold text-white">C5</td><td class="p-2 text-center text-white">7.5</td><td class="p-2 text-center">0.18</td><td class="p-2 text-center">16</td></tr>
+                                        <tbody class="text-dim-gray divide-y divide-white/5 font-mono">
+                                            <tr><td class="p-3 font-bold text-white">M1</td><td class="text-center text-white">2.0</td><td class="text-center">0.40</td><td class="text-center">0.70</td><td class="text-center">10</td><td class="text-center">0.50</td></tr>
+                                            <tr><td class="p-3 font-bold text-white">M2</td><td class="text-center text-white">1.5</td><td class="text-center">0.40</td><td class="text-center">0.70</td><td class="text-center">10</td><td class="text-center">0.50</td></tr>
+                                            <tr><td class="p-3 font-bold text-white">M3</td><td class="text-center text-white">1.0</td><td class="text-center">0.40</td><td class="text-center">0.60</td><td class="text-center">15</td><td class="text-center">0.40</td></tr>
+                                            <tr><td class="p-3 font-bold text-white">M4</td><td class="text-center text-white">0.75</td><td class="text-center">0.40</td><td class="text-center">0.60</td><td class="text-center">15</td><td class="text-center">0.40</td></tr>
+                                            <tr><td class="p-3 font-bold text-white">M5</td><td class="text-center text-white">0.50</td><td class="text-center">0.35</td><td class="text-center">0.40</td><td class="text-center">15</td><td class="text-center">0.30</td></tr>
                                         </tbody>
                                     </table>
                                 </div>
 
-                                <!-- NOTA OBRIGATÓRIA NBR 5101:2024 -->
-                                <div class="col-span-1 lg:col-span-12 bg-white/5 p-4 rounded-xl border border-white/10 flex gap-4 items-start">
-                                    <i class="fas fa-exclamation-circle text-luminous-gold mt-1"></i>
-                                    <div>
-                                        <h5 class="text-xs font-bold text-white mb-2 uppercase">Nota de Projeto: Restrição de Temperatura de Cor (CCT)</h5>
-                                        <p class="text-[10px] text-dim-gray leading-relaxed">
-                                            A norma **NBR 5101:2024 (Secção 6.7)** estabelece limites rigorosos para o $T_{cp}$ visando a saúde humana e ambiental:
-                                            <br>• <strong class="text-white">Vias Locais:</strong> Máximo de <strong class="text-luminous-gold">2200K</strong>.
-                                            <br>• <strong class="text-white">Demais Vias:</strong> Máximo de <strong class="text-luminous-gold">2700K</strong>.
-                                            <br>• <strong class="text-white">Áreas Ambientais Sensíveis:</strong> Recomendado <strong class="text-tech-cyan">1800K</strong>, máximo de 2200K.
-                                            <br><br><span class="italic">Dica: Escolha óticas com classificação BUG adequada (Tabela A.1) para evitar "Uplight" (luz acima da luminária), obrigatório para mitigar o Sky Glow.</span>
-                                        </p>
+                                <!-- TABELA CLASSE P -->
+                                <div class="bg-black/20 rounded-xl border border-white/5 overflow-hidden">
+                                    <div class="p-3 bg-white/5 border-b border-white/10 flex justify-between">
+                                        <h4 class="text-xs font-bold text-leed-green uppercase">Tabela 4: Requisitos para Classe P (Iluminância)</h4>
+                                        <span class="text-[10px] text-muted-blue font-bold">NBR 5101:2024</span>
                                     </div>
+                                    <table class="w-full text-xs text-left">
+                                        <thead class="text-white bg-black/40 border-b border-white/10">
+                                            <tr><th class="p-3">Classe</th><th class="p-3 text-center text-luminous-gold">Emed (lux)</th><th class="p-3 text-center">Emin (lux)</th><th class="p-3 text-center text-tech-cyan">Ev,min (lux)*</th></tr>
+                                        </thead>
+                                        <tbody class="text-dim-gray divide-y divide-white/5 font-mono">
+                                            <tr><td class="p-3 font-bold text-white">P1</td><td class="text-center text-white">20.0</td><td class="text-center">5.0</td><td class="text-center">5.0</td></tr>
+                                            <tr><td class="p-3 font-bold text-white">P2</td><td class="text-center text-white">10.0</td><td class="text-center">2.0</td><td class="text-center">2.0</td></tr>
+                                            <tr><td class="p-3 font-bold text-white">P3</td><td class="text-center text-white">7.5</td><td class="text-center">1.5</td><td class="text-center">1.5</td></tr>
+                                            <tr><td class="p-3 font-bold text-white">P4</td><td class="text-center text-white">5.0</td><td class="text-center">1.0</td><td class="text-center">1.0</td></tr>
+                                            <tr><td class="p-3 font-bold text-white">P5</td><td class="text-center text-white">3.0</td><td class="text-center">0.6</td><td class="text-center">0.6</td></tr>
+                                        </tbody>
+                                    </table>
+                                    <p class="p-3 text-[9px] text-dim-gray italic">(*) Ev,min deve ser aplicado quando o reconhecimento facial é considerado fator de segurança.</p>
                                 </div>
 
-                            </div>
-                        </div>
-
-                        <!-- Conteúdo: LEED / WELL (Atualizado) -->
-                        <div id="content-leed" class="query-content hidden">
-                            <!-- Abas Internas -->
-                            <div class="flex gap-2 mb-4 border-b border-white/5 pb-2">
-                                <span onclick="switchCertTab('leed')" id="cert-tab-leed" class="cert-tab active">LEED v4.1 (BD+C)</span>
-                                <span onclick="switchCertTab('well')" id="cert-tab-well" class="cert-tab inactive">WELL v2</span>
-                            </div>
-
-                            <!-- TAB LEED -->
-                            <div id="pane-leed" class="max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
-                                
-                                <!-- GUIA DE USO -->
-                                <div class="mb-6 bg-white/5 p-4 rounded-xl border border-white/10">
-                                    <h4 class="text-sm font-bold text-luminous-gold mb-2 flex items-center gap-2">
-                                        <i class="fas fa-lightbulb"></i> Guia Rápido de Aplicação
-                                    </h4>
-                                    <p class="text-xs text-dim-line mb-2 leading-relaxed">
-                                        Use as tabelas abaixo como <strong>metas de projeto</strong> antes de iniciar o cálculo. 
-                                        Para garantir a pontuação, verifique o LPD (Densidade de Potência) no Dialux ou nas especificações técnicas das luminárias.
+                                <!-- NOTA CRÍTICA CCT NBR 5101:2024 -->
+                                <div class="bg-white/5 p-5 rounded-xl border-l-4 border-l-luminous-gold">
+                                    <h5 class="text-xs font-bold text-white mb-2 uppercase flex items-center gap-2">
+                                        <i class="fas fa-exclamation-triangle text-luminous-gold"></i> Limites de Temperatura de Cor (Tcp)
+                                    </h5>
+                                    <p class="text-xs text-dim-line leading-relaxed">
+                                        Conforme a Secção 6.7 da norma atualizada, os limites máximos de temperatura de cor para reduzir o impacto ambiental (Sky Glow) e proteger o ciclo circadiano são:
+                                        <br>• <strong class="text-white">Vias Locais e áreas residenciais:</strong> Máximo de <strong class="text-luminous-gold">2200K</strong>.
+                                        <br>• <strong class="text-white">Vias principais, arteriais e conflito:</strong> Máximo de <strong class="text-luminous-gold">2700K</strong>.
+                                        <br>• <strong class="text-tech-cyan">DICA:</strong> Utilize luminárias com emissão hemisférica superior de 0% (U0) para conformidade total.
                                     </p>
                                 </div>
-
-                                <!-- Pontuação Global Interativa -->
-                                <div class="mb-6 bg-black/20 p-4 rounded-xl border border-white/5">
-                                    <div class="flex justify-between items-end mb-3">
-                                        <div class="text-xs text-muted-blue uppercase tracking-widest font-bold">Definir Meta do Projeto</div>
-                                        <select id="leed-target-select" onchange="updateLeedTargets()" class="bg-black/30 border border-white/20 rounded px-2 py-1 text-xs text-white outline-none cursor-pointer focus:border-luminous-gold">
-                                            <option value="certified">Certified (Min)</option>
-                                            <option value="silver">Silver (Otimizado)</option>
-                                            <option value="gold" selected>Gold (Alta Efic.)</option>
-                                            <option value="platinum">Platinum (Max)</option>
-                                        </select>
-                                    </div>
-                                    <div class="grid grid-cols-4 gap-2 text-center">
-                                        <div id="lvl-certified" class="leed-level-box bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-gray-400">CERTIFIED</div><div class="text-[10px] text-muted-blue font-bold">40-49 pts</div></div>
-                                        <div id="lvl-silver" class="leed-level-box bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-gray-300">SILVER</div><div class="text-[10px] text-muted-blue font-bold">50-59 pts</div></div>
-                                        <div id="lvl-gold" class="leed-level-box bg-white/5 p-3 rounded-lg border border-luminous-gold/20 active"><div class="text-xs font-bold text-luminous-gold">GOLD</div><div class="text-[10px] text-muted-blue font-bold">60-79 pts</div></div>
-                                        <div id="lvl-platinum" class="leed-level-box bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-cyan-200">PLATINUM</div><div class="text-[10px] text-muted-blue font-bold">80+ pts</div></div>
-                                    </div>
-                                </div>
-
-                                <!-- EFICIÊNCIA ENERGÉTICA (NOVO) -->
-                                <div class="mb-6 bg-black/20 p-4 rounded-xl border border-white/5">
-                                    <h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between items-center">
-                                        Eficiência Energética (LPD) <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">ASHRAE 90.1-2016</span>
-                                    </h4>
-                                    
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                                        <div class="bg-white/5 p-3 rounded-lg">
-                                            <div class="text-xs font-bold text-white mb-1">Building Area Method</div>
-                                            <p class="text-xs text-dim-gray leading-tight">
-                                                Limite único de W/m² para todo o edifício. <br>
-                                                <span class="text-luminous-gold">Ideal para:</span> Fases iniciais e Estudo Preliminar.
-                                            </p>
-                                        </div>
-                                        <div class="bg-white/5 p-3 rounded-lg">
-                                            <div class="text-xs font-bold text-white mb-1">Space-by-Space Method</div>
-                                            <p class="text-xs text-dim-gray leading-tight">
-                                                Limites específicos por tipo de ambiente. Permite "trocas" entre áreas. <br>
-                                                <span class="text-luminous-gold">Ideal para:</span> Projetos detalhados e Otimização.
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <table class="w-full text-xs text-left border-collapse">
-                                        <thead class="text-white border-b border-white/10 bg-white/5">
-                                            <tr>
-                                                <th class="p-2 font-bold">Tipologia</th>
-                                                <th class="p-2 text-center font-bold text-dim-gray">Norma (ASHRAE)<br><span class="text-[9px] opacity-70">(W/m²)</span></th>
-                                                <th class="p-2 text-center font-bold text-luminous-gold">Meta Sugerida<br><span class="text-[9px] opacity-70">(Para Pontuar)</span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="leed-lpd-body" class="text-dim-line text-xs font-medium">
-                                            <!-- Preenchido via JS -->
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <!-- Qualidade Interna (EQ) -->
-                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                        <h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">EQ: Interior Lighting <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">1-2 Pts</span></h4>
-                                        <div class="space-y-4">
-                                            <div>
-                                                <div class="text-xs font-bold text-white mb-1">Opção 1: Controle (1 Pt)</div>
-                                                <p class="text-xs text-dim-gray leading-relaxed">
-                                                    Fornecer controle individual de iluminação para <strong>90%</strong> dos ocupantes + controle em 100% dos espaços compartilhados.
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-white mb-1">Opção 2: Qualidade (1 Pt)</div>
-                                                <p class="text-xs text-dim-gray leading-tight mb-2">Escolha 4 estratégias:</p>
-                                                <ul class="list-disc pl-4 text-xs text-dim-gray space-y-1">
-                                                    <li>Luminância < 2.500 cd/m² (45°-90°)</li>
-                                                    <li>CRI (Ra) > 80</li>
-                                                    <li>Vida útil (L70) > 24.000h</li>
-                                                    <li>Reflectância: Teto 85% / Parede 60%</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Poluição Luminosa (SS) -->
-                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                        <h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">SS: Light Pollution <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">Req</span></h4>
-                                        <p class="text-xs text-dim-gray mb-3">Requisito de especificação BUG (Backlight-Uplight-Glare) por Zona:</p>
-                                        <table class="w-full text-xs text-left border-collapse">
-                                            <thead class="text-white border-b border-white/10">
-                                                <tr><th class="py-2">Zona</th><th class="py-2">Descrição</th><th class="py-2 text-center">Uplight Max</th></tr>
-                                            </thead>
-                                            <tbody class="text-dim-gray font-medium">
-                                                <tr class="border-b border-white/5"><td class="py-2 font-bold text-white">LZ0</td><td>Área Selvagem</td><td class="text-center">U0</td></tr>
-                                                <tr class="border-b border-white/5"><td class="py-2 font-bold text-white">LZ1</td><td>Rural / Parque</td><td class="text-center">U1</td></tr>
-                                                <tr class="border-b border-white/5"><td class="py-2 font-bold text-white">LZ2</td><td>Residencial</td><td class="text-center">U2</td></tr>
-                                                <tr class="border-b border-white/5"><td class="py-2 font-bold text-white">LZ3</td><td>Urbano</td><td class="text-center">U3</td></tr>
-                                                <tr><td class="py-2 font-bold text-white">LZ4</td><td>Metrópole</td><td class="text-center">U4</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                    <!-- Luz Natural (EQ) - Cheat Sheet -->
-                                    <div class="col-span-1 md:col-span-2 bg-black/20 p-4 rounded-xl border border-white/5 flex flex-col md:flex-row gap-4 items-center">
-                                        <div class="text-xs font-bold text-leed-green whitespace-nowrap uppercase">EQ: Daylight (Luz Natural)</div>
-                                        <div class="hidden md:block h-8 w-px bg-white/10"></div>
-                                        <div class="text-xs text-dim-gray flex-grow text-center md:text-left">
-                                            <div class="mb-1"><span class="text-white font-bold">sDA <sub>300/50%</sub></span> > 55% (2 pts) ou > 75% (3 pts)</div>
-                                            <div><span class="text-white font-bold">ASE <sub>1000,250</sub></span> < 10% (Obrigatório para pontuar)</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- TAB WELL -->
-                            <div id="pane-well" class="hidden max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
-                                <!-- Pontuação WELL -->
-                                <div class="mb-6 bg-black/20 p-4 rounded-xl border border-white/5">
-                                    <div class="text-xs text-muted-blue uppercase tracking-widest mb-3 font-bold">Níveis WELL v2</div>
-                                    <div class="grid grid-cols-4 gap-2 text-center">
-                                        <div class="bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-orange-300">BRONZE</div><div class="text-[10px] text-muted-blue font-bold">40 pts</div></div>
-                                        <div class="bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-gray-300">SILVER</div><div class="text-[10px] text-muted-blue font-bold">50 pts</div></div>
-                                        <div class="bg-white/5 p-3 rounded-lg border border-luminous-gold/20"><div class="text-xs font-bold text-luminous-gold">GOLD</div><div class="text-[10px] text-muted-blue font-bold">60 pts</div></div>
-                                        <div class="bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-cyan-200">PLATINUM</div><div class="text-[10px] text-muted-blue font-bold">80 pts</div></div>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <!-- Preconditions (Obrigatórios) -->
-                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5 relative overflow-hidden">
-                                        <div class="absolute top-0 right-0 px-2 py-1 bg-red-500/20 text-red-300 text-[9px] font-bold uppercase rounded-bl">Obrigatório</div>
-                                        <h4 class="text-sm font-bold text-white mb-4">Preconditions (L01-L02)</h4>
-                                        
-                                        <div class="space-y-4">
-                                            <div>
-                                                <div class="text-xs font-bold text-tech-cyan mb-1">L01: Light Exposure</div>
-                                                <p class="text-xs text-dim-gray leading-relaxed">
-                                                    Obrigatório garantir acesso à luz natural para todos os ocupantes e controle de iluminação artificial adequado.
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-tech-cyan mb-1">L02: Visual Lighting Design</div>
-                                                <p class="text-xs text-dim-gray leading-relaxed mb-2">
-                                                    Atender níveis de iluminância (Lux) baseados na tarefa visual e idade dos ocupantes.
-                                                </p>
-                                                <div class="text-[10px] text-white bg-white/5 p-2 rounded inline-block font-mono">Ref: IES Handbook / EN 12464-1</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Optimizations (Pontos) -->
-                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                        <h4 class="text-sm font-bold text-white mb-4">Optimizations (Max 18 pts)</h4>
-                                        <div class="space-y-4">
-                                            <div class="border-l-2 border-tech-cyan pl-3">
-                                                <div class="text-xs font-bold text-white flex justify-between mb-1">L03: Circadian Lighting <span class="text-tech-cyan font-bold">3 pts</span></div>
-                                                <p class="text-xs text-dim-gray leading-relaxed">
-                                                    Mínimo <strong>150-240 EML</strong> (Equivalent Melanopic Lux) medido na vista do ocupante durante 4h do dia (manhã).
-                                                </p>
-                                            </div>
-                                            <div class="border-l-2 border-tech-cyan pl-3">
-                                                <div class="text-xs font-bold text-white flex justify-between mb-1">L04: Glare Control <span class="text-tech-cyan font-bold">2 pts</span></div>
-                                                <p class="text-xs text-dim-gray leading-relaxed">
-                                                    UGR < 16 (Estações de Trabalho) ou UGR < 19 (Geral). Gestão de ofuscamento por luz natural obrigatória.
-                                                </p>
-                                            </div>
-                                            <div class="border-l-2 border-tech-cyan pl-3">
-                                                <div class="text-xs font-bold text-white flex justify-between mb-1">L07: Visual Balance <span class="text-tech-cyan font-bold">1 pt</span></div>
-                                                <p class="text-xs text-dim-gray leading-relaxed">
-                                                    Criar ambientes com equilíbrio de luminância e temperatura de cor ajustável (Tunable White).
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
+                        <!-- LEED / WELL -->
+                        <div id="content-leed" class="query-content hidden">
+                            <!-- Código de metas LEED já existente -->
+                             <div class="mb-6 bg-black/20 p-4 rounded-xl border border-white/5">
+                                <div class="flex justify-between items-end mb-3">
+                                    <div class="text-xs text-muted-blue uppercase tracking-widest font-bold">Definir Meta de Certificação</div>
+                                    <select id="leed-target-select" onchange="updateLeedTargets()" class="bg-black/30 border border-white/20 rounded px-2 py-1 text-xs text-white outline-none cursor-pointer focus:border-luminous-gold">
+                                        <option value="certified">Certified</option>
+                                        <option value="silver">Silver</option>
+                                        <option value="gold" selected>Gold</option>
+                                        <option value="platinum">Platinum</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-4 gap-2 text-center">
+                                    <div id="lvl-certified" class="leed-level-box bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-gray-400">CERTIFIED</div></div>
+                                    <div id="lvl-silver" class="leed-level-box bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-gray-300">SILVER</div></div>
+                                    <div id="lvl-gold" class="leed-level-box bg-white/5 p-3 rounded-lg border active"><div class="text-xs font-bold text-luminous-gold">GOLD</div></div>
+                                    <div id="lvl-platinum" class="leed-level-box bg-white/5 p-3 rounded-lg"><div class="text-xs font-bold text-cyan-200">PLATINUM</div></div>
+                                </div>
+                            </div>
+
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead class="text-white border-b border-white/10 bg-white/5">
+                                    <tr><th class="p-3 font-bold">Tipologia</th><th class="p-3 text-center font-bold text-dim-gray">Norma (W/m²)</th><th class="p-3 text-center font-bold text-luminous-gold">Meta Sugerida</th></tr>
+                                </thead>
+                                <tbody id="leed-lpd-body" class="text-dim-line font-medium"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1511,6 +1291,14 @@
                     const xR_p = leftX + (diaPlane * scale / 2);
                     drawDimLine(xL_p, py + 20, xR_p, py + 20, `Ø ${diaPlane.toFixed(2)}m`);
                 }
+            }
+        }
+
+        // IES File Handling
+        function handleIESUpload(input) {
+            if (input.files && input.files[0]) {
+                alert("Upload de arquivo IES iniciado: " + input.files[0].name);
+                // Placeholder para lógica futura de parsing IES
             }
         }
 
