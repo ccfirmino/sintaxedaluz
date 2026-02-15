@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuxSintax | Lighting Design SaaS</title>
+    <title>LuxSintax | Lighting Design SaaS (BETA)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
-    <!-- Supabase Client -->
+    <!-- Supabase Client (Ready for Backend Integration) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -134,25 +135,35 @@
 
     <nav class="fixed w-full z-50 bg-midnight/90 backdrop-blur-xl border-b border-white/5">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
-                LUX<span class="text-white font-light opacity-60">SINTAX</span>
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
+                    LUX<span class="text-white font-light opacity-60">SINTAX</span>
+                </a>
+                <!-- BETA BADGE -->
+                <span class="bg-luminous-gold/20 text-luminous-gold text-[9px] font-black px-2 py-0.5 rounded border border-luminous-gold/30 tracking-widest animate-pulse">BETA</span>
+            </div>
             
             <!-- Desktop Menu -->
             <div class="hidden md:flex gap-8 items-center">
-                <div id="license-status" class="hidden inline-flex items-center gap-2 px-2 py-1 rounded-full border border-green-500/30 bg-green-900/20 backdrop-blur-sm shadow-[0_0_10px_rgba(34,197,94,0.1)]">
-                    <div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
-                    <span class="text-[9px] text-green-400 font-bold tracking-widest uppercase" id="license-date-text">CARREGANDO...</span>
+                <!-- Status User -->
+                <div class="hidden inline-flex items-center gap-2 px-3 py-1 rounded-full border border-tech-cyan/30 bg-tech-cyan/10 backdrop-blur-sm">
+                    <div class="w-1.5 h-1.5 rounded-full bg-tech-cyan"></div>
+                    <span class="text-[9px] text-tech-cyan font-bold tracking-widest uppercase">Early Adopter</span>
                 </div>
                 
                 <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
                 <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
                 
-                <button onclick="toggleLanguage()" class="text-xs text-muted-blue hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-white/10 pl-4 ml-2 uppercase">
-                    <span class="lang-display">PT / EN</span>
+                <!-- Profile Trigger -->
+                <button onclick="openProfile()" class="nav-link flex items-center gap-2 group">
+                    <span data-i18n="nav_profile">PERFIL</span>
+                    <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center border border-white/20 group-hover:border-luminous-gold transition-colors">
+                        <i class="fas fa-user text-[10px] text-dim-gray group-hover:text-luminous-gold"></i>
+                    </div>
                 </button>
-                <button id="btn-logout" onclick="handleLogout()" class="text-xs text-muted-blue hover:text-luminous-gold transition-colors tracking-widest ml-4 pl-4 border-l border-white/10">
-                    <span data-i18n="nav_logout">LOGOUT</span> <i class="fas fa-unlock text-[10px] ml-1 text-luminous-gold drop-shadow-md" id="nav-lock-icon"></i>
+
+                <button onclick="toggleLanguage()" class="text-xs text-muted-blue hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-white/10 pl-4 uppercase">
+                    <span class="lang-display">PT / EN</span>
                 </button>
             </div>
 
@@ -166,9 +177,9 @@
         <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-midnight/95 backdrop-blur-xl border-b border-white/5 p-6 flex flex-col gap-6 shadow-2xl transition-all duration-300">
              <a href="#calculadora" onclick="toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
              <a href="#fundamentos" onclick="toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
+             <button onclick="openProfile(); toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left" data-i18n="nav_profile">MEU PERFIL</button>
              <div class="h-[1px] bg-white/10 w-full"></div>
              <button onclick="toggleLanguage(); toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left lang-display">PT / EN</button>
-             <button onclick="handleLogout()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left" data-i18n="nav_logout">LOGOUT</button>
         </div>
     </nav>
 
@@ -819,6 +830,7 @@
         </div>
     </footer>
 
+    <!-- TERMS MODAL -->
     <div id="terms-modal" class="fixed inset-0 z-[60] hidden">
         <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="closeTerms()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-twilight border border-white/10 rounded-2xl shadow-2xl p-8 animate-fade-in-up">
@@ -845,11 +857,72 @@
         </div>
     </div>
 
+    <!-- PROFILE MODAL (NEW) -->
+    <div id="profile-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="closeProfile()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-twilight border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up">
+            
+            <!-- Modal Header -->
+            <div class="bg-white/5 p-6 border-b border-white/5 flex justify-between items-center">
+                <h3 class="text-luminous-gold font-bold tracking-widest uppercase text-sm" data-i18n="profile_title">Meu Perfil</h3>
+                <button onclick="closeProfile()" class="text-dim-gray hover:text-white transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="p-6">
+                <!-- User Info -->
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-16 h-16 rounded-full bg-luminous-gold/10 border border-luminous-gold flex items-center justify-center text-luminous-gold text-2xl">
+                        <i class="fas fa-user-astronaut"></i>
+                    </div>
+                    <div>
+                        <div class="text-white font-bold text-lg tracking-wide" id="profile-name">Carregando...</div>
+                        <div class="text-xs text-dim-gray uppercase tracking-wider" id="profile-role">Lighting Designer</div>
+                        <div class="inline-block mt-2 px-2 py-0.5 rounded bg-tech-cyan/20 text-tech-cyan text-[9px] font-bold uppercase tracking-widest border border-tech-cyan/30">Early Adopter</div>
+                    </div>
+                </div>
+
+                <!-- Fields -->
+                <div class="space-y-4">
+                    <div class="group">
+                        <label class="text-[9px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_email">E-mail</label>
+                        <div class="w-full bg-black/40 border border-white/10 rounded px-3 py-3 text-xs text-white" id="profile-email">user@demo.com</div>
+                    </div>
+                    
+                    <div class="group">
+                        <label class="text-[9px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_company">Empresa / Escritório</label>
+                        <input type="text" value="Lux Studio Design" class="w-full bg-black/40 border border-white/10 rounded px-3 py-3 text-xs text-white outline-none focus:border-luminous-gold text-left !important">
+                    </div>
+
+                    <!-- Usage Stats (Mock) -->
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div class="bg-white/5 p-3 rounded border border-white/5 text-center">
+                            <div class="text-xl font-bold text-white">124</div>
+                            <div class="text-[9px] text-dim-gray uppercase tracking-wider">Consultas</div>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded border border-white/5 text-center">
+                            <div class="text-xl font-bold text-white">8</div>
+                            <div class="text-[9px] text-dim-gray uppercase tracking-wider">Projetos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+                    <button class="text-[10px] text-dim-gray hover:text-white uppercase tracking-widest transition-colors">
+                        <i class="fas fa-cog mr-1"></i> Configurações
+                    </button>
+                    <button onclick="handleLogout()" class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-widest font-bold border border-red-500/30 px-4 py-2 rounded hover:bg-red-500/10 transition-colors">
+                        Logout <i class="fas fa-sign-out-alt ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- Translations Database ---
         const i18n = {
             pt: {
-                nav_home: "INICIO", nav_about: "SOBRE", nav_logout: "LOGOUT",
+                nav_home: "INICIO", nav_about: "SOBRE", nav_logout: "LOGOUT", nav_profile: "PERFIL",
                 tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
                 calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA (CD/KLM)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_flux: "FLUXO LUMINOSO", 
@@ -876,10 +949,10 @@
                 card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.",
                 card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.",
                 footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade", terms_accept: "Compreendo e Aceito",
-                lic_active_pre: "VÁLIDO ATÉ:"
+                profile_title: "Meu Perfil", lbl_email: "E-mail", lbl_company: "Empresa / Escritório"
             },
             en: {
-                nav_home: "HOME", nav_about: "ABOUT", nav_logout: "LOGOUT",
+                nav_home: "HOME", nav_about: "ABOUT", nav_logout: "LOGOUT", nav_profile: "PROFILE",
                 tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DESIGN",
                 calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY (CD/KLM)",
                 lbl_intensity_i: "INTENSITY (I)", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_flux: "LUMINOUS FLUX", 
@@ -906,7 +979,7 @@
                 card_2_title: "CUBIC COSINE LAW", card_2_desc: "Inverse Square Law variation for horizontal surfaces.",
                 card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.",
                 footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility", terms_accept: "I Understand and Accept",
-                lic_active_pre: "VALID UNTIL:"
+                profile_title: "My Profile", lbl_email: "E-mail", lbl_company: "Company / Office"
             }
         };
 
@@ -918,10 +991,15 @@
         let currentLeedTarget = 'gold'; // Default
         let currentWellScore = 0; // WELL State
 
-        // State Management (Mocked for MVP)
+        // State Management (Mocked for SaaS MVP)
         const state = {
-            user: { id: 'demo' },
-            profile: { is_pro: true, license_expiry: '2027-12-31', isValid: true },
+            user: { 
+                id: 'beta-user-001',
+                name: "Usuário Beta",
+                email: "usuario@luxsintax.com",
+                role: "Arquiteto / LD"
+            },
+            profile: { is_pro: true, license_status: 'beta', isValid: true },
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, workPlane: 0.75, flux: 1500, cdklm: 2000 },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000 },
@@ -1251,17 +1329,11 @@
             updateCalculations();
         }
 
-        function updateLicenseDisplay(profile) {
-            const el = document.getElementById('license-date-text');
-            const statusDiv = document.getElementById('license-status');
-            const t = i18n[currentLang];
-            if (!el || !statusDiv) return;
-            if (profile.isValid && profile.license_expiry) {
-                const parts = profile.license_expiry.split('-');
-                el.innerText = `${t.lic_active_pre} ${parts[2]}/${parts[1]}/${parts[0]}`;
-                statusDiv.classList.remove('hidden');
-                statusDiv.classList.add('inline-flex');
-            }
+        function populateProfileData() {
+            const u = state.user;
+            if(document.getElementById('profile-name')) document.getElementById('profile-name').innerText = u.name;
+            if(document.getElementById('profile-email')) document.getElementById('profile-email').innerText = u.email;
+            if(document.getElementById('profile-role')) document.getElementById('profile-role').innerText = u.role;
         }
 
         function getIntensity(s) {
@@ -1586,6 +1658,12 @@
         function openTerms() { document.getElementById('terms-modal').classList.remove('hidden'); }
         function closeTerms() { document.getElementById('terms-modal').classList.add('hidden'); }
         
+        function openProfile() { 
+            populateProfileData();
+            document.getElementById('profile-modal').classList.remove('hidden'); 
+        }
+        function closeProfile() { document.getElementById('profile-modal').classList.add('hidden'); }
+        
         function toggleLanguage() { 
             currentLang = currentLang === 'pt' ? 'en' : 'pt'; 
             document.querySelectorAll('.lang-display').forEach(e => e.innerText = currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
@@ -1599,10 +1677,13 @@
             });
 
             updateCalculations(); 
-            updateLicenseDisplay(state.profile); 
+            populateProfileData(); // Translate profile labels if needed
         }
         
-        function handleLogout() { alert('Logout System: Waiting for Supabase Auth Integration'); }
+        function handleLogout() { 
+            alert('Logout System: Waiting for Supabase Auth Integration'); 
+            closeProfile();
+        }
         
         function toggleMobileMenu() { 
             const menu = document.getElementById('mobile-menu');
@@ -1613,7 +1694,7 @@
 
         // Initialize
         document.addEventListener("DOMContentLoaded", () => {
-            updateLicenseDisplay(state.profile); 
+            populateProfileData();
             populateCategoryFilter();
             switchTool('query'); 
             filterNorms();
