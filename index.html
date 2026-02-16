@@ -236,7 +236,6 @@
                                 <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75"></div>
                                 <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_spacing">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
                                  <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
-                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="h-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-tilt" min="0" max="60" step="1" value="0"></div>
                                 <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000"></div>
                                 <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                     <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="h-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-h-flux" min="0" max="10000" step="10" value="1500"></div>
@@ -642,7 +641,6 @@
         }
 
         function filterNorms() {
-            // FIXED: Removed reliance on global-search input
             const categorySelect = document.getElementById('category-filter');
             if (!categorySelect) return;
             
@@ -743,7 +741,6 @@
         }
 
         function toggleWellFeature(el, points) {
-            // FIXED: Logic relies on data attributes now
             el.classList.toggle('active');
             let total = 0;
             document.querySelectorAll('.well-toggle-group.active').forEach(item => {
@@ -751,7 +748,7 @@
                 total += pts;
             });
             currentWellScore = total;
-            document.getElementById('well-total-score').innerHTML = `${total} <span class="text-xs text-dim-gray font-normal">/ 8</span>`; // FIXED: Denominator / 8
+            document.getElementById('well-total-score').innerHTML = `${total} <span class="text-xs text-dim-gray font-normal">/ 8</span>`; 
             const maxPoints = 8; 
             let pct = (total / maxPoints) * 100;
             if(pct > 100) pct = 100;
@@ -773,12 +770,22 @@
         };
 
         function calc5101() {
-            const speed = parseInt(document.getElementById('m-speed').value) || 0;
-            const volume = parseInt(document.getElementById('m-volume').value) || 0;
-            const separation = parseInt(document.getElementById('m-separation').value) || 0;
-            const density = parseInt(document.getElementById('m-density').value) || 0;
-            const complexity = parseInt(document.getElementById('m-complexity').value) || 0;
-            const ambient = parseInt(document.getElementById('m-ambient').value) || 0;
+            // Function calc5101 (Robust with element checks)
+            const sEl = document.getElementById('m-speed');
+            const vEl = document.getElementById('m-volume');
+            const sepEl = document.getElementById('m-separation');
+            const dEl = document.getElementById('m-density');
+            const cEl = document.getElementById('m-complexity');
+            const aEl = document.getElementById('m-ambient');
+
+            if (!sEl || !vEl || !sepEl || !dEl || !cEl || !aEl) return;
+
+            const speed = parseInt(sEl.value) || 0;
+            const volume = parseInt(vEl.value) || 0;
+            const separation = parseInt(sepEl.value) || 0;
+            const density = parseInt(dEl.value) || 0;
+            const complexity = parseInt(cEl.value) || 0;
+            const ambient = parseInt(aEl.value) || 0;
 
             let score = speed + volume + separation + density + complexity + ambient;
             let mClassNum = 6 - score;
@@ -790,30 +797,34 @@
             const data = mClassTable[className];
             
             if (data) {
-                document.getElementById('m-result-class').innerText = className;
-                document.getElementById('m-result-desc').innerText = data.desc;
-                document.getElementById('m-score-debug').innerText = `Vws: ${score} | Calc: 6 - ${score} = ${mClassNum}`;
+                const resultClassEl = document.getElementById('m-result-class');
+                const resultDescEl = document.getElementById('m-result-desc');
+                
+                if (resultClassEl) resultClassEl.innerText = className;
+                if (resultDescEl) resultDescEl.innerText = data.desc;
 
                 const maxLmed = 2.0; 
                 const maxU0 = 0.40; 
                 const maxTI = 20;
                 const maxEmed = 30; 
 
-                document.getElementById('res-lmed-val').innerText = data.lmed.toFixed(1);
-                const lmedPct = (data.lmed / maxLmed) * 100;
-                document.getElementById('bar-lmed').style.width = `${lmedPct}%`;
+                // Ensure bars exist before setting width
+                const barLmed = document.getElementById('bar-lmed');
+                const barEmed = document.getElementById('bar-emed');
+                const barU0 = document.getElementById('bar-u0');
+                const barTi = document.getElementById('bar-ti');
 
-                document.getElementById('res-emed-val').innerText = data.emed;
-                const emedPct = (data.emed / maxEmed) * 100;
-                document.getElementById('bar-emed').style.width = `${emedPct}%`;
+                if(document.getElementById('res-lmed-val')) document.getElementById('res-lmed-val').innerText = data.lmed.toFixed(1);
+                if(barLmed) barLmed.style.width = ((data.lmed / maxLmed) * 100) + "%";
 
-                document.getElementById('res-u0-val').innerText = data.u0.toFixed(2);
-                const u0Pct = (data.u0 / maxU0) * 100;
-                document.getElementById('bar-u0').style.width = `${u0Pct}%`;
+                if(document.getElementById('res-emed-val')) document.getElementById('res-emed-val').innerText = data.emed;
+                if(barEmed) barEmed.style.width = ((data.emed / maxEmed) * 100) + "%";
 
-                document.getElementById('res-ti-val').innerText = data.ti;
-                const tiPct = (data.ti / maxTI) * 100;
-                document.getElementById('bar-ti').style.width = `${tiPct}%`;
+                if(document.getElementById('res-u0-val')) document.getElementById('res-u0-val').innerText = data.u0.toFixed(2);
+                if(barU0) barU0.style.width = ((data.u0 / maxU0) * 100) + "%";
+
+                if(document.getElementById('res-ti-val')) document.getElementById('res-ti-val').innerText = data.ti;
+                if(barTi) barTi.style.width = ((data.ti / maxTI) * 100) + "%";
             }
         }
 
@@ -1085,11 +1096,9 @@
                         ctx.beginPath(); ctx.moveTo(wx, hitY_px); ctx.lineTo(wx + 40, hitY_px); ctx.strokeStyle = "#FBBF24"; ctx.setLineDash([2, 2]); ctx.stroke(); ctx.setLineDash([]);
                         drawTextVal(Math.round(ev) + " Lux", wx - 40, hitY_px);
                         
-                        // FIXED: Vertical spot calculation (Top of Beam to Floor)
                         const angleTop = tr + br/2;
                         if(angleTop < Math.PI/2) {
                             const yTopMetric = s.height - (s.dist / Math.tan(angleTop));
-                            // Only draw if intersection is above ground and reasonable
                             if(yTopMetric > 0 && yTopMetric < s.height * 2) {
                                 const yTopPx = floorY - (yTopMetric * scale);
                                 drawDimLineVertical(wx - 15, yTopPx, floorY, `hMax: ${yTopMetric.toFixed(2)}m`);
@@ -1113,6 +1122,9 @@
                 const hS = (s.spacing * scale) / 2;
                 const br = s.beam * Math.PI / 180;
                 
+                // Tilt logic removed from calculation for homog, defaulting to 0
+                const tl = 0; 
+                
                 const dia = 2 * s.height * Math.tan(br / 2);
                 const hEff = s.height - s.workPlane;
                 const diaPlane = hEff > 0 ? 2 * hEff * Math.tan(br / 2) : 0;
@@ -1125,8 +1137,10 @@
 
                 drawFloor(); drawPlaneLine(py, `hp: ${s.workPlane}m`); 
                 drawSource(leftX, sy); drawSource(rightX, sy); 
-                drawBeam(leftX, sy, s.beam, 0, 0.6); drawBeam(rightX, sy, s.beam, 0, 0.6);
-                drawAngleDim(leftX, sy, s.beam, 0, 40, "rgba(251, 191, 36, 0.8)", false);
+                drawBeam(leftX, sy, s.beam, tl, 0.6); drawBeam(rightX, sy, s.beam, -tl, 0.6); 
+                drawAngleDim(leftX, sy, s.beam, tl, 40, "rgba(251, 191, 36, 0.8)", false);
+                
+                // Removed tilt visualization code for homog since it's always 0 now
                 
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(255,255,255,0.2)"; 
                 ctx.moveTo(leftX, sy); ctx.lineTo(leftX, floorY); 
@@ -1190,7 +1204,6 @@
         bind('h-plane', 'homog', 'workPlane'); bind('range-h-plane', 'homog', 'workPlane');
         bind('h-spacing', 'homog', 'spacing'); bind('range-h-spacing', 'homog', 'spacing');
         bind('h-beam', 'homog', 'beam'); bind('range-h-beam', 'homog', 'beam');
-        bind('h-tilt', 'homog', 'tilt'); bind('range-h-tilt', 'homog', 'tilt');
 
         function openTerms() { document.getElementById('terms-modal').classList.remove('hidden'); }
         function closeTerms() { document.getElementById('terms-modal').classList.add('hidden'); }
