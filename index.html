@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
-    <!-- Supabase Client (Ready for Backend Integration) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -65,10 +64,13 @@
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: #FBBF24; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(251, 191, 36, 0.8); border: 2px solid #0f172a; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1e293b; border-radius: 2px; }
 
-        input[type=number], select, input[type=text], input[type=date] { background-color: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; text-align: right; width: 65px; font-family: 'Manrope', sans-serif; font-weight: 300; -moz-appearance: textfield; }
-        input[type=number]:focus, select:focus, input[type=text]:focus, input[type=date]:focus { outline: none; border-bottom: 1px solid #FBBF24; color: #FBBF24; }
+        input[type=number], select, input[type=text], input[type=date], input[type=email], input[type=password] { background-color: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; text-align: right; width: 100%; font-family: 'Manrope', sans-serif; font-weight: 300; -moz-appearance: textfield; }
+        input[type=number]:focus, select:focus, input[type=text]:focus, input[type=date]:focus, input[type=email]:focus, input[type=password]:focus { outline: none; border-bottom: 1px solid #FBBF24; color: #FBBF24; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
+        /* Ajuste específico para inputs de texto/email no modal */
+        #auth-modal input { text-align: left; }
+
         select.custom-select option { background-color: #0f172a; color: #f8fafc; }
 
         .nav-link { position: relative; font-size: 0.85rem; letter-spacing: 2px; color: #94a3b8; transition: color 0.3s; }
@@ -139,13 +141,10 @@
                 <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
                     LUX<span class="text-white font-light opacity-60">SINTAX</span>
                 </a>
-                <!-- BETA BADGE -->
                 <span class="bg-luminous-gold/20 text-luminous-gold text-[9px] font-black px-2 py-0.5 rounded border border-luminous-gold/30 tracking-widest animate-pulse">BETA</span>
             </div>
             
-            <!-- Desktop Menu -->
             <div class="hidden md:flex gap-8 items-center">
-                <!-- Status User -->
                 <div class="hidden inline-flex items-center gap-2 px-3 py-1 rounded-full border border-tech-cyan/30 bg-tech-cyan/10 backdrop-blur-sm">
                     <div class="w-1.5 h-1.5 rounded-full bg-tech-cyan"></div>
                     <span class="text-[9px] text-tech-cyan font-bold tracking-widest uppercase">Early Adopter</span>
@@ -154,11 +153,10 @@
                 <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
                 <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
                 
-                <!-- Profile Trigger -->
                 <button onclick="openProfile()" class="nav-link flex items-center gap-2 group">
-                    <span data-i18n="nav_profile">PERFIL</span>
+                    <span data-i18n="nav_profile">ENTRAR</span>
                     <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center border border-white/20 group-hover:border-luminous-gold transition-colors">
-                        <i class="fas fa-user text-[10px] text-dim-gray group-hover:text-luminous-gold"></i>
+                        <i class="fas fa-sign-in-alt text-[10px] text-dim-gray group-hover:text-luminous-gold"></i>
                     </div>
                 </button>
 
@@ -167,17 +165,15 @@
                 </button>
             </div>
 
-            <!-- Mobile Menu Button -->
             <div class="md:hidden text-luminous-gold text-2xl cursor-pointer" onclick="toggleMobileMenu()">
                 <i class="fas fa-bars"></i>
             </div>
         </div>
 
-        <!-- Mobile Menu Dropdown -->
         <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-midnight/95 backdrop-blur-xl border-b border-white/5 p-6 flex flex-col gap-6 shadow-2xl transition-all duration-300">
              <a href="#calculadora" onclick="toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
              <a href="#fundamentos" onclick="toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
-             <button onclick="openProfile(); toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left" data-i18n="nav_profile">MEU PERFIL</button>
+             <button onclick="openProfile(); toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left" data-i18n="nav_profile">ENTRAR / CADASTRAR</button>
              <div class="h-[1px] bg-white/10 w-full"></div>
              <button onclick="toggleLanguage(); toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left lang-display">PT / EN</button>
         </div>
@@ -189,7 +185,6 @@
 
         <div class="max-w-7xl mx-auto flex flex-col items-center">
             
-            <!-- Tool Selector -->
             <div class="flex justify-center gap-4 sm:gap-10 mb-10 relative z-10 fade-in-up flex-wrap mt-6">
                 <button onclick="switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold">
                     <i class="fas fa-search"></i>
@@ -211,10 +206,7 @@
             </div>
 
             <div id="calculator-interface" class="w-full relative">
-                
-                <!-- Calculation Visualizer & Inputs -->
                 <div id="visual-tools" class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full transition-opacity duration-300 hidden">
-                    <!-- Control Panel (Left) -->
                     <div class="lg:col-span-4 flex flex-col gap-6">
                         <div class="glass-panel p-6 rounded-2xl relative h-full">
                             <div class="mb-4">
@@ -231,7 +223,6 @@
                                 </div>
                             </div>
 
-                            <!-- Inputs: Ponto -->
                             <div id="inputs-ponto" class="hidden">
                                  <div class="mode-direct-group mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
@@ -286,7 +277,6 @@
                                 </div>
                             </div>
 
-                            <!-- Inputs: Vertical -->
                             <div id="inputs-vertical" class="hidden">
                                  <div class="mode-direct-group mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
@@ -348,7 +338,6 @@
                                 </div>
                             </div>
 
-                            <!-- Inputs: Homogeneity -->
                             <div id="inputs-homog" class="hidden">
                                 <div class="mode-direct-group mb-6 group">
                                     <div class="flex justify-between items-end mb-2">
@@ -406,7 +395,6 @@
                         </div>
                     </div>
 
-                    <!-- Canvas Results (Right) -->
                     <div class="lg:col-span-8 flex flex-col gap-6">
                         <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full">
                             <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 drop-shadow-md uppercase tracking-widest font-bold" data-i18n="hdr_results">Resultados em Tempo Real</h3>
@@ -419,7 +407,6 @@
                     </div>
                 </div>
 
-                <!-- Query Tool (NBR/LEED) -->
                 <div id="query-tool" class="w-full animate-fade-in-up col-span-12">
                     <div class="glass-panel p-6 rounded-2xl">
                         
@@ -437,7 +424,6 @@
                             </div>
                         </div>
 
-                        <!-- Search Bar -->
                         <div id="search-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div class="md:col-span-2 relative w-full">
                                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-blue text-sm"></i>
@@ -452,7 +438,6 @@
                             </div>
                         </div>
 
-                        <!-- Content: NBR 8995 -->
                         <div id="content-nbr8995" class="query-content">
                             <div class="overflow-hidden rounded-xl border border-white/10">
                                 <div class="overflow-x-auto max-h-[450px] overflow-y-auto custom-scrollbar">
@@ -466,147 +451,43 @@
                             </div>
                         </div>
 
-                        <!-- Content: NBR 5101 (CALCULATOR) -->
                         <div id="content-nbr5101" class="query-content hidden">
                             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-                                <!-- Input Panel -->
                                 <div class="lg:col-span-5 flex flex-col gap-4">
                                     <div class="glass-panel p-5 rounded-xl border border-white/5">
                                         <h4 class="text-sm font-bold text-luminous-gold mb-4 flex items-center gap-2 uppercase tracking-wider">
                                             <i class="fas fa-sliders-h"></i> <span data-i18n="road_params">Parâmetros da Via (Classe M)</span>
                                         </h4>
-                                        
-                                        <!-- Inputs -->
                                         <div class="space-y-4">
-                                            <!-- Velocidade -->
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_speed">Velocidade (km/h)</label>
-                                                <select id="m-speed" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="2">Muito Alta (> 100)</option>
-                                                    <option value="1">Alta (70 - 100)</option>
-                                                    <option value="-1">Moderada (40 - 70)</option>
-                                                    <option value="-2">Baixa (< 40)</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- Volume -->
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_volume">Volume de Tráfego</label>
-                                                <select id="m-volume" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="1">Alto (> 65% capacidade)</option>
-                                                    <option value="0" selected>Moderado (35-65%)</option>
-                                                    <option value="-1">Baixo (< 35%)</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- Separação -->
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_separation">Separação de Tráfego</label>
-                                                <select id="m-separation" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="0">Não (Pista Simples)</option>
-                                                    <option value="-1">Sim (Canteiro Central)</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- Interseções -->
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_density">Densidade de Interseções</label>
-                                                <select id="m-density" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="1">Alta (> 3 por km)</option>
-                                                    <option value="0" selected>Moderada (< 3 por km)</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- Complexidade -->
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_complexity">Complexidade / Guiagem</label>
-                                                <select id="m-complexity" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="1">Alta / Guiagem Pobre</option>
-                                                    <option value="0" selected>Normal / Guiagem Boa</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <!-- Brilho -->
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_ambient">Luminância do Entorno</label>
-                                                <select id="m-ambient" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="1">Alta (Comercial/Urbano)</option>
-                                                    <option value="0" selected>Moderada (Residencial)</option>
-                                                    <option value="-1">Baixa (Rural)</option>
-                                                </select>
-                                            </div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_speed">Velocidade (km/h)</label><select id="m-speed" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="2">Muito Alta (> 100)</option><option value="1">Alta (70 - 100)</option><option value="-1">Moderada (40 - 70)</option><option value="-2">Baixa (< 40)</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_volume">Volume de Tráfego</label><select id="m-volume" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alto (> 65% capacidade)</option><option value="0" selected>Moderado (35-65%)</option><option value="-1">Baixo (< 35%)</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_separation">Separação de Tráfego</label><select id="m-separation" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="0">Não (Pista Simples)</option><option value="-1">Sim (Canteiro Central)</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_density">Densidade de Interseções</label><select id="m-density" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta (> 3 por km)</option><option value="0" selected>Moderada (< 3 por km)</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_complexity">Complexidade / Guiagem</label><select id="m-complexity" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta / Guiagem Pobre</option><option value="0" selected>Normal / Guiagem Boa</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_ambient">Luminância do Entorno</label><select id="m-ambient" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta (Comercial/Urbano)</option><option value="0" selected>Moderada (Residencial)</option><option value="-1">Baixa (Rural)</option></select></div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Result Panel (New Dynamic Bars) -->
                                 <div class="lg:col-span-7">
                                     <div class="glass-panel p-6 rounded-xl border border-white/10 h-full flex flex-col justify-center relative overflow-hidden">
                                         <div class="absolute inset-0 bg-gradient-to-br from-luminous-gold/5 to-transparent pointer-events-none"></div>
-                                        
                                         <div class="text-center mb-8">
                                             <div class="text-[10px] text-dim-gray font-bold uppercase tracking-[0.2em] mb-2" data-i18n="road_rec_class">Classe Recomendada</div>
                                             <div id="m-result-class" class="text-7xl font-black text-white mb-2 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tracking-tighter">M3</div>
                                             <div id="m-result-desc" class="text-xs text-luminous-gold font-bold uppercase tracking-widest bg-luminous-gold/10 px-4 py-1.5 rounded-full border border-luminous-gold/20 inline-block">Vias Arteriais Secundárias</div>
                                         </div>
-
                                         <div class="space-y-5 px-4 max-w-md mx-auto w-full">
-                                            <!-- Lmed Bar -->
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <span class="text-xs font-bold text-white uppercase" data-i18n="road_lmed">Luminância Média (Lmed)</span>
-                                                    <span class="text-xs font-bold text-luminous-gold"><span id="res-lmed-val">1.0</span> <span class="text-[9px] text-dim-gray">cd/m²</span></span>
-                                                </div>
-                                                <div class="bar-container">
-                                                    <div id="bar-lmed" class="bar-fill bg-gradient-to-r from-luminous-gold/50 to-luminous-gold" style="width: 50%;"></div>
-                                                </div>
-                                                <div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_ref_m1">Referência: M1 (2.0)</div>
-                                            </div>
-
-                                            <!-- NEW: Emed Bar (Lux) -->
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <span class="text-xs font-bold text-white uppercase" data-i18n="road_emed">Iluminância Média (Emed)</span>
-                                                    <span class="text-xs font-bold text-white"><span id="res-emed-val">15</span> <span class="text-[9px] text-dim-gray">Lux</span></span>
-                                                </div>
-                                                <div class="bar-container">
-                                                    <div id="bar-emed" class="bar-fill bg-gradient-to-r from-white/30 to-white" style="width: 50%;"></div>
-                                                </div>
-                                                <div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_approx">Aprox. para Asfalto Padrão</div>
-                                            </div>
-
-                                            <!-- U0 Bar -->
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <span class="text-xs font-bold text-white uppercase" data-i18n="road_u0">Uniformidade Geral (U0)</span>
-                                                    <span class="text-xs font-bold text-tech-cyan"><span id="res-u0-val">0.40</span></span>
-                                                </div>
-                                                <div class="bar-container">
-                                                    <div id="bar-u0" class="bar-fill bg-gradient-to-r from-tech-cyan/50 to-tech-cyan" style="width: 80%;"></div>
-                                                </div>
-                                            </div>
-
-                                            <!-- TI Bar (Inverse logic: lower is better usually, but bar represents max allowed) -->
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <span class="text-xs font-bold text-white uppercase" data-i18n="road_ti">Ofuscamento Máx (TI)</span>
-                                                    <span class="text-xs font-bold text-red-400"><span id="res-ti-val">15</span>%</span>
-                                                </div>
-                                                <div class="bar-container">
-                                                    <div id="bar-ti" class="bar-fill bg-gradient-to-r from-red-400/50 to-red-400" style="width: 60%;"></div>
-                                                </div>
-                                            </div>
+                                            <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_lmed">Luminância Média (Lmed)</span><span class="text-xs font-bold text-luminous-gold"><span id="res-lmed-val">1.0</span> <span class="text-[9px] text-dim-gray">cd/m²</span></span></div><div class="bar-container"><div id="bar-lmed" class="bar-fill bg-gradient-to-r from-luminous-gold/50 to-luminous-gold" style="width: 50%;"></div></div><div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_ref_m1">Referência: M1 (2.0)</div></div>
+                                            <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_emed">Iluminância Média (Emed)</span><span class="text-xs font-bold text-white"><span id="res-emed-val">15</span> <span class="text-[9px] text-dim-gray">Lux</span></span></div><div class="bar-container"><div id="bar-emed" class="bar-fill bg-gradient-to-r from-white/30 to-white" style="width: 50%;"></div></div><div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_approx">Aprox. para Asfalto Padrão</div></div>
+                                            <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_u0">Uniformidade Geral (U0)</span><span class="text-xs font-bold text-tech-cyan"><span id="res-u0-val">0.40</span></span></div><div class="bar-container"><div id="bar-u0" class="bar-fill bg-gradient-to-r from-tech-cyan/50 to-tech-cyan" style="width: 80%;"></div></div></div>
+                                            <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_ti">Ofuscamento Máx (TI)</span><span class="text-xs font-bold text-red-400"><span id="res-ti-val">15</span>%</span></div><div class="bar-container"><div id="bar-ti" class="bar-fill bg-gradient-to-r from-red-400/50 to-red-400" style="width: 60%;"></div></div></div>
                                         </div>
-                                        
-                                        <div class="mt-8 text-center">
-                                            <div id="m-score-debug" class="text-[10px] font-mono text-dim-line opacity-40">System Score: 3</div>
-                                        </div>
+                                        <div class="mt-8 text-center"><div id="m-score-debug" class="text-[10px] font-mono text-dim-line opacity-40">System Score: 3</div></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Content: LEED -->
                         <div id="content-leed" class="query-content hidden">
                             <div class="flex gap-2 mb-4 border-b border-white/5 pb-2">
                                 <span onclick="switchCertTab('leed')" id="cert-tab-leed" class="cert-tab active">LEED v4.1 (BD+C)</span>
@@ -614,19 +495,14 @@
                             </div>
 
                             <div id="pane-leed" class="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                                
                                 <div class="mb-6 bg-black/30 p-4 rounded-xl border border-white/5 shadow-lg">
                                     <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-                                        <h4 class="text-sm font-bold text-luminous-gold flex items-center gap-2">
-                                            <i class="fas fa-calculator"></i> <span data-i18n="leed_calc_title">Calculadora de Orçamento (LPD)</span>
-                                        </h4>
+                                        <h4 class="text-sm font-bold text-luminous-gold flex items-center gap-2"><i class="fas fa-calculator"></i> <span data-i18n="leed_calc_title">Calculadora de Orçamento (LPD)</span></h4>
                                         <div class="text-[9px] bg-leed-green/20 px-2 py-1 rounded text-leed-green font-bold">ASHRAE 90.1-2016</div>
                                     </div>
-
                                     <div class="flex flex-col md:flex-row gap-6 items-end mb-6">
                                         <div class="w-full md:w-1/2">
                                             <label class="text-[10px] text-dim-gray font-bold uppercase block mb-3" data-i18n="leed_select_target">Selecione a Meta de Certificação</label>
-                                            <!-- New Clickable LEED Targets -->
                                             <div class="grid grid-cols-4 gap-2 text-center">
                                                 <div onclick="setLeedTarget('certified')" id="lvl-certified" class="leed-level-box bg-white/5 p-2 rounded border border-transparent hover:border-white/20"><div class="text-[9px] font-bold text-gray-400">CERTIFIED</div></div>
                                                 <div onclick="setLeedTarget('silver')" id="lvl-silver" class="leed-level-box bg-white/5 p-2 rounded border border-transparent hover:border-white/20"><div class="text-[9px] font-bold text-gray-300">SILVER</div></div>
@@ -634,151 +510,46 @@
                                                 <div onclick="setLeedTarget('platinum')" id="lvl-platinum" class="leed-level-box bg-white/5 p-2 rounded border border-transparent hover:border-white/20"><div class="text-[9px] font-bold text-cyan-200">PLATINUM</div></div>
                                             </div>
                                         </div>
-                                        
-                                        <!-- Swapped: Reduction moved to left -->
                                         <div class="w-full md:w-1/4 text-right md:text-left">
                                             <div class="text-[10px] text-dim-gray font-bold uppercase mb-1" data-i18n="leed_reduction">Redução Aplicada</div>
                                             <div id="leed-reduction-display" class="text-xl font-bold text-leed-green">20%</div>
                                         </div>
-
-                                        <!-- Swapped: Area moved to right & colored cyan -->
                                         <div class="w-full md:w-1/4">
                                             <label class="text-[10px] text-tech-cyan font-bold uppercase block mb-2" data-i18n="leed_area">Área do Projeto (m²)</label>
-                                            <div class="relative">
-                                                <input type="number" id="leed-area-input" value="100" oninput="updateLeedTargets()" class="w-full bg-midnight border border-white/20 rounded px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold text-right pr-8">
-                                                <span class="absolute right-3 top-2 text-xs text-tech-cyan">m²</span>
-                                            </div>
+                                            <div class="relative"><input type="number" id="leed-area-input" value="100" oninput="updateLeedTargets()" class="w-full bg-midnight border border-white/20 rounded px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold text-right pr-8"><span class="absolute right-3 top-2 text-xs text-tech-cyan">m²</span></div>
                                         </div>
                                     </div>
-
                                     <table class="w-full text-xs text-left border-collapse">
-                                        <thead class="text-white border-b border-white/10 bg-white/5">
-                                            <tr>
-                                                <th class="p-3 font-bold" data-i18n="leed_type">Tipologia</th>
-                                                <th class="p-3 text-center font-bold text-dim-gray">Base ASHRAE<br><span class="text-[9px] opacity-70">(W/m²)</span></th>
-                                                <th class="p-3 text-center font-bold text-luminous-gold">Meta LPD<br><span class="text-[9px] opacity-70">(W/m²)</span></th>
-                                                <!-- Text changed to CARGA PERMITIDA -->
-                                                <th class="p-3 text-right font-bold text-tech-cyan"><span data-i18n="leed_allowance">CARGA PERMITIDA</span><br><span class="text-[9px] opacity-70">(Watts)</span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="leed-lpd-body" class="text-dim-line text-xs font-medium">
-                                        </tbody>
+                                        <thead class="text-white border-b border-white/10 bg-white/5"><tr><th class="p-3 font-bold" data-i18n="leed_type">Tipologia</th><th class="p-3 text-center font-bold text-dim-gray">Base ASHRAE<br><span class="text-[9px] opacity-70">(W/m²)</span></th><th class="p-3 text-center font-bold text-luminous-gold">Meta LPD<br><span class="text-[9px] opacity-70">(W/m²)</span></th><th class="p-3 text-right font-bold text-tech-cyan"><span data-i18n="leed_allowance">CARGA PERMITIDA</span><br><span class="text-[9px] opacity-70">(Watts)</span></th></tr></thead>
+                                        <tbody id="leed-lpd-body" class="text-dim-line text-xs font-medium"></tbody>
                                     </table>
                                 </div>
-
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                        <h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">EQ: Interior Lighting <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">1-2 Pts</span></h4>
-                                        <ul class="list-disc pl-4 text-xs text-dim-gray space-y-2">
-                                            <li data-i18n="leed_eq_1"><strong class="text-white">Controle:</strong> Individual para 90% dos ocupantes.</li>
-                                            <li data-i18n="leed_eq_2"><strong class="text-white">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.</li>
-                                        </ul>
-                                    </div>
-                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                        <h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">SS: Light Pollution <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">Req</span></h4>
-                                        <div class="text-xs text-dim-gray" data-i18n="leed_ss_1">
-                                            Requisito <strong class="text-white">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).
-                                        </div>
-                                    </div>
+                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5"><h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">EQ: Interior Lighting <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">1-2 Pts</span></h4><ul class="list-disc pl-4 text-xs text-dim-gray space-y-2"><li data-i18n="leed_eq_1"><strong class="text-white">Controle:</strong> Individual para 90% dos ocupantes.</li><li data-i18n="leed_eq_2"><strong class="text-white">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.</li></ul></div>
+                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5"><h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">SS: Light Pollution <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">Req</span></h4><div class="text-xs text-dim-gray" data-i18n="leed_ss_1">Requisito <strong class="text-white">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).</div></div>
                                 </div>
                             </div>
 
                             <div id="pane-well" class="hidden max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                                <!-- Dynamic WELL Scorecard -->
                                 <div class="mb-6 bg-black/30 p-5 rounded-xl border border-white/5 shadow-lg">
                                     <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                                        <div>
-                                            <h4 class="text-sm font-bold text-tech-cyan flex items-center gap-2">
-                                                <i class="fas fa-check-circle"></i> <span data-i18n="well_sim_title">Simulador de Créditos de Iluminação</span>
-                                            </h4>
-                                            <p class="text-[10px] text-dim-gray mt-1" data-i18n="well_concept">Conceito: LIGHT (WELL v2)</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="text-[9px] text-dim-gray uppercase font-bold" data-i18n="well_est_pts">Pontos Estimados</div>
-                                            <div id="well-total-score" class="text-2xl font-black text-white">0 <span class="text-xs text-dim-gray font-normal">/ 12</span></div>
-                                        </div>
+                                        <div><h4 class="text-sm font-bold text-tech-cyan flex items-center gap-2"><i class="fas fa-check-circle"></i> <span data-i18n="well_sim_title">Simulador de Créditos de Iluminação</span></h4><p class="text-[10px] text-dim-gray mt-1" data-i18n="well_concept">Conceito: LIGHT (WELL v2)</p></div>
+                                        <div class="text-right"><div class="text-[9px] text-dim-gray uppercase font-bold" data-i18n="well_est_pts">Pontos Estimados</div><div id="well-total-score" class="text-2xl font-black text-white">0 <span class="text-xs text-dim-gray font-normal">/ 12</span></div></div>
                                     </div>
-
-                                    <!-- Progress Bar -->
-                                    <div class="mb-6">
-                                        <div class="flex justify-between text-[9px] text-dim-gray mb-1 uppercase font-bold">
-                                            <span data-i18n="well_contrib">Contribuição para Certificação</span>
-                                            <span id="well-progress-text">0%</span>
-                                        </div>
-                                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                            <div id="well-progress-bar" class="h-full bg-gradient-to-r from-tech-cyan/40 to-tech-cyan transition-all duration-500" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Features List -->
+                                    <div class="mb-6"><div class="flex justify-between text-[9px] text-dim-gray mb-1 uppercase font-bold"><span data-i18n="well_contrib">Contribuição para Certificação</span><span id="well-progress-text">0%</span></div><div class="w-full bg-white/10 h-2 rounded-full overflow-hidden"><div id="well-progress-bar" class="h-full bg-gradient-to-r from-tech-cyan/40 to-tech-cyan transition-all duration-500" style="width: 0%"></div></div></div>
                                     <div class="space-y-3">
-                                        <!-- Preconditions -->
-                                        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green">
-                                            <div>
-                                                <div class="text-xs font-bold text-white">L01: Light Exposure</div>
-                                                <div class="text-[10px] text-dim-gray" data-i18n="well_l01">Acesso à luz natural e visualização.</div>
-                                            </div>
-                                            <div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div>
-                                        </div>
-                                        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green">
-                                            <div>
-                                                <div class="text-xs font-bold text-white">L02: Visual Lighting Design</div>
-                                                <div class="text-[10px] text-dim-gray" data-i18n="well_l02">Níveis de iluminância adequados.</div>
-                                            </div>
-                                            <div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div>
-                                        </div>
-
-                                        <!-- Optimizations (Toggles) -->
+                                        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green"><div><div class="text-xs font-bold text-white">L01: Light Exposure</div><div class="text-[10px] text-dim-gray" data-i18n="well_l01">Acesso à luz natural e visualização.</div></div><div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div></div>
+                                        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green"><div><div class="text-xs font-bold text-white">L02: Visual Lighting Design</div><div class="text-[10px] text-dim-gray" data-i18n="well_l02">Níveis de iluminância adequados.</div></div><div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div></div>
                                         <div class="grid grid-cols-1 gap-2">
-                                            <div onclick="toggleWellFeature(this, 3)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div>
-                                                    <div>
-                                                        <div class="text-xs font-bold text-white">L03: Circadian Lighting Design</div>
-                                                        <div class="text-[10px] text-dim-gray" data-i18n="well_l03">Melanopic Lux > 240 (Workstations).</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs font-bold text-tech-cyan">+3 pts</div>
-                                            </div>
-
-                                            <div onclick="toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div>
-                                                    <div>
-                                                        <div class="text-xs font-bold text-white">L04: Glare Control</div>
-                                                        <div class="text-[10px] text-dim-gray" data-i18n="well_l04">UGR < 16 / Gestão de brilho solar.</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs font-bold text-tech-cyan">+2 pts</div>
-                                            </div>
-
-                                            <div onclick="toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div>
-                                                    <div>
-                                                        <div class="text-xs font-bold text-white">L07: Electric Light Quality</div>
-                                                        <div class="text-[10px] text-dim-gray" data-i18n="well_l07">CRI > 90, R9 > 50, Flicker < 90Hz.</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs font-bold text-tech-cyan">+2 pts</div>
-                                            </div>
-
-                                            <div onclick="toggleWellFeature(this, 1)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div>
-                                                    <div>
-                                                        <div class="text-xs font-bold text-white">L08: Occupant Control</div>
-                                                        <div class="text-[10px] text-dim-gray" data-i18n="well_l08">Controle de zonas e intensidade.</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs font-bold text-tech-cyan">+1 pt</div>
-                                            </div>
+                                            <div onclick="toggleWellFeature(this, 3)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L03: Circadian Lighting Design</div><div class="text-[10px] text-dim-gray" data-i18n="well_l03">Melanopic Lux > 240 (Workstations).</div></div></div><div class="text-xs font-bold text-tech-cyan">+3 pts</div></div>
+                                            <div onclick="toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L04: Glare Control</div><div class="text-[10px] text-dim-gray" data-i18n="well_l04">UGR < 16 / Gestão de brilho solar.</div></div></div><div class="text-xs font-bold text-tech-cyan">+2 pts</div></div>
+                                            <div onclick="toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L07: Electric Light Quality</div><div class="text-[10px] text-dim-gray" data-i18n="well_l07">CRI > 90, R9 > 50, Flicker < 90Hz.</div></div></div><div class="text-xs font-bold text-tech-cyan">+2 pts</div></div>
+                                            <div onclick="toggleWellFeature(this, 1)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L08: Occupant Control</div><div class="text-[10px] text-dim-gray" data-i18n="well_l08">Controle de zonas e intensidade.</div></div></div><div class="text-xs font-bold text-tech-cyan">+1 pt</div></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -830,7 +601,6 @@
         </div>
     </footer>
 
-    <!-- TERMS MODAL -->
     <div id="terms-modal" class="fixed inset-0 z-[60] hidden">
         <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="closeTerms()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-twilight border border-white/10 rounded-2xl shadow-2xl p-8 animate-fade-in-up">
@@ -857,19 +627,16 @@
         </div>
     </div>
 
-    <!-- PROFILE MODAL (NEW) -->
     <div id="profile-modal" class="fixed inset-0 z-[60] hidden">
         <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="closeProfile()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-twilight border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up">
             
-            <!-- Modal Header -->
             <div class="bg-white/5 p-6 border-b border-white/5 flex justify-between items-center">
                 <h3 class="text-luminous-gold font-bold tracking-widest uppercase text-sm" data-i18n="profile_title">Meu Perfil</h3>
                 <button onclick="closeProfile()" class="text-dim-gray hover:text-white transition-colors"><i class="fas fa-times"></i></button>
             </div>
 
             <div class="p-6">
-                <!-- User Info -->
                 <div class="flex items-center gap-4 mb-8">
                     <div class="w-16 h-16 rounded-full bg-luminous-gold/10 border border-luminous-gold flex items-center justify-center text-luminous-gold text-2xl">
                         <i class="fas fa-user-astronaut"></i>
@@ -881,7 +648,6 @@
                     </div>
                 </div>
 
-                <!-- Fields -->
                 <div class="space-y-4">
                     <div class="group">
                         <label class="text-[9px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_email">E-mail</label>
@@ -890,10 +656,9 @@
                     
                     <div class="group">
                         <label class="text-[9px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_company">Empresa / Escritório</label>
-                        <input type="text" value="Lux Studio Design" class="w-full bg-black/40 border border-white/10 rounded px-3 py-3 text-xs text-white outline-none focus:border-luminous-gold text-left !important">
+                        <input type="text" value="Lux Studio Design" class="w-full bg-black/40 border border-white/10 rounded px-3 py-3 text-xs text-white outline-none focus:border-luminous-gold text-left">
                     </div>
 
-                    <!-- Usage Stats (Mock) -->
                     <div class="grid grid-cols-2 gap-4 mt-4">
                         <div class="bg-white/5 p-3 rounded border border-white/5 text-center">
                             <div class="text-xl font-bold text-white">124</div>
@@ -911,18 +676,95 @@
                         <i class="fas fa-cog mr-1"></i> Configurações
                     </button>
                     <button onclick="handleLogout()" class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-widest font-bold border border-red-500/30 px-4 py-2 rounded hover:bg-red-500/10 transition-colors">
-                        Logout <i class="fas fa-sign-out-alt ml-1"></i>
+                        Sair <i class="fas fa-sign-out-alt ml-1"></i>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div id="auth-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="closeAuth()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-twilight border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up">
+            
+            <div class="flex border-b border-white/5">
+                <button onclick="switchAuthMode('login')" id="tab-login" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-luminous-gold border-b-2 border-luminous-gold bg-white/5 transition-colors">Login</button>
+                <button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-dim-gray border-b-2 border-transparent hover:text-white transition-colors">Cadastrar</button>
+            </div>
+
+            <div class="p-8">
+                <h3 id="auth-title" class="text-white font-bold tracking-widest text-lg mb-2 uppercase text-center">Bem-vindo de volta</h3>
+                <p id="auth-subtitle" class="text-[10px] text-dim-gray text-center mb-6">Acesse seus projetos e configurações.</p>
+
+                <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                    <div class="group">
+                        <label class="text-[9px] text-dim-gray font-bold uppercase mb-1 block">E-mail</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-dim-gray text-xs"></i>
+                            <input type="email" id="auth-email" required placeholder="seu@email.com" class="w-full bg-black/40 border border-white/10 rounded px-3 py-3 pl-9 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
+                        </div>
+                    </div>
+                    
+                    <div class="group">
+                        <label class="text-[9px] text-dim-gray font-bold uppercase mb-1 block">Senha</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-dim-gray text-xs"></i>
+                            <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-black/40 border border-white/10 rounded px-3 py-3 pl-9 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
+                        </div>
+                    </div>
+
+                    <div id="register-fields" class="hidden space-y-4">
+                        <div class="group">
+                            <label class="text-[9px] text-dim-gray font-bold uppercase mb-1 block">Nome Completo</label>
+                            <input type="text" id="auth-name" placeholder="Arquiteto Exemplo" class="w-full bg-black/40 border border-white/10 rounded px-3 py-3 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" id="auth-submit-btn" class="w-full py-3 bg-luminous-gold text-midnight font-bold rounded-lg hover:bg-white transition-colors text-xs tracking-widest uppercase shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                            Entrar
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p id="auth-footer-text" class="text-[10px] text-dim-gray">
+                        Ainda não tem conta? <a href="#" onclick="switchAuthMode('register')" class="text-luminous-gold hover:underline">Cadastre-se</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // --- Configuração SaaS (Supabase) ---
+        // PARA PRODUÇÃO: Substitua pelos valores reais do seu projeto Supabase
+        const SUPABASE_URL = ""; 
+        const SUPABASE_KEY = ""; 
+        
+        // Inicialização do Cliente (com fallback seguro)
+        let supabase = null;
+        if (SUPABASE_URL && SUPABASE_KEY && window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+
+        // --- State Management Centralizado ---
+        const state = {
+            user: null, // Começa nulo (Logged Out)
+            isAuthLoading: false,
+            profile: { is_pro: false, license_status: 'free' },
+            // Dados das calculadoras
+            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, workPlane: 0.75, flux: 1500, cdklm: 2000 },
+            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 },
+            homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000 },
+        };
+
         // --- Translations Database ---
         const i18n = {
             pt: {
-                nav_home: "INICIO", nav_about: "SOBRE", nav_logout: "LOGOUT", nav_profile: "PERFIL",
+                nav_home: "INICIO", nav_about: "SOBRE", nav_logout: "SAIR", nav_profile: "PERFIL", nav_login: "ENTRAR",
+                auth_login_title: "BEM-VINDO DE VOLTA", auth_register_title: "CRIAR CONTA",
+                auth_login_btn: "ENTRAR", auth_register_btn: "CADASTRAR",
                 tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
                 calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA (CD/KLM)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_flux: "FLUXO LUMINOSO", 
@@ -949,10 +791,13 @@
                 card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.",
                 card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.",
                 footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade", terms_accept: "Compreendo e Aceito",
-                profile_title: "Meu Perfil", lbl_email: "E-mail", lbl_company: "Empresa / Escritório"
+                profile_title: "Meu Perfil", lbl_email: "E-mail", lbl_company: "Empresa / Escritório",
+                err_login: "Falha no login. Verifique as credenciais.", success_register: "Cadastro realizado com sucesso! Faça login."
             },
             en: {
-                nav_home: "HOME", nav_about: "ABOUT", nav_logout: "LOGOUT", nav_profile: "PROFILE",
+                nav_home: "HOME", nav_about: "ABOUT", nav_logout: "LOGOUT", nav_profile: "PROFILE", nav_login: "LOGIN",
+                auth_login_title: "WELCOME BACK", auth_register_title: "CREATE ACCOUNT",
+                auth_login_btn: "LOGIN", auth_register_btn: "SIGN UP",
                 tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DESIGN",
                 calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY (CD/KLM)",
                 lbl_intensity_i: "INTENSITY (I)", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_flux: "LUMINOUS FLUX", 
@@ -979,31 +824,199 @@
                 card_2_title: "CUBIC COSINE LAW", card_2_desc: "Inverse Square Law variation for horizontal surfaces.",
                 card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.",
                 footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility", terms_accept: "I Understand and Accept",
-                profile_title: "My Profile", lbl_email: "E-mail", lbl_company: "Company / Office"
+                profile_title: "My Profile", lbl_email: "E-mail", lbl_company: "Company / Office",
+                err_login: "Login failed. Check credentials.", success_register: "Registration successful! Please login."
             }
         };
 
         let currentLang = 'pt';
-        let currentTool = 'query'; 
-        let calcMode = 'direct'; 
-        
-        // App State
+        let currentTool = 'query';
+        let calcMode = 'direct';
+        let authMode = 'login'; // 'login' or 'register'
         let currentLeedTarget = 'gold'; // Default
         let currentWellScore = 0; // WELL State
 
-        // State Management (Mocked for SaaS MVP)
-        const state = {
-            user: { 
-                id: 'beta-user-001',
-                name: "Usuário Beta",
-                email: "usuario@luxsintax.com",
-                role: "Arquiteto / LD"
+        // --- Auth Logic (Service Layer) ---
+        const AuthService = {
+            async login(email, password) {
+                if (!supabase) return this.mockLogin(email); // Fallback para teste sem backend
+                
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                return data.user;
             },
-            profile: { is_pro: true, license_status: 'beta', isValid: true },
-            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, workPlane: 0.75, flux: 1500, cdklm: 2000 },
-            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 }, 
-            homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000 },
+
+            async register(email, password, metaData) {
+                if (!supabase) return this.mockRegister(email, metaData); // Fallback
+
+                const { data, error } = await supabase.auth.signUp({
+                    email, password,
+                    options: { data: metaData }
+                });
+                if (error) throw error;
+                return data.user;
+            },
+
+            async logout() {
+                if (supabase) await supabase.auth.signOut();
+                state.user = null;
+                updateUIForAuth();
+            },
+
+            // Simulação para desenvolvimento (funciona sem backend configurado)
+            mockLogin(email) {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve({ 
+                            id: 'mock-id-' + Date.now(), 
+                            email: email, 
+                            user_metadata: { name: email.split('@')[0] } 
+                        });
+                    }, 800);
+                });
+            },
+            mockRegister(email, meta) {
+                return this.mockLogin(email);
+            }
         };
+
+        // --- UI Logic Improvements ---
+
+        function updateUIForAuth() {
+            const user = state.user;
+            const profileBtn = document.querySelector('button[onclick="openProfile()"] span');
+            const profileIcon = document.querySelector('button[onclick="openProfile()"] div');
+            
+            // Mobile menu references
+            const mobileProfileBtn = document.querySelector('#mobile-menu button[onclick*="openProfile"]');
+
+            if (user) {
+                // Logged In State
+                if(profileBtn) profileBtn.innerText = currentLang === 'pt' ? "PERFIL" : "PROFILE";
+                if(profileIcon) profileIcon.innerHTML = `<i class="fas fa-user text-[10px] text-luminous-gold"></i>`;
+                if(mobileProfileBtn) mobileProfileBtn.innerText = currentLang === 'pt' ? "MEU PERFIL" : "MY PROFILE";
+            } else {
+                // Guest State
+                if(profileBtn) profileBtn.innerText = currentLang === 'pt' ? "ENTRAR" : "LOGIN";
+                if(profileIcon) profileIcon.innerHTML = `<i class="fas fa-sign-in-alt text-[10px] text-dim-gray group-hover:text-luminous-gold"></i>`;
+                if(mobileProfileBtn) mobileProfileBtn.innerText = currentLang === 'pt' ? "ENTRAR / CADASTRAR" : "LOGIN / SIGN UP";
+            }
+        }
+
+        // Função Principal de Ação do Botão Perfil
+        function openProfile() {
+            if (!state.user) {
+                openAuthModal();
+            } else {
+                populateProfileData();
+                document.getElementById('profile-modal').classList.remove('hidden');
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            switchAuthMode('login'); // Default to login
+        }
+
+        function closeAuth() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function switchAuthMode(mode) {
+            authMode = mode;
+            const loginTab = document.getElementById('tab-login');
+            const regTab = document.getElementById('tab-register');
+            const regFields = document.getElementById('register-fields');
+            const title = document.getElementById('auth-title');
+            const sub = document.getElementById('auth-subtitle');
+            const btn = document.getElementById('auth-submit-btn');
+            const footer = document.getElementById('auth-footer-text');
+
+            // Reset Styles
+            const activeClass = "text-luminous-gold border-b-2 border-luminous-gold bg-white/5";
+            const inactiveClass = "text-dim-gray border-b-2 border-transparent hover:text-white";
+
+            if (mode === 'login') {
+                loginTab.className = "flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-colors " + activeClass;
+                regTab.className = "flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-colors " + inactiveClass;
+                regFields.classList.add('hidden');
+                
+                title.innerText = currentLang === 'pt' ? "Bem-vindo de volta" : "Welcome Back";
+                sub.innerText = currentLang === 'pt' ? "Acesse seus projetos." : "Access your projects.";
+                btn.innerText = currentLang === 'pt' ? "Entrar" : "Login";
+                footer.innerHTML = currentLang === 'pt' 
+                    ? `Ainda não tem conta? <a href="#" onclick="switchAuthMode('register')" class="text-luminous-gold hover:underline">Cadastre-se</a>`
+                    : `No account? <a href="#" onclick="switchAuthMode('register')" class="text-luminous-gold hover:underline">Sign Up</a>`;
+
+            } else {
+                regTab.className = "flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-colors " + activeClass;
+                loginTab.className = "flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-colors " + inactiveClass;
+                regFields.classList.remove('hidden');
+
+                title.innerText = currentLang === 'pt' ? "Criar Conta" : "Create Account";
+                sub.innerText = currentLang === 'pt' ? "Junte-se ao LuxSintax." : "Join LuxSintax.";
+                btn.innerText = currentLang === 'pt' ? "Cadastrar" : "Sign Up";
+                footer.innerHTML = currentLang === 'pt' 
+                    ? `Já tem conta? <a href="#" onclick="switchAuthMode('login')" class="text-luminous-gold hover:underline">Fazer Login</a>`
+                    : `Have an account? <a href="#" onclick="switchAuthMode('login')" class="text-luminous-gold hover:underline">Login</a>`;
+            }
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const name = document.getElementById('auth-name').value;
+            const btn = document.getElementById('auth-submit-btn');
+
+            // Loading State
+            const originalText = btn.innerText;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+            btn.disabled = true;
+
+            try {
+                let user = null;
+                if (authMode === 'login') {
+                    user = await AuthService.login(email, password);
+                } else {
+                    user = await AuthService.register(email, password, { name: name || email.split('@')[0] });
+                }
+
+                // Success Logic
+                state.user = user;
+                updateUIForAuth();
+                closeAuth();
+                
+                // Auto open profile on success to show user info
+                setTimeout(() => openProfile(), 500);
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro: " + err.message);
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function handleLogout() {
+            AuthService.logout();
+            closeProfile();
+            // Reset Inputs
+            document.getElementById('auth-form').reset();
+        }
+
+        function populateProfileData() {
+            if (!state.user) return;
+            
+            const u = state.user;
+            const meta = u.user_metadata || {};
+            const displayName = meta.name || u.email.split('@')[0];
+
+            if(document.getElementById('profile-name')) document.getElementById('profile-name').innerText = displayName;
+            if(document.getElementById('profile-email')) document.getElementById('profile-email').innerText = u.email;
+            if(document.getElementById('profile-role')) document.getElementById('profile-role').innerText = "Lighting Designer (BETA)";
+        }
 
         // --- Data: Norms ---
         const normsDatabase = [
@@ -1329,13 +1342,6 @@
             updateCalculations();
         }
 
-        function populateProfileData() {
-            const u = state.user;
-            if(document.getElementById('profile-name')) document.getElementById('profile-name').innerText = u.name;
-            if(document.getElementById('profile-email')) document.getElementById('profile-email').innerText = u.email;
-            if(document.getElementById('profile-role')) document.getElementById('profile-role').innerText = u.role;
-        }
-
         function getIntensity(s) {
             if (calcMode === 'direct') return s.intensity;
             return (s.cdklm * s.flux) / 1000;
@@ -1658,31 +1664,23 @@
         function openTerms() { document.getElementById('terms-modal').classList.remove('hidden'); }
         function closeTerms() { document.getElementById('terms-modal').classList.add('hidden'); }
         
-        function openProfile() { 
-            populateProfileData();
-            document.getElementById('profile-modal').classList.remove('hidden'); 
-        }
         function closeProfile() { document.getElementById('profile-modal').classList.add('hidden'); }
         
         function toggleLanguage() { 
             currentLang = currentLang === 'pt' ? 'en' : 'pt'; 
             document.querySelectorAll('.lang-display').forEach(e => e.innerText = currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
             
-            // Translate all elements with data-i18n attribute
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (i18n[currentLang] && i18n[currentLang][key]) {
-                    el.innerHTML = i18n[currentLang][key]; // innerHTML allows bold tags
+                    el.innerHTML = i18n[currentLang][key];
                 }
             });
 
+            // Re-render auth UI to update language on button
+            updateUIForAuth();
             updateCalculations(); 
-            populateProfileData(); // Translate profile labels if needed
-        }
-        
-        function handleLogout() { 
-            alert('Logout System: Waiting for Supabase Auth Integration'); 
-            closeProfile();
+            populateProfileData(); 
         }
         
         function toggleMobileMenu() { 
@@ -1694,12 +1692,12 @@
 
         // Initialize
         document.addEventListener("DOMContentLoaded", () => {
+            updateUIForAuth();
             populateProfileData();
             populateCategoryFilter();
             switchTool('query'); 
             filterNorms();
             
-            // Handle canvas resize
             window.addEventListener('resize', updateCalculations);
         });
     </script>
