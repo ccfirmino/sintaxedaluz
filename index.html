@@ -9,8 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -209,172 +207,40 @@
                             </div>
 
                             <div id="inputs-ponto" class="hidden">
-                                 <div class="mode-direct-group mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div>
-                                    </div>
-                                    <input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000">
-                                </div>
-                                <div class="mode-photo-group hidden space-y-6 mb-6">
-                                    <div class="group">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div>
-                                        </div>
-                                        <input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000">
-                                    </div>
-                                    <div class="group">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div>
-                                        </div>
-                                        <input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500">
-                                    </div>
-                                </div>
-                                <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
-                                    </div>
-                                    <input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0">
-                                </div>
-                                <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
-                                    </div>
-                                    <input type="range" id="range-p-beam" min="5" max="120" step="1" value="30">
-                                </div>
-                                <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
-                                    </div>
-                                    <input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0">
-                                </div>
-                                <div class="group border-t border-white/5 pt-4">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
-                                    </div>
-                                    <input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75">
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
+                                <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
+                                    <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
+                                    <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
                                 </div>
                             </div>
 
                             <div id="inputs-vertical" class="hidden">
-                                 <div class="mode-direct-group mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div>
-                                    </div>
-                                    <input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000">
-                                </div>
-                                <div class="mode-photo-group hidden space-y-6 mb-6">
-                                    <div class="group">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div>
-                                        </div>
-                                        <input type="range" id="range-v-cdklm" min="0" max="10000" step="10" value="2000">
-                                    </div>
-                                    <div class="group">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div>
-                                        </div>
-                                        <input type="range" id="range-v-flux" min="0" max="10000" step="10" value="1500">
-                                    </div>
-                                </div>
-                                <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
-                                    </div>
-                                    <input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0">
-                                </div>
-                                <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
-                                    </div>
-                                    <input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0">
-                                </div>
-                                <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
-                                    </div>
-                                    <input type="range" id="range-v-beam" min="5" max="120" step="1" value="30">
-                                </div>
-                                <div class="mb-2 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
-                                    </div>
-                                    <input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30">
-                                </div>
-                                <div class="group border-t border-white/5 pt-4">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
-                                    </div>
-                                    <input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6">
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+                                <div class="mb-2 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
+                                <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
+                                    <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-v-flux" min="0" max="10000" step="10" value="1500"></div>
+                                    <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-v-cdklm" min="0" max="10000" step="10" value="2000"></div>
                                 </div>
                             </div>
 
                             <div id="inputs-homog" class="hidden">
-                                <div class="mode-direct-group mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div>
-                                    </div>
-                                    <input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000">
-                                </div>
-                                <div class="mode-photo-group hidden space-y-6 mb-6">
-                                    <div class="group">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="h-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div>
-                                        </div>
-                                        <input type="range" id="range-h-cdklm" min="0" max="10000" step="10" value="2000">
-                                    </div>
-                                    <div class="group">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label>
-                                            <div class="flex items-baseline gap-1"><input type="number" id="h-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div>
-                                        </div>
-                                        <input type="range" id="range-h-flux" min="0" max="10000" step="10" value="1500">
-                                    </div>
-                                </div>
-
-                                <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
-                                    </div>
-                                    <input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0">
-                                </div>
-                                <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_spacing">DISTÂNCIA ENTRE FONTES (D)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
-                                    </div>
-                                    <input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0">
-                                </div>
-                                 <div class="mb-6 group">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div>
-                                    </div>
-                                    <input type="range" id="range-h-beam" min="5" max="120" step="1" value="30">
-                                </div>
-                                <div class="group border-t border-white/5 pt-4">
-                                    <div class="flex justify-between items-end mb-2">
-                                        <label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label>
-                                        <div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div>
-                                    </div>
-                                    <input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75">
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_spacing">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
+                                 <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
+                                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="h-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-tilt" min="0" max="60" step="1" value="0"></div>
+                                <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
+                                    <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="h-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-h-flux" min="0" max="10000" step="10" value="1500"></div>
+                                    <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="h-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-h-cdklm" min="0" max="10000" step="10" value="2000"></div>
                                 </div>
                             </div>
                         </div>
@@ -383,7 +249,6 @@
                     <div class="lg:col-span-8 flex flex-col gap-6">
                         <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full">
                             <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 drop-shadow-md uppercase tracking-widest font-bold" data-i18n="hdr_results">Resultados em Tempo Real</h3>
-                            
                             <div class="relative w-full h-[500px] bg-twilight/50 border border-white/10 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner">
                                 <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 40px 40px;"></div>
                                 <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
@@ -409,15 +274,9 @@
                             </div>
                         </div>
 
-                        <div id="search-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div class="md:col-span-2 relative w-full">
-                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-blue text-sm"></i>
-                                <input type="text" id="global-search" placeholder="Pesquisar ambiente, tarefa ou crédito..." 
-                                    class="w-full bg-black/40 border border-white/10 rounded-full py-2 pl-9 pr-4 text-sm text-white focus:border-luminous-gold outline-none transition-all" 
-                                    oninput="filterQueryContent()">
-                            </div>
-                            <div class="md:col-span-1">
-                                <select id="category-filter" onchange="filterQueryContent()" class="w-full bg-black/40 border border-white/10 rounded-full py-2 px-4 text-sm text-white focus:border-luminous-gold outline-none transition-all custom-select uppercase">
+                        <div id="search-container" class="flex flex-col md:flex-row gap-4 mb-6 w-full">
+                            <div class="w-full">
+                                <select id="category-filter" onchange="filterNorms()" class="w-full bg-black/40 border border-white/10 rounded-full py-3 px-6 text-sm text-white focus:border-luminous-gold outline-none transition-all custom-select uppercase cursor-pointer">
                                     <option value="all" data-i18n="filter_all">Todas as Categorias</option>
                                 </select>
                             </div>
@@ -440,122 +299,30 @@
                             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
                                 <div class="lg:col-span-5 flex flex-col gap-4">
                                     <div class="glass-panel p-5 rounded-xl border border-white/5">
-                                        <h4 class="text-sm font-bold text-luminous-gold mb-4 flex items-center gap-2 uppercase tracking-wider">
-                                            <i class="fas fa-sliders-h"></i> <span data-i18n="road_params">Parâmetros da Via (Classe M)</span>
-                                        </h4>
-                                        
+                                        <h4 class="text-sm font-bold text-luminous-gold mb-4 flex items-center gap-2 uppercase tracking-wider"><i class="fas fa-sliders-h"></i> <span data-i18n="road_params">Parâmetros da Via (Classe M)</span></h4>
                                         <div class="space-y-4">
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_speed">Velocidade (km/h)</label>
-                                                <select id="m-speed" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="2">Muito Alta (> 100)</option>
-                                                    <option value="1">Alta (70 - 100)</option>
-                                                    <option value="-1">Moderada (40 - 70)</option>
-                                                    <option value="-2">Baixa (< 40)</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_volume">Volume de Tráfego</label>
-                                                <select id="m-volume" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="1">Alto (> 65% capacidade)</option>
-                                                    <option value="0" selected>Moderado (35-65%)</option>
-                                                    <option value="-1">Baixo (< 35%)</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_separation">Separação de Tráfego</label>
-                                                <select id="m-separation" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="0">Não (Pista Simples)</option>
-                                                    <option value="-1">Sim (Canteiro Central)</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_density">Densidade de Interseções</label>
-                                                <select id="m-density" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="1">Alta (> 3 por km)</option>
-                                                    <option value="0" selected>Moderada (< 3 por km)</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_complexity">Complexidade / Guiagem</label>
-                                                <select id="m-complexity" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="1">Alta / Guiagem Pobre</option>
-                                                    <option value="0" selected>Normal / Guiagem Boa</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div class="group">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_ambient">Luminância do Entorno</label>
-                                                <select id="m-ambient" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors">
-                                                    <option value="1">Alta (Comercial/Urbano)</option>
-                                                    <option value="0" selected>Moderada (Residencial)</option>
-                                                    <option value="-1">Baixa (Rural)</option>
-                                                </select>
-                                            </div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_speed">Velocidade (km/h)</label><select id="m-speed" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="2">Muito Alta (> 100)</option><option value="1">Alta (70 - 100)</option><option value="-1">Moderada (40 - 70)</option><option value="-2">Baixa (< 40)</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_volume">Volume de Tráfego</label><select id="m-volume" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alto (> 65% capacidade)</option><option value="0" selected>Moderado (35-65%)</option><option value="-1">Baixo (< 35%)</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_separation">Separação de Tráfego</label><select id="m-separation" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="0">Não (Pista Simples)</option><option value="-1">Sim (Canteiro Central)</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_density">Densidade de Interseções</label><select id="m-density" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta (> 3 por km)</option><option value="0" selected>Moderada (< 3 por km)</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_complexity">Complexidade / Guiagem</label><select id="m-complexity" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta / Guiagem Pobre</option><option value="0" selected>Normal / Guiagem Boa</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_ambient">Luminância do Entorno</label><select id="m-ambient" onchange="calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta (Comercial/Urbano)</option><option value="0" selected>Moderada (Residencial)</option><option value="-1">Baixa (Rural)</option></select></div>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="lg:col-span-7">
                                     <div class="glass-panel p-6 rounded-xl border border-white/10 h-full flex flex-col justify-center relative overflow-hidden">
                                         <div class="absolute inset-0 bg-gradient-to-br from-luminous-gold/5 to-transparent pointer-events-none"></div>
-                                        
                                         <div class="text-center mb-8">
                                             <div class="text-[10px] text-dim-gray font-bold uppercase tracking-[0.2em] mb-2" data-i18n="road_rec_class">Classe Recomendada</div>
                                             <div id="m-result-class" class="text-7xl font-black text-white mb-2 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tracking-tighter">M3</div>
                                             <div id="m-result-desc" class="text-xs text-luminous-gold font-bold uppercase tracking-widest bg-luminous-gold/10 px-4 py-1.5 rounded-full border border-luminous-gold/20 inline-block">Vias Arteriais Secundárias</div>
                                         </div>
-
                                         <div class="space-y-5 px-4 max-w-md mx-auto w-full">
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <span class="text-xs font-bold text-white uppercase" data-i18n="road_lmed">Luminância Média (Lmed)</span>
-                                                    <span class="text-xs font-bold text-luminous-gold"><span id="res-lmed-val">1.0</span> <span class="text-[9px] text-dim-gray">cd/m²</span></span>
-                                                </div>
-                                                <div class="bar-container">
-                                                    <div id="bar-lmed" class="bar-fill bg-gradient-to-r from-luminous-gold/50 to-luminous-gold" style="width: 50%;"></div>
-                                                </div>
-                                                <div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_ref_m1">Referência: M1 (2.0)</div>
-                                            </div>
-
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <span class="text-xs font-bold text-white uppercase" data-i18n="road_emed">Iluminância Média (Emed)</span>
-                                                    <span class="text-xs font-bold text-white"><span id="res-emed-val">15</span> <span class="text-[9px] text-dim-gray">Lux</span></span>
-                                                </div>
-                                                <div class="bar-container">
-                                                    <div id="bar-emed" class="bar-fill bg-gradient-to-r from-white/30 to-white" style="width: 50%;"></div>
-                                                </div>
-                                                <div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_approx">Aprox. para Asfalto Padrão</div>
-                                            </div>
-
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <span class="text-xs font-bold text-white uppercase" data-i18n="road_u0">Uniformidade Geral (U0)</span>
-                                                    <span class="text-xs font-bold text-tech-cyan"><span id="res-u0-val">0.40</span></span>
-                                                </div>
-                                                <div class="bar-container">
-                                                    <div id="bar-u0" class="bar-fill bg-gradient-to-r from-tech-cyan/50 to-tech-cyan" style="width: 80%;"></div>
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <span class="text-xs font-bold text-white uppercase" data-i18n="road_ti">Ofuscamento Máx (TI)</span>
-                                                    <span class="text-xs font-bold text-red-400"><span id="res-ti-val">15</span>%</span>
-                                                </div>
-                                                <div class="bar-container">
-                                                    <div id="bar-ti" class="bar-fill bg-gradient-to-r from-red-400/50 to-red-400" style="width: 60%;"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="mt-8 text-center">
-                                            <div id="m-score-debug" class="text-[10px] font-mono text-dim-line opacity-40">System Score: 3</div>
+                                            <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_lmed">Luminância Média (Lmed)</span><span class="text-xs font-bold text-luminous-gold"><span id="res-lmed-val">1.0</span> <span class="text-[9px] text-dim-gray">cd/m²</span></span></div><div class="bar-container"><div id="bar-lmed" class="bar-fill bg-gradient-to-r from-luminous-gold/50 to-luminous-gold" style="width: 50%;"></div></div><div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_ref_m1">Referência: M1 (2.0)</div></div>
+                                            <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_emed">Iluminância Média (Emed)</span><span class="text-xs font-bold text-white"><span id="res-emed-val">15</span> <span class="text-[9px] text-dim-gray">Lux</span></span></div><div class="bar-container"><div id="bar-emed" class="bar-fill bg-gradient-to-r from-white/30 to-white" style="width: 50%;"></div></div><div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_approx">Aprox. para Asfalto Padrão</div></div>
+                                            <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_u0">Uniformidade Geral (U0)</span><span class="text-xs font-bold text-tech-cyan"><span id="res-u0-val">0.40</span></span></div><div class="bar-container"><div id="bar-u0" class="bar-fill bg-gradient-to-r from-tech-cyan/50 to-tech-cyan" style="width: 80%;"></div></div></div>
+                                            <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_ti">Ofuscamento Máx (TI)</span><span class="text-xs font-bold text-red-400"><span id="res-ti-val">15</span>%</span></div><div class="bar-container"><div id="bar-ti" class="bar-fill bg-gradient-to-r from-red-400/50 to-red-400" style="width: 60%;"></div></div></div>
                                         </div>
                                     </div>
                                 </div>
@@ -569,15 +336,11 @@
                             </div>
 
                             <div id="pane-leed" class="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                                
                                 <div class="mb-6 bg-black/30 p-4 rounded-xl border border-white/5 shadow-lg">
                                     <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-                                        <h4 class="text-sm font-bold text-luminous-gold flex items-center gap-2">
-                                            <i class="fas fa-calculator"></i> <span data-i18n="leed_calc_title">Calculadora de Orçamento (LPD)</span>
-                                        </h4>
+                                        <h4 class="text-sm font-bold text-luminous-gold flex items-center gap-2"><i class="fas fa-calculator"></i> <span data-i18n="leed_calc_title">Calculadora de Orçamento (LPD)</span></h4>
                                         <div class="text-[9px] bg-leed-green/20 px-2 py-1 rounded text-leed-green font-bold">ASHRAE 90.1-2016</div>
                                     </div>
-
                                     <div class="flex flex-col md:flex-row gap-6 items-end mb-6">
                                         <div class="w-full md:w-1/2">
                                             <label class="text-[10px] text-dim-gray font-bold uppercase block mb-3" data-i18n="leed_select_target">Selecione a Meta de Certificação</label>
@@ -588,137 +351,43 @@
                                                 <div onclick="setLeedTarget('platinum')" id="lvl-platinum" class="leed-level-box bg-white/5 p-2 rounded border border-transparent hover:border-white/20"><div class="text-[9px] font-bold text-cyan-200">PLATINUM</div></div>
                                             </div>
                                         </div>
-                                        
                                         <div class="w-full md:w-1/4 text-right md:text-left">
                                             <div class="text-[10px] text-dim-gray font-bold uppercase mb-1" data-i18n="leed_reduction">Redução Aplicada</div>
                                             <div id="leed-reduction-display" class="text-xl font-bold text-leed-green">20%</div>
                                         </div>
-
                                         <div class="w-full md:w-1/4">
                                             <label class="text-[10px] text-tech-cyan font-bold uppercase block mb-2" data-i18n="leed_area">Área do Projeto (m²)</label>
-                                            <div class="relative">
-                                                <input type="number" id="leed-area-input" value="100" oninput="updateLeedTargets()" class="w-full bg-midnight border border-white/20 rounded px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold text-right pr-8">
-                                                <span class="absolute right-3 top-2 text-xs text-tech-cyan">m²</span>
-                                            </div>
+                                            <div class="relative"><input type="number" id="leed-area-input" value="100" oninput="updateLeedTargets()" class="w-full bg-midnight border border-white/20 rounded px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold text-right pr-8"><span class="absolute right-3 top-2 text-xs text-tech-cyan">m²</span></div>
                                         </div>
                                     </div>
-
                                     <table class="w-full text-xs text-left border-collapse">
                                         <thead class="text-white border-b border-white/10 bg-white/5">
-                                            <tr>
-                                                <th class="p-3 font-bold" data-i18n="leed_type">Tipologia</th>
-                                                <th class="p-3 text-center font-bold text-dim-gray">Base ASHRAE<br><span class="text-[9px] opacity-70">(W/m²)</span></th>
-                                                <th class="p-3 text-center font-bold text-luminous-gold">Meta LPD<br><span class="text-[9px] opacity-70">(W/m²)</span></th>
-                                                <th class="p-3 text-right font-bold text-tech-cyan"><span data-i18n="leed_allowance">CARGA PERMITIDA</span><br><span class="text-[9px] opacity-70">(Watts)</span></th>
-                                            </tr>
+                                            <tr><th class="p-3 font-bold" data-i18n="leed_type">Tipologia</th><th class="p-3 text-center font-bold text-dim-gray">Base ASHRAE<br><span class="text-[9px] opacity-70">(W/m²)</span></th><th class="p-3 text-center font-bold text-luminous-gold">Meta LPD<br><span class="text-[9px] opacity-70">(W/m²)</span></th><th class="p-3 text-right font-bold text-tech-cyan"><span data-i18n="leed_allowance">CARGA PERMITIDA</span><br><span class="text-[9px] opacity-70">(Watts)</span></th></tr>
                                         </thead>
-                                        <tbody id="leed-lpd-body" class="text-dim-line text-xs font-medium">
-                                        </tbody>
+                                        <tbody id="leed-lpd-body" class="text-dim-line text-xs font-medium"></tbody>
                                     </table>
                                 </div>
-
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                        <h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">EQ: Interior Lighting <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">1-2 Pts</span></h4>
-                                        <ul class="list-disc pl-4 text-xs text-dim-gray space-y-2">
-                                            <li data-i18n="leed_eq_1"><strong class="text-white">Controle:</strong> Individual para 90% dos ocupantes.</li>
-                                            <li data-i18n="leed_eq_2"><strong class="text-white">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.</li>
-                                        </ul>
-                                    </div>
-                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                        <h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">SS: Light Pollution <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">Req</span></h4>
-                                        <div class="text-xs text-dim-gray" data-i18n="leed_ss_1">
-                                            Requisito <strong class="text-white">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).
-                                        </div>
-                                    </div>
+                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5"><h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">EQ: Interior Lighting <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">1-2 Pts</span></h4><ul class="list-disc pl-4 text-xs text-dim-gray space-y-2"><li data-i18n="leed_eq_1"><strong class="text-white">Controle:</strong> Individual para 90% dos ocupantes.</li><li data-i18n="leed_eq_2"><strong class="text-white">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.</li></ul></div>
+                                    <div class="bg-black/20 p-4 rounded-xl border border-white/5"><h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">SS: Light Pollution <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">Req</span></h4><div class="text-xs text-dim-gray" data-i18n="leed_ss_1">Requisito <strong class="text-white">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).</div></div>
                                 </div>
                             </div>
 
                             <div id="pane-well" class="hidden max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
                                 <div class="mb-6 bg-black/30 p-5 rounded-xl border border-white/5 shadow-lg">
                                     <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                                        <div>
-                                            <h4 class="text-sm font-bold text-tech-cyan flex items-center gap-2">
-                                                <i class="fas fa-check-circle"></i> <span data-i18n="well_sim_title">Simulador de Créditos de Iluminação</span>
-                                            </h4>
-                                            <p class="text-[10px] text-dim-gray mt-1" data-i18n="well_concept">Conceito: LIGHT (WELL v2)</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="text-[9px] text-dim-gray uppercase font-bold" data-i18n="well_est_pts">Pontos Estimados</div>
-                                            <div id="well-total-score" class="text-2xl font-black text-white">0 <span class="text-xs text-dim-gray font-normal">/ 12</span></div>
-                                        </div>
+                                        <div><h4 class="text-sm font-bold text-tech-cyan flex items-center gap-2"><i class="fas fa-check-circle"></i> <span data-i18n="well_sim_title">Simulador de Créditos de Iluminação</span></h4><p class="text-[10px] text-dim-gray mt-1" data-i18n="well_concept">Conceito: LIGHT (WELL v2)</p></div>
+                                        <div class="text-right"><div class="text-[9px] text-dim-gray uppercase font-bold" data-i18n="well_est_pts">Pontos Estimados</div><div id="well-total-score" class="text-2xl font-black text-white">0 <span class="text-xs text-dim-gray font-normal">/ 8</span></div></div>
                                     </div>
-
-                                    <div class="mb-6">
-                                        <div class="flex justify-between text-[9px] text-dim-gray mb-1 uppercase font-bold">
-                                            <span data-i18n="well_contrib">Contribuição para Certificação</span>
-                                            <span id="well-progress-text">0%</span>
-                                        </div>
-                                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                            <div id="well-progress-bar" class="h-full bg-gradient-to-r from-tech-cyan/40 to-tech-cyan transition-all duration-500" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-
+                                    <div class="mb-6"><div class="flex justify-between text-[9px] text-dim-gray mb-1 uppercase font-bold"><span data-i18n="well_contrib">Contribuição para Certificação</span><span id="well-progress-text">0%</span></div><div class="w-full bg-white/10 h-2 rounded-full overflow-hidden"><div id="well-progress-bar" class="h-full bg-gradient-to-r from-tech-cyan/40 to-tech-cyan transition-all duration-500" style="width: 0%"></div></div></div>
                                     <div class="space-y-3">
-                                        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green">
-                                            <div>
-                                                <div class="text-xs font-bold text-white">L01: Light Exposure</div>
-                                                <div class="text-[10px] text-dim-gray" data-i18n="well_l01">Acesso à luz natural e visualização.</div>
-                                            </div>
-                                            <div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div>
-                                        </div>
-                                        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green">
-                                            <div>
-                                                <div class="text-xs font-bold text-white">L02: Visual Lighting Design</div>
-                                                <div class="text-[10px] text-dim-gray" data-i18n="well_l02">Níveis de iluminância adequados.</div>
-                                            </div>
-                                            <div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div>
-                                        </div>
-
+                                        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green"><div><div class="text-xs font-bold text-white">L01: Light Exposure</div><div class="text-[10px] text-dim-gray" data-i18n="well_l01">Acesso à luz natural e visualização.</div></div><div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div></div>
+                                        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green"><div><div class="text-xs font-bold text-white">L02: Visual Lighting Design</div><div class="text-[10px] text-dim-gray" data-i18n="well_l02">Níveis de iluminância adequados.</div></div><div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div></div>
                                         <div class="grid grid-cols-1 gap-2">
-                                            <div onclick="toggleWellFeature(this, 3)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div>
-                                                    <div>
-                                                        <div class="text-xs font-bold text-white">L03: Circadian Lighting Design</div>
-                                                        <div class="text-[10px] text-dim-gray" data-i18n="well_l03">Melanopic Lux > 240 (Workstations).</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs font-bold text-tech-cyan">+3 pts</div>
-                                            </div>
-
-                                            <div onclick="toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div>
-                                                    <div>
-                                                        <div class="text-xs font-bold text-white">L04: Glare Control</div>
-                                                        <div class="text-[10px] text-dim-gray" data-i18n="well_l04">UGR < 16 / Gestão de brilho solar.</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs font-bold text-tech-cyan">+2 pts</div>
-                                            </div>
-
-                                            <div onclick="toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div>
-                                                    <div>
-                                                        <div class="text-xs font-bold text-white">L07: Electric Light Quality</div>
-                                                        <div class="text-[10px] text-dim-gray" data-i18n="well_l07">CRI > 90, R9 > 50, Flicker < 90Hz.</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs font-bold text-tech-cyan">+2 pts</div>
-                                            </div>
-
-                                            <div onclick="toggleWellFeature(this, 1)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div>
-                                                    <div>
-                                                        <div class="text-xs font-bold text-white">L08: Occupant Control</div>
-                                                        <div class="text-[10px] text-dim-gray" data-i18n="well_l08">Controle de zonas e intensidade.</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs font-bold text-tech-cyan">+1 pt</div>
-                                            </div>
+                                            <div onclick="toggleWellFeature(this, 3)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="3"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L03: Circadian Lighting Design</div><div class="text-[10px] text-dim-gray" data-i18n="well_l03">Melanopic Lux > 240 (Workstations).</div></div></div><div class="text-xs font-bold text-tech-cyan">+3 pts</div></div>
+                                            <div onclick="toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="2"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L04: Glare Control</div><div class="text-[10px] text-dim-gray" data-i18n="well_l04">UGR < 16 / Gestão de brilho solar.</div></div></div><div class="text-xs font-bold text-tech-cyan">+2 pts</div></div>
+                                            <div onclick="toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="2"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L07: Electric Light Quality</div><div class="text-[10px] text-dim-gray" data-i18n="well_l07">CRI > 90, R9 > 50, Flicker < 90Hz.</div></div></div><div class="text-xs font-bold text-tech-cyan">+2 pts</div></div>
+                                            <div onclick="toggleWellFeature(this, 1)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="1"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L08: Occupant Control</div><div class="text-[10px] text-dim-gray" data-i18n="well_l08">Controle de zonas e intensidade.</div></div></div><div class="text-xs font-bold text-tech-cyan">+1 pt</div></div>
                                         </div>
                                     </div>
                                 </div>
@@ -765,38 +434,39 @@
     </section>
     
     <footer class="bg-midnight py-12 px-6 border-t border-white/5 mt-auto text-[10px] tracking-widest text-muted-blue opacity-60">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left uppercase font-black">
-            <div>
-                <a href="#" class="text-lg font-bold tracking-[0.2em] text-luminous-gold uppercase">LuxSintax</a>
-                <p class="mt-2">© 2026 LuxSintax. All rights reserved.</p>
-            </div>
-            <div>
-                <button onclick="openTerms()" class="hover:text-luminous-gold transition-colors border-b border-transparent hover:border-luminous-gold" data-i18n="footer_terms">Termo de Responsabilidade</button>
-            </div>
+        <div class="max-w-7xl mx-auto text-center uppercase font-black">
+            <a href="#" class="text-lg font-bold tracking-[0.2em] text-luminous-gold uppercase">LuxSintax</a>
+            <p class="mt-2">© 2026 LuxSintax. All rights reserved.</p>
+            <div class="mt-4"><button onclick="openTerms()" class="hover:text-luminous-gold transition-colors border-b border-transparent hover:border-luminous-gold" data-i18n="footer_terms">Termo de Responsabilidade</button></div>
         </div>
     </footer>
 
     <div id="terms-modal" class="fixed inset-0 z-[60] hidden">
         <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="closeTerms()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-twilight border border-white/10 rounded-2xl shadow-2xl p-8 animate-fade-in-up">
-            <h3 class="text-luminous-gold font-bold tracking-widest text-lg mb-6 uppercase text-center" data-i18n="terms_title">Termo de Responsabilidade</h3>
+            <h3 class="text-luminous-gold font-bold tracking-widest text-lg mb-6 uppercase text-center" data-i18n="terms_title">Termo de Responsabilidade e Uso</h3>
             <div class="text-xs text-dim-gray leading-relaxed text-justify space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2" id="terms-content">
-                <p>O <strong>LuxSintax</strong> é uma ferramenta desenvolvida para auxiliar arquitetos, designers de iluminação e engenheiros nas etapas de <strong>estudo preliminar e pré-dimensionamento</strong>.</p>
-                <p><strong>Limitação de Escopo:</strong> Os cálculos apresentados utilizam métodos matemáticos simplificados (Ponto a Ponto e Lei do Cosseno) em um ambiente teórico ideal (vazio), <strong>não considerando</strong>:</p>
+                <p>Ao utilizar o <strong>LuxSintax</strong> ("Plataforma"), você reconhece e concorda expressamente com os seguintes termos:</p>
+                
+                <p class="text-white font-bold">1. Natureza Informativa e Preliminar</p>
+                <p>Esta Plataforma é uma ferramenta de auxílio destinada exclusivamente a <strong>estudos preliminares e conceituais</strong>. Os cálculos de iluminância (ponto a ponto), dimensionamento e consumo energético aqui apresentados baseiam-se em modelos matemáticos teóricos simplificados e ambientes ideais (sem obstruções).</p>
+
+                <p class="text-white font-bold">2. Limitação de Responsabilidade Técnica</p>
                 <ul class="list-disc pl-4 space-y-1 text-dim-line">
-                    <li>Contribuições de reflexões inter-superfícies (radiosidade);</li>
-                    <li>Fatores de depreciação luminosa ao longo do tempo (LLF complexos);</li>
-                    <li>Interferências físicas, sombreamentos ou mobiliário;</li>
-                    <li>Contribuição de luz natural (Daylighting).</li>
+                    <li>Os resultados gerados <strong>NÃO SUBSTITUEM</strong>, em hipótese alguma, simulações luminotécnicas complexas (realizadas em softwares como Dialux, Relux ou AGi32) nem projetos executivos elaborados por profissionais habilitados.</li>
+                    <li>A Plataforma não considera variáveis críticas reais como: depreciação luminosa (LLF) in loco, tensão da rede elétrica, tolerância de fabricação das luminárias ou interferências físicas.</li>
                 </ul>
+
                 <p class="text-white font-bold border-l-2 border-luminous-gold pl-3 py-1 bg-white/5">
-                    AVISO LEGAL: Os resultados obtidos NÃO substituem simulações computacionais completas (como Dialux, Relux ou AGi32) e NÃO possuem validade legal para emissão de laudos técnicos ou projetos executivos finais.
+                    AVISO LEGAL: A equipe LuxSintax isenta-se de qualquer responsabilidade civil, criminal ou administrativa por danos diretos, indiretos, incidentais ou consequenciais resultantes do uso desta ferramenta ou da aplicação dos dados gerados em obras, instalações ou especificações técnicas.
                 </p>
-                <p>O uso desta ferramenta e a aplicação dos dados gerados em obra são de inteira responsabilidade do profissional usuário. A equipe LuxSintax e seus desenvolvedores isentam-se de qualquer responsabilidade civil ou criminal por discrepâncias entre a simulação teórica aqui apresentada e a instalação real.</p>
+
+                <p class="text-white font-bold">3. Dever de Verificação</p>
+                <p>É responsabilidade exclusiva do usuário (Arquiteto, Lighting Designer, Engenheiro ou Projetista) verificar, validar e garantir que os dados atendam às normas técnicas vigentes (como NBR ISO/CIE 8995-1) e às exigências legais locais antes de qualquer aplicação prática.</p>
             </div>
             <div class="mt-8 flex justify-center">
                 <button onclick="closeTerms()" class="px-8 py-3 bg-luminous-gold text-midnight font-bold rounded-full hover:bg-white transition-colors text-xs tracking-widest uppercase" data-i18n="terms_accept">
-                    Compreendo e Aceito
+                    Li, Compreendi e Aceito os Riscos
                 </button>
             </div>
         </div>
@@ -832,7 +502,7 @@
                 card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).",
                 card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.",
                 card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.",
-                footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade", terms_accept: "Compreendo e Aceito"
+                footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade e Uso", terms_accept: "Li, Compreendi e Aceito os Riscos"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT",
@@ -842,7 +512,6 @@
                 lbl_height: "SOURCE HEIGHT (H)", lbl_beam: "BEAM ANGLE", lbl_tilt: "ORIENTATION (TILT)", 
                 lbl_plane: "WORK PLANE (HP)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_hq: "FRAME AXIS (hq)", lbl_spacing: "SOURCE SPACING (D)",
                 hdr_results: "Real-time Results", hdr_query: "Reference Center", query_subtitle: "Quick access to standards and technical references.",
-                tab_interiors: "Interiors (ISO 8995)", tab_roadway: "Roadway (Std 5101)",
                 filter_all: "All Categories", col_cat: "Category", col_room: "Room / Task",
                 road_params: "Roadway Parameters (Class M)", lbl_speed: "Speed (km/h)", lbl_volume: "Traffic Volume", lbl_separation: "Traffic Separation",
                 lbl_density: "Intersection Density", lbl_complexity: "Complexity / Guidance", lbl_ambient: "Ambient Luminance",
@@ -861,25 +530,23 @@
                 card_1_title: "ABSOLUTE INTENSITY", card_1_desc: "Converts relative photometric data to absolute intensity (Candelas).",
                 card_2_title: "CUBIC COSINE LAW", card_2_desc: "Inverse Square Law variation for horizontal surfaces.",
                 card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.",
-                footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility", terms_accept: "I Understand and Accept"
+                footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility & Use", terms_accept: "I Read, Understand and Accept Risks"
             }
         };
 
         let currentLang = 'pt';
         let currentTool = 'query'; 
         let calcMode = 'direct'; 
-        
-        // App State
-        let currentLeedTarget = 'gold'; // Default
-        let currentWellScore = 0; // WELL State
 
-        // State Management (Simplified for No-Auth Beta)
+        // State Management
         const state = {
-            // User & Profile keys removed for stateless Beta
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, workPlane: 0.75, flux: 1500, cdklm: 2000 },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 }, 
-            homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000 },
+            homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
         };
+
+        let currentLeedTarget = 'gold'; // Default
+        let currentWellScore = 0; // WELL State
 
         // --- Data: Norms ---
         const normsDatabase = [
@@ -975,22 +642,18 @@
         }
 
         function filterNorms() {
-            const input = document.getElementById('global-search');
+            // FIXED: Removed reliance on global-search input
             const categorySelect = document.getElementById('category-filter');
+            if (!categorySelect) return;
             
-            if (!input || !categorySelect) return;
-            
-            const term = input.value.toLowerCase();
             const selectedCategory = categorySelect.value;
             const tbody = document.getElementById('nbr8995-tbody');
-            
             if (!tbody) return;
             tbody.innerHTML = "";
             
             const filtered = normsDatabase.filter(n => {
-                const matchesTerm = n.cat.toLowerCase().includes(term) || n.room.toLowerCase().includes(term);
                 const matchesCategory = selectedCategory === 'all' || n.cat === selectedCategory;
-                return matchesTerm && matchesCategory;
+                return matchesCategory;
             });
 
             if (filtered.length === 0) {
@@ -998,15 +661,9 @@
                 return;
             }
             filtered.forEach(n => {
-                let roomText = n.room;
-                if(term.length > 1) {
-                    const regex = new RegExp(`(${term})`, 'gi');
-                    roomText = roomText.replace(regex, '<span class="text-white bg-luminous-gold/20 font-bold">$1</span>');
-                }
-
                 const row = document.createElement('tr');
                 row.className = "hover:bg-white/5 transition-colors border-b border-white/5";
-                row.innerHTML = `<td class="p-4 font-bold text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-dim-gray">${roomText}</td><td class="p-4 text-center font-bold text-white bg-white/5">${n.lux}</td><td class="p-4 text-center text-muted-blue">${n.ugr}</td><td class="p-4 text-center text-muted-blue">${n.ra}</td>`;
+                row.innerHTML = `<td class="p-4 font-bold text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-dim-gray">${n.room}</td><td class="p-4 text-center font-bold text-white bg-white/5">${n.lux}</td><td class="p-4 text-center text-muted-blue">${n.ugr}</td><td class="p-4 text-center text-muted-blue">${n.ra}</td>`;
                 tbody.appendChild(row);
             });
         }
@@ -1086,16 +743,15 @@
         }
 
         function toggleWellFeature(el, points) {
+            // FIXED: Logic relies on data attributes now
             el.classList.toggle('active');
             let total = 0;
             document.querySelectorAll('.well-toggle-group.active').forEach(item => {
-                const ptsText = item.querySelector('.text-tech-cyan').innerText;
-                const pts = parseInt(ptsText.replace(/\D/g,''));
+                const pts = parseInt(item.getAttribute('data-points') || 0);
                 total += pts;
             });
             currentWellScore = total;
-            document.getElementById('well-total-score').innerHTML = `${total} <span class="text-xs text-dim-gray font-normal">/ 12</span>`;
-            
+            document.getElementById('well-total-score').innerHTML = `${total} <span class="text-xs text-dim-gray font-normal">/ 8</span>`; // FIXED: Denominator / 8
             const maxPoints = 8; 
             let pct = (total / maxPoints) * 100;
             if(pct > 100) pct = 100;
@@ -1396,7 +1052,7 @@
                 drawDimLine(centerX + xL_p, py + 20, centerX + xR_p, py + 20, `Ø ${diaPlane.toFixed(2)}m`);
                 
             } else if (currentTool === 'vertical') {
-                const s = state.vertical, I = getIntensity(s), sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180;
+                const s = state.vertical, I = getIntensity(s), sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
                 
                 let ev = 0;
                 if (s.tilt > 0) ev = (I * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
@@ -1428,6 +1084,17 @@
                         ctx.beginPath(); ctx.arc(wx, hitY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
                         ctx.beginPath(); ctx.moveTo(wx, hitY_px); ctx.lineTo(wx + 40, hitY_px); ctx.strokeStyle = "#FBBF24"; ctx.setLineDash([2, 2]); ctx.stroke(); ctx.setLineDash([]);
                         drawTextVal(Math.round(ev) + " Lux", wx - 40, hitY_px);
+                        
+                        // FIXED: Vertical spot calculation (Top of Beam to Floor)
+                        const angleTop = tr + br/2;
+                        if(angleTop < Math.PI/2) {
+                            const yTopMetric = s.height - (s.dist / Math.tan(angleTop));
+                            // Only draw if intersection is above ground and reasonable
+                            if(yTopMetric > 0 && yTopMetric < s.height * 2) {
+                                const yTopPx = floorY - (yTopMetric * scale);
+                                drawDimLineVertical(wx - 15, yTopPx, floorY, `hMax: ${yTopMetric.toFixed(2)}m`);
+                            }
+                        }
                      }
                     const hitXFloor = centerX + (s.height * scale) * Math.tan(tr);
                     if (hitXFloor < wx) { ctx.beginPath(); ctx.arc(hitXFloor, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill(); }
@@ -1523,6 +1190,7 @@
         bind('h-plane', 'homog', 'workPlane'); bind('range-h-plane', 'homog', 'workPlane');
         bind('h-spacing', 'homog', 'spacing'); bind('range-h-spacing', 'homog', 'spacing');
         bind('h-beam', 'homog', 'beam'); bind('range-h-beam', 'homog', 'beam');
+        bind('h-tilt', 'homog', 'tilt'); bind('range-h-tilt', 'homog', 'tilt');
 
         function openTerms() { document.getElementById('terms-modal').classList.remove('hidden'); }
         function closeTerms() { document.getElementById('terms-modal').classList.add('hidden'); }
