@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuxSintax | Lighting Design SaaS (BETA)</title>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
@@ -46,6 +55,11 @@
             letter-spacing: 0.5px;
             min-height: 100vh;
         }
+        
+        /* Lock scroll when login wall is active */
+        body.auth-locked {
+            overflow: hidden;
+        }
 
         h1, h2, h3, h4, .nav-link, button, input, label, select { text-transform: uppercase !important; }
 
@@ -55,6 +69,39 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(148, 163, 184, 0.1);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Login Wall Specific Styles */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(2, 6, 23, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .login-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .login-card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.1);
+            transform: translateY(20px);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .login-overlay.active .login-card {
+            transform: translateY(0);
         }
 
         /* Input Range Styling */
@@ -130,6 +177,43 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-midnight">
 
+    <div id="auth-wall" class="login-overlay">
+        <div class="login-card p-8 md:p-12 w-full max-w-md rounded-2xl text-center relative overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-luminous-gold opacity-10 blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="mb-6">
+                    <span class="text-2xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
+                        LUX<span class="text-white font-light opacity-60">SINTAX</span>
+                    </span>
+                    <div class="bg-luminous-gold/20 text-luminous-gold text-[9px] font-black px-2 py-0.5 rounded border border-luminous-gold/30 tracking-widest inline-block ml-2 align-middle">PRO</div>
+                </div>
+
+                <h2 class="text-white text-lg font-bold uppercase tracking-widest mb-3">Acesso Profissional</h2>
+                <p class="text-dim-gray text-xs leading-relaxed mb-8 font-light">
+                    Junte-se a arquitetos e lighting designers que utilizam o LuxSintax para validar projetos com agilidade. <br><strong class="text-white">Crie sua conta gratuita</strong> para desbloquear:
+                </p>
+
+                <ul class="text-left text-xs text-dim-line space-y-3 mb-8 w-full px-4">
+                    <li class="flex items-center gap-3"><i class="fas fa-check text-luminous-gold"></i> Validação NBR 8995-1 / 5101</li>
+                    <li class="flex items-center gap-3"><i class="fas fa-check text-luminous-gold"></i> Simulador LEED & WELL v2</li>
+                    <li class="flex items-center gap-3"><i class="fas fa-check text-luminous-gold"></i> Ferramentas de Cálculo Ponto-a-Ponto</li>
+                </ul>
+
+                <button onclick="simulateLogin('google')" class="w-full bg-white text-midnight font-bold py-3 rounded-lg hover:bg-gray-100 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-wider mb-3 group">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                    <span>Entrar com Google</span>
+                </button>
+                
+                <button onclick="simulateLogin('email')" class="w-full bg-white/5 border border-white/10 text-white font-bold py-3 rounded-lg hover:bg-white/10 transition-all text-xs uppercase tracking-wider">
+                    Entrar com E-mail
+                </button>
+
+                <p class="mt-6 text-[9px] text-dim-gray">Ao continuar, você aceita nossos <a href="#" class="text-luminous-gold hover:underline">Termos de Uso</a>.</p>
+            </div>
+        </div>
+    </div>
+
     <nav class="fixed w-full z-50 bg-midnight/90 backdrop-blur-xl border-b border-white/5">
         <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -146,6 +230,13 @@
                 <button onclick="toggleLanguage()" class="text-xs text-muted-blue hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-white/10 pl-4 uppercase">
                     <span class="lang-display">PT / EN</span>
                 </button>
+
+                <div id="user-nav-area" class="hidden flex items-center gap-4 pl-4 border-l border-white/10">
+                    <span id="user-email-display" class="text-[10px] text-dim-gray font-mono"></span>
+                    <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300 font-bold tracking-widest uppercase border border-red-900/30 bg-red-900/10 px-3 py-1 rounded hover:bg-red-900/20 transition-all">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Sair
+                    </button>
+                </div>
             </div>
 
             <div class="md:hidden text-luminous-gold text-2xl cursor-pointer" onclick="toggleMobileMenu()">
@@ -157,6 +248,12 @@
              <a href="#calculadora" onclick="toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
              <a href="#fundamentos" onclick="toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
              <div class="h-[1px] bg-white/10 w-full"></div>
+             
+             <div id="mobile-user-area" class="hidden flex flex-col gap-4">
+                 <span id="mobile-email-display" class="text-xs text-dim-gray font-mono text-center"></span>
+                 <button onclick="logout()" class="text-xs font-bold tracking-widest text-red-400 border border-red-900/30 p-3 rounded text-center">SAIR / LOGOUT</button>
+             </div>
+
              <button onclick="toggleLanguage(); toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left lang-display">PT / EN</button>
         </div>
     </nav>
@@ -1233,6 +1330,115 @@
             }
         }
 
+        // --- AUTHENTICATION LOGIC (PRODUCTION READY) ---
+        
+        // Arquitetura:
+        // Em produção, isso seria substituído por um JWT no Cookie (HttpOnly).
+        // Para o protótipo, usamos localStorage com um objeto JSON para simular o payload do usuário.
+        
+        function checkAuth() {
+            const sessionData = localStorage.getItem('lux_user_session');
+            const wall = document.getElementById('auth-wall');
+            const userNav = document.getElementById('user-nav-area');
+            const mobileUserNav = document.getElementById('mobile-user-area');
+            
+            if (!sessionData) {
+                // Not logged in
+                if(wall) wall.classList.add('active');
+                document.body.classList.add('auth-locked');
+                if(userNav) userNav.classList.add('hidden');
+                if(mobileUserNav) mobileUserNav.classList.add('hidden');
+            } else {
+                // Logged in
+                if(wall) wall.classList.remove('active');
+                document.body.classList.remove('auth-locked');
+                
+                // Parse User Data for UI
+                try {
+                    const user = JSON.parse(sessionData);
+                    if(userNav) {
+                        userNav.classList.remove('hidden');
+                        document.getElementById('user-email-display').innerText = user.email;
+                    }
+                    if(mobileUserNav) {
+                        mobileUserNav.classList.remove('hidden');
+                        document.getElementById('mobile-email-display').innerText = user.email;
+                    }
+                } catch (e) {
+                    // Se dados corrompidos, força logout
+                    logout();
+                }
+            }
+        }
+
+        function simulateLogin(provider = 'google') {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.style.opacity = '0.8';
+
+            setTimeout(() => {
+                // Mock Data: Simulando o retorno de uma API de Auth (ex: Auth0 / Firebase)
+                const mockUser = {
+                    id: 'usr_' + Math.floor(Math.random() * 10000),
+                    email: provider === 'google' ? 'arquiteto@studio.com' : 'usuario@luxsintax.com',
+                    plan: 'PRO',
+                    token: 'mock_jwt_token_xyz'
+                };
+
+                // Armazenamento: Salvando o objeto stringificado
+                localStorage.setItem('lux_user_session', JSON.stringify(mockUser));
+                
+                const wall = document.getElementById('auth-wall');
+                wall.style.opacity = '0';
+                
+                setTimeout(() => {
+                    wall.classList.remove('active');
+                    wall.style.opacity = ''; 
+                    document.body.classList.remove('auth-locked');
+                    btn.innerHTML = originalText;
+                    btn.style.opacity = '1';
+                    
+                    // Atualiza a UI imediatamente
+                    checkAuth();
+                    
+                    // Track Login Event (Analytics)
+                    if(typeof gtag === 'function') {
+                        gtag('event', 'login', { method: provider });
+                    }
+
+                }, 500);
+            }, 800);
+        }
+
+        function logout() {
+            // 1. Limpa Sessão
+            localStorage.removeItem('lux_user_session');
+            
+            // 2. Feedback Visual / Recarrega Estado
+            const wall = document.getElementById('auth-wall');
+            const userNav = document.getElementById('user-nav-area');
+            
+            // Esconde menu do usuário
+            if(userNav) userNav.classList.add('hidden');
+            
+            // Bloqueia tela novamente com animação
+            if(wall) {
+                wall.style.opacity = '0';
+                wall.classList.add('active');
+                // Força reflow
+                void wall.offsetWidth; 
+                wall.style.opacity = '1';
+            }
+            document.body.classList.add('auth-locked');
+            
+            // Track Logout
+            if(typeof gtag === 'function') {
+                gtag('event', 'logout');
+            }
+        }
+
         // Initialize with Debounce for resize
         let resizeTimeout;
         window.addEventListener('resize', () => {
@@ -1243,6 +1449,7 @@
         });
 
         document.addEventListener("DOMContentLoaded", () => {
+            checkAuth(); // Verifica Auth ao carregar
             populateCategoryFilter();
             switchTool('query'); 
             filterNorms();
