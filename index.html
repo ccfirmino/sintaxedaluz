@@ -131,7 +131,7 @@
 <body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-midnight">
 
     <nav class="fixed w-full z-50 bg-midnight/90 backdrop-blur-xl border-b border-white/5">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
                     LUX<span class="text-white font-light opacity-60">SINTAX</span>
@@ -161,13 +161,13 @@
         </div>
     </nav>
 
-    <section id="calculadora" class="pt-24 pb-20 px-4 md:px-8 relative min-h-screen">
+    <section id="calculadora" class="pt-24 pb-10 px-4 md:px-8 relative min-h-screen">
         
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[400px] bg-gold-glow pointer-events-none opacity-40"></div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-30"></div>
 
-        <div class="max-w-7xl mx-auto flex flex-col items-center">
+        <div class="max-w-[1800px] mx-auto flex flex-col items-center">
             
-            <div class="flex justify-center gap-4 sm:gap-10 mb-10 relative z-10 fade-in-up flex-wrap mt-6">
+            <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
                 <button onclick="switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold">
                     <i class="fas fa-search"></i>
                     <span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span>
@@ -190,18 +190,19 @@
             <div id="calculator-interface" class="w-full relative">
                 
                 <div id="visual-tools" class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full transition-opacity duration-300 hidden">
-                    <div class="lg:col-span-4 flex flex-col gap-6">
-                        <div class="glass-panel p-6 rounded-2xl relative h-full">
+                    
+                    <div class="lg:col-span-3 flex flex-col gap-6">
+                        <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                             <div class="mb-4">
-                                <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md" data-i18n="calc_params">Parâmetros da Fonte</h3>
-                                <div class="flex flex-col sm:flex-row gap-4 p-1 mb-6 border-b border-white/10 pb-4 justify-center">
+                                <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md border-b border-white/10 pb-3" data-i18n="calc_params">Parâmetros da Fonte</h3>
+                                <div class="flex flex-col sm:flex-row gap-4 p-1 mb-6 justify-center">
                                     <label class="flex items-center gap-2 cursor-pointer group">
                                         <input type="radio" name="calc_mode" value="direct" checked onchange="updateCalcMode('direct')">
                                         <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span>
                                     </label>
                                     <label class="flex items-center gap-2 cursor-pointer group">
                                         <input type="radio" name="calc_mode" value="photometric" onchange="updateCalcMode('photometric')">
-                                        <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA (CD/KLM)</span>
+                                        <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span>
                                     </label>
                                 </div>
                             </div>
@@ -245,10 +246,10 @@
                         </div>
                     </div>
 
-                    <div class="lg:col-span-8 flex flex-col gap-6">
-                        <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full">
+                    <div class="lg:col-span-9 flex flex-col gap-6">
+                        <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full min-h-[600px]">
                             <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 drop-shadow-md uppercase tracking-widest font-bold" data-i18n="hdr_results">Resultados em Tempo Real</h3>
-                            <div class="relative w-full h-[500px] bg-twilight/50 border border-white/10 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner">
+                            <div class="relative w-full flex-grow bg-twilight/50 border border-white/10 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner">
                                 <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 40px 40px;"></div>
                                 <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
                             </div>
@@ -283,7 +284,7 @@
 
                         <div id="content-nbr8995" class="query-content">
                             <div class="overflow-hidden rounded-xl border border-white/10">
-                                <div class="overflow-x-auto max-h-[450px] overflow-y-auto custom-scrollbar">
+                                <div class="overflow-x-auto max-h-[550px] overflow-y-auto custom-scrollbar">
                                     <table class="w-full text-left border-collapse">
                                         <thead class="bg-white/5 text-xs text-white font-bold uppercase tracking-wider sticky top-0 bg-midnight z-10">
                                             <tr><th class="p-4 border-b border-white/10" data-i18n="col_cat">Categoria</th><th class="p-4 border-b border-white/10" data-i18n="col_room">Ambiente / Tarefa</th><th class="p-4 border-b border-white/10 text-center text-white">Lux (Em)</th><th class="p-4 border-b border-white/10 text-center">UGR Máx</th><th class="p-4 border-b border-white/10 text-center">Ra Min</th></tr>
@@ -400,7 +401,7 @@
     </section>
 
     <section id="fundamentos" class="py-24 px-6 border-t border-white/5 bg-midnight">
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-[1800px] mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-3xl text-luminous-gold font-bold tracking-widest mb-6 uppercase" data-i18n="about_title">SOBRE</h2>
                 <p class="text-sm text-dim-line font-light max-w-4xl mx-auto leading-relaxed text-justify" data-i18n="about_text">
@@ -433,7 +434,7 @@
     </section>
     
     <footer class="bg-midnight py-12 px-6 border-t border-white/5 mt-auto text-[10px] tracking-widest text-muted-blue opacity-60">
-        <div class="max-w-7xl mx-auto text-center uppercase font-black">
+        <div class="max-w-[1800px] mx-auto text-center uppercase font-black">
             <a href="#" class="text-lg font-bold tracking-[0.2em] text-luminous-gold uppercase">LuxSintax</a>
             <p class="mt-2">© 2026 LuxSintax. All rights reserved.</p>
             <div class="mt-4"><button onclick="openTerms()" class="hover:text-luminous-gold transition-colors border-b border-transparent hover:border-luminous-gold" data-i18n="footer_terms">Termo de Responsabilidade</button></div>
@@ -877,13 +878,17 @@
             return (s.cdklm * s.flux) / 1000;
         }
 
+        // --- NEW RENDER LOGIC WITH DPR SUPPORT & DYNAMIC SCALING ---
         function updateCalculations() {
             const canvas = document.getElementById('beamCanvas');
             if (!canvas) return;
             
+            // 1. DPI/DPR Handling
             const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
+            const parent = canvas.parentElement;
+            const rect = parent.getBoundingClientRect();
             
+            // Sync canvas with container size
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             
@@ -895,37 +900,39 @@
             const floorY = ch - 70;
             const centerX = cw / 2;
 
+            // 2. Dynamic Scaling Calculation based on available Width & Height
             let boundsH = 3.0;
             let boundsW = 3.0; 
+            const s = state[currentTool === 'homog' ? 'homog' : currentTool];
 
             if (currentTool === 'ponto') {
-                const s = state.ponto;
                 boundsH = s.height;
                 const maxAngleRad = (Math.abs(s.tilt) + s.beam/2) * Math.PI / 180;
-                const limitRad = Math.min(maxAngleRad, 85 * Math.PI / 180); 
+                // Limit the width calculation to avoid extreme zoom out on high angles
+                const limitRad = Math.min(maxAngleRad, 1.48); // ~85 deg
                 boundsW = s.height * Math.tan(limitRad);
             } 
             else if (currentTool === 'vertical') {
-                const s = state.vertical;
                 boundsH = s.height;
-                boundsW = Math.max(s.dist * 1.8, 3.0); 
+                boundsW = Math.max(s.dist * 1.6, 3.5); 
             } 
             else if (currentTool === 'homog') {
-                const s = state.homog;
                 boundsH = s.height;
                 const halfBeamRad = (s.beam/2) * Math.PI / 180;
                 boundsW = (s.spacing / 2) + (s.height * Math.tan(halfBeamRad));
             }
 
-            const availH = floorY - 50; 
-            const availW = (cw / 2) - 40; 
+            const availH = floorY - 60; // Leave space for top labels
+            const availW = (cw / 2) - 50; // Use half width as ref since most are centered
             
-            const scaleH = availH / Math.max(boundsH, 0.5);
-            const scaleW = availW / Math.max(boundsW, 0.5);
+            let scaleH = availH / Math.max(boundsH, 0.5);
+            let scaleW = availW / Math.max(boundsW, 0.5);
 
             let scale = Math.min(scaleH, scaleW);
-            scale = Math.min(Math.max(scale, 10), 150);
+            // Clamp scale to reasonable limits so it doesn't get microscopic or huge
+            scale = Math.min(Math.max(scale, 12), 160);
 
+            // --- DRAWING ---
             ctx.clearRect(0, 0, cw, ch);
             ctx.lineWidth = 2;
 
@@ -1027,7 +1034,7 @@
             }
 
             if (currentTool === 'ponto') {
-                const s = state.ponto, I = getIntensity(s), sy = floorY - (s.height * scale), py = floorY - (s.workPlane * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                const I = getIntensity(s), sy = floorY - (s.height * scale), py = floorY - (s.workPlane * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
                 
                 const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
                 const hEff = s.height - s.workPlane;
@@ -1063,7 +1070,7 @@
                 drawDimLine(centerX + xL_p, py + 20, centerX + xR_p, py + 20, `Ø ${diaPlane.toFixed(2)}m`);
                 
             } else if (currentTool === 'vertical') {
-                const s = state.vertical, I = getIntensity(s), sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                const I = getIntensity(s), sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
                 
                 let ev = 0;
                 if (s.tilt > 0) ev = (I * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
@@ -1114,7 +1121,6 @@
                 drawDimLineVertical(wx + 15, floorY, hqY, `hq: ${s.hq.toFixed(1)}m`); 
 
             } else if (currentTool === 'homog') {
-                const s = state.homog;
                 const I = getIntensity(state.homog); 
                 
                 const sy = floorY - (s.height * scale);
@@ -1122,7 +1128,6 @@
                 const hS = (s.spacing * scale) / 2;
                 const br = s.beam * Math.PI / 180;
                 
-                // Tilt logic removed from calculation for homog, defaulting to 0
                 const tl = 0; 
                 
                 const dia = 2 * s.height * Math.tan(br / 2);
@@ -1139,8 +1144,6 @@
                 drawSource(leftX, sy); drawSource(rightX, sy); 
                 drawBeam(leftX, sy, s.beam, tl, 0.6); drawBeam(rightX, sy, s.beam, -tl, 0.6); 
                 drawAngleDim(leftX, sy, s.beam, tl, 40, "rgba(251, 191, 36, 0.8)", false);
-                
-                // Removed tilt visualization code for homog since it's always 0 now
                 
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(255,255,255,0.2)"; 
                 ctx.moveTo(leftX, sy); ctx.lineTo(leftX, floorY); 
@@ -1230,14 +1233,20 @@
             }
         }
 
-        // Initialize
+        // Initialize with Debounce for resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                updateCalculations();
+            }, 100);
+        });
+
         document.addEventListener("DOMContentLoaded", () => {
             populateCategoryFilter();
             switchTool('query'); 
             filterNorms();
-            
-            // Handle canvas resize
-            window.addEventListener('resize', updateCalculations);
+            updateCalculations();
         });
     </script>
 </body>
