@@ -104,13 +104,34 @@
             transform: translateY(0);
         }
 
+        /* Signup Form Styles */
+        .signup-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .signup-input:focus {
+            border-color: #FBBF24;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .signup-input::placeholder {
+            color: #64748b;
+            text-transform: none;
+        }
+
         /* Input Range Styling */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: #FBBF24; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(251, 191, 36, 0.8); border: 2px solid #0f172a; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1e293b; border-radius: 2px; }
 
-        input[type=number], select, input[type=text], input[type=date] { background-color: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; text-align: right; width: 65px; font-family: 'Manrope', sans-serif; font-weight: 300; -moz-appearance: textfield; }
-        input[type=number]:focus, select:focus, input[type=text]:focus, input[type=date]:focus { outline: none; border-bottom: 1px solid #FBBF24; color: #FBBF24; }
+        input[type=number], select, input[type=text]:not(.signup-input), input[type=date] { background-color: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; text-align: right; width: 65px; font-family: 'Manrope', sans-serif; font-weight: 300; -moz-appearance: textfield; }
+        input[type=number]:focus, select:focus, input[type=text]:not(.signup-input):focus, input[type=date]:focus { outline: none; border-bottom: 1px solid #FBBF24; color: #FBBF24; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
         select.custom-select option { background-color: #0f172a; color: #f8fafc; }
@@ -175,10 +196,10 @@
         .bar-fill { height: 100%; border-radius: 99px; transition: width 1s ease-out; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-midnight">
+<body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-midnight auth-locked">
 
-    <div id="auth-wall" class="login-overlay">
-        <div class="login-card p-8 md:p-12 w-full max-w-md rounded-2xl text-center relative overflow-hidden">
+    <div id="auth-wall" class="login-overlay active" style="opacity: 1; pointer-events: auto;">
+        <div id="login-step-1" class="login-card p-8 md:p-12 w-full max-w-md rounded-2xl text-center relative overflow-hidden">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-luminous-gold opacity-10 blur-3xl pointer-events-none"></div>
 
             <div class="relative z-10 flex flex-col items-center">
@@ -201,16 +222,56 @@
                     <li class="flex items-center gap-3"><i class="fas fa-check text-luminous-gold"></i> Ferramentas de Cálculo Ponto-a-Ponto</li>
                 </ul>
 
-                <button onclick="simulateLogin('google')" class="w-full bg-white text-midnight font-bold py-3 rounded-lg hover:bg-gray-100 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-wider mb-3 group">
+                <button onclick="AuthService.openSignup('google')" class="w-full bg-white text-midnight font-bold py-3 rounded-lg hover:bg-gray-100 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-wider mb-3 group">
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
                     <span>Entrar com Google</span>
                 </button>
                 
-                <button onclick="simulateLogin('email')" class="w-full bg-white/5 border border-white/10 text-white font-bold py-3 rounded-lg hover:bg-white/10 transition-all text-xs uppercase tracking-wider">
+                <button onclick="AuthService.openSignup('email')" class="w-full bg-white/5 border border-white/10 text-white font-bold py-3 rounded-lg hover:bg-white/10 transition-all text-xs uppercase tracking-wider">
                     Entrar com E-mail
                 </button>
 
                 <p class="mt-6 text-[9px] text-dim-gray">Ao continuar, você aceita nossos <a href="#" class="text-luminous-gold hover:underline">Termos de Uso</a>.</p>
+            </div>
+        </div>
+
+        <div id="login-step-2" class="hidden login-card p-8 w-full max-w-md rounded-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-tech-cyan opacity-10 blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10">
+                <button onclick="AuthService.backToLogin()" class="absolute top-0 left-0 text-dim-gray hover:text-white transition-colors text-xs uppercase font-bold"><i class="fas fa-arrow-left mr-1"></i> Voltar</button>
+                
+                <div class="text-center mb-6 mt-4">
+                    <h2 class="text-white text-md font-bold uppercase tracking-widest mb-1">Finalizar Cadastro</h2>
+                    <p class="text-[10px] text-dim-gray">Complete seus dados para acesso imediato.</p>
+                </div>
+
+                <form onsubmit="AuthService.submitSignup(event)" class="space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[9px] text-luminous-gold font-bold uppercase block mb-1">Nome</label>
+                            <input type="text" id="reg-name" class="signup-input" placeholder="Seu nome" required>
+                        </div>
+                        <div>
+                            <label class="text-[9px] text-dim-gray font-bold uppercase block mb-1">Sobrenome</label>
+                            <input type="text" id="reg-surname" class="signup-input" placeholder="Sobrenome" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="text-[9px] text-dim-gray font-bold uppercase block mb-1">E-mail Profissional</label>
+                        <input type="email" id="reg-email" class="signup-input" placeholder="nome@empresa.com" required>
+                    </div>
+
+                    <div>
+                        <label class="text-[9px] text-dim-gray font-bold uppercase block mb-1">Empresa / Studio <span class="text-[8px] opacity-50">(Opcional)</span></label>
+                        <input type="text" id="reg-company" class="signup-input" placeholder="Nome da empresa">
+                    </div>
+
+                    <button type="submit" id="btn-submit-auth" class="w-full bg-luminous-gold text-midnight font-bold py-3 rounded-lg hover:bg-white transition-all text-xs uppercase tracking-wider mt-4 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
+                        Acessar Plataforma
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -233,9 +294,12 @@
                 </button>
 
                 <div id="user-nav-area" class="hidden flex items-center gap-4 pl-4 border-l border-white/10">
-                    <span id="user-email-display" class="text-[10px] text-dim-gray font-mono"></span>
-                    <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300 font-bold tracking-widest uppercase border border-red-900/30 bg-red-900/10 px-3 py-1 rounded hover:bg-red-900/20 transition-all">
-                        <i class="fas fa-sign-out-alt mr-1"></i> Sair
+                    <div class="text-right leading-tight">
+                        <div id="user-name-display" class="text-[10px] text-white font-bold uppercase"></div>
+                        <div id="user-email-display" class="text-[9px] text-dim-gray font-mono"></div>
+                    </div>
+                    <button onclick="AuthService.logout()" class="text-[10px] text-red-400 hover:text-red-300 font-bold tracking-widest uppercase border border-red-900/30 bg-red-900/10 px-3 py-1 rounded hover:bg-red-900/20 transition-all">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
                     </button>
                 </div>
             </div>
@@ -251,8 +315,11 @@
              <div class="h-[1px] bg-white/10 w-full"></div>
              
              <div id="mobile-user-area" class="hidden flex flex-col gap-4">
-                 <span id="mobile-email-display" class="text-xs text-dim-gray font-mono text-center"></span>
-                 <button onclick="logout()" class="text-xs font-bold tracking-widest text-red-400 border border-red-900/30 p-3 rounded text-center">SAIR / LOGOUT</button>
+                 <div class="text-center">
+                     <div id="mobile-name-display" class="text-sm font-bold text-white uppercase"></div>
+                     <span id="mobile-email-display" class="text-xs text-dim-gray font-mono"></span>
+                 </div>
+                 <button onclick="AuthService.logout()" class="text-xs font-bold tracking-widest text-red-400 border border-red-900/30 p-3 rounded text-center">SAIR / LOGOUT</button>
              </div>
 
              <button onclick="toggleLanguage(); toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left lang-display">PT / EN</button>
@@ -1331,114 +1398,170 @@
             }
         }
 
-        // --- AUTHENTICATION LOGIC (PRODUCTION READY) ---
+        // --- AUTHENTICATION MODULE (Refactored & Production Ready) ---
         
-        // Arquitetura:
-        // Em produção, isso seria substituído por um JWT no Cookie (HttpOnly).
-        // Para o protótipo, usamos localStorage com um objeto JSON para simular o payload do usuário.
-        
-        function checkAuth() {
-            const sessionData = localStorage.getItem('lux_user_session');
-            const wall = document.getElementById('auth-wall');
-            const userNav = document.getElementById('user-nav-area');
-            const mobileUserNav = document.getElementById('mobile-user-area');
-            
-            if (!sessionData) {
-                // Not logged in
-                if(wall) wall.classList.add('active');
-                document.body.classList.add('auth-locked');
-                if(userNav) userNav.classList.add('hidden');
-                if(mobileUserNav) mobileUserNav.classList.add('hidden');
-            } else {
-                // Logged in
-                if(wall) wall.classList.remove('active');
-                document.body.classList.remove('auth-locked');
-                
-                // Parse User Data for UI
+        const AuthService = {
+            STORAGE_KEY: 'lux_user_session',
+            currentProvider: 'email',
+
+            init: function() {
+                // Execute immediately on script load to prevent FOUC (Flash of Unprotected Content)
+                this.checkAuth();
+            },
+
+            checkAuth: function() {
+                let sessionData = null;
                 try {
-                    const user = JSON.parse(sessionData);
-                    if(userNav) {
-                        userNav.classList.remove('hidden');
-                        document.getElementById('user-email-display').innerText = user.email;
-                    }
-                    if(mobileUserNav) {
-                        mobileUserNav.classList.remove('hidden');
-                        document.getElementById('mobile-email-display').innerText = user.email;
-                    }
+                    sessionData = localStorage.getItem(this.STORAGE_KEY);
                 } catch (e) {
-                    // Se dados corrompidos, força logout
-                    logout();
+                    console.error("Storage Access Blocked", e);
+                }
+
+                const wall = document.getElementById('auth-wall');
+                const userNav = document.getElementById('user-nav-area');
+                const mobileUserNav = document.getElementById('mobile-user-area');
+                const body = document.body;
+                
+                if (!sessionData) {
+                    // Locked State
+                    if(wall) wall.classList.add('active');
+                    body.classList.add('auth-locked');
+                    if(userNav) userNav.classList.add('hidden');
+                    if(mobileUserNav) mobileUserNav.classList.add('hidden');
+                } else {
+                    // Unlocked State
+                    if(wall) wall.classList.remove('active');
+                    body.classList.remove('auth-locked');
+                    
+                    try {
+                        const user = JSON.parse(sessionData);
+                        
+                        // Update UI with sanitized output
+                        if(userNav) {
+                            userNav.classList.remove('hidden');
+                            document.getElementById('user-email-display').innerText = user.email || '';
+                            const fullName = (user.firstName || '') + ' ' + (user.lastName || '');
+                            document.getElementById('user-name-display').innerText = fullName.length > 20 ? user.firstName : fullName;
+                        }
+                        
+                        if(mobileUserNav) {
+                            mobileUserNav.classList.remove('hidden');
+                            document.getElementById('mobile-email-display').innerText = user.email || '';
+                            document.getElementById('mobile-name-display').innerText = (user.firstName || '') + ' ' + (user.lastName || '');
+                        }
+                    } catch (e) {
+                        // Data corruption recovery
+                        this.logout();
+                    }
+                }
+            },
+
+            openSignup: function(provider) {
+                this.currentProvider = provider;
+                document.getElementById('login-step-1').classList.add('hidden');
+                const step2 = document.getElementById('login-step-2');
+                step2.classList.remove('hidden');
+                step2.classList.add('fade-in-up');
+            },
+
+            backToLogin: function() {
+                document.getElementById('login-step-2').classList.add('hidden');
+                document.getElementById('login-step-1').classList.remove('hidden');
+            },
+
+            submitSignup: function(e) {
+                e.preventDefault();
+                
+                const btn = document.getElementById('btn-submit-auth');
+                if(btn.disabled) return; // Prevent double submit
+                
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+                btn.style.opacity = '0.8';
+                btn.disabled = true;
+
+                // Harvest Data
+                const firstName = document.getElementById('reg-name').value.trim();
+                const lastName = document.getElementById('reg-surname').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                const company = document.getElementById('reg-company').value.trim();
+
+                setTimeout(() => {
+                    const mockUser = {
+                        id: 'usr_' + Date.now(),
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        company: company,
+                        plan: 'BETA',
+                        token: 'mock_jwt_' + Math.random().toString(36).substr(2),
+                        provider: this.currentProvider,
+                        createdAt: new Date().toISOString()
+                    };
+
+                    try {
+                        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mockUser));
+                    } catch(e) {
+                        alert("Erro: Seu navegador está bloqueando cookies/armazenamento. Não foi possível salvar o login.");
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        return;
+                    }
+                    
+                    const wall = document.getElementById('auth-wall');
+                    wall.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        wall.classList.remove('active');
+                        wall.style.opacity = ''; 
+                        document.body.classList.remove('auth-locked');
+                        
+                        // Reset form state for security
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        this.backToLogin(); // Reset view step
+                        e.target.reset();   // Clear inputs
+                        
+                        this.checkAuth();
+                        
+                        if(typeof gtag === 'function') {
+                            gtag('event', 'sign_up', { method: this.currentProvider });
+                        }
+                    }, 500);
+                }, 1000);
+            },
+
+            logout: function() {
+                try {
+                    localStorage.removeItem(this.STORAGE_KEY);
+                } catch(e) { console.warn("Storage clear failed"); }
+
+                // Clear Form Data for privacy
+                const inputs = document.querySelectorAll('.signup-input');
+                inputs.forEach(i => i.value = '');
+
+                const wall = document.getElementById('auth-wall');
+                
+                // Hide navs immediately
+                document.getElementById('user-nav-area').classList.add('hidden');
+                document.getElementById('mobile-user-area').classList.add('hidden');
+                
+                if(wall) {
+                    wall.style.opacity = '0';
+                    wall.classList.add('active');
+                    // Force reflow
+                    void wall.offsetWidth; 
+                    wall.style.opacity = '1';
+                }
+                
+                document.body.classList.add('auth-locked');
+                this.backToLogin();
+
+                if(typeof gtag === 'function') {
+                    gtag('event', 'logout');
                 }
             }
-        }
-
-        function simulateLogin(provider = 'google') {
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            btn.style.opacity = '0.8';
-
-            setTimeout(() => {
-                // Mock Data: Simulando o retorno de uma API de Auth (ex: Auth0 / Firebase)
-                const mockUser = {
-                    id: 'usr_' + Math.floor(Math.random() * 10000),
-                    email: provider === 'google' ? 'arquiteto@studio.com' : 'usuario@luxsintax.com',
-                    plan: 'PRO',
-                    token: 'mock_jwt_token_xyz'
-                };
-
-                // Armazenamento: Salvando o objeto stringificado
-                localStorage.setItem('lux_user_session', JSON.stringify(mockUser));
-                
-                const wall = document.getElementById('auth-wall');
-                wall.style.opacity = '0';
-                
-                setTimeout(() => {
-                    wall.classList.remove('active');
-                    wall.style.opacity = ''; 
-                    document.body.classList.remove('auth-locked');
-                    btn.innerHTML = originalText;
-                    btn.style.opacity = '1';
-                    
-                    // Atualiza a UI imediatamente
-                    checkAuth();
-                    
-                    // Track Login Event (Analytics)
-                    if(typeof gtag === 'function') {
-                        gtag('event', 'login', { method: provider });
-                    }
-
-                }, 500);
-            }, 800);
-        }
-
-        function logout() {
-            // 1. Limpa Sessão
-            localStorage.removeItem('lux_user_session');
-            
-            // 2. Feedback Visual / Recarrega Estado
-            const wall = document.getElementById('auth-wall');
-            const userNav = document.getElementById('user-nav-area');
-            
-            // Esconde menu do usuário
-            if(userNav) userNav.classList.add('hidden');
-            
-            // Bloqueia tela novamente com animação
-            if(wall) {
-                wall.style.opacity = '0';
-                wall.classList.add('active');
-                // Força reflow
-                void wall.offsetWidth; 
-                wall.style.opacity = '1';
-            }
-            document.body.classList.add('auth-locked');
-            
-            // Track Logout
-            if(typeof gtag === 'function') {
-                gtag('event', 'logout');
-            }
-        }
+        };
 
         // Initialize with Debounce for resize
         let resizeTimeout;
@@ -1449,8 +1572,10 @@
             }, 100);
         });
 
+        // Initialize App
+        AuthService.init(); // Run immediately
+        
         document.addEventListener("DOMContentLoaded", () => {
-            checkAuth(); // Verifica Auth ao carregar
             populateCategoryFilter();
             switchTool('query'); 
             filterNorms();
