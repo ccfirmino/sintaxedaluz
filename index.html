@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuxSintax | Lighting Design SaaS (v1.3)</title>
+    <title>LuxSintax | Lighting Design SaaS (v1.4)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -319,7 +319,27 @@
         <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="window.closeTerms()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-twilight border border-white/10 rounded-2xl shadow-2xl p-8 animate-fade-in-up">
             <h3 class="text-luminous-gold font-bold tracking-widest text-lg mb-6 uppercase text-center" data-i18n="terms_title">Termo de Responsabilidade e Uso</h3>
-            <div class="text-xs text-dim-gray leading-relaxed text-justify space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2" id="terms-content"><p>Ao utilizar o <strong>LuxSintax</strong> ("Plataforma"), você reconhece e concorda expressamente com os seguintes termos:</p><p class="text-white font-bold">1. Natureza Informativa e Preliminar</p><p>Esta Plataforma é uma ferramenta de auxílio destinada exclusivamente a <strong>estudos preliminares e conceituais</strong>...</p></div>
+            <div class="text-xs text-dim-gray leading-relaxed text-justify space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2" id="terms-content">
+                <p>Ao utilizar o <strong>LuxSintax</strong> ("Plataforma"), você reconhece e concorda expressamente com os seguintes termos:</p>
+                
+                <p class="text-white font-bold">1. Natureza Informativa e Preliminar</p>
+                <p>Esta Plataforma é uma ferramenta de auxílio destinada exclusivamente a <strong>estudos preliminares e conceituais</strong>. Os cálculos apresentados baseiam-se em modelos matemáticos teóricos (Lei do Cosseno, Inverso do Quadrado) e não consideram variáveis complexas do mundo real, como reflexões inter-reflexivas (radiosidade), obstruções físicas, depreciação luminosa por sujeira (LLF), flutuações de tensão ou tolerâncias de fabricação das luminárias.</p>
+
+                <p class="text-white font-bold">2. Isenção de Responsabilidade Profissional</p>
+                <p>Os resultados gerados <strong>NÃO substituem</strong> um projeto luminotécnico executivo, nem dispensam a realização de cálculos complexos em softwares dedicados (ex: DIALux, Relux) obrigatórios para validação normativa oficial. A LuxSintax e seus desenvolvedores isentam-se de qualquer responsabilidade por:</p>
+                <ul class="list-disc pl-4 space-y-1">
+                    <li>Dimensionamento incorreto de instalações elétricas ou luminotécnicas;</li>
+                    <li>Compra de materiais inadequados baseados nestas estimativas;</li>
+                    <li>Reprovação em auditorias de certificação (LEED, WELL, PROCEL) ou vistorias de órgãos públicos;</li>
+                    <li>Diferenças entre a iluminância calculada e a medida in loco.</li>
+                </ul>
+
+                <p class="text-white font-bold">3. Uso por Profissionais</p>
+                <p>A ferramenta pressupõe o manuseio por profissionais habilitados (Lighting Designers, Arquitetos, Engenheiros). É dever exclusivo do usuário verificar a conformidade dos resultados com as normas vigentes (NBR ISO/CIE 8995-1, NBR 5101, NBR 5410, entre outras).</p>
+
+                <p class="text-white font-bold">4. Propriedade Intelectual e Acesso</p>
+                <p>O software é fornecido "no estado em que se encontra" (as-is). Reservamo-nos o direito de alterar algoritmos ou suspender o acesso sem aviso prévio.</p>
+            </div>
             <div class="mt-8 flex justify-center"><button onclick="window.closeTerms()" class="px-8 py-3 bg-luminous-gold text-midnight font-bold rounded-full hover:bg-white transition-colors text-xs tracking-widest uppercase" data-i18n="terms_accept">Li, Compreendi e Aceito os Riscos</button></div>
         </div>
     </div>
