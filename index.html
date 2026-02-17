@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuxSintax | Lighting Design SaaS (BETA)</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -563,20 +566,35 @@
     </div>
 
     <script>
+        // --- SUPABASE CONFIGURATION (SAAS PRODUCTION) ---
+        const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         /**
-         * AUTHENTICATION MANAGER (SAAS ARCHITECTURE)
-         * Handles Session, Data Collection, and Access Control
+         * AUTHENTICATION MANAGER (REAL-TIME)
          */
         const AuthManager = {
             currentUser: null,
             
-            init: function() {
-                // Check for existing session in localStorage
-                const storedUser = localStorage.getItem('lux_user');
-                if (storedUser) {
-                    this.currentUser = JSON.parse(storedUser);
+            init: async function() {
+                // 1. Initial Session Check
+                const { data: { session } } = await supabase.auth.getSession();
+                this.handleSessionUpdate(session);
+
+                // 2. Real-time Listener for Auth Changes
+                supabase.auth.onAuthStateChange((event, session) => {
+                    this.handleSessionUpdate(session);
+                });
+            },
+
+            handleSessionUpdate: function(session) {
+                if (session) {
+                    this.currentUser = session.user;
                     this.unlockApp();
                 } else {
+                    this.currentUser = null;
                     this.lockApp();
                 }
             },
@@ -584,19 +602,19 @@
             lockApp: function() {
                 document.getElementById('auth-modal').classList.remove('hidden');
                 document.getElementById('app-content').classList.add('app-locked');
-                document.body.style.overflow = 'hidden'; // Prevent scrolling
+                document.body.style.overflow = 'hidden'; 
             },
 
             unlockApp: function() {
                 document.getElementById('auth-modal').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('app-locked');
-                document.body.style.overflow = 'auto'; // Restore scrolling
+                document.body.style.overflow = 'auto'; 
                 
-                // Update UI with User Info
                 if(this.currentUser) {
-                    const displayName = this.currentUser.name ? this.currentUser.name.split(' ')[0] : 'Usuário';
+                    // Fetch Name from User Metadata
+                    const name = this.currentUser.user_metadata.first_name || 'Usuário';
                     const displayEl = document.getElementById('user-name-display');
-                    if(displayEl) displayEl.innerText = displayName;
+                    if(displayEl) displayEl.innerText = name;
                 }
             },
 
@@ -627,70 +645,48 @@
                 }
             },
 
-            handleLogin: function() {
+            handleLogin: async function() {
                 const email = document.getElementById('login-email').value;
-                const pass = document.getElementById('login-password').value;
+                const password = document.getElementById('login-password').value;
 
-                if (!email || !pass) {
-                    alert("Por favor, preencha todos os campos.");
-                    return;
-                }
+                if (!email || !password) return alert("Preencha todos os campos.");
 
-                // SIMULATED AUTHENTICATION (Replace with API Call)
-                const mockUser = {
-                    name: "Architect",
-                    surname: "User",
+                const { error } = await supabase.auth.signInWithPassword({
                     email: email,
-                    id: "user_" + Date.now(),
-                    role: "free_tier"
-                };
+                    password: password,
+                });
 
-                this.loginSuccess(mockUser);
+                if (error) alert("Erro no login: " + error.message);
             },
 
-            handleRegister: function() {
-                const name = document.getElementById('reg-name').value;
-                const surname = document.getElementById('reg-surname').value;
+            handleRegister: async function() {
                 const email = document.getElementById('reg-email').value;
-                const pass = document.getElementById('reg-password').value;
+                const password = document.getElementById('reg-password').value;
+                const firstName = document.getElementById('reg-name').value;
+                const lastName = document.getElementById('reg-surname').value;
                 const terms = document.getElementById('reg-terms').checked;
 
-                if (!name || !surname || !email || !pass) {
-                    alert("Por favor, preencha todos os campos de cadastro.");
-                    return;
-                }
+                if (!firstName || !lastName || !email || !password) return alert("Preencha todos os campos.");
+                if (!terms) return alert("É necessário concordar com os termos.");
 
-                if (!terms) {
-                    alert("É necessário concordar com a coleta de dados.");
-                    return;
-                }
-
-                // DATA COLLECTION OBJECT (Ready for Analytics API)
-                const newUser = {
-                    name: name,
-                    surname: surname,
+                const { error } = await supabase.auth.signUp({
                     email: email,
-                    role: "free_tier",
-                    signupDate: new Date().toISOString(),
-                    source: "web_app_v1"
-                };
+                    password: password,
+                    options: {
+                        data: {
+                            first_name: firstName,
+                            last_name: lastName
+                        }
+                    }
+                });
 
-                // In a real app, POST this to your backend
-                console.log("Analytics Payload:", newUser);
-
-                this.loginSuccess(newUser);
+                if (error) alert("Erro no cadastro: " + error.message);
+                else alert("Cadastro realizado com sucesso! Se a confirmação de e-mail estiver ativada, verifique sua caixa de entrada.");
             },
 
-            loginSuccess: function(userObj) {
-                this.currentUser = userObj;
-                localStorage.setItem('lux_user', JSON.stringify(userObj));
-                this.unlockApp();
-            },
-
-            logout: function() {
-                localStorage.removeItem('lux_user');
-                this.currentUser = null;
-                location.reload(); // Reload to re-lock
+            logout: async function() {
+                await supabase.auth.signOut();
+                location.reload(); 
             }
         };
 
