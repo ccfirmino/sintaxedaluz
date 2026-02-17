@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuxSintax | Lighting Design SaaS (v1.2)</title>
+    <title>LuxSintax | Lighting Design SaaS (v1.3)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -296,7 +296,7 @@
             <div class="max-w-[1800px] mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="text-3xl text-luminous-gold font-bold tracking-widest mb-6 uppercase" data-i18n="about_title">SOBRE</h2>
-                    <p class="text-sm text-dim-line font-light max-w-4xl mx-auto leading-relaxed text-justify" data-i18n="about_text">...</p>
+                    <p class="text-sm text-dim-line font-light max-w-4xl mx-auto leading-relaxed text-justify" data-i18n="about_text">O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.</p>
                 </div>
                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                      <div class="glass-panel p-6 rounded-2xl relative group hover:border-luminous-gold/30 transition-all h-full"><div class="absolute top-0 right-0 p-4 opacity-30 text-luminous-gold"><i class="fas fa-calculator text-2xl"></i></div><h3 class="text-starlight text-[10px] font-bold mb-4 tracking-wider border-b border-luminous-gold/30 pb-2 inline-block" data-i18n="card_1_title">INTENSIDADE ABSOLUTA</h3><p class="text-muted-blue text-[10px] mb-4 font-light leading-relaxed min-h-[50px]" data-i18n="card_1_desc">Converte dados fotométricos relativos para intensidade absoluta (Candelas).</p><div class="bg-black/40 p-3 rounded-lg text-center shadow-inner"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-medium whitespace-nowrap">I = (Φ · γ) / 1000</span></div></div>
@@ -382,7 +382,7 @@
             logout: async function() { await supabase.auth.signOut(); location.reload(); }
         };
 
-        // --- CORE LOGIC PRESERVED FROM ORIGINAL FILE ---
+        // --- CORE LOGIC PRESERVED ---
         
         window.i18n = {
             pt: {
@@ -408,7 +408,7 @@
                 well_l01: "Acesso à luz natural e visualização.", well_req: "Obrigatório", well_l02: "Níveis de iluminância adequados.", 
                 well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Gestão de brilho solar.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Controle de zonas e intensidade.",
                 about_title: "SOBRE", 
-                about_text: "O LuxSintax nasce com um compromisso claro...",
+                about_text: "O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.",
                 card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).",
                 card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.",
                 card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.",
@@ -449,9 +449,9 @@
         window.calcMode = 'direct'; 
 
         window.state = {
-            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, workPlane: 0.75, flux: 1500, cdklm: 2000 },
+            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000 },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 }, 
-            homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
+            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
         };
 
         window.currentLeedTarget = 'gold';
@@ -779,12 +779,12 @@
             }
 
             if (window.currentTool === 'ponto') {
-                const I = getIntensity(s), sy = floorY - (s.height * scale), py = floorY - (s.workPlane * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                const I = getIntensity(s), sy = floorY - (s.height * scale), py = floorY - (s.plane * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
                 const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
-                const hEff = s.height - s.workPlane;
+                const hEff = s.height - s.plane;
                 const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
                 const dia = 2 * (s.height / Math.cos(tr)) * Math.tan(br / 2); 
-                drawFloor(); drawSource(centerX, sy); drawBeam(centerX, sy, s.beam, s.tilt); drawHeightLine(centerX, sy, s.height); drawPlaneLine(py, `hp: ${s.workPlane}m`);
+                drawFloor(); drawSource(centerX, sy); drawBeam(centerX, sy, s.beam, s.tilt); drawHeightLine(centerX, sy, s.height); drawPlaneLine(py, `hp: ${s.plane}m`);
                 drawAngleDim(centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false); 
                 if (s.tilt > 0) {
                     const axisX = centerX + (s.height * scale) * Math.tan(tr);
@@ -839,15 +839,15 @@
                 drawHeightLine(centerX, sy, s.height, 12); drawDimLine(centerX, sy - 30, wx, sy - 30, `d: ${s.dist.toFixed(1)}m`); drawDimLineVertical(wx + 15, floorY, hqY, `hq: ${s.hq.toFixed(1)}m`); 
             } else if (window.currentTool === 'homog') {
                 const I = getIntensity(window.state.homog); 
-                const sy = floorY - (s.height * scale); const py = floorY - (s.workPlane * scale); const hS = (s.spacing * scale) / 2;
+                const sy = floorY - (s.height * scale); const py = floorY - (s.plane * scale); const hS = (s.spacing * scale) / 2;
                 const br = s.beam * Math.PI / 180; const tl = 0; 
                 const dia = 2 * s.height * Math.tan(br / 2);
-                const hEff = s.height - s.workPlane;
+                const hEff = s.height - s.plane;
                 const diaPlane = hEff > 0 ? 2 * hEff * Math.tan(br / 2) : 0;
                 const luxFloor = I / (s.height ** 2);
                 const luxPlane = hEff > 0 ? I / (hEff ** 2) : 0;
                 const leftX = centerX - hS; const rightX = centerX + hS;
-                drawFloor(); drawPlaneLine(py, `hp: ${s.workPlane}m`); 
+                drawFloor(); drawPlaneLine(py, `hp: ${s.plane}m`); 
                 drawSource(leftX, sy); drawSource(rightX, sy); 
                 drawBeam(leftX, sy, s.beam, tl, 0.6); drawBeam(rightX, sy, s.beam, -tl, 0.6); 
                 drawAngleDim(leftX, sy, s.beam, tl, 40, "rgba(251, 191, 36, 0.8)", false);
@@ -877,7 +877,7 @@
         }
 
         ['ponto', 'vertical', 'homog'].forEach(key => {
-            ['intensity', 'height', 'beam', 'tilt', 'workPlane', 'dist', 'spacing', 'flux', 'cdklm', 'hq'].forEach(param => {
+            ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq'].forEach(param => {
                 bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param);
             });
         });
