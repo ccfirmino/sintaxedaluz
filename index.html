@@ -6,8 +6,6 @@
     <title>LuxSintax | Lighting Design SaaS (BETA)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
@@ -17,15 +15,9 @@
             theme: {
                 extend: {
                     colors: {
-                        'midnight': '#020617',
-                        'twilight': '#0f172a',
-                        'glass': 'rgba(15, 23, 42, 0.6)',
-                        'luminous-gold': '#FBBF24',
-                        'tech-cyan': '#22d3ee',
-                        'dim-gray': '#94a3b8',
-                        'dim-line': '#cbd5e1',
-                        'starlight': '#f8fafc',
-                        'leed-green': '#84cc16'
+                        'midnight': '#020617', 'twilight': '#0f172a', 'glass': 'rgba(15, 23, 42, 0.6)',
+                        'luminous-gold': '#FBBF24', 'tech-cyan': '#22d3ee', 'dim-gray': '#94a3b8',
+                        'dim-line': '#cbd5e1', 'starlight': '#f8fafc', 'leed-green': '#84cc16'
                     },
                     fontFamily: { sans: ['Manrope', 'sans-serif'] },
                     backgroundImage: {
@@ -74,11 +66,12 @@
                     LUX<span class="text-white font-light opacity-60">SINTAX</span>
                 </div>
                 <p class="text-[10px] text-dim-gray uppercase tracking-widest">SaaS de Inteligência em Iluminação</p>
+                <p id="connection-status" class="text-[9px] text-red-400 mt-2 font-bold animate-pulse">CONECTANDO AO SERVIDOR...</p>
             </div>
 
             <div class="flex border-b border-white/10 mb-6">
-                <button onclick="AuthManager.switchTab('login')" id="tab-auth-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all">Login</button>
-                <button onclick="AuthManager.switchTab('register')" id="tab-auth-register" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all">Cadastro</button>
+                <button onclick="window.AuthManager.switchTab('login')" id="tab-auth-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all">Login</button>
+                <button onclick="window.AuthManager.switchTab('register')" id="tab-auth-register" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all">Cadastro</button>
             </div>
 
             <div id="form-login" class="space-y-6">
@@ -90,7 +83,7 @@
                     <label>Senha</label>
                     <input type="password" id="login-password" placeholder="••••••••">
                 </div>
-                <button onclick="AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-white transition-colors shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-white transition-colors shadow-[0_0_20px_rgba(251,191,36,0.3)]">
                     Acessar Plataforma
                 </button>
             </div>
@@ -118,7 +111,7 @@
                     <input type="checkbox" id="reg-terms" class="mt-1 w-3 h-3 accent-luminous-gold">
                     <label for="reg-terms" class="text-[9px] leading-tight text-dim-gray cursor-pointer">Concordo com os termos de uso.</label>
                 </div>
-                <button onclick="AuthManager.handleRegister()" class="w-full py-4 bg-transparent border border-luminous-gold text-luminous-gold font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-midnight transition-colors">
+                <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border border-luminous-gold text-luminous-gold font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-midnight transition-colors">
                     Criar Conta Gratuita
                 </button>
             </div>
@@ -144,7 +137,7 @@
                         </div>
                         <div class="flex flex-col">
                             <span id="user-name-display" class="text-[10px] font-bold text-white uppercase leading-none">Usuário</span>
-                            <button onclick="AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-400 text-left uppercase font-bold">Sair</button>
+                            <button onclick="window.AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-400 text-left uppercase font-bold">Sair</button>
                         </div>
                     </div>
                 </div>
@@ -270,22 +263,29 @@
         </footer>
     </div>
 
-    <script>
-        // --- 1. CONFIGURAÇÃO ÚNICA DO SUPABASE ---
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
         const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
         
-        // Inicializa o cliente uma única vez
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Inicializa o cliente Supabase
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Atualiza UI de status
+        const statusEl = document.getElementById('connection-status');
+        if(statusEl) {
+            statusEl.innerText = "SISTEMA PRONTO";
+            statusEl.classList.remove('text-red-400', 'animate-pulse');
+            statusEl.classList.add('text-leed-green');
+        }
 
-        // --- 2. AUTH MANAGER (COM AUTO-LOGIN) ---
-        const AuthManager = {
+        // Auth Manager global
+        window.AuthManager = {
             init: async function() {
-                // Verifica sessão existente
                 const { data: { session } } = await supabase.auth.getSession();
                 this.handleSessionUpdate(session);
 
-                // Escuta eventos de login/logout
                 supabase.auth.onAuthStateChange((event, session) => {
                     this.handleSessionUpdate(session);
                 });
@@ -317,8 +317,7 @@
                 if(content) content.classList.remove('app-locked');
                 document.body.style.overflow = 'auto'; 
                 
-                // Força atualização da calculadora ao desbloquear
-                if(typeof updateCalculations === 'function') setTimeout(updateCalculations, 100);
+                if(typeof window.updateCalculations === 'function') setTimeout(window.updateCalculations, 100);
             },
 
             switchTab: function(tab) {
@@ -368,10 +367,8 @@
                 if (error) {
                     alert("Erro no cadastro: " + error.message);
                 } else if (data.session) {
-                    // SUCESSO IMEDIATO (Sem confirmação de email)
                     this.unlockApp();
                 } else {
-                    // Fallback caso a config no Supabase ainda exija email
                     alert("Cadastro realizado! Verifique seu e-mail.");
                 }
             },
@@ -382,7 +379,7 @@
             }
         };
 
-        // --- 3. LÓGICA DAS CALCULADORAS ---
+        // --- CALC LOGIC (EXPOSED TO WINDOW) ---
         let currentTool = 'query'; 
         let calcMode = 'direct'; 
 
@@ -392,7 +389,6 @@
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
         };
 
-        // Dados de Normas (Amostra)
         const normsDatabase = [
             { cat: "Escritório", room: "Escrita, digitação, leitura", lux: 500, ugr: 19, ra: 80 },
             { cat: "Escritório", room: "Salas de conferência", lux: 500, ugr: 19, ra: 80 },
@@ -415,15 +411,12 @@
             `).join('');
         }
 
-        function switchTool(tool) {
+        window.switchTool = function(tool) {
             currentTool = tool;
-            
-            // Toggle Visual vs Query
             const isQuery = tool === 'query';
             document.getElementById('visual-tools').classList.toggle('hidden', isQuery);
             document.getElementById('query-tool').classList.toggle('hidden', !isQuery);
             
-            // Toggle Inputs Específicos
             ['ponto', 'vertical', 'homog'].forEach(t => {
                 const el = document.getElementById(`inputs-${t}`);
                 if(el) el.classList.add('hidden');
@@ -433,7 +426,6 @@
                 if(el) el.classList.remove('hidden');
             }
 
-            // Atualiza Botões
             document.querySelectorAll('.mode-tab-btn').forEach(btn => {
                 const isActive = btn.id === `tab-${tool}`;
                 btn.className = isActive 
@@ -441,22 +433,21 @@
                     : "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap";
             });
 
-            updateCalculations();
+            window.updateCalculations();
         }
 
-        function updateCalcMode(mode) {
+        window.updateCalcMode = function(mode) {
             calcMode = mode;
             document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode === 'direct'));
-            updateCalculations();
+            window.updateCalculations();
         }
 
         function getIntensity(s) {
             return calcMode === 'direct' ? s.intensity : (s.flux * s.cdklm) / 1000;
         }
 
-        // Renderização Canvas (Simplified for stability)
-        function updateCalculations() {
+        window.updateCalculations = function() {
             const canvas = document.getElementById('beamCanvas');
             if (!canvas || currentTool === 'query') return;
 
@@ -473,22 +464,16 @@
             const centerX = cw / 2;
 
             ctx.clearRect(0, 0, cw, ch);
-
-            // Chão
             ctx.strokeStyle = '#334155'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
 
             const s = state[currentTool];
             const I = getIntensity(s);
             
-            // Desenho simplificado baseado na ferramenta
             if (currentTool === 'ponto') {
-                const scale = 40; // Pixels por metro
+                const scale = 40; 
                 const sy = floorY - (s.height * scale);
-                
-                // Fonte
                 ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI*2); ctx.fill();
                 
-                // Feixe de luz
                 const tr = s.tilt * Math.PI / 180;
                 const br = s.beam * Math.PI / 180;
                 
@@ -501,12 +486,10 @@
                 ctx.lineTo((s.height*scale) * Math.tan(tr + br/2), s.height*scale);
                 ctx.fill(); ctx.restore();
 
-                // Valor Lux (Lei Cosseno)
                 const lux = (I * Math.pow(Math.cos(tr), 3)) / (s.height * s.height);
                 ctx.fillStyle = "#fff"; ctx.font = "bold 12px Manrope";
                 ctx.fillText(`${Math.round(lux)} LUX`, centerX + 10, floorY - 10);
             }
-            // Vertical e Homog seguem lógica similar simplificada para garantir funcionamento
             else if (currentTool === 'vertical') {
                 const scale = 40;
                 const sy = floorY - (s.height * scale);
@@ -515,13 +498,11 @@
                 ctx.strokeStyle = '#94a3b8'; ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, sy - 50); ctx.stroke();
                 ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI*2); ctx.fill();
                 
-                // Raio central
                 ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)'; ctx.setLineDash([5,5]);
                 ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, floorY - (s.height - s.dist/Math.tan(s.tilt*Math.PI/180))*scale ); ctx.stroke();
             }
         }
 
-        // Binds
         function bindInputs() {
             const bind = (id, tool, prop) => {
                 const el = document.getElementById(id);
@@ -530,31 +511,23 @@
                     const update = (val) => {
                         el.value = val; range.value = val;
                         state[tool][prop] = parseFloat(val);
-                        updateCalculations();
+                        window.updateCalculations();
                     };
                     el.addEventListener('input', e => update(e.target.value));
                     range.addEventListener('input', e => update(e.target.value));
                 }
             };
-
-            // Ponto
             bind('p-height', 'ponto', 'height'); bind('p-beam', 'ponto', 'beam'); 
             bind('p-tilt', 'ponto', 'tilt'); bind('p-intensity', 'ponto', 'intensity');
-            
-            // Vertical
             bind('v-height', 'vertical', 'height'); bind('v-dist', 'vertical', 'dist');
-            
-            // Outros podem ser adicionados seguindo o padrão
         }
 
-        // Inicialização Final
-        document.addEventListener("DOMContentLoaded", () => {
-            AuthManager.init();
-            populateNorms();
-            bindInputs();
-            switchTool('query');
-            window.addEventListener('resize', updateCalculations);
-        });
+        // INIT
+        window.AuthManager.init();
+        populateNorms();
+        bindInputs();
+        window.switchTool('query');
+        window.addEventListener('resize', window.updateCalculations);
 
     </script>
 </body>
