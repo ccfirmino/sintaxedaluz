@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuxSintax | Lighting Design SaaS (BETA)</title>
+    <title>LuxSintax | Lighting Design SaaS (v1.2)</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
@@ -35,6 +36,7 @@
         body { font-family: 'Manrope', sans-serif; background-color: #020617; color: #f8fafc; background: linear-gradient(180deg, #020617 0%, #0f172a 100%); letter-spacing: 0.5px; min-height: 100vh; }
         h1, h2, h3, h4, .nav-link, button, input, label, select { text-transform: uppercase !important; }
         
+        /* Glassmorphism & UI Components */
         .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
         
         /* Inputs */
@@ -381,7 +383,6 @@
         };
 
         // --- CORE LOGIC PRESERVED FROM ORIGINAL FILE ---
-        // Exposing functions to window so HTML onchange/onclick works with type=module
         
         window.i18n = {
             pt: {
@@ -459,13 +460,68 @@
         window.normsDatabase = [
             { cat: "Áreas de Tráfego", room: "Áreas de circulação e corredores", lux: 100, ugr: 28, ra: 40 },
             { cat: "Áreas de Tráfego", room: "Escadas, escadas rolantes, esteiras", lux: 150, ugr: 25, ra: 40 },
+            { cat: "Áreas de Tráfego", room: "Rampas de carregamento", lux: 150, ugr: 25, ra: 40 },
+            { cat: "Edifícios (Geral)", room: "Cantinas", lux: 200, ugr: 22, ra: 80 },
             { cat: "Edifícios (Geral)", room: "Salas de descanso", lux: 100, ugr: 22, ra: 80 },
-            { cat: "Escritório", room: "Escrita, digitação, leitura", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Salas de conferência / reunião", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Indústria", room: "Trabalho de precisão", lux: 1000, ugr: 19, ra: 80 },
+            { cat: "Edifícios (Geral)", room: "Salas de exercícios físicos", lux: 300, ugr: 22, ra: 80 },
+            { cat: "Edifícios (Geral)", room: "Vestiários, banheiros, toaletes", lux: 200, ugr: 25, ra: 80 },
+            { cat: "Edifícios (Geral)", room: "Sala de primeiros socorros", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Edifícios (Geral)", room: "Salas para atendimento médico", lux: 500, ugr: 16, ra: 90 },
+            { cat: "Edifícios (Geral)", room: "Salas de controle de instalações", lux: 150, ugr: 25, ra: 60 },
             { cat: "Indústria", room: "Armazenamento (Depósitos)", lux: 100, ugr: 25, ra: 60 },
+            { cat: "Indústria", room: "Expedição e embalagem", lux: 300, ugr: 25, ra: 60 },
+            { cat: "Indústria (Alim.)", room: "Preparação de alimentos", lux: 500, ugr: 22, ra: 80 },
+            { cat: "Indústria (Alim.)", room: "Inspeção de cor", lux: 1000, ugr: 19, ra: 90 },
+            { cat: "Indústria (Metal)", room: "Forjamento (livre)", lux: 200, ugr: 25, ra: 60 },
+            { cat: "Indústria (Metal)", room: "Soldagem", lux: 300, ugr: 22, ra: 60 },
+            { cat: "Indústria (Metal)", room: "Usinagem grosseira", lux: 300, ugr: 22, ra: 60 },
+            { cat: "Indústria (Metal)", room: "Usinagem média", lux: 500, ugr: 22, ra: 60 },
+            { cat: "Indústria (Metal)", room: "Usinagem fina", lux: 750, ugr: 19, ra: 60 },
+            { cat: "Indústria (Eletr.)", room: "Montagem de componentes (Geral)", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Indústria (Eletr.)", room: "Montagem fina / Inspeção", lux: 1000, ugr: 16, ra: 80 },
+            { cat: "Indústria (Textil)", room: "Costura fina", lux: 750, ugr: 19, ra: 80 },
+            { cat: "Indústria (Gráfica)", room: "Impressão à máquina", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Indústria (Gráfica)", room: "Inspeção de cores (Controle)", lux: 1500, ugr: 16, ra: 90 },
+            { cat: "Indústria (Madeira)", room: "Marcenaria (bancada)", lux: 300, ugr: 22, ra: 60 },
+            { cat: "Indústria (Madeira)", room: "Acabamento / Pintura", lux: 750, ugr: 22, ra: 80 },
+            { cat: "Escritório", room: "Arquivamento, cópia, circulação", lux: 300, ugr: 25, ra: 80 },
+            { cat: "Escritório", room: "Escrita, digitação, leitura", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Escritório", room: "Desenho técnico", lux: 750, ugr: 16, ra: 80 },
+            { cat: "Escritório", room: "Estações de trabalho CAD", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Escritório", room: "Salas de conferência / reunião", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Escritório", room: "Recepção / Balcão", lux: 300, ugr: 22, ra: 80 },
             { cat: "Varejo", room: "Área de vendas (pequenas lojas)", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Educação", room: "Sala de aula", lux: 300, ugr: 19, ra: 80 }
+            { cat: "Varejo", room: "Área de vendas (grandes lojas)", lux: 500, ugr: 22, ra: 80 },
+            { cat: "Varejo", room: "Caixa / Empacotamento", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Varejo", room: "Vitrine (Destaque)", lux: 1000, ugr: "-", ra: 80 },
+            { cat: "Locais Públicos", room: "Saguões de entrada", lux: 100, ugr: 22, ra: 60 },
+            { cat: "Locais Públicos", room: "Bilheterias", lux: 300, ugr: 22, ra: 80 },
+            { cat: "Locais Públicos", room: "Restaurantes (Salão)", lux: 200, ugr: 22, ra: 80 },
+            { cat: "Locais Públicos", room: "Restaurantes (Cozinha)", lux: 500, ugr: 22, ra: 80 },
+            { cat: "Locais Públicos", room: "Teatros / Cinemas (Foyer)", lux: 200, ugr: 22, ra: 80 },
+            { cat: "Locais Públicos", room: "Museus (Exposição geral)", lux: 300, ugr: 19, ra: 80 },
+            { cat: "Locais Públicos", room: "Bibliotecas (Estantes)", lux: 200, ugr: 19, ra: 80 },
+            { cat: "Locais Públicos", room: "Bibliotecas (Leitura)", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Locais Públicos", room: "Estacionamento Coberto", lux: 75, ugr: 25, ra: 40 },
+            { cat: "Educação", room: "Sala de aula", lux: 300, ugr: 19, ra: 80 },
+            { cat: "Educação", room: "Sala de aula (Noturno/Adultos)", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Educação", room: "Quadro negro (Vertical)", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Educação", room: "Auditório / Anfiteatro", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Educação", room: "Laboratórios", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Educação", room: "Salas de arte / desenho", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Educação", room: "Ginásios esportivos", lux: 300, ugr: 22, ra: 80 },
+            { cat: "Saúde", room: "Salas de espera", lux: 200, ugr: 22, ra: 80 },
+            { cat: "Saúde", room: "Corredores (dia)", lux: 200, ugr: 22, ra: 80 },
+            { cat: "Saúde", room: "Enfermaria (Geral)", lux: 100, ugr: 19, ra: 80 },
+            { cat: "Saúde", room: "Enfermaria (Exame simples)", lux: 300, ugr: 19, ra: 80 },
+            { cat: "Saúde", room: "Exame e tratamento (Geral)", lux: 1000, ugr: 19, ra: 90 },
+            { cat: "Saúde", room: "Salas de cirurgia (Geral)", lux: 1000, ugr: 19, ra: 90 },
+            { cat: "Saúde", room: "Salas de cirurgia (Cavidade)", lux: 10000, ugr: "-", ra: 90 },
+            { cat: "Saúde", room: "Dentista (Iluminação geral)", lux: 500, ugr: 19, ra: 90 },
+            { cat: "Saúde", room: "Dentista (No paciente)", lux: 1000, ugr: "-", ra: 90 },
+            { cat: "Transporte", room: "Aeroportos (Embarque/Check-in)", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Transporte", room: "Aeroportos (Saguões)", lux: 200, ugr: 22, ra: 80 },
+            { cat: "Transporte", room: "Estações ferroviárias (Plataforma)", lux: 50, ugr: 28, ra: 40 }
         ];
 
         window.lpdBaselines = [
