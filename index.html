@@ -6,6 +6,7 @@
     <title>LuxSintax | Lighting Design SaaS (BETA)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
@@ -75,45 +76,23 @@
             </div>
 
             <div id="form-login" class="space-y-6">
-                <div class="auth-input-group">
-                    <label>E-mail</label>
-                    <input type="email" id="login-email" placeholder="seu@email.com">
-                </div>
-                <div class="auth-input-group">
-                    <label>Senha</label>
-                    <input type="password" id="login-password" placeholder="••••••••">
-                </div>
-                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-white transition-colors shadow-[0_0_20px_rgba(251,191,36,0.3)]">
-                    Acessar Plataforma
-                </button>
+                <div class="auth-input-group"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"></div>
+                <div class="auth-input-group"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••"></div>
+                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-white transition-colors shadow-[0_0_20px_rgba(251,191,36,0.3)]">Acessar Plataforma</button>
             </div>
 
             <div id="form-register" class="space-y-5 hidden">
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="auth-input-group">
-                        <label>Nome</label>
-                        <input type="text" id="reg-name" placeholder="Nome">
-                    </div>
-                    <div class="auth-input-group">
-                        <label>Sobrenome</label>
-                        <input type="text" id="reg-surname" placeholder="Sobrenome">
-                    </div>
+                    <div class="auth-input-group"><label>Nome</label><input type="text" id="reg-name" placeholder="Nome"></div>
+                    <div class="auth-input-group"><label>Sobrenome</label><input type="text" id="reg-surname" placeholder="Sobrenome"></div>
                 </div>
-                <div class="auth-input-group">
-                    <label>E-mail Corporativo</label>
-                    <input type="email" id="reg-email" placeholder="nome@empresa.com">
-                </div>
-                 <div class="auth-input-group">
-                    <label>Senha</label>
-                    <input type="password" id="reg-password" placeholder="Crie uma senha forte">
-                </div>
+                <div class="auth-input-group"><label>E-mail Corporativo</label><input type="email" id="reg-email" placeholder="nome@empresa.com"></div>
+                 <div class="auth-input-group"><label>Senha</label><input type="password" id="reg-password" placeholder="Crie uma senha forte"></div>
                 <div class="flex items-start gap-2 mt-2">
                     <input type="checkbox" id="reg-terms" class="mt-1 w-3 h-3 accent-luminous-gold">
                     <label for="reg-terms" class="text-[9px] leading-tight text-dim-gray cursor-pointer">Concordo com os termos de uso.</label>
                 </div>
-                <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border border-luminous-gold text-luminous-gold font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-midnight transition-colors">
-                    Criar Conta Gratuita
-                </button>
+                <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border border-luminous-gold text-luminous-gold font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-midnight transition-colors">Criar Conta Gratuita</button>
             </div>
         </div>
     </div>
@@ -122,19 +101,14 @@
         <nav class="fixed w-full z-50 bg-midnight/90 backdrop-blur-xl border-b border-white/5">
             <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
-                        LUX<span class="text-white font-light opacity-60">SINTAX</span>
-                    </a>
+                    <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">LUX<span class="text-white font-light opacity-60">SINTAX</span></a>
                     <span class="bg-luminous-gold/20 text-luminous-gold text-[9px] font-black px-2 py-0.5 rounded border border-luminous-gold/30 tracking-widest animate-pulse">BETA</span>
                 </div>
-                
                 <div class="hidden md:flex gap-8 items-center">
                     <button class="nav-link">INICIO</button>
                     <button class="nav-link">SOBRE</button>
                     <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-white/10">
-                        <div class="w-8 h-8 rounded-full bg-luminous-gold/20 flex items-center justify-center text-luminous-gold font-bold text-xs border border-luminous-gold/30">
-                            <i class="fas fa-user"></i>
-                        </div>
+                        <div class="w-8 h-8 rounded-full bg-luminous-gold/20 flex items-center justify-center text-luminous-gold font-bold text-xs border border-luminous-gold/30"><i class="fas fa-user"></i></div>
                         <div class="flex flex-col">
                             <span id="user-name-display" class="text-[10px] font-bold text-white uppercase leading-none">Usuário</span>
                             <button onclick="window.AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-400 text-left uppercase font-bold">Sair</button>
@@ -147,24 +121,11 @@
         <section id="calculadora" class="pt-24 pb-10 px-4 md:px-8 relative min-h-screen">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-30"></div>
             <div class="max-w-[1800px] mx-auto flex flex-col items-center">
-                
                 <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
-                    <button onclick="switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold">
-                        <i class="fas fa-search"></i>
-                        <span>CONSULTA<br>(NBR/LEED)</span>
-                    </button>
-                    <button onclick="switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
-                        <i class="fas fa-grip-lines"></i>
-                        <span>SUPERFÍCIE<br>HORIZONTAL</span>
-                    </button>
-                    <button onclick="switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
-                        <i class="fas fa-grip-lines-vertical"></i>
-                        <span>SUPERFÍCIE<br>VERTICAL</span>
-                    </button>
-                    <button onclick="switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
-                        <i class="fas fa-border-all"></i>
-                        <span>DISTRIBUIÇÃO<br>& DESENHO</span>
-                    </button>
+                    <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold"><i class="fas fa-search"></i><span>CONSULTA<br>(NBR/LEED)</span></button>
+                    <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines"></i><span>SUPERFÍCIE<br>HORIZONTAL</span></button>
+                    <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical"></i><span>SUPERFÍCIE<br>VERTICAL</span></button>
+                    <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-border-all"></i><span>DISTRIBUIÇÃO<br>& DESENHO</span></button>
                 </div>
 
                 <div id="calculator-interface" class="w-full relative">
@@ -174,40 +135,30 @@
                                 <div class="mb-4">
                                     <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md border-b border-white/10 pb-3">Parâmetros da Fonte</h3>
                                     <div class="flex flex-col sm:flex-row gap-4 p-1 mb-6 justify-center">
-                                        <label class="flex items-center gap-2 cursor-pointer group">
-                                            <input type="radio" name="calc_mode" value="direct" checked onchange="updateCalcMode('direct')">
-                                            <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">INTENSIDADE (CD)</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer group">
-                                            <input type="radio" name="calc_mode" value="photometric" onchange="updateCalcMode('photometric')">
-                                            <span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">FOTOMETRIA</span>
-                                        </label>
+                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">INTENSIDADE (CD)</span></label>
+                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">FOTOMETRIA</span></label>
                                     </div>
                                 </div>
-
                                 <div id="inputs-ponto" class="hidden">
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
-                                    <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1" class="calc-input" oninput="window.state.ponto.height=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0" oninput="window.state.ponto.height=this.value;document.getElementById('p-height').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05" class="calc-input" oninput="window.state.ponto.workPlane=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75" oninput="window.state.ponto.workPlane=this.value;document.getElementById('p-plane').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120" class="calc-input" oninput="window.state.ponto.beam=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30" oninput="window.state.ponto.beam=this.value;document.getElementById('p-beam').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60" class="calc-input" oninput="window.state.ponto.tilt=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0" oninput="window.state.ponto.tilt=this.value;document.getElementById('p-tilt').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000" class="calc-input" oninput="window.state.ponto.intensity=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000" oninput="window.state.ponto.intensity=this.value;document.getElementById('p-intensity').value=this.value;window.updateCalculations()"></div>
                                 </div>
-
                                 <div id="inputs-vertical" class="hidden">
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
-                                    <div class="mb-2 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
-                                    <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1" class="calc-input" oninput="window.state.vertical.height=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0" oninput="window.state.vertical.height=this.value;document.getElementById('v-height').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">DISTÂNCIA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1" class="calc-input" oninput="window.state.vertical.dist=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0" oninput="window.state.vertical.dist=this.value;document.getElementById('v-dist').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120" class="calc-input" oninput="window.state.vertical.beam=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30" oninput="window.state.vertical.beam=this.value;document.getElementById('v-beam').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-2 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90" class="calc-input" oninput="window.state.vertical.tilt=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30" oninput="window.state.vertical.tilt=this.value;document.getElementById('v-tilt').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000" class="calc-input" oninput="window.state.vertical.intensity=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000" oninput="window.state.vertical.intensity=this.value;document.getElementById('v-intensity').value=this.value;window.updateCalculations()"></div>
                                 </div>
-
                                 <div id="inputs-homog" class="hidden">
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
-                                    <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000" class="calc-input"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1" class="calc-input" oninput="window.state.homog.height=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0" oninput="window.state.homog.height=this.value;document.getElementById('h-height').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05" class="calc-input" oninput="window.state.homog.workPlane=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75" oninput="window.state.homog.workPlane=this.value;document.getElementById('h-plane').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">DISTÂNCIA FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1" class="calc-input" oninput="window.state.homog.spacing=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0" oninput="window.state.homog.spacing=this.value;document.getElementById('h-spacing').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120" class="calc-input" oninput="window.state.homog.beam=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30" oninput="window.state.homog.beam=this.value;document.getElementById('h-beam').value=this.value;window.updateCalculations()"></div>
+                                    <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000" class="calc-input" oninput="window.state.homog.intensity=this.value;window.updateCalculations()"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000" oninput="window.state.homog.intensity=this.value;document.getElementById('h-intensity').value=this.value;window.updateCalculations()"></div>
                                 </div>
                             </div>
                         </div>
@@ -227,16 +178,11 @@
                         <div class="glass-panel p-6 rounded-2xl">
                             <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-white/10 pb-4 gap-4">
                                 <div>
-                                    <h3 class="text-lg text-luminous-gold font-bold tracking-widest flex items-center gap-2 uppercase">
-                                        <i class="fas fa-search"></i> <span>Centro de Consultas</span>
-                                    </h3>
+                                    <h3 class="text-lg text-luminous-gold font-bold tracking-widest flex items-center gap-2 uppercase"><i class="fas fa-search"></i> <span>Centro de Consultas</span></h3>
                                     <p class="text-xs text-muted-blue mt-1">Acesso rápido a normas e referências técnicas.</p>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button class="query-tab-btn query-tab-active">Interiores (NBR 8995)</button>
-                                </div>
+                                <div class="flex gap-2"><button class="query-tab-btn query-tab-active">Interiores (NBR 8995)</button></div>
                             </div>
-
                             <div id="content-nbr8995" class="query-content">
                                 <div class="overflow-hidden rounded-xl border border-white/10">
                                     <div class="overflow-x-auto max-h-[550px] overflow-y-auto custom-scrollbar">
@@ -266,153 +212,96 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
+        // 1. CONEXÃO SUPABASE
         const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
-        
-        // Inicializa o cliente Supabase
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        // Atualiza UI de status
+
+        // UI: Status
         const statusEl = document.getElementById('connection-status');
         if(statusEl) {
-            statusEl.innerText = "SISTEMA PRONTO";
+            statusEl.innerText = "SISTEMA ONLINE";
             statusEl.classList.remove('text-red-400', 'animate-pulse');
             statusEl.classList.add('text-leed-green');
         }
 
-        // Auth Manager global
+        // 2. STATE GLOBAL (IMPORTANTÍSSIMO PARA OS INPUTS FUNCIONAREM)
+        window.state = {
+            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, workPlane: 0.75, flux: 1500, cdklm: 2000 },
+            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 }, 
+            homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
+        };
+        window.calcMode = 'direct';
+        window.currentTool = 'query';
+
+        // 3. AUTH MANAGER
         window.AuthManager = {
             init: async function() {
                 const { data: { session } } = await supabase.auth.getSession();
                 this.handleSessionUpdate(session);
-
-                supabase.auth.onAuthStateChange((event, session) => {
-                    this.handleSessionUpdate(session);
-                });
+                supabase.auth.onAuthStateChange((event, session) => this.handleSessionUpdate(session));
             },
-
             handleSessionUpdate: function(session) {
                 if (session) {
                     const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
-                    const displayEl = document.getElementById('user-name-display');
-                    if(displayEl) displayEl.innerText = name.toUpperCase();
+                    document.getElementById('user-name-display').innerText = name.toUpperCase();
                     this.unlockApp();
                 } else {
                     this.lockApp();
                 }
             },
-
             lockApp: function() {
-                const modal = document.getElementById('auth-modal');
-                const content = document.getElementById('app-content');
-                if(modal) modal.classList.remove('hidden');
-                if(content) content.classList.add('app-locked');
-                document.body.style.overflow = 'hidden'; 
+                document.getElementById('auth-modal').classList.remove('hidden');
+                document.getElementById('app-content').classList.add('app-locked');
             },
-
             unlockApp: function() {
-                const modal = document.getElementById('auth-modal');
-                const content = document.getElementById('app-content');
-                if(modal) modal.classList.add('hidden');
-                if(content) content.classList.remove('app-locked');
-                document.body.style.overflow = 'auto'; 
-                
-                if(typeof window.updateCalculations === 'function') setTimeout(window.updateCalculations, 100);
+                document.getElementById('auth-modal').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('app-locked');
+                setTimeout(() => { window.updateCalculations(); }, 500); // Garante render
             },
-
             switchTab: function(tab) {
                 const loginForm = document.getElementById('form-login');
                 const regForm = document.getElementById('form-register');
                 const btnLogin = document.getElementById('tab-auth-login');
                 const btnReg = document.getElementById('tab-auth-register');
-
                 if (tab === 'login') {
-                    loginForm.classList.remove('hidden');
-                    regForm.classList.add('hidden');
+                    loginForm.classList.remove('hidden'); regForm.classList.add('hidden');
                     btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
                     btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all";
                 } else {
-                    loginForm.classList.add('hidden');
-                    regForm.classList.remove('hidden');
+                    loginForm.classList.add('hidden'); regForm.classList.remove('hidden');
                     btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
                     btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all";
                 }
             },
-
             handleLogin: async function() {
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
-                if (!email || !password) return alert("Preencha todos os campos.");
-
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) alert("Erro no login: " + error.message);
+                if (error) alert(error.message);
             },
-
             handleRegister: async function() {
                 const email = document.getElementById('reg-email').value;
                 const password = document.getElementById('reg-password').value;
                 const firstName = document.getElementById('reg-name').value;
                 const lastName = document.getElementById('reg-surname').value;
-                const terms = document.getElementById('reg-terms').checked;
-
-                if (!firstName || !lastName || !email || !password) return alert("Preencha todos os campos.");
-                if (!terms) return alert("É necessário concordar com os termos.");
-
+                if (!document.getElementById('reg-terms').checked) return alert("Aceite os termos.");
                 const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: { data: { first_name: firstName, last_name: lastName } }
+                    email, password, options: { data: { first_name: firstName, last_name: lastName } }
                 });
-
-                if (error) {
-                    alert("Erro no cadastro: " + error.message);
-                } else if (data.session) {
-                    this.unlockApp();
-                } else {
-                    alert("Cadastro realizado! Verifique seu e-mail.");
-                }
+                if (error) alert(error.message);
+                else if (data.session) this.unlockApp();
+                else alert("Cadastro feito. Verifique e-mail.");
             },
-
             logout: async function() {
                 await supabase.auth.signOut();
                 location.reload(); 
             }
         };
 
-        // --- CALC LOGIC (EXPOSED TO WINDOW) ---
-        let currentTool = 'query'; 
-        let calcMode = 'direct'; 
-
-        const state = {
-            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, workPlane: 0.75, flux: 1500, cdklm: 2000 },
-            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 }, 
-            homog: { intensity: 3000, height: 3.0, spacing: 2.0, workPlane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
-        };
-
-        const normsDatabase = [
-            { cat: "Escritório", room: "Escrita, digitação, leitura", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Salas de conferência", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Arquivamento", lux: 300, ugr: 25, ra: 80 },
-            { cat: "Indústria", room: "Trabalho de precisão", lux: 1000, ugr: 19, ra: 80 },
-            { cat: "Áreas Comuns", room: "Corredores", lux: 100, ugr: 28, ra: 40 }
-        ];
-
-        function populateNorms() {
-            const tbody = document.getElementById('nbr8995-tbody');
-            if(!tbody) return;
-            tbody.innerHTML = normsDatabase.map(n => `
-                <tr class="hover:bg-white/5 transition-colors border-b border-white/5">
-                    <td class="p-4 font-bold text-luminous-gold text-xs uppercase">${n.cat}</td>
-                    <td class="p-4 text-dim-gray">${n.room}</td>
-                    <td class="p-4 text-center font-bold text-white bg-white/5">${n.lux}</td>
-                    <td class="p-4 text-center text-muted-blue">${n.ugr}</td>
-                    <td class="p-4 text-center text-muted-blue">${n.ra}</td>
-                </tr>
-            `).join('');
-        }
-
+        // 4. LÓGICA DE INTERFACE E CÁLCULOS (EXPOSTA GLOBALMENTE)
         window.switchTool = function(tool) {
-            currentTool = tool;
+            window.currentTool = tool;
             const isQuery = tool === 'query';
             document.getElementById('visual-tools').classList.toggle('hidden', isQuery);
             document.getElementById('query-tool').classList.toggle('hidden', !isQuery);
@@ -433,26 +322,40 @@
                     : "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap";
             });
 
-            window.updateCalculations();
+            setTimeout(() => window.updateCalculations(), 50);
         }
 
         window.updateCalcMode = function(mode) {
-            calcMode = mode;
+            window.calcMode = mode;
             document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode === 'direct'));
             window.updateCalculations();
         }
 
         function getIntensity(s) {
-            return calcMode === 'direct' ? s.intensity : (s.flux * s.cdklm) / 1000;
+            return window.calcMode === 'direct' ? s.intensity : (s.flux * s.cdklm) / 1000;
         }
 
+        // DATABASE DE NORMAS
+        const normsDatabase = [
+            { cat: "Escritório", room: "Escrita, digitação, leitura", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Escritório", room: "Salas de conferência", lux: 500, ugr: 19, ra: 80 },
+            { cat: "Escritório", room: "Arquivamento", lux: 300, ugr: 25, ra: 80 },
+            { cat: "Indústria", room: "Trabalho de precisão", lux: 1000, ugr: 19, ra: 80 },
+            { cat: "Indústria", room: "Depósitos e estoques", lux: 100, ugr: 25, ra: 60 },
+            { cat: "Áreas Comuns", room: "Corredores / Circulação", lux: 100, ugr: 28, ra: 40 },
+            { cat: "Varejo", room: "Área de vendas geral", lux: 300, ugr: 22, ra: 80 },
+            { cat: "Educação", room: "Salas de aula", lux: 300, ugr: 19, ra: 80 }
+        ];
+
+        // RENDERIZADOR
         window.updateCalculations = function() {
             const canvas = document.getElementById('beamCanvas');
-            if (!canvas || currentTool === 'query') return;
+            if (!canvas || window.currentTool === 'query') return;
 
             const rect = canvas.parentElement.getBoundingClientRect();
             const dpr = window.devicePixelRatio || 1;
+            // Força redimensionamento para evitar canvas esticado
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             
@@ -466,10 +369,12 @@
             ctx.clearRect(0, 0, cw, ch);
             ctx.strokeStyle = '#334155'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
 
-            const s = state[currentTool];
+            const s = window.state[window.currentTool];
+            if(!s) return; // Segurança
+
             const I = getIntensity(s);
             
-            if (currentTool === 'ponto') {
+            if (window.currentTool === 'ponto') {
                 const scale = 40; 
                 const sy = floorY - (s.height * scale);
                 ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI*2); ctx.fill();
@@ -490,7 +395,7 @@
                 ctx.fillStyle = "#fff"; ctx.font = "bold 12px Manrope";
                 ctx.fillText(`${Math.round(lux)} LUX`, centerX + 10, floorY - 10);
             }
-            else if (currentTool === 'vertical') {
+            else if (window.currentTool === 'vertical') {
                 const scale = 40;
                 const sy = floorY - (s.height * scale);
                 const wx = centerX + (s.dist * scale);
@@ -501,31 +406,36 @@
                 ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)'; ctx.setLineDash([5,5]);
                 ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, floorY - (s.height - s.dist/Math.tan(s.tilt*Math.PI/180))*scale ); ctx.stroke();
             }
+            else if (window.currentTool === 'homog') {
+                 // Simplificação visual para homogeneidade
+                 const scale = 30;
+                 const sy = floorY - (s.height * scale);
+                 const offset = (s.spacing * scale) / 2;
+                 ctx.fillStyle = '#FBBF24'; 
+                 ctx.beginPath(); ctx.arc(centerX - offset, sy, 4, 0, Math.PI*2); ctx.fill();
+                 ctx.beginPath(); ctx.arc(centerX + offset, sy, 4, 0, Math.PI*2); ctx.fill();
+                 ctx.strokeStyle = "#fff"; ctx.beginPath(); ctx.moveTo(centerX - offset, sy); ctx.lineTo(centerX + offset, sy); ctx.stroke();
+                 ctx.fillStyle = "#fff"; ctx.font = "10px Manrope"; ctx.fillText(`Dist: ${s.spacing}m`, centerX - 15, sy - 10);
+            }
         }
 
-        function bindInputs() {
-            const bind = (id, tool, prop) => {
-                const el = document.getElementById(id);
-                const range = document.getElementById('range-' + id);
-                if(el && range) {
-                    const update = (val) => {
-                        el.value = val; range.value = val;
-                        state[tool][prop] = parseFloat(val);
-                        window.updateCalculations();
-                    };
-                    el.addEventListener('input', e => update(e.target.value));
-                    range.addEventListener('input', e => update(e.target.value));
-                }
-            };
-            bind('p-height', 'ponto', 'height'); bind('p-beam', 'ponto', 'beam'); 
-            bind('p-tilt', 'ponto', 'tilt'); bind('p-intensity', 'ponto', 'intensity');
-            bind('v-height', 'vertical', 'height'); bind('v-dist', 'vertical', 'dist');
+        function populateNorms() {
+            const tbody = document.getElementById('nbr8995-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = normsDatabase.map(n => `
+                <tr class="hover:bg-white/5 transition-colors border-b border-white/5">
+                    <td class="p-4 font-bold text-luminous-gold text-xs uppercase">${n.cat}</td>
+                    <td class="p-4 text-dim-gray">${n.room}</td>
+                    <td class="p-4 text-center font-bold text-white bg-white/5">${n.lux}</td>
+                    <td class="p-4 text-center text-muted-blue">${n.ugr}</td>
+                    <td class="p-4 text-center text-muted-blue">${n.ra}</td>
+                </tr>
+            `).join('');
         }
 
         // INIT
         window.AuthManager.init();
         populateNorms();
-        bindInputs();
         window.switchTool('query');
         window.addEventListener('resize', window.updateCalculations);
 
