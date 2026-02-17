@@ -566,24 +566,33 @@
     </div>
 
     <script>
-        // --- SUPABASE CONFIGURATION (SAAS PRODUCTION) ---
+        // --- CONFIGURAÇÃO SUPABASE (PRODUÇÃO) ---
         const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Inicializa o cliente apenas se a biblioteca carregou
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.error("Erro ao carregar Supabase. Verifique sua conexão ou CDN.", e);
+        }
 
         /**
-         * AUTHENTICATION MANAGER (REAL-TIME)
+         * AUTHENTICATION MANAGER
+         * Gerencia Login, Cadastro e Sessão
          */
         const AuthManager = {
             currentUser: null,
             
             init: async function() {
-                // 1. Initial Session Check
+                if (!supabase) return;
+
+                // 1. Verifica sessão existente
                 const { data: { session } } = await supabase.auth.getSession();
                 this.handleSessionUpdate(session);
 
-                // 2. Real-time Listener for Auth Changes
+                // 2. Escuta mudanças de estado (Login/Logout em tempo real)
                 supabase.auth.onAuthStateChange((event, session) => {
                     this.handleSessionUpdate(session);
                 });
@@ -600,18 +609,21 @@
             },
 
             lockApp: function() {
-                document.getElementById('auth-modal').classList.remove('hidden');
-                document.getElementById('app-content').classList.add('app-locked');
+                const modal = document.getElementById('auth-modal');
+                const content = document.getElementById('app-content');
+                if(modal) modal.classList.remove('hidden');
+                if(content) content.classList.add('app-locked');
                 document.body.style.overflow = 'hidden'; 
             },
 
             unlockApp: function() {
-                document.getElementById('auth-modal').classList.add('hidden');
-                document.getElementById('app-content').classList.remove('app-locked');
+                const modal = document.getElementById('auth-modal');
+                const content = document.getElementById('app-content');
+                if(modal) modal.classList.add('hidden');
+                if(content) content.classList.remove('app-locked');
                 document.body.style.overflow = 'auto'; 
                 
                 if(this.currentUser) {
-                    // Fetch Name from User Metadata
                     const name = this.currentUser.user_metadata.first_name || 'Usuário';
                     const displayEl = document.getElementById('user-name-display');
                     if(displayEl) displayEl.innerText = name;
@@ -628,20 +640,14 @@
                     loginForm.classList.remove('hidden');
                     regForm.classList.add('hidden');
                     
-                    btnLogin.classList.add('border-luminous-gold', 'text-luminous-gold');
-                    btnLogin.classList.remove('border-transparent', 'text-dim-gray');
-                    
-                    btnReg.classList.remove('border-luminous-gold', 'text-luminous-gold');
-                    btnReg.classList.add('border-transparent', 'text-dim-gray');
+                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
+                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all";
                 } else {
                     loginForm.classList.add('hidden');
                     regForm.classList.remove('hidden');
 
-                    btnReg.classList.add('border-luminous-gold', 'text-luminous-gold');
-                    btnReg.classList.remove('border-transparent', 'text-dim-gray');
-
-                    btnLogin.classList.remove('border-luminous-gold', 'text-luminous-gold');
-                    btnLogin.classList.add('border-transparent', 'text-dim-gray');
+                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
+                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all";
                 }
             },
 
@@ -681,7 +687,7 @@
                 });
 
                 if (error) alert("Erro no cadastro: " + error.message);
-                else alert("Cadastro realizado com sucesso! Se a confirmação de e-mail estiver ativada, verifique sua caixa de entrada.");
+                else alert("Cadastro realizado! Verifique seu e-mail.");
             },
 
             logout: async function() {
@@ -703,7 +709,7 @@
                 tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)",
                 filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
                 road_params: "Parâmetros da Via (Classe M)", lbl_speed: "Velocidade (km/h)", lbl_volume: "Volume de Tráfego", lbl_separation: "Separação de Tráfego",
-                lbl_density: "Densidade de Interseções", lbl_complexity: "Complexity / Guiagem", lbl_ambient: "Luminância do Entorno",
+                lbl_density: "Densidade de Interseções", lbl_complexity: "Complexidade / Guiagem", lbl_ambient: "Luminância do Entorno",
                 road_rec_class: "Classe Recomendada", road_lmed: "Luminância Média (Lmed)", road_ref_m1: "Referência: M1 (2.0)",
                 road_emed: "Iluminância Média (Emed)", road_approx: "Aprox. para Asfalto Padrão", road_u0: "Uniformidade Geral (U0)", road_ti: "Ofuscamento Máx (TI)",
                 leed_calc_title: "Calculadora de Orçamento (LPD)", leed_select_target: "Selecione a Meta de Certificação", leed_reduction: "Redução Aplicada", leed_area: "Área do Projeto (m²)",
@@ -1461,8 +1467,9 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             // INIT AUTH FIRST
-            AuthManager.init();
-            
+            if (typeof AuthManager !== 'undefined') {
+                AuthManager.init();
+            }
             populateCategoryFilter();
             switchTool('query'); 
             filterNorms();
