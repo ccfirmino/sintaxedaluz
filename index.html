@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuxSintax | Lighting Design SaaS (v1.2 Stable)</title>
+    <title>LuxSintax | Lighting Design SaaS (Pro)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
     <script>
@@ -16,14 +16,12 @@
             theme: {
                 extend: {
                     colors: {
-                        'midnight': '#020617', 
-                        'twilight': '#0f172a', 
-                        'glass': 'rgba(15, 23, 42, 0.8)',
-                        'luminous-gold': '#FBBF24', 
-                        'tech-cyan': '#22d3ee', 
-                        'dim-gray': '#94a3b8',
-                        'dim-line': '#334155',
-                        'leed-green': '#84cc16'
+                        'midnight': '#050b14', // Fundo mais escuro como nas imagens
+                        'panel': '#0b1221',    // Cor dos paineis
+                        'gold': '#fbbf24',     // Amarelo LuxSintax
+                        'cyan': '#22d3ee',     // Cyan técnico
+                        'grid': '#1e293b',     // Cor da grade
+                        'text-mute': '#64748b'
                     },
                     fontFamily: { 
                         sans: ['Manrope', 'sans-serif'],
@@ -35,613 +33,575 @@
     </script>
 
     <style>
-        /* --- Base & Reset --- */
-        body { background-color: #020617; color: #f8fafc; overflow-x: hidden; }
+        /* CSS Reset & Base */
+        body { background-color: #050b14; color: #e2e8f0; overflow-x: hidden; }
         
-        /* Glassmorphism & UI Components */
-        .glass-panel { 
-            background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        /* Custom Range Slider (Igual ao Design System das imagens) */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%;
+            background: #fbbf24; margin-top: -5px; box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+            border: 2px solid #0b1221;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #334155; border-radius: 2px;
         }
         
-        /* Inputs Customizados */
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 24px; cursor: pointer; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #334155; border-radius: 2px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #FBBF24; margin-top: -6px; box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); border: 2px solid #0f172a; transition: transform 0.1s; }
-        input[type=range]:active::-webkit-slider-thumb { transform: scale(1.2); }
+        /* Glass Panel */
+        .glass-panel {
+            background: rgba(11, 18, 33, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
 
-        input[type=number], select, input[type=text], input[type=email], input[type=password] { 
-            background: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; 
-            font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; padding: 4px 0; transition: all 0.3s;
-        }
-        input:focus { outline: none; border-bottom-color: #FBBF24; }
-        
-        /* Canvas Container */
-        .canvas-wrapper {
+        /* Canvas Background Grid Pattern */
+        .canvas-bg {
+            background-color: #0b1221;
             background-image: 
                 linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+            background-size: 40px 40px;
+            box-shadow: inset 0 0 50px #020617;
         }
 
         /* Utilities */
-        .app-locked { filter: blur(10px); pointer-events: none; user-select: none; overflow: hidden; height: 100vh; }
-        .text-xxs { font-size: 0.65rem; }
+        .app-locked { filter: blur(10px); pointer-events: none; user-select: none; height: 100vh; overflow: hidden; }
+        .tab-btn.active { color: #fbbf24; border-bottom: 2px solid #fbbf24; }
+        .tab-btn { color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .tab-btn:hover { color: #e2e8f0; }
         
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050b14; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #FBBF24; }
-
-        /* Tabs */
-        .tab-btn { position: relative; transition: all 0.3s; }
-        .tab-btn.active { color: #FBBF24; border-color: #FBBF24; background: rgba(251, 191, 36, 0.05); }
-        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: #FBBF24; box-shadow: 0 0 10px #FBBF24; }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col">
+<body class="flex flex-col min-h-screen">
 
-    <div id="auth-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-700">
-        <div class="absolute inset-0 bg-midnight/90 backdrop-blur-md"></div>
-        
-        <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative z-10 border-t border-luminous-gold/20 shadow-2xl">
+    <div id="auth-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-midnight/95"></div>
+        <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative z-10 border-t border-gold/20">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold tracking-[0.2em] text-luminous-gold mb-2">LUX<span class="text-white font-light opacity-60">SINTAX</span></h1>
-                <p class="text-xs text-dim-gray uppercase tracking-widest font-mono">Lighting Intelligence SaaS</p>
-                <div id="auth-status" class="mt-4 text-[10px] font-mono text-tech-cyan animate-pulse">ESTABELECENDO CONEXÃO SEGURA...</div>
+                <h1 class="text-3xl font-bold tracking-[0.2em] text-gold mb-1">LUX<span class="text-white opacity-60">SINTAX</span></h1>
+                <div id="conn-status" class="text-[10px] font-mono text-cyan animate-pulse uppercase">Conectando ao Servidor...</div>
             </div>
-
+            
             <div class="flex mb-6 border-b border-white/10">
-                <button onclick="AuthManager.setMode('login')" id="btn-mode-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold">Login</button>
-                <button onclick="AuthManager.setMode('register')" id="btn-mode-register" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-colors">Cadastro</button>
+                <button onclick="Auth.setTab('login')" id="btn-login" class="flex-1 py-3 text-xs font-bold uppercase text-gold border-b-2 border-gold">Login</button>
+                <button onclick="Auth.setTab('register')" id="btn-register" class="flex-1 py-3 text-xs font-bold uppercase text-text-mute hover:text-white">Cadastro</button>
             </div>
 
             <div id="form-login" class="space-y-5">
-                <div><label class="text-[10px] font-bold text-luminous-gold uppercase block mb-1">E-mail</label><input type="email" id="login-email" placeholder="pro@lighting.com"></div>
-                <div><label class="text-[10px] font-bold text-luminous-gold uppercase block mb-1">Senha</label><input type="password" id="login-password" placeholder="••••••••"></div>
-                <button onclick="AuthManager.login()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded shadow-lg shadow-luminous-gold/20 hover:bg-white transition-all uppercase tracking-widest text-xs mt-4">Entrar na Plataforma</button>
+                <div><label class="text-[10px] font-bold text-gold uppercase block mb-1">E-mail</label><input type="email" id="l-email" class="w-full bg-transparent border-b border-white/20 py-2 text-sm focus:border-gold outline-none" placeholder="usuario@email.com"></div>
+                <div><label class="text-[10px] font-bold text-gold uppercase block mb-1">Senha</label><input type="password" id="l-pass" class="w-full bg-transparent border-b border-white/20 py-2 text-sm focus:border-gold outline-none" placeholder="••••••••"></div>
+                <button onclick="Auth.login()" class="w-full py-4 bg-gold text-midnight font-bold rounded shadow-lg shadow-gold/20 hover:bg-white transition-all uppercase text-xs tracking-widest mt-2">Acessar Sistema</button>
             </div>
 
             <div id="form-register" class="space-y-5 hidden">
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-[10px] font-bold text-luminous-gold uppercase block mb-1">Nome</label><input type="text" id="reg-name"></div>
-                    <div><label class="text-[10px] font-bold text-luminous-gold uppercase block mb-1">Sobrenome</label><input type="text" id="reg-surname"></div>
-                </div>
-                <div><label class="text-[10px] font-bold text-luminous-gold uppercase block mb-1">E-mail</label><input type="email" id="reg-email"></div>
-                <div><label class="text-[10px] font-bold text-luminous-gold uppercase block mb-1">Senha</label><input type="password" id="reg-password"></div>
-                <button onclick="AuthManager.register()" class="w-full py-4 border border-luminous-gold text-luminous-gold font-bold rounded hover:bg-luminous-gold hover:text-midnight transition-all uppercase tracking-widest text-xs mt-4">Criar Conta</button>
+                 <div><label class="text-[10px] font-bold text-gold uppercase block mb-1">Nome</label><input type="text" id="r-name" class="w-full bg-transparent border-b border-white/20 py-2 text-sm focus:border-gold outline-none"></div>
+                <div><label class="text-[10px] font-bold text-gold uppercase block mb-1">E-mail</label><input type="email" id="r-email" class="w-full bg-transparent border-b border-white/20 py-2 text-sm focus:border-gold outline-none"></div>
+                <div><label class="text-[10px] font-bold text-gold uppercase block mb-1">Senha</label><input type="password" id="r-pass" class="w-full bg-transparent border-b border-white/20 py-2 text-sm focus:border-gold outline-none"></div>
+                <button onclick="Auth.register()" class="w-full py-4 border border-gold text-gold font-bold rounded hover:bg-gold hover:text-midnight transition-all uppercase text-xs tracking-widest mt-2">Criar Conta</button>
             </div>
         </div>
     </div>
 
-    <div id="app-container" class="app-locked transition-all duration-1000 flex flex-col min-h-screen">
+    <div id="app-container" class="app-locked flex-grow flex flex-col transition-all duration-700">
         
-        <nav class="sticky top-0 z-40 bg-midnight/80 backdrop-blur-xl border-b border-white/5">
+        <nav class="border-b border-white/5 bg-midnight/80 backdrop-blur">
             <div class="max-w-[1920px] mx-auto px-6 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <div class="text-lg font-bold tracking-[0.15em] text-luminous-gold">LUX<span class="text-white opacity-50">SINTAX</span></div>
-                    <div class="h-4 w-[1px] bg-white/20"></div>
-                    <div class="flex gap-6 text-xs font-bold tracking-widest text-dim-gray">
-                        <button onclick="App.setView('calc')" class="hover:text-white transition-colors text-white">CALCULADORA</button>
-                        <button onclick="App.setView('about')" class="hover:text-white transition-colors">SOBRE</button>
-                    </div>
+                    <div class="text-xl font-bold tracking-widest text-gold">LUX<span class="text-white opacity-50">SINTAX</span></div>
+                    <div class="h-4 w-[1px] bg-white/10"></div>
+                    <div class="text-[10px] font-mono text-text-mute">V2.0 PROD</div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="text-right hidden sm:block">
-                        <div id="user-name" class="text-[10px] font-bold text-white uppercase">USUÁRIO</div>
-                        <div class="text-[9px] text-leed-green font-mono">PRO LICENSE</div>
+                    <div class="text-right">
+                        <div id="user-display" class="text-[10px] font-bold text-white uppercase">VISITANTE</div>
+                        <div class="text-[9px] text-cyan font-mono">ONLINE</div>
                     </div>
-                    <button onclick="AuthManager.logout()" class="w-8 h-8 rounded bg-white/5 flex items-center justify-center text-dim-gray hover:text-red-400 hover:bg-white/10 transition-all"><i class="fas fa-power-off text-xs"></i></button>
+                    <button onclick="Auth.logout()" class="w-8 h-8 rounded bg-white/5 flex items-center justify-center hover:bg-red-500/20 hover:text-red-400 transition-colors"><i class="fas fa-power-off text-xs"></i></button>
                 </div>
             </div>
         </nav>
 
-        <main class="flex-grow relative">
-            
-            <section id="view-calc" class="p-6 max-w-[1920px] mx-auto h-full flex flex-col">
+        <header class="pt-8 px-6 pb-2">
+            <div class="max-w-[1920px] mx-auto flex gap-4 overflow-x-auto">
+                <button onclick="App.setTool('query')" id="tab-query" class="glass-panel px-6 py-4 rounded-xl flex flex-col items-center min-w-[120px] group hover:border-gold/50 transition-all tab-btn">
+                    <i class="fas fa-search text-lg mb-2"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Consulta</span>
+                </button>
+                <button onclick="App.setTool('ponto')" id="tab-ponto" class="glass-panel px-6 py-4 rounded-xl flex flex-col items-center min-w-[120px] group hover:border-gold/50 transition-all tab-btn active">
+                    <i class="fas fa-grip-lines text-lg mb-2"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Horizontal</span>
+                </button>
+                <button onclick="App.setTool('vertical')" id="tab-vertical" class="glass-panel px-6 py-4 rounded-xl flex flex-col items-center min-w-[120px] group hover:border-gold/50 transition-all tab-btn">
+                    <i class="fas fa-grip-lines-vertical text-lg mb-2"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Vertical</span>
+                </button>
+                <button onclick="App.setTool('homog')" id="tab-homog" class="glass-panel px-6 py-4 rounded-xl flex flex-col items-center min-w-[120px] group hover:border-gold/50 transition-all tab-btn">
+                    <i class="fas fa-th text-lg mb-2"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Distribuição</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-grow px-6 py-6 overflow-hidden">
+            <div class="max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-[600px]">
                 
-                <div class="flex overflow-x-auto gap-4 mb-6 pb-2 border-b border-white/5">
-                    <button onclick="App.setTool('query')" id="tab-query" class="tab-btn active px-6 py-3 flex items-center gap-3 min-w-max">
-                        <i class="fas fa-search text-lg"></i>
-                        <div class="text-left"><div class="text-[10px] font-bold uppercase text-dim-gray">Biblioteca</div><div class="text-xs font-bold">NORMAS & LEED</div></div>
-                    </button>
-                    <button onclick="App.setTool('ponto')" id="tab-ponto" class="tab-btn px-6 py-3 flex items-center gap-3 min-w-max">
-                        <i class="fas fa-bullseye text-lg"></i>
-                        <div class="text-left"><div class="text-[10px] font-bold uppercase text-dim-gray">Cálculo</div><div class="text-xs font-bold">PONTO A PONTO</div></div>
-                    </button>
-                    <button onclick="App.setTool('vertical')" id="tab-vertical" class="tab-btn px-6 py-3 flex items-center gap-3 min-w-max">
-                        <i class="fas fa-arrows-alt-v text-lg"></i>
-                        <div class="text-left"><div class="text-[10px] font-bold uppercase text-dim-gray">Cálculo</div><div class="text-xs font-bold">VERTICAL / WALL</div></div>
-                    </button>
-                    <button onclick="App.setTool('homog')" id="tab-homog" class="tab-btn px-6 py-3 flex items-center gap-3 min-w-max">
-                        <i class="fas fa-th text-lg"></i>
-                        <div class="text-left"><div class="text-[10px] font-bold uppercase text-dim-gray">Análise</div><div class="text-xs font-bold">DISTRIBUIÇÃO</div></div>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-[600px]">
-                    
-                    <div class="lg:col-span-3 flex flex-col gap-4">
+                <div class="lg:col-span-3 flex flex-col gap-6">
+                    <div id="controls-area" class="glass-panel p-6 rounded-2xl h-full">
+                        <h2 class="text-xs font-bold text-white uppercase tracking-widest mb-6 border-b border-white/10 pb-3">Parâmetros da Fonte</h2>
                         
-                        <div id="controls-panel" class="glass-panel p-5 rounded-xl hidden">
-                            <h3 class="text-xs font-bold text-luminous-gold uppercase tracking-widest mb-4 border-b border-white/10 pb-2">Parâmetros de Entrada</h3>
-                            
-                            <div class="flex bg-black/40 rounded p-1 mb-6">
-                                <button onclick="App.setCalcMode('direct')" id="mode-direct" class="flex-1 py-1 text-[9px] font-bold uppercase rounded bg-white/10 text-white">Intensidade (cd)</button>
-                                <button onclick="App.setCalcMode('photo')" id="mode-photo" class="flex-1 py-1 text-[9px] font-bold uppercase text-dim-gray hover:text-white">Fotometria</button>
-                            </div>
-
-                            <div id="dynamic-inputs" class="space-y-5">
-                                </div>
-                        </div>
-
-                        <div id="query-menu" class="glass-panel p-5 rounded-xl">
-                            <h3 class="text-xs font-bold text-luminous-gold uppercase tracking-widest mb-4 border-b border-white/10 pb-2">Base de Dados</h3>
-                            <div class="space-y-2">
-                                <button onclick="QuerySystem.load('nbr8995')" class="w-full text-left px-4 py-3 rounded bg-white/5 hover:bg-white/10 hover:border-luminous-gold border border-transparent transition-all text-xs font-bold uppercase flex justify-between"><span>NBR 8995-1</span> <i class="fas fa-chevron-right text-[10px] mt-1"></i></button>
-                                <button onclick="QuerySystem.load('leed')" class="w-full text-left px-4 py-3 rounded bg-white/5 hover:bg-white/10 hover:border-luminous-gold border border-transparent transition-all text-xs font-bold uppercase flex justify-between"><span>LEED v4.1 / WELL</span> <i class="fas fa-chevron-right text-[10px] mt-1"></i></button>
-                            </div>
-                        </div>
+                        <div id="inputs-container" class="space-y-8"></div>
                     </div>
 
-                    <div class="lg:col-span-9 flex flex-col">
-                        <div class="glass-panel p-1 rounded-xl flex-grow h-full relative overflow-hidden flex flex-col">
-                            
-                            <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-midnight/30">
-                                <h2 id="result-title" class="text-sm font-bold text-white uppercase tracking-wider"><i class="fas fa-chart-pie mr-2 text-luminous-gold"></i> Visualização Gráfica</h2>
-                                <div id="calc-readout" class="flex gap-4 opacity-0 transition-opacity duration-300">
-                                    <div class="text-right"><div class="text-[9px] text-dim-gray uppercase">Iluminância (Piso)</div><div class="text-lg font-mono font-bold text-luminous-gold leading-none"><span id="val-lux-floor">0</span> <span class="text-xs">lx</span></div></div>
-                                    <div class="text-right pl-4 border-l border-white/10"><div class="text-[9px] text-dim-gray uppercase">Diâmetro (Ø)</div><div class="text-lg font-mono font-bold text-tech-cyan leading-none"><span id="val-dia">0.0</span> <span class="text-xs">m</span></div></div>
-                                </div>
-                            </div>
-
-                            <div class="relative flex-grow bg-twilight/50 canvas-wrapper">
-                                
-                                <canvas id="mainCanvas" class="absolute inset-0 w-full h-full z-10 hidden"></canvas>
-                                
-                                <div id="query-content" class="absolute inset-0 w-full h-full z-20 overflow-auto p-6 custom-scrollbar">
-                                    </div>
-                            </div>
+                    <div id="query-area" class="glass-panel p-6 rounded-2xl h-full hidden">
+                        <h2 class="text-xs font-bold text-white uppercase tracking-widest mb-4">Normas Técnicas</h2>
+                        <div class="space-y-2">
+                            <button onclick="Query.load('nbr')" class="w-full text-left p-3 rounded bg-white/5 hover:bg-white/10 text-xs font-bold uppercase border-l-2 border-transparent hover:border-gold transition-all">NBR ISO/CIE 8995-1</button>
+                            <button onclick="Query.load('leed')" class="w-full text-left p-3 rounded bg-white/5 hover:bg-white/10 text-xs font-bold uppercase border-l-2 border-transparent hover:border-gold transition-all">LEED v4.1 / WELL</button>
                         </div>
                     </div>
                 </div>
-            </section>
+
+                <div class="lg:col-span-9">
+                    <div class="glass-panel p-1 rounded-2xl h-full relative flex flex-col">
+                        <div class="px-6 py-3 border-b border-white/5 flex justify-between items-center bg-midnight/50 rounded-t-xl">
+                            <h3 class="text-xs font-bold text-text-mute uppercase tracking-widest">Resultados em Tempo Real</h3>
+                            <div id="live-readout" class="flex gap-4 font-mono text-xs"></div>
+                        </div>
+                        
+                        <div class="relative flex-grow canvas-bg rounded-b-xl overflow-hidden">
+                            <canvas id="mainCanvas" class="absolute inset-0 w-full h-full"></canvas>
+                            <div id="query-content" class="absolute inset-0 p-8 overflow-auto hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-        // --- Configuration ---
+        // --- 1. CONFIG & SUPABASE ---
         const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- State Management ---
+        // --- 2. STATE MANAGEMENT ---
         const State = {
-            tool: 'query',
-            calcMode: 'direct',
+            tool: 'ponto',
             params: {
-                ponto: { intensity: 3000, height: 3.0, beam: 36, tilt: 0, workPlane: 0.75, flux: 2000, cdklm: 1500 },
-                vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 24, flux: 2000, cdklm: 1500, hq: 1.6 },
-                homog: { intensity: 3000, height: 3.0, spacing: 2.5, workPlane: 0.75, beam: 60, flux: 2000, cdklm: 1500 }
+                // Estado Inicial Robusto
+                ponto: { height: 3.0, workPlane: 0.75, beam: 30, tilt: 0, intensity: 3000 },
+                vertical: { height: 3.0, dist: 1.0, hq: 1.6, beam: 30, tilt: 30, intensity: 3000 },
+                homog: { height: 3.0, workPlane: 0.75, spacing: 2.0, beam: 30, intensity: 3000 }
             }
         };
 
-        // --- Norms Data ---
-        const Norms = [
-            { cat: "Escritório", room: "Escrita / Digitação", lux: 500, ugr: 19 },
-            { cat: "Escritório", room: "Reunião", lux: 500, ugr: 19 },
-            { cat: "Escritório", room: "Arquivamento", lux: 300, ugr: 25 },
-            { cat: "Industrial", room: "Usinagem Fina", lux: 750, ugr: 19 },
-            { cat: "Industrial", room: "Depósito", lux: 100, ugr: 25 },
-            { cat: "Varejo", room: "Área de Vendas", lux: 300, ugr: 22 },
-            { cat: "Varejo", room: "Vitrine", lux: 1000, ugr: "-" },
-            { cat: "Educação", room: "Sala de Aula", lux: 300, ugr: 19 },
-            { cat: "Hospitalar", room: "Centro Cirúrgico", lux: 1000, ugr: 19 },
-            { cat: "Hospitalar", room: "Quarto", lux: 100, ugr: 19 }
-        ];
-
-        // --- Authentication Logic ---
-        window.AuthManager = {
-            init: async () => {
-                const { data } = await supabase.auth.getSession();
-                if (data.session) AuthManager.unlock(data.session);
-                else document.getElementById('auth-status').innerText = "AGUARDANDO CREDENCIAIS";
-                
-                supabase.auth.onAuthStateChange((_evt, session) => {
-                    if (session) AuthManager.unlock(session);
-                    else window.location.reload();
-                });
-            },
-            setMode: (mode) => {
-                document.getElementById('form-login').classList.toggle('hidden', mode !== 'login');
-                document.getElementById('form-register').classList.toggle('hidden', mode !== 'register');
-                document.getElementById('btn-mode-login').className = mode === 'login' ? "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold" : "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-colors";
-                document.getElementById('btn-mode-register').className = mode === 'register' ? "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold" : "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-colors";
-            },
-            login: async () => {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) alert("Erro: " + error.message);
-            },
-            register: async () => {
-                const email = document.getElementById('reg-email').value;
-                const password = document.getElementById('reg-password').value;
-                const { error } = await supabase.auth.signUp({ email, password });
-                if (error) alert(error.message); else alert("Verifique seu e-mail!");
-            },
-            unlock: (session) => {
-                document.getElementById('auth-overlay').classList.add('opacity-0', 'pointer-events-none');
-                document.getElementById('app-container').classList.remove('app-locked');
-                const user = session.user.email.split('@')[0];
-                document.getElementById('user-name').innerText = user;
-                App.init();
-            },
-            logout: async () => supabase.auth.signOut()
+        // --- 3. INPUT CONFIGURATION (META-DATA) ---
+        const InputConfig = {
+            ponto: [
+                { key: 'height', label: 'Altura da Fonte (H)', min: 1, max: 10, step: 0.1, unit: 'm' },
+                { key: 'workPlane', label: 'Plano de Trabalho (HP)', min: 0, max: 2, step: 0.05, unit: 'm' },
+                { key: 'beam', label: 'Abertura do Facho', min: 10, max: 120, step: 1, unit: '°' },
+                { key: 'tilt', label: 'Orientação (Tilt)', min: 0, max: 45, step: 1, unit: '°' },
+                { key: 'intensity', label: 'Intensidade (I)', min: 100, max: 10000, step: 100, unit: 'cd' }
+            ],
+            vertical: [
+                { key: 'height', label: 'Altura da Fonte (H)', min: 1, max: 10, step: 0.1, unit: 'm' },
+                { key: 'hq', label: 'Eixo do Quadro (HQ)', min: 0.5, max: 3, step: 0.1, unit: 'm' },
+                { key: 'dist', label: 'Distância da Parede (D)', min: 0.5, max: 4, step: 0.1, unit: 'm' },
+                { key: 'beam', label: 'Abertura do Facho', min: 10, max: 120, step: 1, unit: '°' },
+                { key: 'tilt', label: 'Orientação (Tilt)', min: 0, max: 60, step: 1, unit: '°' },
+                { key: 'intensity', label: 'Intensidade (I)', min: 100, max: 10000, step: 100, unit: 'cd' }
+            ],
+            homog: [
+                { key: 'height', label: 'Altura da Fonte (H)', min: 1, max: 10, step: 0.1, unit: 'm' },
+                { key: 'workPlane', label: 'Plano de Trabalho (HP)', min: 0, max: 2, step: 0.05, unit: 'm' },
+                { key: 'spacing', label: 'Distância entre Fontes (D)', min: 0.5, max: 6, step: 0.1, unit: 'm' },
+                { key: 'beam', label: 'Abertura do Facho', min: 10, max: 120, step: 1, unit: '°' },
+                { key: 'intensity', label: 'Intensidade (I)', min: 100, max: 10000, step: 100, unit: 'cd' }
+            ]
         };
 
-        // --- UI & Application Logic ---
-        window.App = {
-            init: () => {
-                App.setTool('query');
-                QuerySystem.load('nbr8995');
-                window.addEventListener('resize', () => RenderEngine.draw());
-            },
-            setTool: (tool) => {
-                State.tool = tool;
-                // Update Tabs UI
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'border-luminous-gold'));
-                document.getElementById(`tab-${tool}`).classList.add('active');
-
-                // Toggle View Panels
-                const isQuery = tool === 'query';
-                document.getElementById('controls-panel').classList.toggle('hidden', isQuery);
-                document.getElementById('query-menu').classList.toggle('hidden', !isQuery);
-                document.getElementById('mainCanvas').classList.toggle('hidden', isQuery);
-                document.getElementById('query-content').classList.toggle('hidden', !isQuery);
-                document.getElementById('calc-readout').classList.toggle('opacity-0', isQuery);
-
-                if (!isQuery) {
-                    InputBuilder.build(tool);
-                    RenderEngine.draw();
-                }
-            },
-            setCalcMode: (mode) => {
-                State.calcMode = mode;
-                document.getElementById('mode-direct').className = mode === 'direct' ? "flex-1 py-1 text-[9px] font-bold uppercase rounded bg-white/10 text-white" : "flex-1 py-1 text-[9px] font-bold uppercase text-dim-gray hover:text-white";
-                document.getElementById('mode-photo').className = mode === 'photo' ? "flex-1 py-1 text-[9px] font-bold uppercase rounded bg-white/10 text-white" : "flex-1 py-1 text-[9px] font-bold uppercase text-dim-gray hover:text-white";
-                InputBuilder.build(State.tool); // Rebuild inputs
-                RenderEngine.draw();
-            }
-        };
-
-        // --- Input Builder (Dynamic Form Generation) ---
-        window.InputBuilder = {
-            build: (tool) => {
-                const container = document.getElementById('dynamic-inputs');
-                container.innerHTML = '';
-
-                const config = {
-                    ponto: [
-                        { id: 'height', label: 'Altura (H)', unit: 'm', min: 1, max: 15, step: 0.1 },
-                        { id: 'workPlane', label: 'Plano Trabalho', unit: 'm', min: 0, max: 2, step: 0.05 },
-                        { id: 'beam', label: 'Facho', unit: '°', min: 5, max: 120, step: 1 },
-                        { id: 'tilt', label: 'Tilt', unit: '°', min: 0, max: 60, step: 1 }
-                    ],
-                    vertical: [
-                        { id: 'height', label: 'Altura (H)', unit: 'm', min: 1, max: 15, step: 0.1 },
-                        { id: 'dist', label: 'Dist. Parede', unit: 'm', min: 0.5, max: 5, step: 0.1 },
-                        { id: 'hq', label: 'Eixo Quadro', unit: 'm', min: 0.5, max: 5, step: 0.1 },
-                        { id: 'tilt', label: 'Tilt', unit: '°', min: 0, max: 60, step: 1 },
-                        { id: 'beam', label: 'Facho', unit: '°', min: 5, max: 120, step: 1 }
-                    ],
-                    homog: [
-                        { id: 'height', label: 'Altura (H)', unit: 'm', min: 1, max: 15, step: 0.1 },
-                        { id: 'spacing', label: 'Espaçamento', unit: 'm', min: 0.5, max: 8, step: 0.1 },
-                        { id: 'beam', label: 'Facho', unit: '°', min: 5, max: 120, step: 1 }
-                    ]
-                };
-
-                // Add Geometry Inputs
-                config[tool].forEach(field => {
-                    const val = State.params[tool][field.id];
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <div class="flex justify-between items-end mb-1">
-                            <label class="text-[10px] text-dim-gray font-mono uppercase">${field.label}</label>
-                            <div class="text-[10px] font-bold text-white"><span id="disp-${field.id}">${val}</span>${field.unit}</div>
-                        </div>
-                        <input type="range" id="in-${field.id}" min="${field.min}" max="${field.max}" step="${field.step}" value="${val}">
-                    `;
-                    container.appendChild(div);
-                    document.getElementById(`in-${field.id}`).addEventListener('input', (e) => {
-                        const v = parseFloat(e.target.value);
-                        State.params[tool][field.id] = v;
-                        document.getElementById(`disp-${field.id}`).innerText = v;
-                        RenderEngine.draw();
-                    });
-                });
-
-                // Add Intensity Inputs (Based on Mode)
-                const intensityDiv = document.createElement('div');
-                intensityDiv.className = "pt-4 border-t border-white/5";
-                
-                if (State.calcMode === 'direct') {
-                    intensityDiv.innerHTML = `
-                        <div class="flex justify-between items-end mb-1"><label class="text-[10px] text-luminous-gold font-bold uppercase">Intensidade</label><div class="text-[10px] text-white font-mono"><span id="disp-int">${State.params[tool].intensity}</span>cd</div></div>
-                        <input type="range" id="in-intensity" min="100" max="20000" step="100" value="${State.params[tool].intensity}">
-                    `;
-                } else {
-                    intensityDiv.innerHTML = `
-                        <div class="mb-3"><div class="flex justify-between items-end mb-1"><label class="text-[10px] text-dim-gray uppercase">Fluxo (Lumens)</label><div class="text-[10px] text-white font-mono"><span id="disp-flux">${State.params[tool].flux}</span>lm</div></div><input type="range" id="in-flux" min="100" max="10000" step="100" value="${State.params[tool].flux}"></div>
-                        <div><div class="flex justify-between items-end mb-1"><label class="text-[10px] text-dim-gray uppercase">Fotometria (cd/klm)</label><div class="text-[10px] text-white font-mono"><span id="disp-cdklm">${State.params[tool].cdklm}</span></div></div><input type="range" id="in-cdklm" min="100" max="5000" step="50" value="${State.params[tool].cdklm}"></div>
-                    `;
-                }
-                container.appendChild(intensityDiv);
-                
-                // Bind Intensity Listeners
-                if(State.calcMode === 'direct') {
-                    document.getElementById('in-intensity').addEventListener('input', (e) => { State.params[tool].intensity = parseInt(e.target.value); document.getElementById('disp-int').innerText = e.target.value; RenderEngine.draw(); });
-                } else {
-                    document.getElementById('in-flux').addEventListener('input', (e) => { State.params[tool].flux = parseInt(e.target.value); document.getElementById('disp-flux').innerText = e.target.value; RenderEngine.draw(); });
-                    document.getElementById('in-cdklm').addEventListener('input', (e) => { State.params[tool].cdklm = parseInt(e.target.value); document.getElementById('disp-cdklm').innerText = e.target.value; RenderEngine.draw(); });
-                }
-            }
-        };
-
-        // --- Render Engine (Canvas) - O CORAÇÃO DO SISTEMA ---
-        window.RenderEngine = {
+        // --- 4. RENDER ENGINE (CANVAS) ---
+        const Render = {
             draw: () => {
                 const canvas = document.getElementById('mainCanvas');
-                const ctx = canvas.getContext('2d');
-                const tool = State.tool;
-                if (tool === 'query') return;
-
-                // 1. Setup Canvas DPI
+                if (!canvas.offsetParent) return; // Se estiver escondido (tab query)
+                
+                // DPI Setup
                 const dpr = window.devicePixelRatio || 1;
                 const rect = canvas.parentElement.getBoundingClientRect();
                 canvas.width = rect.width * dpr;
                 canvas.height = rect.height * dpr;
+                const ctx = canvas.getContext('2d');
                 ctx.scale(dpr, dpr);
 
-                // 2. Constants & Physics
+                // Physics Constants
                 const W = rect.width;
                 const H = rect.height;
-                const floorY = H - 60; // Base floor position
                 const CX = W / 2;
-                const P = State.params[tool];
+                const FLOOR_Y = H - 60; // Margem inferior
+                const params = State.params[State.tool];
+
+                // Auto-Scaling (Garante que tudo caiba na tela)
+                // A altura máxima de desenho é baseada na altura da fonte ou na altura da fonte + margem
+                let maxMetricH = params.height; 
+                if(State.tool === 'vertical') maxMetricH = Math.max(params.height, params.dist * 2); // Ajuste para wall washer largo
+                const scale = (H * 0.7) / Math.max(maxMetricH, 1.0); // 70% da altura da tela
+
+                // --- HELPER FUNCTIONS (Desenho Técnico) ---
                 
-                // Calculate Scale (Pixels per Meter) - Auto-zoom
-                // Height takes 60% of screen height
-                let scale = (H * 0.6) / Math.max(P.height, 1);
-                // Clamp scale to prevent issues
-                scale = Math.max(20, Math.min(scale, 150));
-
-                // 3. Helper Functions (Dimensions/Cotas)
-                const drawLine = (x1, y1, x2, y2, style = '#475569', dash = []) => {
-                    ctx.beginPath(); ctx.strokeStyle = style; ctx.lineWidth = 1; ctx.setLineDash(dash);
-                    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
-                };
-
-                const drawDim = (x1, y1, x2, y2, text, offset = 20) => {
-                    // Lines
-                    ctx.beginPath(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
-                    // Ticks
-                    const ang = Math.atan2(y2-y1, x2-x1);
-                    const pX = Math.cos(ang + Math.PI/2) * 4;
-                    const pY = Math.sin(ang + Math.PI/2) * 4;
+                // Desenha linha de cota com texto centralizado (Estilo Imagem 1)
+                const drawDimLine = (x1, y1, x2, y2, text, color = '#64748b') => {
+                    ctx.beginPath();
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1;
                     
                     // Main Line
-                    ctx.moveTo(x1, y1 + offset); ctx.lineTo(x2, y2 + offset);
-                    // End Caps
-                    ctx.moveTo(x1, y1 + offset - 3); ctx.lineTo(x1, y1 + offset + 3);
-                    ctx.moveTo(x2, y2 + offset - 3); ctx.lineTo(x2, y2 + offset + 3);
+                    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+                    
+                    // Ticks (Tracinhos verticais nas pontas)
+                    const tickSize = 4;
+                    ctx.moveTo(x1, y1 - tickSize); ctx.lineTo(x1, y1 + tickSize);
+                    ctx.moveTo(x2, y2 - tickSize); ctx.lineTo(x2, y2 + tickSize);
                     ctx.stroke();
 
-                    // Text Box
-                    ctx.font = "bold 11px JetBrains Mono";
+                    // Text Background (Para legibilidade)
+                    ctx.font = "500 11px JetBrains Mono";
                     const tw = ctx.measureText(text).width;
-                    const midX = (x1 + x2) / 2;
-                    const midY = (y1 + y2) / 2 + offset;
+                    const mx = (x1 + x2) / 2;
+                    const my = (y1 + y2) / 2;
                     
-                    ctx.fillStyle = "rgba(2,6,23,0.9)";
-                    ctx.fillRect(midX - tw/2 - 4, midY - 8, tw + 8, 16);
+                    ctx.fillStyle = "rgba(11, 18, 33, 0.9)";
+                    ctx.fillRect(mx - tw/2 - 4, my - 8, tw + 8, 16);
                     
-                    ctx.fillStyle = "#FBBF24";
+                    // Text
+                    ctx.fillStyle = "#e2e8f0"; // Texto Branco/Cinza claro
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
-                    ctx.fillText(text, midX, midY);
+                    ctx.fillText(text, mx, my);
                 };
 
-                const drawSpot = (x, y) => {
-                    ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI*2);
-                    ctx.fillStyle = '#FBBF24'; ctx.fill();
-                    ctx.shadowBlur = 15; ctx.shadowColor = '#FBBF24'; ctx.fill(); ctx.shadowBlur = 0;
+                // Desenha linha pontilhada (Planos)
+                const drawDashedLine = (y, label) => {
+                    ctx.beginPath();
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+                    ctx.moveTo(0, y); ctx.lineTo(W, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    if (label) {
+                        ctx.fillStyle = "#64748b";
+                        ctx.font = "10px Manrope";
+                        ctx.textAlign = "left";
+                        ctx.fillText(label, 10, y - 6);
+                    }
                 };
 
-                const getLux = (intensity, dist, angleRad) => {
-                    return (intensity * Math.cos(angleRad)) / (dist * dist);
+                // Desenha fonte de luz (Ponto Amarelo)
+                const drawSource = (x, y) => {
+                    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2);
+                    ctx.fillStyle = '#fbbf24'; ctx.fill();
+                    ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 10; ctx.stroke(); ctx.shadowBlur = 0;
                 };
 
-                // 4. Render Scene
+                // Desenha etiqueta de valor Lux (Texto Dourado em cima de ponto)
+                const drawLuxTag = (x, y, val) => {
+                    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
+                    ctx.fillStyle = '#fbbf24'; ctx.fill();
+                    
+                    ctx.font = "700 12px JetBrains Mono";
+                    const text = Math.round(val) + " Lux";
+                    const tw = ctx.measureText(text).width;
+                    
+                    ctx.fillStyle = "rgba(11, 18, 33, 0.8)"; // Backplate escuro
+                    ctx.fillRect(x - tw/2 - 4, y - 20, tw + 8, 16);
+                    
+                    ctx.fillStyle = "#fbbf24"; // Texto Dourado
+                    ctx.textAlign = "center";
+                    ctx.fillText(text, x, y - 8);
+                };
+
+                // --- RENDER LOGIC PER TOOL ---
+
+                const srcY = FLOOR_Y - (params.height * scale);
+                const hpY = FLOOR_Y - (params.workPlane ? params.workPlane * scale : 0);
+
+                // Limpar Canvas
                 ctx.clearRect(0, 0, W, H);
 
-                // Draw Floor
-                drawLine(0, floorY, W, floorY, '#cbd5e1');
-                ctx.fillStyle = '#64748b'; ctx.font = "10px Manrope"; ctx.textAlign="left"; ctx.fillText("FLOOR (0.00m)", 10, floorY - 5);
+                // Desenhar Piso (Sempre presente)
+                ctx.beginPath(); ctx.strokeStyle = "#475569"; ctx.lineWidth = 1;
+                ctx.moveTo(0, FLOOR_Y); ctx.lineTo(W, FLOOR_Y); ctx.stroke();
+                ctx.fillStyle = "#64748b"; ctx.font = "10px Manrope"; ctx.fillText("LINHA DE PISO (lp)", 10, FLOOR_Y + 15);
 
-                const srcY = floorY - (P.height * scale);
-                const intensity = State.calcMode === 'direct' ? P.intensity : (P.flux * P.cdklm / 1000);
-                
-                // --- TOOL SPECIFIC LOGIC ---
-                if (tool === 'ponto') {
-                    const tr = P.tilt * Math.PI / 180;
-                    const br = P.beam * Math.PI / 180;
+                if (State.tool === 'ponto') {
+                    const tr = params.tilt * Math.PI / 180;
+                    const br = params.beam * Math.PI / 180;
                     
-                    // Draw Beam
-                    const hBeam = floorY - srcY;
-                    const xL = CX + Math.tan(tr - br/2) * hBeam;
-                    const xR = CX + Math.tan(tr + br/2) * hBeam;
+                    // Desenhar Plano de Trabalho
+                    drawDashedLine(hpY, `hp: ${params.workPlane}m`);
+
+                    // Calcular geometria do facho no piso e no HP
+                    const rFloor = params.height * Math.tan(br/2); // Raio no piso (Simplificado sem tilt para cone visual)
+                    const rHP = (params.height - params.workPlane) * Math.tan(br/2);
                     
-                    const grad = ctx.createLinearGradient(CX, srcY, CX, floorY);
-                    grad.addColorStop(0, `rgba(251, 191, 36, 0.4)`);
-                    grad.addColorStop(1, `rgba(251, 191, 36, 0.0)`);
+                    // Desenhar Cone (Gradiente)
+                    const grad = ctx.createLinearGradient(CX, srcY, CX, FLOOR_Y);
+                    grad.addColorStop(0, "rgba(251, 191, 36, 0.5)");
+                    grad.addColorStop(1, "rgba(251, 191, 36, 0)");
                     
-                    ctx.beginPath(); ctx.moveTo(CX, srcY); ctx.lineTo(xL, floorY); ctx.lineTo(xR, floorY); ctx.closePath();
+                    ctx.beginPath();
+                    ctx.moveTo(CX, srcY);
+                    ctx.lineTo(CX - rFloor * scale, FLOOR_Y);
+                    ctx.lineTo(CX + rFloor * scale, FLOOR_Y);
+                    ctx.closePath();
                     ctx.fillStyle = grad; ctx.fill();
 
-                    // Draw Source
-                    drawSpot(CX, srcY);
+                    // Fonte
+                    drawSource(CX, srcY);
 
-                    // Draw Height Dimension
-                    drawDim(CX - 50, floorY, CX - 50, srcY, `H: ${P.height}m`, 0);
-
-                    // Draw Diameter on Floor
-                    const dia = Math.abs(xR - xL) / scale;
-                    drawDim(xL, floorY, xR, floorY, `Ø ${dia.toFixed(2)}m`, 20);
-
-                    // Calculations
-                    const distToFloor = P.height / Math.cos(tr);
-                    const luxVal = (intensity * Math.pow(Math.cos(tr), 3)) / (P.height * P.height);
-                    
-                    // Update UI Readout
-                    document.getElementById('val-lux-floor').innerText = Math.round(luxVal);
-                    document.getElementById('val-dia').innerText = dia.toFixed(2);
-
-                } 
-                else if (tool === 'vertical') {
-                    const wallX = CX + (P.dist * scale);
-                    const tr = P.tilt * Math.PI / 180;
-                    
-                    // Wall Line
-                    drawLine(wallX, floorY, wallX, srcY - 50, '#94a3b8', []);
-                    ctx.fillStyle = '#94a3b8'; ctx.fillText("WALL", wallX + 5, floorY - 5);
-
-                    // Source
-                    drawSpot(CX, srcY);
-                    
-                    // Aim Axis
-                    const hitY = srcY + Math.tan(tr) * (P.dist * scale);
-                    // Prevent drawing to infinity
-                    if(hitY < floorY + 1000 && hitY > -1000) {
-                         drawLine(CX, srcY, wallX, hitY, '#FBBF24', [5,5]);
-                         // Intersection Dot
-                         if (hitY < floorY) {
-                            ctx.beginPath(); ctx.arc(wallX, hitY, 4, 0, Math.PI*2); ctx.fillStyle="#fff"; ctx.fill();
-                            const luxV = (intensity * Math.pow(Math.cos(tr), 3)) / (P.dist * P.dist); // Simplified normal incidence approximation
-                            ctx.fillText(`${Math.round(luxV)} lx`, wallX + 10, hitY);
-                         }
+                    // Cotas de Diâmetro e Lux
+                    // 1. No HP
+                    if (params.workPlane < params.height) {
+                        const luxHP = (params.intensity) / Math.pow(params.height - params.workPlane, 2);
+                        drawDimLine(CX - rHP*scale, hpY, CX + rHP*scale, hpY, `Ø ${(rHP*2).toFixed(2)}m`);
+                        drawLuxTag(CX, hpY, luxHP);
                     }
 
-                    // Beam Cone
-                    const br = P.beam * Math.PI / 180;
+                    // 2. No Piso
+                    const luxFloor = (params.intensity) / Math.pow(params.height, 2);
+                    drawDimLine(CX - rFloor*scale, FLOOR_Y + 30, CX + rFloor*scale, FLOOR_Y + 30, `Ø ${(rFloor*2).toFixed(2)}m`);
+                    drawLuxTag(CX, FLOOR_Y, luxFloor);
+
+                    // Altura e Angulo
+                    ctx.fillStyle = "#fff"; ctx.font = "10px Manrope"; ctx.fillText(`${params.height}m`, CX - 30, srcY + 10);
+                    
+                    // Arco do angulo
+                    ctx.beginPath(); ctx.strokeStyle="rgba(255,255,255,0.5)"; ctx.arc(CX, srcY, 40, Math.PI/2 - br/2, Math.PI/2 + br/2); ctx.stroke();
+                    ctx.fillStyle = "#fff"; ctx.fillText(`${params.beam}°`, CX, srcY + 55);
+                }
+
+                else if (State.tool === 'vertical') {
+                    const wallX = CX + (params.dist * scale);
+                    const tr = params.tilt * Math.PI / 180;
+                    const br = params.beam * Math.PI / 180;
+
+                    // Desenhar Parede
+                    ctx.beginPath(); ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 2;
+                    ctx.moveTo(wallX, FLOOR_Y); ctx.lineTo(wallX, srcY - 50); ctx.stroke();
+                    drawDimLine(CX, srcY - 20, wallX, srcY - 20, `d: ${params.dist}m`);
+
+                    // Eixo do Quadro
+                    const hqY = FLOOR_Y - (params.hq * scale);
+                    drawDashedLine(hqY, `hq: ${params.hq}m`);
+
+                    // Fonte
+                    drawSource(CX, srcY);
+
+                    // Facho (Cone rotacionado e clipado na parede)
                     ctx.save();
-                    ctx.beginPath(); ctx.rect(0,0, wallX, H); ctx.clip(); // Clip to wall
-                    const grad = ctx.createLinearGradient(CX, srcY, wallX, srcY);
-                    grad.addColorStop(0, `rgba(251, 191, 36, 0.4)`); grad.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                    ctx.beginPath(); ctx.rect(0, 0, wallX, H); ctx.clip(); // Corta na parede
+                    
+                    // Vetores do facho (limites superior e inferior)
+                    const angleTop = tr - br/2;
+                    const angleBot = tr + br/2;
+                    
+                    const grad = ctx.createLinearGradient(CX, srcY, wallX, srcY + (Math.tan(tr) * params.dist * scale));
+                    grad.addColorStop(0, "rgba(251, 191, 36, 0.6)");
+                    grad.addColorStop(1, "rgba(251, 191, 36, 0.1)");
                     ctx.fillStyle = grad;
-                    ctx.beginPath(); ctx.moveTo(CX, srcY);
-                    ctx.lineTo(wallX, srcY + Math.tan(tr - br/2) * (P.dist*scale));
-                    ctx.lineTo(wallX, srcY + Math.tan(tr + br/2) * (P.dist*scale));
+
+                    ctx.beginPath();
+                    ctx.moveTo(CX, srcY);
+                    ctx.lineTo(wallX, srcY + Math.tan(angleTop) * params.dist * scale); // Top hit
+                    ctx.lineTo(wallX, srcY + Math.tan(angleBot) * params.dist * scale); // Bot hit
                     ctx.fill();
                     ctx.restore();
 
-                    // Dimensions
-                    drawDim(CX, srcY, wallX, srcY, `D: ${P.dist}m`, -20);
-                    drawDim(CX - 20, floorY, CX - 20, srcY, `H: ${P.height}m`, 0);
+                    // Ponto central de impacto (Axis)
+                    const hitY = srcY + Math.tan(tr) * params.dist * scale;
+                    const axisYMetric = params.height - (params.dist * Math.tan(tr));
+                    
+                    // Linha de eixo
+                    ctx.beginPath(); ctx.setLineDash([2,2]); ctx.strokeStyle="#fbbf24";
+                    ctx.moveTo(CX, srcY); ctx.lineTo(wallX, hitY); ctx.stroke(); ctx.setLineDash([]);
 
-                    document.getElementById('val-lux-floor').innerText = "-"; // N/A for wall mode usually
-                    document.getElementById('val-dia').innerText = "-";
+                    // Lux no impacto
+                    if (hitY < FLOOR_Y + 500) { // Se estiver visível
+                        const distHypot = params.dist / Math.cos(tr);
+                        const luxWall = (params.intensity * Math.cos(tr)) / (distHypot*distHypot); // Lambert simples
+                        drawLuxTag(wallX, hitY, luxWall);
+                        
+                        // Altura do impacto
+                        ctx.fillStyle = "#64748b"; ctx.fillText(`hMax: ${axisYMetric.toFixed(2)}m`, wallX + 5, hitY - 10);
+                    }
                 }
-                else if (tool === 'homog') {
-                    const hSpacing = (P.spacing * scale) / 2;
-                    const lX = CX - hSpacing;
-                    const rX = CX + hSpacing;
 
-                    drawSpot(lX, srcY);
-                    drawSpot(rX, srcY);
+                else if (State.tool === 'homog') {
+                    const spacingPx = params.spacing * scale;
+                    const lx = CX - spacingPx/2;
+                    const rx = CX + spacingPx/2;
+                    
+                    drawDashedLine(hpY, `hp: ${params.workPlane}m`);
 
-                    // Beams
-                    const br = P.beam * Math.PI / 180;
-                    const hBeam = floorY - srcY;
-                    const wBeam = Math.tan(br/2) * hBeam;
+                    // Desenha 2 fontes
+                    [lx, rx].forEach(x => {
+                        const rHP = (params.height - params.workPlane) * Math.tan((params.beam * Math.PI / 180)/2);
+                        const rFloor = params.height * Math.tan((params.beam * Math.PI / 180)/2);
+                        
+                        // Cone
+                        const grad = ctx.createLinearGradient(x, srcY, x, FLOOR_Y);
+                        grad.addColorStop(0, "rgba(251, 191, 36, 0.4)"); grad.addColorStop(1, "rgba(251, 191, 36, 0)");
+                        ctx.beginPath(); ctx.moveTo(x, srcY); ctx.lineTo(x - rFloor*scale, FLOOR_Y); ctx.lineTo(x + rFloor*scale, FLOOR_Y); ctx.fill();
+                        
+                        drawSource(x, srcY);
 
-                    [lX, rX].forEach(x => {
-                        const grad = ctx.createLinearGradient(x, srcY, x, floorY);
-                        grad.addColorStop(0, `rgba(251, 191, 36, 0.3)`); grad.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                        ctx.beginPath(); ctx.moveTo(x, srcY);
-                        ctx.lineTo(x - wBeam, floorY); ctx.lineTo(x + wBeam, floorY);
-                        ctx.fillStyle = grad; ctx.fill();
+                        // Dimensões individuais (como na imagem 3)
+                        const luxC = (params.intensity) / Math.pow(params.height, 2);
+                        drawLuxTag(x, FLOOR_Y, luxC);
+                        drawDimLine(x - rFloor*scale, FLOOR_Y + 20, x + rFloor*scale, FLOOR_Y + 20, `Ø ${(rFloor*2).toFixed(2)}m`);
+                        
+                        if(params.workPlane < params.height) {
+                            const luxHP = (params.intensity) / Math.pow(params.height - params.workPlane, 2);
+                            drawLuxTag(x, hpY, luxHP);
+                            drawDimLine(x - rHP*scale, hpY + 10, x + rHP*scale, hpY + 10, `Ø ${(rHP*2).toFixed(2)}m`);
+                        }
                     });
 
-                    // Overlap
-                    const overlapStart = rX - wBeam;
-                    const overlapEnd = lX + wBeam;
-                    if (overlapEnd > overlapStart) {
-                        ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-                        ctx.fillRect(overlapStart, floorY - 10, overlapEnd - overlapStart, 10);
-                    }
-
-                    // Dimensions
-                    drawDim(lX, srcY, rX, srcY, `Spacing: ${P.spacing}m`, -20);
-                    drawDim(lX - 40, floorY, lX - 40, srcY, `H: ${P.height}m`, 0);
-
-                    // Lux at center (approx superposition)
-                    const luxCenter = 2 * (intensity * Math.pow(Math.cos(Math.atan((P.spacing/2)/P.height)), 3)) / (P.height**2 + (P.spacing/2)**2);
-                    document.getElementById('val-lux-floor').innerText = Math.round(luxCenter);
-                    document.getElementById('val-dia').innerText = "-";
+                    // Cota de espaçamento entre fontes (Topo)
+                    drawDimLine(lx, srcY - 20, rx, srcY - 20, `D: ${params.spacing}m`, '#e2e8f0');
                 }
             }
         };
 
-        // --- Query System ---
-        window.QuerySystem = {
-            load: (db) => {
-                const container = document.getElementById('query-content');
+        // --- 5. UI CONTROLLER ---
+        window.App = {
+            init: () => {
+                App.setTool('ponto');
+                window.addEventListener('resize', () => { requestAnimationFrame(Render.draw); });
+            },
+            setTool: (toolName) => {
+                State.tool = toolName;
+                
+                // Tabs UI
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`tab-${toolName}`).classList.add('active');
+
+                // View Toggle
+                const isQuery = toolName === 'query';
+                document.getElementById('controls-area').classList.toggle('hidden', isQuery);
+                document.getElementById('query-area').classList.toggle('hidden', !isQuery);
+                document.getElementById('mainCanvas').style.display = isQuery ? 'none' : 'block';
+                document.getElementById('query-content').style.display = isQuery ? 'block' : 'none';
+
+                if (!isQuery) {
+                    App.buildInputs(toolName);
+                    Render.draw();
+                }
+            },
+            buildInputs: (toolName) => {
+                const container = document.getElementById('inputs-container');
                 container.innerHTML = '';
                 
-                if (db === 'nbr8995') {
-                    let html = `<table class="w-full text-left border-collapse"><thead class="bg-white/5 sticky top-0 backdrop-blur-md"><tr><th class="p-3 text-xs text-dim-gray uppercase">Categoria</th><th class="p-3 text-xs text-dim-gray uppercase">Ambiente</th><th class="p-3 text-xs text-white uppercase text-center">Lux</th><th class="p-3 text-xs text-dim-gray uppercase text-center">UGR</th></tr></thead><tbody>`;
-                    Norms.forEach(n => {
-                        html += `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-3 text-xs text-luminous-gold font-bold">${n.cat}</td><td class="p-3 text-xs text-white">${n.room}</td><td class="p-3 text-xs text-white font-mono font-bold text-center bg-white/5">${n.lux}</td><td class="p-3 text-xs text-dim-gray text-center">${n.ugr}</td></tr>`;
-                    });
-                    html += `</tbody></table>`;
-                    container.innerHTML = html;
-                } 
-                else if (db === 'leed') {
-                    container.innerHTML = `
-                        <div class="space-y-4">
-                            <div class="p-4 bg-white/5 rounded border border-leed-green/30">
-                                <h4 class="text-leed-green font-bold text-sm mb-2">LEED v4.1 - Interior Lighting</h4>
-                                <p class="text-xs text-dim-gray mb-2">Opção 1: Controle de Iluminação</p>
-                                <ul class="list-disc pl-4 text-xs text-white space-y-1">
-                                    <li>Controle individual para 90% dos ocupantes.</li>
-                                    <li>Controle multi-nível (3+ cenas) em áreas de conferência.</li>
-                                </ul>
-                            </div>
-                            <div class="p-4 bg-white/5 rounded border border-tech-cyan/30">
-                                <h4 class="text-tech-cyan font-bold text-sm mb-2">WELL v2 - L02 Visual Balance</h4>
-                                <p class="text-xs text-dim-gray mb-2">Gestão de Luminância</p>
-                                <ul class="list-disc pl-4 text-xs text-white space-y-1">
-                                    <li>Max ratio 10:1 (Principal vs Auxiliar).</li>
-                                    <li>Mudanças graduais de luz (transição espacial).</li>
-                                </ul>
+                InputConfig[toolName].forEach(field => {
+                    const currentVal = State.params[toolName][field.key];
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = "group";
+                    wrapper.innerHTML = `
+                        <div class="flex justify-between items-end mb-2">
+                            <label class="text-[10px] font-bold text-text-mute uppercase group-hover:text-gold transition-colors">${field.label}</label>
+                            <div class="text-xs font-mono font-bold text-white">
+                                <span id="val-${field.key}">${currentVal}</span> ${field.unit}
                             </div>
                         </div>
+                        <input type="range" id="in-${field.key}" 
+                               min="${field.min}" max="${field.max}" step="${field.step}" value="${currentVal}">
                     `;
+                    container.appendChild(wrapper);
+
+                    // Event Listener Imediato
+                    document.getElementById(`in-${field.key}`).addEventListener('input', (e) => {
+                        const v = parseFloat(e.target.value);
+                        State.params[toolName][field.key] = v;
+                        document.getElementById(`val-${field.key}`).innerText = v;
+                        requestAnimationFrame(Render.draw);
+                    });
+                });
+            }
+        };
+
+        // --- 6. AUTH MANAGER ---
+        window.Auth = {
+            setTab: (mode) => {
+                document.getElementById('form-login').classList.toggle('hidden', mode !== 'login');
+                document.getElementById('form-register').classList.toggle('hidden', mode !== 'register');
+                document.getElementById('btn-login').className = mode === 'login' ? "flex-1 py-3 text-xs font-bold uppercase text-gold border-b-2 border-gold" : "flex-1 py-3 text-xs font-bold uppercase text-text-mute hover:text-white";
+                document.getElementById('btn-register').className = mode === 'register' ? "flex-1 py-3 text-xs font-bold uppercase text-gold border-b-2 border-gold" : "flex-1 py-3 text-xs font-bold uppercase text-text-mute hover:text-white";
+            },
+            login: async () => {
+                const email = document.getElementById('l-email').value;
+                const pass = document.getElementById('l-pass').value;
+                const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+                if (error) alert(error.message);
+            },
+            register: async () => {
+                const email = document.getElementById('r-email').value;
+                const pass = document.getElementById('r-pass').value;
+                const { error } = await supabase.auth.signUp({ email, password: pass });
+                if (error) alert(error.message); else alert("Verifique seu email!");
+            },
+            logout: async () => { await supabase.auth.signOut(); },
+            checkUser: async () => {
+                const { data } = await supabase.auth.getSession();
+                if(data.session) Auth.unlock(data.session);
+                
+                supabase.auth.onAuthStateChange((_evt, session) => {
+                    if(session) Auth.unlock(session);
+                    else window.location.reload();
+                });
+            },
+            unlock: (session) => {
+                document.getElementById('auth-overlay').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('app-locked');
+                document.getElementById('user-display').innerText = session.user.email.split('@')[0];
+                App.init(); // Inicia app apenas após login
+            }
+        };
+
+        // --- 7. QUERY SYSTEM ---
+        window.Query = {
+            load: (type) => {
+                const el = document.getElementById('query-content');
+                el.innerHTML = '';
+                if(type === 'nbr') {
+                    el.innerHTML = `
+                        <h3 class="text-gold font-bold mb-4">NBR ISO/CIE 8995-1 (Resumo)</h3>
+                        <table class="w-full text-left text-xs text-text-mute">
+                            <thead class="text-white border-b border-white/10"><tr><th class="py-2">Ambiente</th><th>Lux</th><th>UGR</th></tr></thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr><td class="py-2">Escritório (Digitação)</td><td class="text-gold">500</td><td>19</td></tr>
+                                <tr><td class="py-2">Sala de Reunião</td><td class="text-gold">500</td><td>19</td></tr>
+                                <tr><td class="py-2">Corredores</td><td class="text-gold">100</td><td>28</td></tr>
+                                <tr><td class="py-2">Industrial (Precisão)</td><td class="text-gold">1000</td><td>19</td></tr>
+                            </tbody>
+                        </table>`;
+                } else {
+                    el.innerHTML = `<h3 class="text-cyan font-bold mb-4">LEED v4.1 / WELL</h3><p class="text-xs text-text-mute">Requisitos de poluição luminosa e controle individual.</p>`;
                 }
             }
         };
 
-        // --- Init ---
-        AuthManager.init();
+        // Start
+        Auth.checkUser();
 
     </script>
 </body>
