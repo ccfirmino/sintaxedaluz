@@ -68,7 +68,6 @@
         input[type=number], select, input[type=text], input[type=date], input[type=email], input[type=password] { background-color: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; text-align: left; width: 100%; font-family: 'Manrope', sans-serif; font-weight: 300; -moz-appearance: textfield; padding: 8px 0; }
         input[type=number]:focus, select:focus, input[type=text]:focus, input[type=email]:focus, input[type=password]:focus { outline: none; border-bottom: 1px solid #FBBF24; color: #FBBF24; }
         
-        /* Ajuste específico para inputs numéricos das calculadoras */
         .calc-input { text-align: right !important; width: 65px !important; }
 
         select.custom-select option { background-color: #0f172a; color: #f8fafc; }
@@ -130,7 +129,6 @@
         .bar-container { width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 99px; overflow: hidden; margin-top: 4px; }
         .bar-fill { height: 100%; border-radius: 99px; transition: width 1s ease-out; }
 
-        /* Auth Blur Effect */
         .app-locked {
             filter: blur(8px) grayscale(0.5);
             pointer-events: none;
@@ -229,6 +227,7 @@
                     <button onclick="toggleLanguage()" class="text-xs text-muted-blue hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-white/10 pl-4 uppercase">
                         <span class="lang-display">PT / EN</span>
                     </button>
+                    
                     <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-white/10">
                         <div class="w-8 h-8 rounded-full bg-luminous-gold/20 flex items-center justify-center text-luminous-gold font-bold text-xs border border-luminous-gold/30">
                             <i class="fas fa-user"></i>
@@ -570,30 +569,37 @@
         const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
 
-        // Inicializa o cliente apenas se a biblioteca carregou
-        let supabase;
+        // Inicialização Segura do Cliente
+        let supabaseClient;
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            // Usamos 'window.supabase' para garantir que pegamos a biblioteca global
+            if (window.supabase) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } else {
+                console.error("A biblioteca do Supabase não foi carregada. Verifique sua conexão.");
+            }
         } catch (e) {
-            console.error("Erro ao carregar Supabase. Verifique sua conexão ou CDN.", e);
+            console.error("Erro fatal ao iniciar Supabase:", e);
         }
 
         /**
-         * AUTHENTICATION MANAGER
-         * Gerencia Login, Cadastro e Sessão
+         * AUTHENTICATION MANAGER (CORRIGIDO)
          */
         const AuthManager = {
             currentUser: null,
             
             init: async function() {
-                if (!supabase) return;
+                if (!supabaseClient) {
+                    // Fail silently or handle error appropriately if offline
+                    return;
+                }
 
                 // 1. Verifica sessão existente
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 this.handleSessionUpdate(session);
 
                 // 2. Escuta mudanças de estado (Login/Logout em tempo real)
-                supabase.auth.onAuthStateChange((event, session) => {
+                supabaseClient.auth.onAuthStateChange((event, session) => {
                     this.handleSessionUpdate(session);
                 });
             },
@@ -624,9 +630,12 @@
                 document.body.style.overflow = 'auto'; 
                 
                 if(this.currentUser) {
-                    const name = this.currentUser.user_metadata.first_name || 'Usuário';
+                    // Tenta pegar o nome dos metadados, ou usa o e-mail como fallback
+                    const metaName = this.currentUser.user_metadata.first_name;
+                    const displayName = metaName ? metaName : (this.currentUser.email ? this.currentUser.email.split('@')[0] : 'Usuário');
+                    
                     const displayEl = document.getElementById('user-name-display');
-                    if(displayEl) displayEl.innerText = name;
+                    if(displayEl) displayEl.innerText = displayName.toUpperCase();
                 }
             },
 
@@ -652,20 +661,28 @@
             },
 
             handleLogin: async function() {
+                if (!supabaseClient) return alert("Erro de conexão com o servidor.");
+                
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
 
                 if (!email || !password) return alert("Preencha todos os campos.");
 
-                const { error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password,
                 });
 
-                if (error) alert("Erro no login: " + error.message);
+                if (error) {
+                    alert("Erro no login: " + error.message);
+                } else {
+                    // Sucesso tratado pelo onAuthStateChange
+                }
             },
 
             handleRegister: async function() {
+                if (!supabaseClient) return alert("Erro de conexão com o servidor.");
+
                 const email = document.getElementById('reg-email').value;
                 const password = document.getElementById('reg-password').value;
                 const firstName = document.getElementById('reg-name').value;
@@ -675,7 +692,7 @@
                 if (!firstName || !lastName || !email || !password) return alert("Preencha todos os campos.");
                 if (!terms) return alert("É necessário concordar com os termos.");
 
-                const { error } = await supabase.auth.signUp({
+                const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -686,12 +703,16 @@
                     }
                 });
 
-                if (error) alert("Erro no cadastro: " + error.message);
-                else alert("Cadastro realizado! Verifique seu e-mail.");
+                if (error) {
+                    alert("Erro no cadastro: " + error.message);
+                } else {
+                    alert("Cadastro realizado! Se o login não for automático, verifique seu e-mail.");
+                }
             },
 
             logout: async function() {
-                await supabase.auth.signOut();
+                if (!supabaseClient) return;
+                await supabaseClient.auth.signOut();
                 location.reload(); 
             }
         };
@@ -1052,55 +1073,6 @@
             }
         }
 
-        function filterQueryContent() {
-            const activeTab = document.querySelector('.query-tab-active');
-            if (activeTab && activeTab.id === 'btn-q-nbr8995') {
-                filterNorms();
-            }
-        }
-
-        const tabs = ['ponto', 'vertical', 'homog', 'query'];
-
-        function switchTool(toolId) {
-            currentTool = toolId;
-            tabs.forEach(id => {
-                const btn = document.getElementById('tab-' + id);
-                if(btn) {
-                    let cls = "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ";
-                    if (id === 'query') cls += "text-luminous-gold "; 
-                    btn.className = cls + (id === toolId ? "tab-active" : "tab-inactive");
-                }
-            });
-
-            document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query');
-            document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
-
-            if (toolId === 'query') switchQueryTab('nbr8995'); 
-            else {
-                ['inputs-ponto', 'inputs-vertical', 'inputs-homog'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.classList.add('hidden');
-                });
-                const selectedInput = document.getElementById('inputs-' + (toolId === 'homog' ? 'homog' : toolId));
-                if (selectedInput) selectedInput.classList.remove('hidden');
-
-                updateCalcMode(calcMode);
-                updateCalculations();
-            }
-        }
-
-        function updateCalcMode(mode) {
-            calcMode = mode;
-            document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
-            document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
-            updateCalculations();
-        }
-
-        function getIntensity(s) {
-            if (calcMode === 'direct') return s.intensity;
-            return (s.cdklm * s.flux) / 1000;
-        }
-
         // --- NEW RENDER LOGIC WITH DPR SUPPORT & DYNAMIC SCALING ---
         function updateCalculations() {
             const canvas = document.getElementById('beamCanvas');
@@ -1437,36 +1409,20 @@
         function toggleLanguage() { 
             currentLang = currentLang === 'pt' ? 'en' : 'pt'; 
             document.querySelectorAll('.lang-display').forEach(e => e.innerText = currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
-            
-            // Translate all elements with data-i18n attribute
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (i18n[currentLang] && i18n[currentLang][key]) {
-                    el.innerHTML = i18n[currentLang][key]; // innerHTML allows bold tags
-                }
+                if (i18n[currentLang] && i18n[currentLang][key]) el.innerHTML = i18n[currentLang][key];
             });
-
             updateCalculations(); 
         }
         
         function toggleMobileMenu() { 
             const menu = document.getElementById('mobile-menu');
-            if (menu) {
-                menu.classList.toggle('hidden');
-            }
+            if (menu) menu.classList.toggle('hidden');
         }
 
-        // Initialize with Debounce for resize
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                updateCalculations();
-            }, 100);
-        });
-
+        // Inicialização Final
         document.addEventListener("DOMContentLoaded", () => {
-            // INIT AUTH FIRST
             if (typeof AuthManager !== 'undefined') {
                 AuthManager.init();
             }
