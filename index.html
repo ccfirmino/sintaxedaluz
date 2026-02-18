@@ -174,6 +174,7 @@
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">IES</span></label>
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ldt" onchange="window.updateCalcMode('ldt')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ldt">LDT</span></label>
                                     </div>
                                 </div>
                                 <div id="inputs-ponto" class="hidden">
@@ -193,6 +194,13 @@
                                             <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
                                             <input type="file" id="p-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
                                             <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                        </div>
+                                    </div>
+                                    <div class="mode-ldt-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ldt_upload">CARREGAR ARQUIVO .LDT</label>
+                                            <input type="file" id="p-ldt-input" accept=".ldt, .LDT" onchange="window.handleLDTUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <p id="p-ldt-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -216,6 +224,13 @@
                                             <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
+                                    <div class="mode-ldt-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ldt_upload">CARREGAR ARQUIVO .LDT</label>
+                                            <input type="file" id="v-ldt-input" accept=".ldt, .LDT" onchange="window.handleLDTUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <p id="v-ldt-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div id="inputs-homog" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
@@ -232,6 +247,13 @@
                                             <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
                                             <input type="file" id="h-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
                                             <p id="h-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                        </div>
+                                    </div>
+                                    <div class="mode-ldt-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ldt_upload">CARREGAR ARQUIVO .LDT</label>
+                                            <input type="file" id="h-ldt-input" accept=".ldt, .LDT" onchange="window.handleLDTUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <p id="h-ldt-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -422,7 +444,7 @@
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
-                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
+                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ldt: "LDT", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_ldt_upload: "CARREGAR ARQUIVO .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
                 tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
@@ -438,7 +460,7 @@
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
-                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES", lbl_ies_upload: "UPLOAD .IES FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
+                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES", lbl_ldt: "LDT", lbl_ies_upload: "UPLOAD .IES FILE", lbl_ldt_upload: "UPLOAD .LDT FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
                 hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
                 tab_interiors: "Interiores (ISO/NBR)", tab_roadway: "Roadway (IES/NBR)", filter_all: "All Categories", col_cat: "Category", col_room: "Room",
@@ -624,20 +646,19 @@
             document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
             document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
-            document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
+            document.querySelectorAll('.mode-ldt-group').forEach(el => el.classList.toggle('hidden', mode !== 'ldt'));
+            document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies' || mode === 'ldt'));
             window.updateCalculations();
         }
 
-        // --- IES PARSER & LOGIC (LDT REMOVED) ---
+        // --- IES PARSER ---
         window.handleIESUpload = function(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const content = e.target.result;
-                    // LDT REMOVED: Now only attempts to parse IES
                     const parsed = window.parseIES(content);
-                    
                     if (parsed) {
                         const targetKey = window.currentTool === 'homog' ? 'homog' : (window.currentTool === 'ponto' ? 'ponto' : 'vertical');
                         window.state[targetKey].iesData = parsed;
@@ -715,12 +736,94 @@
             }
         }
 
+        // --- LDT PARSER (EULUMDAT) ---
+        window.handleLDTUpload = function(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const parsed = window.parseLDT(content);
+                    if (parsed) {
+                        const targetKey = window.currentTool === 'homog' ? 'homog' : (window.currentTool === 'ponto' ? 'ponto' : 'vertical');
+                        window.state[targetKey].iesData = parsed; // Reuse the same storage
+                        window.state[targetKey].iesFileName = file.name;
+                        
+                        let statusId = 'p-ldt-status';
+                        if(window.currentTool === 'vertical') statusId = 'v-ldt-status';
+                        if(window.currentTool === 'homog') statusId = 'h-ldt-status';
+
+                        const statusEl = document.getElementById(statusId);
+                        if(statusEl) {
+                            statusEl.innerText = `Carregado: ${file.name}`;
+                            statusEl.classList.add('text-luminous-gold');
+                        }
+                        window.updateCalculations();
+                    } else {
+                        alert("Erro ao ler arquivo " + file.name + ". Verifique se é um arquivo LDT válido.");
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        window.parseLDT = function(content) {
+            try {
+                // Normalize line endings and decimals (European comma to dot)
+                const cleanContent = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/,/g, '.');
+                const lines = cleanContent.split('\n');
+                
+                if (lines.length < 42) throw new Error("File too short");
+
+                // Parse Header
+                const Mc = parseInt(lines[14]); // Number of C-planes
+                const Ng = parseInt(lines[16]); // Number of Luminous intensities in each C-plane
+                const totalFlux = parseFloat(lines[25]);
+
+                if (isNaN(Mc) || isNaN(Ng)) throw new Error("Invalid Geometry");
+
+                // Parse Body using Token Stream approach
+                const rawBody = lines.slice(42).join(' ');
+                const tokens = rawBody.trim().split(/\s+/).map(Number).filter(n => !isNaN(n));
+
+                let ptr = 0;
+                
+                // Read C-Angles (Mc values)
+                const cAngles = [];
+                for(let i=0; i<Mc; i++) cAngles.push(tokens[ptr++] || 0);
+
+                // Read G-Angles (Ng values)
+                const vAngles = [];
+                for(let i=0; i<Ng; i++) vAngles.push(tokens[ptr++] || 0);
+
+                // Read Intensity Matrix (Mc * Ng values)
+                const candelas = [];
+                for(let c=0; c<Mc; c++) {
+                    const row = [];
+                    for(let g=0; g<Ng; g++) {
+                        row.push(tokens[ptr++] || 0);
+                    }
+                    candelas.push(row);
+                }
+
+                // Normalization
+                const multiplier = (totalFlux > 0 ? totalFlux : 1000) / 1000;
+
+                // Return structure compatible with getIESIntensity
+                return { vAngles, candelas, multiplier, type: 'LDT' };
+
+            } catch (e) {
+                console.error("LDT Parse Error:", e);
+                return null;
+            }
+        };
+
         window.getIESIntensity = function(state, angleDeg) {
             if (!state.iesData) return 0;
             
             const data = state.iesData;
             const vAngles = data.vAngles;
-            const candelaRow = data.candelas[0]; 
+            const candelaRow = data.candelas[0]; // Assume first C-plane for 2D visual
             const mult = data.multiplier;
 
             let idx = 0;
@@ -746,7 +849,7 @@
 
         function getIntensity(s) {
             if (window.calcMode === 'direct') return s.intensity;
-            if (window.calcMode === 'ies') {
+            if (window.calcMode === 'ies' || window.calcMode === 'ldt') {
                 const tiltVal = (window.currentTool === 'homog') ? 0 : Math.abs(s.tilt);
                 return window.getIESIntensity(s, tiltVal); 
             }
@@ -840,7 +943,7 @@
                 const tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
                 
                 let I;
-                if(window.calcMode === 'ies') {
+                if(window.calcMode === 'ies' || window.calcMode === 'ldt') {
                     I = window.getIESIntensity(s, s.tilt);
                 } else {
                     I = getIntensity(s);
@@ -863,7 +966,7 @@
                 ctx.font = "11px Manrope"; ctx.fillStyle = "#94a3b8"; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 45, sy + 3); 
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(148, 163, 184, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
 
-                if (window.calcMode !== 'ies') {
+                if (window.calcMode !== 'ies' && window.calcMode !== 'ldt') {
                     drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false); 
                 }
 
@@ -883,16 +986,16 @@
                 
                 // Result Display
                 let valText = Math.round(luxFloor) + " Lux";
-                if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
+                if ((window.calcMode === 'ies' || window.calcMode === 'ldt') && !s.iesData) valText = "LOAD FILE";
                 drawTextVal(ctx, valText, hitXFloor, floorY - 10); 
                 
                 if (hEff > 0) { 
                     const ix = centerX + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill(); 
                     let valTextPlane = Math.round(luxPlane) + " Lux";
-                    if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD FILE";
+                    if ((window.calcMode === 'ies' || window.calcMode === 'ldt') && !s.iesData) valTextPlane = "LOAD FILE";
                     drawTextVal(ctx, valTextPlane, ix, py - 10); 
                     
-                    if (window.calcMode !== 'ies') {
+                    if (window.calcMode !== 'ies' && window.calcMode !== 'ldt') {
                         const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
                         const hPx_plane = py - sy;
                         const xL_p = hPx_plane * Math.tan(tr - br / 2);
@@ -901,7 +1004,7 @@
                     }
                 }
                 
-                if (window.calcMode !== 'ies') {
+                if (window.calcMode !== 'ies' && window.calcMode !== 'ldt') {
                     const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
                     drawDimLine(ctx, centerX + xL, floorY + 45, centerX + xR, floorY + 45, `Ø ${dia.toFixed(2)}m`);
                 }
@@ -911,7 +1014,7 @@
                 
                 let ev = 0; 
                 let I_v;
-                 if(window.calcMode === 'ies') {
+                 if(window.calcMode === 'ies' || window.calcMode === 'ldt') {
                     I_v = window.getIESIntensity(s, s.tilt);
                  } else {
                     I_v = getIntensity(s);
@@ -936,7 +1039,7 @@
                 ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                 ctx.restore();
 
-                if (window.calcMode !== 'ies') {
+                if (window.calcMode !== 'ies' && window.calcMode !== 'ldt') {
                     drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false);
                 }
 
@@ -952,7 +1055,7 @@
                         ctx.beginPath(); ctx.arc(wx, hitY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
                         
                         let valText = Math.round(ev) + " Lux";
-                        if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
+                        if ((window.calcMode === 'ies' || window.calcMode === 'ldt') && !s.iesData) valText = "LOAD FILE";
                         drawTextVal(ctx, valText, wx - 40, hitY_px);
                         
                         if (hitY_px < floorY) {
@@ -960,7 +1063,7 @@
                         }
                      }
                      
-                    if (window.calcMode !== 'ies' && s.tilt + s.beam/2 < 89) {
+                    if (window.calcMode !== 'ies' && window.calcMode !== 'ldt' && s.tilt + s.beam/2 < 89) {
                         const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + s.beam/2) * Math.PI/180));
                         const hTopPx = floorY - (hTopMetric * scale);
                         if(hTopPx > -100 && hTopPx < floorY + 100) {
@@ -996,11 +1099,11 @@
                 ctx.beginPath(); ctx.arc(leftX, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
                 
                 let valText = Math.round(luxFloor) + " Lux";
-                if (window.calcMode === 'ies' && !window.state.homog.iesData) valText = "LOAD FILE";
+                if ((window.calcMode === 'ies' || window.calcMode === 'ldt') && !window.state.homog.iesData) valText = "LOAD FILE";
                 drawTextVal(ctx, valText, leftX, floorY - 10);
 
                 const rFloor = (floorY - sy) * Math.tan(br/2);
-                if (window.calcMode !== 'ies') {
+                if (window.calcMode !== 'ies' && window.calcMode !== 'ldt') {
                     drawDimLine(ctx, leftX - rFloor, floorY + 25, leftX + rFloor, floorY + 25, `Ø ${dia.toFixed(2)}m`);
                 }
 
@@ -1008,14 +1111,42 @@
                      ctx.beginPath(); ctx.arc(leftX, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
                      
                      let valTextPlane = Math.round(luxPlane) + " Lux";
-                     if (window.calcMode === 'ies' && !window.state.homog.iesData) valTextPlane = "LOAD FILE";
+                     if ((window.calcMode === 'ies' || window.calcMode === 'ldt') && !window.state.homog.iesData) valTextPlane = "LOAD FILE";
                      drawTextVal(ctx, valTextPlane, leftX, py - 10);
                      
-                     if (window.calcMode !== 'ies') {
+                     if (window.calcMode !== 'ies' && window.calcMode !== 'ldt') {
                         const rPlane = (py - sy) * Math.tan(br/2);
                         drawDimLine(ctx, leftX - rPlane, py + 15, leftX + rPlane, py + 15, `Ø ${diaPlane.toFixed(2)}m`);
                      }
                 }
+            }
+            
+            // Draw Photometric Curve
+            if ((window.calcMode === 'ies' || window.calcMode === 'ldt') && s.iesData) {
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba(251, 191, 36, 0.4)";
+                ctx.setLineDash([]);
+                const { vAngles, candelas } = s.iesData;
+                const row = candelas[0];
+                const maxI = Math.max(...row);
+                
+                // Draw Right Side
+                for(let i=0; i<vAngles.length; i++) {
+                    const ang = (vAngles[i] + s.tilt) * Math.PI / 180;
+                    const r = (row[i] / maxI) * (s.height * scale * 0.9);
+                    const x = centerX + r * Math.sin(ang);
+                    const y = sy + r * Math.cos(ang);
+                    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                }
+                // Draw Left Side (Mirror)
+                for(let i=0; i<vAngles.length; i++) {
+                     const ang = (-vAngles[i] + s.tilt) * Math.PI / 180;
+                     const r = (row[i] / maxI) * (s.height * scale * 0.9);
+                     const x = centerX + r * Math.sin(ang);
+                     const y = sy + r * Math.cos(ang);
+                     ctx.lineTo(x,y);
+                }
+                ctx.stroke();
             }
         }
 
