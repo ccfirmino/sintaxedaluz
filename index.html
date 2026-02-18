@@ -776,13 +776,19 @@
                 if (lines.length < 42) throw new Error("File too short");
 
                 // Parse Header
-                const Mc = parseInt(lines[14]); // Number of C-planes
-                const Ng = parseInt(lines[16]); // Number of Luminous intensities in each C-plane
+                // In standard EULUMDAT (LDT):
+                // Line 4 (index 3) is Number of C-planes (Mc)
+                // Line 6 (index 5) is Number of Luminous intensities in each C-plane (Ng)
+                const Mc = parseInt(lines[3]); 
+                const Ng = parseInt(lines[5]); 
+                // Line 26 (index 25) is Total Luminous Flux
                 const totalFlux = parseFloat(lines[25]);
 
                 if (isNaN(Mc) || isNaN(Ng)) throw new Error("Invalid Geometry");
 
                 // Parse Body using Token Stream approach
+                // Geometry typically starts after line 42, but sometimes varies slightly.
+                // We'll concatenate everything after line 42 and tokenize.
                 const rawBody = lines.slice(42).join(' ');
                 const tokens = rawBody.trim().split(/\s+/).map(Number).filter(n => !isNaN(n));
 
@@ -797,6 +803,7 @@
                 for(let i=0; i<Ng; i++) vAngles.push(tokens[ptr++] || 0);
 
                 // Read Intensity Matrix (Mc * Ng values)
+                // LDT Structure: C-plane loop (outer) -> G-angle loop (inner)
                 const candelas = [];
                 for(let c=0; c<Mc; c++) {
                     const row = [];
