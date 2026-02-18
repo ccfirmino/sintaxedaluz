@@ -56,7 +56,11 @@
         input[type=number] { text-align: right; width: 65px; } 
         input:focus, select:focus { outline: none; border-bottom: 1px solid #FBBF24 !important; color: #FBBF24; }
         select.custom-select option { background-color: #0f172a; color: #f8fafc; }
-        
+        /* File Input Style */
+        input[type="file"] { font-size: 10px; color: #94a3b8; }
+        input[type="file"]::file-selector-button { margin-right: 10px; border: 1px solid rgba(251, 191, 36, 0.3); background: rgba(251, 191, 36, 0.1); padding: 5px 10px; border-radius: 4px; color: #FBBF24; cursor: pointer; transition: all 0.2s; font-weight: bold; text-transform: uppercase; font-size: 9px; }
+        input[type="file"]::file-selector-button:hover { background: rgba(251, 191, 36, 0.2); }
+
         /* Auth & Locking */
         .auth-input-group label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #FBBF24 !important; }
         .auth-input-group input { width: 100%; text-align: left; }
@@ -167,32 +171,55 @@
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
                                     <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md border-b border-white/10 pb-3" data-i18n="calc_params">Parâmetros da Fonte</h3>
-                                    <div class="flex flex-col sm:flex-row gap-4 p-1 mb-6 justify-center">
-                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
-                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
+                                    <div class="flex flex-col gap-2 p-1 mb-6 justify-center">
+                                        <div class="flex flex-row gap-4 justify-center">
+                                            <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
+                                            <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
+                                        </div>
+                                        <div class="flex flex-row justify-center">
+                                            <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">ARQUIVO IES</span></label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div id="inputs-ponto" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
+                                    <div class="mode-standard-only">
+                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
+                                    </div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
                                     <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
                                     </div>
+                                    <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <input type="file" id="p-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div id="inputs-vertical" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+                                    <div class="mode-standard-only">
+                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+                                    </div>
                                     <div class="mb-2 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
                                     <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-v-flux" min="0" max="10000" step="10" value="1500"></div>
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-v-cdklm" min="0" max="10000" step="10" value="2000"></div>
+                                    </div>
+                                    <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <input type="file" id="v-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div id="inputs-homog" class="hidden">
@@ -396,7 +423,7 @@
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
-                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
+                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "ARQUIVO IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
                 tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
@@ -405,14 +432,14 @@
                 leed_calc_title: "Calculadora de Orçamento (LPD)", leed_select_target: "Selecione a Meta de Certificação", leed_reduction: "Redução Aplicada", leed_area: "Área do Projeto (m²)", leed_type: "Tipologia", leed_allowance: "CARGA PERMITIDA",
                 leed_eq_1: "<strong class=\"text-white\">Controle:</strong> Individual para 90% dos ocupantes.", leed_eq_2: "<strong class=\"text-white\">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.", leed_ss_1: "Requisito <strong class=\"text-white\">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).",
                 well_sim_title: "Simulador de Créditos de Iluminação", well_concept: "Conceito: LIGHT (WELL v2)", well_est_pts: "Pontos Estimados", well_contrib: "Contribuição para Certificação",
-                well_l01: "Acesso à luz natural e visualização.", well_req: "Obrigatório", well_l02: "Níveis de iluminância adequados.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Gestão de brilho solar.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Controle de zonas e intensidade.",
+                well_l01: "Acesso à luz natural e visualização.", well_req: "Obrigatório", well_l02: "Níveis de iluminância adequados.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Gestão de brilho solar.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Zoning and intensity control.",
                 about_title: "SOBRE", about_text: "O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.",
                 card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).", card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.", card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.", card_4_title: "CONSULTA NORMATIVA", card_4_desc: "Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.",
                 footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade e Uso", terms_accept: "Li, Compreendi e Aceito os Riscos"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(NBR/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
-                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "ORIENTATION (TILT)",
+                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES FILE", lbl_ies_upload: "UPLOAD .IES FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "ORIENTATION (TILT)",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "FRAME AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "DISTANCE BETWEEN SOURCES (D)",
                 hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
                 tab_interiors: "Interiors (NBR 8995)", tab_roadway: "Roadway (NBR 5101)", filter_all: "All Categories", col_cat: "Category", col_room: "Room / Task",
@@ -430,8 +457,8 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000 },
-            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 }, 
+            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
+            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null, iesFileName: null }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
@@ -605,11 +632,129 @@
             window.calcMode = mode;
             document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
+            document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
+            document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
             window.updateCalculations();
+        }
+
+        // --- IES PARSER & LOGIC ---
+        window.handleIESUpload = function(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const parsed = window.parseIES(content);
+                    if (parsed) {
+                        const targetKey = window.currentTool === 'ponto' ? 'ponto' : 'vertical';
+                        window.state[targetKey].iesData = parsed;
+                        window.state[targetKey].iesFileName = file.name;
+                        
+                        const statusEl = document.getElementById(targetKey === 'ponto' ? 'p-ies-status' : 'v-ies-status');
+                        if(statusEl) {
+                            statusEl.innerText = `Carregado: ${file.name}`;
+                            statusEl.classList.add('text-luminous-gold');
+                        }
+                        window.updateCalculations();
+                    } else {
+                        alert("Erro ao ler arquivo IES.");
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        window.parseIES = function(content) {
+            // Basic LM-63 Parser
+            try {
+                const lines = content.replace(/\r/g, "").split('\n');
+                let dataLines = [];
+                let isData = false;
+                
+                for(let line of lines) {
+                    if (line.includes("TILT=")) {
+                        isData = true;
+                        continue; 
+                    }
+                    if (isData) {
+                        dataLines.push(line);
+                    }
+                }
+                
+                const allNumbers = dataLines.join(" ").trim().split(/\s+/).map(Number);
+                if (allNumbers.length < 13) return null; // Too short
+
+                // Standard LM-63 Structure after TILT:
+                // lamp_num, lumens_per_lamp, multiplier, v_angles_count, h_angles_count, photo_type, units_type, width, length, height, ballast_factor, input_watts, input_voltage
+                const multiplier = allNumbers[2];
+                const vCount = allNumbers[3];
+                const hCount = allNumbers[4];
+                
+                let cursor = 13; 
+                
+                const vAngles = allNumbers.slice(cursor, cursor + vCount);
+                cursor += vCount;
+                
+                const hAngles = allNumbers.slice(cursor, cursor + hCount);
+                cursor += hCount;
+
+                // Candela Values
+                // Looped by horizontal, then vertical inside
+                const candelas = [];
+                for(let h=0; h<hCount; h++) {
+                     const row = allNumbers.slice(cursor, cursor + vCount);
+                     candelas.push(row);
+                     cursor += vCount;
+                }
+
+                return { vAngles, hAngles, candelas, multiplier };
+
+            } catch (e) {
+                console.error("IES Parse Error", e);
+                return null;
+            }
+        }
+
+        window.getIESIntensity = function(state, angleDeg) {
+            if (!state.iesData) return 0;
+            
+            // Simplified: Assuming 0 deg horizontal (first slice) or Average if symmetric
+            // For point-by-point rapid calc, we usually care about vertical distribution (gamma)
+            
+            const data = state.iesData;
+            const vAngles = data.vAngles;
+            const candelaRow = data.candelas[0]; // Taking 0-deg horizontal plane for simplicity in 2D view
+            const mult = data.multiplier;
+
+            // Find indices for interpolation
+            let idx = 0;
+            // Handle limits
+            if (angleDeg <= vAngles[0]) return candelaRow[0] * mult;
+            if (angleDeg >= vAngles[vAngles.length-1]) return candelaRow[vAngles.length-1] * mult;
+
+            while(idx < vAngles.length - 1 && angleDeg > vAngles[idx+1]) {
+                idx++;
+            }
+            
+            const a1 = vAngles[idx];
+            const a2 = vAngles[idx+1];
+            const c1 = candelaRow[idx];
+            const c2 = candelaRow[idx+1];
+            
+            // Linear Interpolation
+            const t = (angleDeg - a1) / (a2 - a1);
+            const rawVal = c1 + t * (c2 - c1);
+            
+            return rawVal * mult;
         }
 
         function getIntensity(s) {
             if (window.calcMode === 'direct') return s.intensity;
+            if (window.calcMode === 'ies') {
+                if (window.currentTool === 'ponto') return window.getIESIntensity(s, Math.abs(s.tilt)); // Intensity at the tilt axis
+                if (window.currentTool === 'vertical') return window.getIESIntensity(s, Math.abs(s.tilt)); // Same logic
+                return 0;
+            }
             return (s.cdklm * s.flux) / 1000;
         }
 
@@ -697,7 +842,17 @@
 
             // DRAW BEAMS
              if (window.currentTool === 'ponto') {
-                const I = getIntensity(s), sy = floorY - (s.height * scale), py = floorY - (s.plane * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                const tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                
+                // Calculate I based on Tilt angle if IES mode
+                let I;
+                if(window.calcMode === 'ies') {
+                    I = window.getIESIntensity(s, s.tilt);
+                } else {
+                    I = getIntensity(s);
+                }
+
+                const sy = floorY - (s.height * scale), py = floorY - (s.plane * scale);
                 const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
                 const hEff = s.height - s.plane;
                 const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
@@ -714,7 +869,10 @@
                 ctx.font = "11px Manrope"; ctx.fillStyle = "#94a3b8"; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 45, sy + 3); 
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(148, 163, 184, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
 
-                drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false); 
+                // Don't draw beam angle dim if IES mode since it's complex/undefined visually in 2D
+                if (window.calcMode !== 'ies') {
+                    drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false); 
+                }
 
                 // Tilt Logic
                 if (s.tilt > 0) {
@@ -729,24 +887,49 @@
                 const hitXFloor = centerX + (s.height * scale) * Math.tan(tr);
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(251, 191, 36, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(hitXFloor, floorY); ctx.stroke(); ctx.setLineDash([]);
                 ctx.beginPath(); ctx.arc(hitXFloor, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
-                drawTextVal(ctx, Math.round(luxFloor) + " Lux", hitXFloor, floorY - 10); 
+                
+                // Result Display
+                let valText = Math.round(luxFloor) + " Lux";
+                if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
+                drawTextVal(ctx, valText, hitXFloor, floorY - 10); 
                 
                 if (hEff > 0) { 
-                    const ix = centerX + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill(); drawTextVal(ctx, Math.round(luxPlane) + " Lux", ix, py - 10); 
+                    const ix = centerX + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill(); 
+                    let valTextPlane = Math.round(luxPlane) + " Lux";
+                    if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD IES";
+                    drawTextVal(ctx, valTextPlane, ix, py - 10); 
                     
-                    // NEW: Diameter at Plane
-                    const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
-                    const hPx_plane = py - sy;
-                    const xL_p = hPx_plane * Math.tan(tr - br / 2);
-                    const xR_p = hPx_plane * Math.tan(tr + br / 2);
-                    drawDimLine(ctx, centerX + xL_p, py + 15, centerX + xR_p, py + 15, `Ø ${diaPlane.toFixed(2)}m`);
+                    if (window.calcMode !== 'ies') {
+                        // NEW: Diameter at Plane
+                        const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
+                        const hPx_plane = py - sy;
+                        const xL_p = hPx_plane * Math.tan(tr - br / 2);
+                        const xR_p = hPx_plane * Math.tan(tr + br / 2);
+                        drawDimLine(ctx, centerX + xL_p, py + 15, centerX + xR_p, py + 15, `Ø ${diaPlane.toFixed(2)}m`);
+                    }
                 }
-                const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
-                drawDimLine(ctx, centerX + xL, floorY + 45, centerX + xR, floorY + 45, `Ø ${dia.toFixed(2)}m`);
+                
+                if (window.calcMode !== 'ies') {
+                    const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
+                    drawDimLine(ctx, centerX + xL, floorY + 45, centerX + xR, floorY + 45, `Ø ${dia.toFixed(2)}m`);
+                }
             }
              else if (window.currentTool === 'vertical') {
-                const I = getIntensity(s), sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
-                let ev = 0; if (s.tilt > 0) ev = (I * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
+                const sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                
+                let ev = 0; 
+                if (s.tilt > 0) {
+                     let I_v;
+                     // For vertical, we need Intensity at the angle aiming at the point
+                     // Simplified: Use the User's TILT as the aiming angle for IES lookup
+                     if(window.calcMode === 'ies') {
+                        I_v = window.getIESIntensity(s, s.tilt);
+                     } else {
+                        I_v = getIntensity(s);
+                     }
+                     ev = (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
+                }
+
                 let hitY_metric = s.height - (s.dist / Math.tan(tr)); let hitY_px = floorY - (hitY_metric * scale);
                 
                 ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; 
@@ -762,7 +945,10 @@
                 ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                 ctx.restore();
 
-                drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false);
+                if (window.calcMode !== 'ies') {
+                    drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false);
+                }
+
                 if (s.tilt > 0) {
                     const axisX = centerX + (s.height * scale) * Math.tan(tr);
                     ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(148, 163, 184, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
@@ -774,7 +960,10 @@
                      
                      if (hitY_metric > -10 && hitY_metric < s.height * 3) {
                         ctx.beginPath(); ctx.arc(wx, hitY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
-                        drawTextVal(ctx, Math.round(ev) + " Lux", wx - 40, hitY_px);
+                        
+                        let valText = Math.round(ev) + " Lux";
+                        if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
+                        drawTextVal(ctx, valText, wx - 40, hitY_px);
                         
                         // NEW: Dimension from Beam Center to Floor
                         if (hitY_px < floorY) {
@@ -783,7 +972,7 @@
                      }
                      
                     // Top of Beam Dimension
-                    if (s.tilt + s.beam/2 < 89) {
+                    if (window.calcMode !== 'ies' && s.tilt + s.beam/2 < 89) {
                         const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + s.beam/2) * Math.PI/180));
                         const hTopPx = floorY - (hTopMetric * scale);
                         if(hTopPx > -100 && hTopPx < floorY + 100) {
