@@ -170,12 +170,20 @@
                                     <div class="flex flex-col sm:flex-row gap-4 p-1 mb-6 justify-center">
                                         <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
                                         <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
+                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">IES</span></label>
+                                    </div>
+                                    <div id="ies-upload-group" class="hidden animate-fade-in-up mt-4 border-t border-white/10 pt-4">
+                                        <label class="block text-[10px] text-luminous-gold font-bold uppercase mb-2">Arquivo IES (.ies)</label>
+                                        <input type="file" id="ies-file" accept=".ies" class="w-full text-xs text-dim-gray file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-white/10 file:text-white hover:file:bg-luminous-gold hover:file:text-midnight transition-all cursor-pointer">
+                                        <div id="ies-status" class="text-[9px] text-tech-cyan mt-2 h-4"></div>
                                     </div>
                                 </div>
                                 <div id="inputs-ponto" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
+                                    <div class="manual-params-group">
+                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
+                                    </div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
                                     <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
@@ -187,7 +195,9 @@
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+                                    <div class="manual-params-group">
+                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+                                    </div>
                                     <div class="mb-2 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
                                     <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
@@ -199,7 +209,9 @@
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_spacing">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
-                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
+                                     <div class="manual-params-group">
+                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
+                                     </div>
                                     <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="h-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-h-flux" min="0" max="10000" step="10" value="1500"></div>
@@ -230,7 +242,6 @@
                                     <button onclick="window.switchQueryTab('leed')" id="btn-q-leed" class="query-tab-btn">LEED / WELL</button>
                                 </div>
                             </div>
-
                             <div id="search-container" class="flex flex-col md:flex-row gap-4 mb-6 w-full">
                                 <div class="w-full">
                                     <select id="category-filter" onchange="window.filterNorms()" class="w-full bg-black/40 border border-white/10 rounded-full py-3 px-6 text-sm text-white focus:border-luminous-gold outline-none transition-all custom-select uppercase cursor-pointer">
@@ -238,7 +249,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div id="content-nbr8995" class="query-content">
                                 <div class="overflow-hidden rounded-xl border border-white/10">
                                     <div class="overflow-x-auto max-h-[550px] overflow-y-auto custom-scrollbar">
@@ -251,7 +261,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div id="content-nbr5101" class="query-content hidden">
                                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
                                     <div class="lg:col-span-5 flex flex-col gap-4">
@@ -285,7 +294,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div id="content-leed" class="query-content hidden">
                                 <div class="flex gap-2 mb-4 border-b border-white/5 pb-2">
                                     <span onclick="window.switchCertTab('leed')" id="cert-tab-leed" class="cert-tab active">LEED v4.1 (BD+C)</span>
@@ -392,7 +400,7 @@
         const statusEl = document.getElementById('connection-status');
         if(statusEl) { statusEl.innerText = "SISTEMA ONLINE"; statusEl.classList.remove('text-red-400', 'animate-pulse'); statusEl.classList.add('text-leed-green'); }
 
-        // 1. I18N DICTIONARY
+        // 1. I18N
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
@@ -436,146 +444,15 @@
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
+        window.iesData = null; // Store parsed IES data
 
-        // 3. DATABASES (FULL RESTORATION)
-        window.normsDatabase = [
-            { cat: "Áreas de Tráfego", room: "Áreas de circulação e corredores", lux: 100, ugr: 28, ra: 40 },
-            { cat: "Áreas de Tráfego", room: "Escadas, escadas rolantes, esteiras", lux: 150, ugr: 25, ra: 40 },
-            { cat: "Áreas de Tráfego", room: "Rampas de carregamento", lux: 150, ugr: 25, ra: 40 },
-            { cat: "Edifícios (Geral)", room: "Cantinas", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Salas de descanso", lux: 100, ugr: 22, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Salas de exercícios físicos", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Vestiários, banheiros, toaletes", lux: 200, ugr: 25, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Sala de primeiros socorros", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Salas para atendimento médico", lux: 500, ugr: 16, ra: 90 },
-            { cat: "Edifícios (Geral)", room: "Salas de controle de instalações", lux: 150, ugr: 25, ra: 60 },
-            { cat: "Indústria", room: "Armazenamento (Depósitos)", lux: 100, ugr: 25, ra: 60 },
-            { cat: "Indústria", room: "Expedição e embalagem", lux: 300, ugr: 25, ra: 60 },
-            { cat: "Indústria (Alim.)", room: "Preparação de alimentos", lux: 500, ugr: 22, ra: 80 },
-            { cat: "Indústria (Alim.)", room: "Inspeção de cor", lux: 1000, ugr: 19, ra: 90 },
-            { cat: "Indústria (Metal)", room: "Forjamento (livre)", lux: 200, ugr: 25, ra: 60 },
-            { cat: "Indústria (Metal)", room: "Soldagem", lux: 300, ugr: 22, ra: 60 },
-            { cat: "Indústria (Metal)", room: "Usinagem grosseira", lux: 300, ugr: 22, ra: 60 },
-            { cat: "Indústria (Metal)", room: "Usinagem média", lux: 500, ugr: 22, ra: 60 },
-            { cat: "Indústria (Metal)", room: "Usinagem fina", lux: 750, ugr: 19, ra: 60 },
-            { cat: "Indústria (Eletr.)", room: "Montagem de componentes (Geral)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Indústria (Eletr.)", room: "Montagem fina / Inspeção", lux: 1000, ugr: 16, ra: 80 },
-            { cat: "Indústria (Textil)", room: "Costura fina", lux: 750, ugr: 19, ra: 80 },
-            { cat: "Indústria (Gráfica)", room: "Impressão à máquina", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Indústria (Gráfica)", room: "Inspeção de cores (Controle)", lux: 1500, ugr: 16, ra: 90 },
-            { cat: "Indústria (Madeira)", room: "Marcenaria (bancada)", lux: 300, ugr: 22, ra: 60 },
-            { cat: "Indústria (Madeira)", room: "Acabamento / Pintura", lux: 750, ugr: 22, ra: 80 },
-            { cat: "Escritório", room: "Arquivamento, cópia, circulação", lux: 300, ugr: 25, ra: 80 },
-            { cat: "Escritório", room: "Escrita, digitação, leitura", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Desenho técnico", lux: 750, ugr: 16, ra: 80 },
-            { cat: "Escritório", room: "Estações de trabalho CAD", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Salas de conferência / reunião", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Recepção / Balcão", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Varejo", room: "Área de vendas (pequenas lojas)", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Varejo", room: "Área de vendas (grandes lojas)", lux: 500, ugr: 22, ra: 80 },
-            { cat: "Varejo", room: "Caixa / Empacotamento", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Varejo", room: "Vitrine (Destaque)", lux: 1000, ugr: "-", ra: 80 },
-            { cat: "Locais Públicos", room: "Saguões de entrada", lux: 100, ugr: 22, ra: 60 },
-            { cat: "Locais Públicos", room: "Bilheterias", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Locais Públicos", room: "Restaurantes (Salão)", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Locais Públicos", room: "Restaurantes (Cozinha)", lux: 500, ugr: 22, ra: 80 },
-            { cat: "Locais Públicos", room: "Teatros / Cinemas (Foyer)", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Locais Públicos", room: "Museus (Exposição geral)", lux: 300, ugr: 19, ra: 80 },
-            { cat: "Locais Públicos", room: "Bibliotecas (Estantes)", lux: 200, ugr: 19, ra: 80 },
-            { cat: "Locais Públicos", room: "Bibliotecas (Leitura)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Locais Públicos", room: "Estacionamento Coberto", lux: 75, ugr: 25, ra: 40 },
-            { cat: "Educação", room: "Sala de aula", lux: 300, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Sala de aula (Noturno/Adultos)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Quadro negro (Vertical)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Auditório / Anfiteatro", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Laboratórios", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Salas de arte / desenho", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Ginásios esportivos", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Saúde", room: "Salas de espera", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Saúde", room: "Corredores (dia)", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Saúde", room: "Enfermaria (Geral)", lux: 100, ugr: 19, ra: 80 },
-            { cat: "Saúde", room: "Enfermaria (Exame simples)", lux: 300, ugr: 19, ra: 80 },
-            { cat: "Saúde", room: "Exame e tratamento (Geral)", lux: 1000, ugr: 19, ra: 90 },
-            { cat: "Saúde", room: "Salas de cirurgia (Geral)", lux: 1000, ugr: 19, ra: 90 },
-            { cat: "Saúde", room: "Salas de cirurgia (Cavidade)", lux: 10000, ugr: "-", ra: 90 },
-            { cat: "Saúde", room: "Dentista (Iluminação geral)", lux: 500, ugr: 19, ra: 90 },
-            { cat: "Saúde", room: "Dentista (No paciente)", lux: 1000, ugr: "-", ra: 90 },
-            { cat: "Transporte", room: "Aeroportos (Embarque/Check-in)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Transporte", room: "Aeroportos (Saguões)", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Transporte", room: "Estações ferroviárias (Plataforma)", lux: 50, ugr: 28, ra: 40 }
-        ];
+        // 3. DATABASES & REST OF LOGIC (Same as before)
+        window.normsDatabase = [ { cat: "Áreas de Tráfego", room: "Áreas de circulação e corredores", lux: 100, ugr: 28, ra: 40 }, { cat: "Áreas de Tráfego", room: "Escadas, escadas rolantes, esteiras", lux: 150, ugr: 25, ra: 40 }, { cat: "Áreas de Tráfego", room: "Rampas de carregamento", lux: 150, ugr: 25, ra: 40 }, { cat: "Edifícios (Geral)", room: "Cantinas", lux: 200, ugr: 22, ra: 80 }, { cat: "Edifícios (Geral)", room: "Salas de descanso", lux: 100, ugr: 22, ra: 80 }, { cat: "Edifícios (Geral)", room: "Salas de exercícios físicos", lux: 300, ugr: 22, ra: 80 }, { cat: "Edifícios (Geral)", room: "Vestiários, banheiros, toaletes", lux: 200, ugr: 25, ra: 80 }, { cat: "Edifícios (Geral)", room: "Sala de primeiros socorros", lux: 500, ugr: 19, ra: 80 }, { cat: "Edifícios (Geral)", room: "Salas para atendimento médico", lux: 500, ugr: 16, ra: 90 }, { cat: "Edifícios (Geral)", room: "Salas de controle de instalações", lux: 150, ugr: 25, ra: 60 }, { cat: "Indústria", room: "Armazenamento (Depósitos)", lux: 100, ugr: 25, ra: 60 }, { cat: "Indústria", room: "Expedição e embalagem", lux: 300, ugr: 25, ra: 60 }, { cat: "Indústria (Alim.)", room: "Preparação de alimentos", lux: 500, ugr: 22, ra: 80 }, { cat: "Indústria (Alim.)", room: "Inspeção de cor", lux: 1000, ugr: 19, ra: 90 }, { cat: "Indústria (Metal)", room: "Forjamento (livre)", lux: 200, ugr: 25, ra: 60 }, { cat: "Indústria (Metal)", room: "Soldagem", lux: 300, ugr: 22, ra: 60 }, { cat: "Indústria (Metal)", room: "Usinagem grosseira", lux: 300, ugr: 22, ra: 60 }, { cat: "Indústria (Metal)", room: "Usinagem média", lux: 500, ugr: 22, ra: 60 }, { cat: "Indústria (Metal)", room: "Usinagem fina", lux: 750, ugr: 19, ra: 60 }, { cat: "Indústria (Eletr.)", room: "Montagem de componentes (Geral)", lux: 500, ugr: 19, ra: 80 }, { cat: "Indústria (Eletr.)", room: "Montagem fina / Inspeção", lux: 1000, ugr: 16, ra: 80 }, { cat: "Indústria (Textil)", room: "Costura fina", lux: 750, ugr: 19, ra: 80 }, { cat: "Indústria (Gráfica)", room: "Impressão à máquina", lux: 500, ugr: 19, ra: 80 }, { cat: "Indústria (Gráfica)", room: "Inspeção de cores (Controle)", lux: 1500, ugr: 16, ra: 90 }, { cat: "Indústria (Madeira)", room: "Marcenaria (bancada)", lux: 300, ugr: 22, ra: 60 }, { cat: "Indústria (Madeira)", room: "Acabamento / Pintura", lux: 750, ugr: 22, ra: 80 }, { cat: "Escritório", room: "Arquivamento, cópia, circulação", lux: 300, ugr: 25, ra: 80 }, { cat: "Escritório", room: "Escrita, digitação, leitura", lux: 500, ugr: 19, ra: 80 }, { cat: "Escritório", room: "Desenho técnico", lux: 750, ugr: 16, ra: 80 }, { cat: "Escritório", room: "Estações de trabalho CAD", lux: 500, ugr: 19, ra: 80 }, { cat: "Escritório", room: "Salas de conferência / reunião", lux: 500, ugr: 19, ra: 80 }, { cat: "Escritório", room: "Recepção / Balcão", lux: 300, ugr: 22, ra: 80 }, { cat: "Varejo", room: "Área de vendas (pequenas lojas)", lux: 300, ugr: 22, ra: 80 }, { cat: "Varejo", room: "Área de vendas (grandes lojas)", lux: 500, ugr: 22, ra: 80 }, { cat: "Varejo", room: "Caixa / Empacotamento", lux: 500, ugr: 19, ra: 80 }, { cat: "Varejo", room: "Vitrine (Destaque)", lux: 1000, ugr: "-", ra: 80 }, { cat: "Locais Públicos", room: "Saguões de entrada", lux: 100, ugr: 22, ra: 60 }, { cat: "Locais Públicos", room: "Bilheterias", lux: 300, ugr: 22, ra: 80 }, { cat: "Locais Públicos", room: "Restaurantes (Salão)", lux: 200, ugr: 22, ra: 80 }, { cat: "Locais Públicos", room: "Restaurantes (Cozinha)", lux: 500, ugr: 22, ra: 80 }, { cat: "Locais Públicos", room: "Teatros / Cinemas (Foyer)", lux: 200, ugr: 22, ra: 80 }, { cat: "Locais Públicos", room: "Museus (Exposição geral)", lux: 300, ugr: 19, ra: 80 }, { cat: "Locais Públicos", room: "Bibliotecas (Estantes)", lux: 200, ugr: 19, ra: 80 }, { cat: "Locais Públicos", room: "Bibliotecas (Leitura)", lux: 500, ugr: 19, ra: 80 }, { cat: "Locais Públicos", room: "Estacionamento Coberto", lux: 75, ugr: 25, ra: 40 }, { cat: "Educação", room: "Sala de aula", lux: 300, ugr: 19, ra: 80 }, { cat: "Educação", room: "Sala de aula (Noturno/Adultos)", lux: 500, ugr: 19, ra: 80 }, { cat: "Educação", room: "Quadro negro (Vertical)", lux: 500, ugr: 19, ra: 80 }, { cat: "Educação", room: "Auditório / Anfiteatro", lux: 500, ugr: 19, ra: 80 }, { cat: "Educação", room: "Laboratórios", lux: 500, ugr: 19, ra: 80 }, { cat: "Educação", room: "Salas de arte / desenho", lux: 500, ugr: 19, ra: 80 }, { cat: "Educação", room: "Ginásios esportivos", lux: 300, ugr: 22, ra: 80 }, { cat: "Saúde", room: "Salas de espera", lux: 200, ugr: 22, ra: 80 }, { cat: "Saúde", room: "Corredores (dia)", lux: 200, ugr: 22, ra: 80 }, { cat: "Saúde", room: "Enfermaria (Geral)", lux: 100, ugr: 19, ra: 80 }, { cat: "Saúde", room: "Enfermaria (Exame simples)", lux: 300, ugr: 19, ra: 80 }, { cat: "Saúde", room: "Exame e tratamento (Geral)", lux: 1000, ugr: 19, ra: 90 }, { cat: "Saúde", room: "Salas de cirurgia (Geral)", lux: 1000, ugr: 19, ra: 90 }, { cat: "Saúde", room: "Salas de cirurgia (Cavidade)", lux: 10000, ugr: "-", ra: 90 }, { cat: "Saúde", room: "Dentista (Iluminação geral)", lux: 500, ugr: 19, ra: 90 }, { cat: "Saúde", room: "Dentista (No paciente)", lux: 1000, ugr: "-", ra: 90 }, { cat: "Transporte", room: "Aeroportos (Embarque/Check-in)", lux: 500, ugr: 19, ra: 80 }, { cat: "Transporte", room: "Aeroportos (Saguões)", lux: 200, ugr: 22, ra: 80 }, { cat: "Transporte", room: "Estações ferroviárias (Plataforma)", lux: 50, ugr: 28, ra: 40 } ];
+        window.lpdBaselines = [ { type: "Escritório (Office)", base: 6.9 }, { type: "Varejo (Retail)", base: 9.0 }, { type: "Escola / Educacional", base: 7.5 }, { type: "Hospital / Saúde", base: 9.0 }, { type: "Indústria / Galpão", base: 6.0 }, { type: "Estacionamento (Garagem)", base: 1.6 } ];
+        window.mClassTable = { M1: { desc: "Vias Expressas / Alta Vel.", lmed: 2.0, emed: 30, u0: 0.40, ul: 0.70, ti: 10, eir: 0.35 }, M2: { desc: "Avenidas Principais", lmed: 1.5, emed: 20, u0: 0.40, ul: 0.60, ti: 10, eir: 0.35 }, M3: { desc: "Vias Arteriais", lmed: 1.0, emed: 15, u0: 0.40, ul: 0.60, ti: 15, eir: 0.30 }, M4: { desc: "Vias Coletoras", lmed: 0.75, emed: 10, u0: 0.40, ul: 0.50, ti: 15, eir: 0.30 }, M5: { desc: "Vias Locais", lmed: 0.50, emed: 7.5, u0: 0.35, ul: 0.40, ti: 15, eir: 0.30 }, M6: { desc: "Vias Residenciais Leves", lmed: 0.30, emed: 5, u0: 0.35, ul: 0.40, ti: 20, eir: 0.30 } };
 
-        window.lpdBaselines = [
-            { type: "Escritório (Office)", base: 6.9 }, { type: "Varejo (Retail)", base: 9.0 },
-            { type: "Escola / Educacional", base: 7.5 }, { type: "Hospital / Saúde", base: 9.0 },
-            { type: "Indústria / Galpão", base: 6.0 }, { type: "Estacionamento (Garagem)", base: 1.6 }
-        ];
+        window.AuthManager.init();
 
-        window.mClassTable = {
-            M1: { desc: "Vias Expressas / Alta Vel.", lmed: 2.0, emed: 30, u0: 0.40, ul: 0.70, ti: 10, eir: 0.35 },
-            M2: { desc: "Avenidas Principais", lmed: 1.5, emed: 20, u0: 0.40, ul: 0.60, ti: 10, eir: 0.35 },
-            M3: { desc: "Vias Arteriais", lmed: 1.0, emed: 15, u0: 0.40, ul: 0.60, ti: 15, eir: 0.30 },
-            M4: { desc: "Vias Coletoras", lmed: 0.75, emed: 10, u0: 0.40, ul: 0.50, ti: 15, eir: 0.30 },
-            M5: { desc: "Vias Locais", lmed: 0.50, emed: 7.5, u0: 0.35, ul: 0.40, ti: 15, eir: 0.30 },
-            M6: { desc: "Vias Residenciais Leves", lmed: 0.30, emed: 5, u0: 0.35, ul: 0.40, ti: 20, eir: 0.30 }
-        };
-
-        // --- AUTH MANAGER (AUTO-LOGIN READY) ---
-        window.AuthManager = {
-            init: async function() {
-                const { data: { session } } = await supabase.auth.getSession();
-                this.handleSessionUpdate(session);
-                supabase.auth.onAuthStateChange((event, session) => this.handleSessionUpdate(session));
-            },
-            handleSessionUpdate: function(session) {
-                if (session) {
-                    const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
-                    document.getElementById('user-name-display').innerText = name.toUpperCase();
-                    this.unlockApp();
-                } else { this.lockApp(); }
-            },
-            lockApp: function() { document.getElementById('auth-modal').classList.remove('hidden'); document.getElementById('app-content').classList.add('app-locked'); },
-            unlockApp: function() { 
-                document.getElementById('auth-modal').classList.add('hidden'); 
-                document.getElementById('app-content').classList.remove('app-locked'); 
-                window.populateCategoryFilter();
-                window.filterNorms();
-                setTimeout(() => window.updateCalculations(), 100); 
-            },
-            switchTab: function(tab) {
-                const loginForm = document.getElementById('form-login'); const regForm = document.getElementById('form-register');
-                const btnLogin = document.getElementById('tab-auth-login'); const btnReg = document.getElementById('tab-auth-register');
-                if (tab === 'login') {
-                    loginForm.classList.remove('hidden'); regForm.classList.add('hidden');
-                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
-                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all";
-                } else {
-                    loginForm.classList.add('hidden'); regForm.classList.remove('hidden');
-                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
-                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all";
-                }
-            },
-            handleLogin: async function() {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) alert(error.message);
-            },
-            handleRegister: async function() {
-                const email = document.getElementById('reg-email').value;
-                const password = document.getElementById('reg-password').value;
-                const firstName = document.getElementById('reg-name').value;
-                const lastName = document.getElementById('reg-surname').value;
-                if (!document.getElementById('reg-terms').checked) return alert("Aceite os termos.");
-                const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName, last_name: lastName } } });
-                if (error) alert(error.message); 
-                else if (data.session) this.unlockApp();
-                else alert("Cadastro feito. Verifique e-mail.");
-            },
-            logout: async function() { await supabase.auth.signOut(); location.reload(); }
-        };
-
-        // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
             window.currentTool = toolId;
             ['ponto', 'vertical', 'homog', 'query'].forEach(id => {
@@ -583,37 +460,163 @@
                 if(btn) {
                     let cls = "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ";
                     if (id === 'query') cls += "text-luminous-gold ml-auto "; 
-                    
                     btn.className = cls + (id === toolId ? "tab-active" : "tab-inactive");
                 }
             });
             document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query');
             document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
-            
             if (toolId !== 'query') {
                 ['inputs-ponto', 'inputs-vertical', 'inputs-homog'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
                 const selectedInput = document.getElementById('inputs-' + (toolId === 'homog' ? 'homog' : toolId));
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 window.updateCalcMode(window.calcMode);
                 window.updateCalculations();
-            } else {
-                 window.switchQueryTab('nbr8995');
-            }
+            } else { window.switchQueryTab('nbr8995'); }
         }
 
         window.updateCalcMode = function(mode) {
             window.calcMode = mode;
             document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
+            
+            const iesGroup = document.getElementById('ies-upload-group');
+            if(iesGroup) iesGroup.classList.toggle('hidden', mode !== 'ies');
+            
+            // Hide manual sliders in IES mode
+            document.querySelectorAll('.manual-params-group').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
+            
             window.updateCalculations();
         }
 
+        // IES PARSING LOGIC
+        document.getElementById('ies-file').addEventListener('change', function(evt) {
+            const file = evt.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                try {
+                    window.iesData = window.parseIES(text);
+                    document.getElementById('ies-status').innerText = "ARQUIVO CARREGADO: " + file.name.toUpperCase();
+                    // Auto-calculate beam angle from IES
+                    const beamAngle = window.calculateIESBeamAngle(window.iesData);
+                    window.state.ponto.beam = beamAngle;
+                    window.state.vertical.beam = beamAngle;
+                    window.state.homog.beam = beamAngle;
+                    window.updateCalculations();
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('ies-status').innerText = "ERRO AO LER ARQUIVO";
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        window.parseIES = function(text) {
+            const lines = text.split(/\r?\n/);
+            let dataLines = [];
+            let isData = false;
+            // Simple logic to find start of data (usually after TILT=...)
+            for (let line of lines) {
+                if (line.trim().startsWith('TILT=')) {
+                    isData = true;
+                    continue; 
+                }
+                if (isData) {
+                    // Filter out comments or file names if TILT=INCLUDE (simplified)
+                    if (!isNaN(parseFloat(line.trim().split(/\s+/)[0]))) {
+                       dataLines.push(line);
+                    }
+                }
+            }
+            const allNumbers = dataLines.join(' ').trim().split(/\s+/).map(Number);
+            
+            // Standard IES Structure (LM-63)
+            const numLamps = allNumbers[0];
+            const lumensPerLamp = allNumbers[1];
+            const multiplier = allNumbers[2];
+            const numVertAngles = allNumbers[3];
+            const numHorizAngles = allNumbers[4];
+            const photoType = allNumbers[5]; // 1=C, 2=B, 3=A
+            const unitsType = allNumbers[6];
+            const width = allNumbers[7];
+            const length = allNumbers[8];
+            const height = allNumbers[9];
+            const ballastFactor = allNumbers[10];
+            // Skip 11 (Future use) and 12 (Input Watts)
+            
+            let idx = 13; 
+            const vertAngles = allNumbers.slice(idx, idx + numVertAngles);
+            idx += numVertAngles;
+            const horizAngles = allNumbers.slice(idx, idx + numHorizAngles);
+            idx += numHorizAngles;
+            
+            const candelaValues = []; // Flat array or 2D
+            // Candela values listed for all vertical angles at 1st horizontal angle, then 2nd...
+            const rawCandela = allNumbers.slice(idx);
+            
+            return { numLamps, lumensPerLamp, multiplier, ballastFactor, vertAngles, horizAngles, rawCandela };
+        }
+
+        window.calculateIESBeamAngle = function(data) {
+            // Estimate Beam Angle (FWHM) from Nadir (0 deg vert)
+            // Simplified: Look at first horizontal slice (usually 0 deg)
+            const centerIntensity = data.rawCandela[0]; // Assuming 0,0 is first
+            const threshold = centerIntensity * 0.5;
+            let beamAngle = 120; // Default fallback
+            
+            // Find angle where intensity drops below threshold
+            for (let i = 0; i < data.vertAngles.length; i++) {
+                if (data.rawCandela[i] < threshold) {
+                    beamAngle = data.vertAngles[i] * 2; // Full angle
+                    break;
+                }
+            }
+            return Math.round(beamAngle);
+        }
+
+        window.getIESIntensity = function(data, vertAngle) {
+            if (!data) return 0;
+            // Simplified lookup: Find closest vertical angle index in first horiz slice
+            // Assumes radial symmetry for this basic visualization or takes 0-deg plane
+            let closestIdx = 0;
+            let minDiff = Infinity;
+            
+            // vertAngle in degrees. IES vertical angles usually 0 to 90 or 180.
+            const target = Math.abs(vertAngle); 
+            
+            for(let i=0; i<data.vertAngles.length; i++) {
+                const diff = Math.abs(data.vertAngles[i] - target);
+                if(diff < minDiff) {
+                    minDiff = diff;
+                    closestIdx = i;
+                }
+            }
+            
+            // Apply multiplier and ballast
+            let rawI = data.rawCandela[closestIdx];
+            return rawI * data.multiplier * data.ballastFactor;
+        }
+
         function getIntensity(s) {
+            if (window.calcMode === 'ies') {
+                if (window.iesData) {
+                    // For lux calc, we want Nadir intensity (0 deg relative to fixture)
+                    // If fixture is tilted, the calculation logic handles the angle. 
+                    // But standard formula E = I * cos^3(theta) / h^2 uses I at angle theta.
+                    // Here we return Nadir intensity for the "Source" strength visualization 
+                    // OR we let updateCalculations call getIESIntensity directly.
+                    // For compatibility with draw functions expecting a scalar I:
+                    return window.getIESIntensity(window.iesData, 0); 
+                }
+                return 0; 
+            }
             if (window.calcMode === 'direct') return s.intensity;
             return (s.cdklm * s.flux) / 1000;
         }
 
-        // --- CANVAS ENGINE (FULL RESTORATION) ---
+        // --- CANVAS ENGINE (FULL RESTORATION + IES) ---
+        // (Draw functions same as previous, updateCalculations modified)
         const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
             ctx.beginPath(); ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1; 
             ctx.moveTo(x1, y1 - 3); ctx.lineTo(x1, y1 + 3); ctx.moveTo(x1, y1); ctx.lineTo(x2, y1); ctx.moveTo(x2, y1 - 3); ctx.lineTo(x2, y1 + 3); ctx.stroke(); 
@@ -697,10 +700,22 @@
 
             // DRAW BEAMS
              if (window.currentTool === 'ponto') {
-                const I = getIntensity(s), sy = floorY - (s.height * scale), py = floorY - (s.plane * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
-                const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
+                const tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                
+                // Determine Intensity for Calculation
+                let I_at_angle = 0;
+                if (window.calcMode === 'ies' && window.iesData) {
+                    // Angle of incidence theta is equal to tilt in this 1-source calc (assuming aiming at point)
+                    // Wait, standard calculation puts source at height, tilted. The point directly in line with tilt axis receives intensity at 0 deg (relative to fixture).
+                    I_at_angle = window.getIESIntensity(window.iesData, 0); 
+                } else {
+                    I_at_angle = getIntensity(s);
+                }
+
+                const sy = floorY - (s.height * scale), py = floorY - (s.plane * scale);
+                const luxFloor = (I_at_angle * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
                 const hEff = s.height - s.plane;
-                const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
+                const luxPlane = hEff > 0 ? (I_at_angle * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
                 const dia = 2 * (s.height / Math.cos(tr)) * Math.tan(br / 2); 
                 
                 // Source & Beam
@@ -745,8 +760,20 @@
                 drawDimLine(ctx, centerX + xL, floorY + 45, centerX + xR, floorY + 45, `Ø ${dia.toFixed(2)}m`);
             }
              else if (window.currentTool === 'vertical') {
-                const I = getIntensity(s), sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
-                let ev = 0; if (s.tilt > 0) ev = (I * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
+                // Determine Intensity
+                let I_at_angle = 0;
+                const sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                
+                if (window.calcMode === 'ies' && window.iesData) {
+                    // For vertical, angle of incidence depends on geometry.
+                    // Angle relative to beam axis (Nadir if tilt=0).
+                    // If aiming at wall point: center of beam is at wall. I = I(0).
+                    I_at_angle = window.getIESIntensity(window.iesData, 0);
+                } else {
+                    I_at_angle = getIntensity(s);
+                }
+
+                let ev = 0; if (s.tilt > 0) ev = (I_at_angle * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
                 let hitY_metric = s.height - (s.dist / Math.tan(tr)); let hitY_px = floorY - (hitY_metric * scale);
                 
                 ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; 
