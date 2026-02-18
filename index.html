@@ -944,9 +944,11 @@
                 }
 
                 // Tilt Logic
+                // Always draw axis and dimension if tilt >= 0
+                const axisX = centerX + (s.height * scale) * Math.tan(tr);
+                ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(148, 163, 184, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
+                
                 if (s.tilt > 0) {
-                    const axisX = centerX + (s.height * scale) * Math.tan(tr);
-                    ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(148, 163, 184, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
                     ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = "rgba(148, 163, 184, 0.3)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
                     drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#22d3ee", true);
                     const distH = s.height * Math.tan(tr);
@@ -987,17 +989,19 @@
                 const sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
                 
                 let ev = 0; 
-                if (s.tilt > 0) {
-                     let I_v;
-                     // For vertical, we need Intensity at the angle aiming at the point
-                     // Simplified: Use the User's TILT as the aiming angle for IES lookup
-                     if(window.calcMode === 'ies') {
-                        I_v = window.getIESIntensity(s, s.tilt);
-                     } else {
-                        I_v = getIntensity(s);
-                     }
-                     ev = (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
-                }
+                let I_v;
+                 // For vertical, we need Intensity at the angle aiming at the point
+                 // Simplified: Use the User's TILT as the aiming angle for IES lookup
+                 if(window.calcMode === 'ies') {
+                    I_v = window.getIESIntensity(s, s.tilt);
+                 } else {
+                    I_v = getIntensity(s);
+                 }
+                 
+                 // If tilt > 0 calculate, else 0 (vertical requires tilt to hit wall usually)
+                 if (s.tilt > 0) {
+                    ev = (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
+                 }
 
                 let hitY_metric = s.height - (s.dist / Math.tan(tr)); let hitY_px = floorY - (hitY_metric * scale);
                 
@@ -1091,83 +1095,3 @@
                 }
             }
         }
-
-        // --- NBR 5101 LOGIC ---
-        window.calc5101 = function() {
-            const s = parseInt(document.getElementById('m-speed').value), v = parseInt(document.getElementById('m-volume').value), sep = parseInt(document.getElementById('m-separation').value);
-            const d = parseInt(document.getElementById('m-density').value), c = parseInt(document.getElementById('m-complexity').value), a = parseInt(document.getElementById('m-ambient').value);
-            let score = s + v + sep + d + c + a;
-            let m = 6 - score; if(m<1) m=1; if(m>6) m=6;
-            const res = window.mClassTable["M"+m];
-            document.getElementById('m-result-class').innerText = "M"+m;
-            document.getElementById('m-result-desc').innerText = res.desc;
-            document.getElementById('res-lmed-val').innerText = res.lmed.toFixed(1); document.getElementById('bar-lmed').style.width = (res.lmed/2.0*100)+'%';
-            document.getElementById('res-emed-val').innerText = res.emed; document.getElementById('bar-emed').style.width = (res.emed/30*100)+'%';
-            document.getElementById('res-u0-val').innerText = res.u0.toFixed(2); document.getElementById('bar-u0').style.width = (res.u0/0.4*100)+'%';
-            document.getElementById('res-ti-val').innerText = res.ti; document.getElementById('bar-ti').style.width = (res.ti/20*100)+'%';
-        }
-
-        window.populateCategoryFilter = function() {
-            const sel = document.getElementById('category-filter');
-            if(!sel || sel.options.length > 1) return;
-            const uniqueCats = [...new Set(window.normsDatabase.map(n => n.cat))].sort();
-            uniqueCats.forEach(c => { const o = document.createElement('option'); o.value=c; o.innerText=c; sel.appendChild(o); });
-        }
-        window.filterNorms = function() {
-            const cat = document.getElementById('category-filter').value;
-            const filtered = window.normsDatabase.filter(n => cat === 'all' || n.cat === cat);
-            document.getElementById('nbr8995-tbody').innerHTML = filtered.map(n => `<tr class="hover:bg-white/5 transition-colors border-b border-white/5"><td class="p-4 font-bold text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-dim-gray">${n.room}</td><td class="p-4 text-center font-bold text-white bg-white/5">${n.lux}</td><td class="p-4 text-center text-muted-blue">${n.ugr}</td><td class="p-4 text-center text-muted-blue">${n.ra}</td></tr>`).join('');
-        }
-        window.switchQueryTab = function(t) {
-            ['nbr8995','nbr5101','leed'].forEach(k => {
-                document.getElementById('content-'+k).classList.toggle('hidden', k!==t);
-                document.getElementById('btn-q-'+k).className = `query-tab-btn ${k===t ? 'query-tab-active' : ''}`;
-            });
-            // NEW: Toggle filter visibility based on tab
-            const searchContainer = document.getElementById('search-container');
-            if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
-
-            if(t==='nbr8995') window.filterNorms();
-            if(t==='nbr5101') window.calc5101();
-            if(t==='leed') window.updateLeedTargets();
-        }
-        
-        window.switchCertTab = function(t) { ['leed','well'].forEach(k => { document.getElementById('pane-'+k).classList.toggle('hidden', k!==t); document.getElementById('cert-tab-'+k).className = `cert-tab ${k===t?'active':'inactive'}`; }); }
-        
-        window.updateLeedTargets = function() {
-            const area = parseFloat(document.getElementById('leed-area-input').value) || 0;
-            const red = window.currentLeedTarget === 'gold' ? 0.20 : (window.currentLeedTarget === 'platinum' ? 0.30 : (window.currentLeedTarget === 'silver' ? 0.10 : 0.05));
-            document.getElementById('leed-reduction-display').innerText = (red*100).toFixed(0)+'%';
-            document.getElementById('leed-lpd-body').innerHTML = window.lpdBaselines.map(b => `<tr class="border-b border-white/5"><td class="p-3 text-white">${b.type}</td><td class="p-3 text-center text-dim-gray font-mono">${b.base}</td><td class="p-3 text-center text-luminous-gold font-bold">${(b.base*(1-red)).toFixed(2)}</td><td class="p-3 text-right text-tech-cyan font-bold">${(b.base*(1-red)*area).toFixed(0)} W</td></tr>`).join('');
-        }
-        window.setLeedTarget = function(t) { window.currentLeedTarget = t; document.querySelectorAll('.leed-level-box').forEach(b => b.classList.remove('active')); document.getElementById('lvl-'+t).classList.add('active'); window.updateLeedTargets(); }
-        window.toggleWellFeature = function(el, pts) { el.classList.toggle('active'); let total=0; document.querySelectorAll('.well-toggle-group.active').forEach(i => total += parseInt(i.getAttribute('data-points'))); document.getElementById('well-total-score').innerHTML = `${total} <span class="text-xs text-dim-gray font-normal">/ 8</span>`; document.getElementById('well-progress-bar').style.width = (total/8*100)+'%'; document.getElementById('well-progress-text').innerText = (total/8*100).toFixed(0)+'%'; const icon = el.querySelector('.fa-check'); if(el.classList.contains('active')) icon.classList.remove('opacity-0'); else icon.classList.add('opacity-0'); }
-
-        window.openTerms = function() { document.getElementById('terms-modal').classList.remove('hidden'); }
-        window.closeTerms = function() { document.getElementById('terms-modal').classList.add('hidden'); }
-        window.toggleLanguage = function() { 
-            window.currentLang = window.currentLang === 'pt' ? 'en' : 'pt'; 
-            document.querySelectorAll('.lang-display').forEach(e => e.innerText = window.currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
-            document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { el.innerHTML = window.i18n[window.currentLang][key]; } });
-            window.updateCalculations(); 
-        }
-        window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
-
-        // BINDING
-        function bind(id, key, param) { 
-            const el = document.getElementById(id); if(!el) return;
-            el.addEventListener('input', (e) => { 
-                let val = parseFloat(e.target.value); 
-                const pairId = id.includes('range') ? id.replace('range-', '') : 'range-' + id;
-                if(document.getElementById(pairId)) document.getElementById(pairId).value = val;
-                window.state[key][param] = val; 
-                window.updateCalculations(); 
-            }); 
-        }
-        ['ponto', 'vertical', 'homog'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
-
-        window.AuthManager.init();
-        window.switchTool('ponto');
-    </script>
-</body>
-</html>
