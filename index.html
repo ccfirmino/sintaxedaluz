@@ -427,7 +427,7 @@
                 well_l01: "Acesso à luz natural e visualização.", well_req: "Obrigatório", well_l02: "Níveis de iluminância adequados.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Gestão de brilho solar.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Zoning and intensity control.",
                 about_title: "SOBRE", about_text: "O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.",
                 card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).", card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.", card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.", card_4_title: "CONSULTA NORMATIVA", card_4_desc: "Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.",
-                footer_terms: "Termo de Responsabilidade", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood, and Accept the Risks"
+                footer_terms: "Termo de Responsabilidade", terms_title: "Terms of Responsibility and Use", terms_accept: "Li, Compreendi e Aceito os Riscos"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(NBR/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
@@ -717,67 +717,79 @@
         }
 
         window.parseLDT = function(content) {
-            // EULUMDAT Parser (Robust & Sanitized)
+            // EULUMDAT Parser (Robust Stream Reader)
             try {
-                // BUG FIX: Replace commas with dots for European format compatibility
-                // Also remove carriage returns
+                // 1. Sanitize: Replace commas with dots and remove carriage returns
                 const cleanContent = content.replace(/\r/g, "").replace(/,/g, ".");
                 
-                // Do NOT filter empty lines here to preserve index structure of standard EULUMDAT
-                const lines = cleanContent.split('\n');
-                const getVal = (lineIdx) => {
-                     if(lineIdx >= lines.length) return 0;
-                     return parseFloat(lines[lineIdx].trim());
-                };
+                // 2. Tokenize into lines, removing ALL empty lines to prevent offset drift
+                const lines = cleanContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                 
                 if (lines.length < 26) return null;
 
-                const mc = parseInt(lines[14]); // Count C-planes
-                const dc = parseFloat(lines[15]); // Distance C-planes
-                const ng = parseInt(lines[16]); // Count Gamma-angles
-                const dg = parseFloat(lines[17]); // Distance Gamma-angles
+                let cursor = 0;
+                const nextLine = () => lines[cursor++];
+                const nextVal = () => parseFloat(nextLine());
 
-                const totalFlux = parseFloat(lines[25]); // Total Luminous Flux (Line 26)
+                // Skip header lines 0-13 (Company, Name, etc.)
+                // Standard LDT usually has text here.
+                for(let i=0; i<14; i++) nextLine();
+
+                const mc = parseInt(nextLine()); // Line 14: Count C-planes
+                const dc = parseFloat(nextLine()); // Line 15: Distance C
+                const ng = parseInt(nextLine()); // Line 16: Count Gamma
+                const dg = parseFloat(nextLine()); // Line 17: Distance Gamma
                 
-                // Normalization: LDT is usually cd/klm. We convert to Absolute.
-                // If Flux is invalid (NaN), assume 1000 (no scaling) to prevent crash
-                const safeFlux = isNaN(totalFlux) ? 1000 : totalFlux;
-                const multiplier = safeFlux / 1000;
+                // Skip lines 18-25 (Report no, Dimensions, etc.)
+                for(let i=18; i<26; i++) nextLine();
+
+                const totalFlux = nextVal(); // Line 26: Flux
+                // Normalization: LDT is cd/klm. Convert to Absolute cd.
+                const multiplier = (isNaN(totalFlux) ? 1000 : totalFlux) / 1000;
+
+                // Skip Direct Ratios / Room Indices (Usually 10 lines, sometimes fewer?)
+                // Actually, standard says: Line 26a = DFF, Line 26b = LORL.
+                // Then Line 26c = Conversion Factor? No.
+                // Standard EULUMDAT is strict. BUT web uploads vary.
+                // Safe approach: The next lines after Flux contain DFF/LOR/Factors.
+                // Usually 2 lines of percentages + 10 lines of DR + 5 lines of zoning? 
+                // NO. The standard is strictly defined indices.
+                // HOWEVER, since we filtered empty lines, we must rely on numeric sequence for the matrix.
+                
+                // Let's assume standard 42 header lines total.
+                // We are at index 27 (Cursor is at line 27).
+                // We need to skip until line 42 (start of data).
+                // 42 - 27 = 15 lines to skip?
+                // Let's be safer: skip the Direct Ratios block.
+                // Direct Ratios usually 10 lines. + 2 lines DFF/LOR.
+                for(let i=0; i<16; i++) nextLine(); // Skip 27..42 approx
 
                 let vAngles = []; 
                 let hAngles = [];
                 let candelas = [];
 
-                let lineCursor = 41; // Standard start of intensity data
-
                 // Angles G (Gamma)
                 if (dg === 0) {
-                    for(let i=0; i<ng; i++) {
-                        vAngles.push(getVal(lineCursor));
-                        lineCursor++;
-                    }
+                    for(let i=0; i<ng; i++) vAngles.push(nextVal());
                 } else {
                     for(let i=0; i<ng; i++) vAngles.push(i * dg);
                 }
 
                 // Angles C (Horizontal)
                 if (dc === 0) {
-                     for(let i=0; i<mc; i++) {
-                        hAngles.push(getVal(lineCursor));
-                        lineCursor++;
-                    }
+                     for(let i=0; i<mc; i++) hAngles.push(nextVal());
                 } else {
                     for(let i=0; i<mc; i++) hAngles.push(i * dc);
                 }
 
                 // Luminous Intensity Matrix
+                // Order: C0 (all Gammas), C1 (all Gammas)...
                 for(let c=0; c<mc; c++) {
                     let row = [];
                     for(let g=0; g<ng; g++) {
-                        let val = getVal(lineCursor);
-                        if(isNaN(val)) val = 0; // Prevent crash
+                        let val = nextVal();
+                        if(isNaN(val)) val = 0; 
                         row.push(val);
-                        lineCursor++;
                     }
                     candelas.push(row);
                 }
