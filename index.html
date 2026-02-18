@@ -437,20 +437,12 @@
                 footer_terms: "Termo de Responsabilidade", terms_title: "Terms of Responsibility and Use", terms_accept: "Li, Compreendi e Aceito os Riscos"
             },
             en: {
-                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(NBR/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
-                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES OR LDT", lbl_ies_upload: "UPLOAD .IES / .LDT FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "ORIENTATION (TILT)",
-                lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "FRAME AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "DISTANCE BETWEEN SOURCES (D)",
+                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
+                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES OR LDT", lbl_ies_upload: "UPLOAD .IES / .LDT FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
+                lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
                 hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
-                tab_interiors: "Interiors (NBR 8995)", tab_roadway: "Roadway (NBR 5101)", filter_all: "All Categories", col_cat: "Category", col_room: "Room / Task",
-                road_params: "Road Parameters (Class M)", lbl_speed: "Speed (km/h)", lbl_volume: "Traffic Volume", lbl_separation: "Traffic Separation", lbl_density: "Intersection Density", lbl_complexity: "Complexity / Guidance", lbl_ambient: "Ambient Luminance",
-                road_rec_class: "Recommended Class", road_lmed: "Average Luminance (Lmed)", road_ref_m1: "Reference: M1 (2.0)", road_emed: "Average Illuminance (Emed)", road_approx: "Approx. for Standard Asphalt", road_u0: "General Uniformity (U0)", road_ti: "Max Glare (TI)",
-                leed_calc_title: "Budget Calculator (LPD)", leed_select_target: "Select Certification Target", leed_reduction: "Applied Reduction", leed_area: "Project Area (m²)", leed_type: "Typology", leed_allowance: "ALLOWED LOAD",
-                leed_eq_1: "<strong class=\"text-white\">Control:</strong> Individual for 90% of occupants.", leed_eq_2: "<strong class=\"text-white\">Quality:</strong> CRI > 80, Life > 24kh, High reflection.", leed_ss_1: "Requirement <strong class=\"text-white\">BUG Rating</strong> (Backlight-Uplight-Glare) mandatory per Zone (LZ0 to LZ4).",
-                well_sim_title: "Lighting Credits Simulator", well_concept: "Concept: LIGHT (WELL v2)", well_est_pts: "Estimated Points", well_contrib: "Contribution to Certification",
-                well_l01: "Access to daylight and views.", well_req: "Mandatory", well_l02: "Adequate illuminance levels.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Solar glare management.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Zoning and intensity control.",
-                about_title: "ABOUT", about_text: "LuxSintax was born with a clear commitment: to transform agility into the Lighting Designer's greatest ally. In a market where time is scarce, we designed an ecosystem that eliminates friction between creative conception and technical validation.<br><br>More than a point-to-point calculator, we are a productivity hub. We integrate agile calculation tools with an intelligent standards search engine (NBR ISO/CIE 8995-1 / NBR 5101:2024), allowing you to validate illuminance levels and regulatory compliance in seconds.<br><br><strong>Technical Note:</strong> Based on the principles of trigonometry and classical photometry (Cubic Cosine Law), this tool offers mathematical precision for preliminary studies. We emphasize that the results are theoretical simulations to support decision-making and do not replace complex global calculation (radiosity) of a final executive project signed by a qualified professional.",
-                card_1_title: "ABSOLUTE INTENSITY", card_1_desc: "Converts relative photometric data to absolute intensity (Candelas).", card_2_title: "CUBIC COSINE LAW", card_2_desc: "Variation of the Inverse Square Law for horizontal surfaces.", card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", card_4_title: "NORMATIVE QUERY", card_4_desc: "Intelligence hub integrating NBR 8995-1, NBR 5101, and LEED/WELL requirements.",
-                footer_terms: "Liability Disclaimer", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood, and Accept the Risks"
+                tab_interiors: "Interiores (ISO/NBR)", tab_roadway: "Roadway (IES/NBR)", filter_all: "All Categories", col_cat: "Category", col_room: "Room",
+                about_title: "ABOUT", about_text: "LuxSintax was born with a clear commitment: to transform agility into the Lighting Designer's greatest ally. In a market where time is scarce, we designed an ecosystem that eliminates friction between creative conception and technical validation. Based on trigonometry and classical photometry principles (Inverse Square Law), this tool offers mathematical precision for preliminary studies."
             }
         };
 
@@ -636,19 +628,15 @@
             window.updateCalculations();
         }
 
-        // --- IES & LDT PARSER & LOGIC ---
+        // --- IES PARSER & LOGIC (LDT REMOVED) ---
         window.handleIESUpload = function(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const content = e.target.result;
-                    let parsed = null;
-                    if (file.name.toLowerCase().endsWith('.ldt')) {
-                        parsed = window.parseLDT(content);
-                    } else {
-                        parsed = window.parseIES(content);
-                    }
+                    // LDT REMOVED: Now only attempts to parse IES
+                    const parsed = window.parseIES(content);
                     
                     if (parsed) {
                         const targetKey = window.currentTool === 'homog' ? 'homog' : (window.currentTool === 'ponto' ? 'ponto' : 'vertical');
@@ -666,7 +654,7 @@
                         }
                         window.updateCalculations();
                     } else {
-                        alert("Erro ao ler arquivo " + file.name + ". Verifique o formato.");
+                        alert("Erro ao ler arquivo " + file.name + ". Verifique se é um arquivo IES válido.");
                     }
                 };
                 reader.readAsText(file);
@@ -723,77 +711,6 @@
 
             } catch (e) {
                 console.error("IES Parse Error", e);
-                return null;
-            }
-        }
-
-        window.parseLDT = function(content) {
-            // EULUMDAT Parser (Fixed Index & Scaling)
-            try {
-                const cleanContent = content.replace(/\r/g, "").replace(/,/g, ".");
-                const lines = cleanContent.split('\n');
-
-                const getVal = (idx) => {
-                    if (idx >= lines.length) return 0;
-                    const val = parseFloat(lines[idx].trim());
-                    return isNaN(val) ? 0 : val;
-                };
-
-                if (lines.length < 26) return null;
-
-                const mc = parseInt(lines[14]) || 1; // Count C-planes (Line 15)
-                const dc = parseFloat(lines[15]) || 0; 
-                const ng = parseInt(lines[16]) || 1; // Count Gamma-angles (Line 17)
-                const dg = parseFloat(lines[17]) || 0; 
-
-                // Correct Index for Total Flux in standard EULUMDAT is Line 26 (Index 25)
-                const totalFlux = getVal(25); 
-                
-                // Normalization: LDT values are cd/1000lm. 
-                // To get Absolute Candelas (cd): Value * (Flux / 1000)
-                const multiplier = (totalFlux > 0 ? totalFlux : 1000) / 1000;
-
-                let vAngles = []; 
-                let hAngles = [];
-                let candelas = [];
-
-                let lineCursor = 42; // Standard start of intensity data
-
-                // Angles G (Gamma)
-                if (dg === 0) {
-                    for(let i=0; i<ng; i++) {
-                        vAngles.push(getVal(lineCursor));
-                        lineCursor++;
-                    }
-                } else {
-                    for(let i=0; i<ng; i++) vAngles.push(i * dg);
-                }
-
-                // Angles C (Horizontal)
-                if (dc === 0) {
-                     for(let i=0; i<mc; i++) {
-                        hAngles.push(getVal(lineCursor));
-                        lineCursor++;
-                    }
-                } else {
-                    for(let i=0; i<mc; i++) hAngles.push(i * dc);
-                }
-
-                // Luminous Intensity Matrix
-                for(let c=0; c<mc; c++) {
-                    let row = [];
-                    for(let g=0; g<ng; g++) {
-                        let val = getVal(lineCursor);
-                        row.push(val);
-                        lineCursor++;
-                    }
-                    candelas.push(row);
-                }
-                
-                return { vAngles, hAngles, candelas, multiplier };
-
-            } catch (e) {
-                console.error("LDT Parse Error", e);
                 return null;
             }
         }
