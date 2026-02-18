@@ -44,30 +44,31 @@
     <style>
         body { font-family: 'Manrope', sans-serif; background-color: #020617; color: #f8fafc; background: linear-gradient(180deg, #020617 0%, #0f172a 100%); letter-spacing: 0.5px; min-height: 100vh; }
         h1, h2, h3, h4, .nav-link, button, input, label, select { text-transform: uppercase !important; }
-        .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
+        .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: #FBBF24; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(251, 191, 36, 0.8); border: 2px solid #0f172a; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #1e293b; border-radius: 2px; }
-        input[type=number], select, input[type=text], input[type=date], input[type=email], input[type=password] { background-color: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; text-align: left; width: 100%; padding: 8px 0; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1e293b; border-radius: 2px; }
+        input[type=number], select, input[type=text], input[type=date], input[type=email], input[type=password] { background-color: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; text-align: left; width: 100%; font-family: 'Manrope', sans-serif; font-weight: 300; -moz-appearance: textfield; padding: 8px 0; }
         input[type=number] { text-align: right; width: 65px; } 
         input:focus, select:focus { outline: none; border-bottom: 1px solid #FBBF24 !important; color: #FBBF24; }
         input[type="file"] { font-size: 10px; color: #94a3b8; }
-        input[type="file"]::file-selector-button { margin-right: 10px; border: 1px solid rgba(251, 191, 36, 0.3); background: rgba(251, 191, 36, 0.1); padding: 5px 10px; border-radius: 4px; color: #FBBF24; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 9px; }
-        .app-locked { filter: blur(8px) grayscale(0.5); pointer-events: none; user-select: none; overflow: hidden; height: 100vh; }
+        input[type="file"]::file-selector-button { margin-right: 10px; border: 1px solid rgba(251, 191, 36, 0.3); background: rgba(251, 191, 36, 0.1); padding: 5px 10px; border-radius: 4px; color: #FBBF24; cursor: pointer; transition: all 0.2s; font-weight: bold; text-transform: uppercase; font-size: 9px; }
+        .auth-input-group label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #FBBF24 !important; }
+        .app-locked { filter: blur(8px) grayscale(0.5); pointer-events: none; user-select: none; overflow: hidden; height: 100vh; transition: filter 0.5s ease; }
         .nav-link { position: relative; font-size: 0.85rem; letter-spacing: 2px; color: #94a3b8; transition: color 0.3s; }
         .tab-active { border-bottom: 2px solid #FBBF24 !important; color: #FBBF24 !important; opacity: 1 !important; }
         .tab-inactive { border-bottom: 2px solid transparent !important; color: #94a3b8 !important; opacity: 0.6; }
-        .mode-tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px 20px; min-width: 130px; height: 90px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(5px); }
-        .canvas-container { background: linear-gradient(135deg, #0B1221 0%, #1e293b 100%); }
-        .query-tab-btn { padding: 8px 16px; font-size: 10px; font-weight: bold; text-transform: uppercase; border-radius: 9999px; border: 1px solid transparent; color: #94a3b8; }
+        .mode-tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px 20px; min-width: 130px; height: 90px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); background: rgba(255, 255, 255, 0.02); transition: all 0.3s ease; backdrop-filter: blur(5px); }
+        .canvas-container { background: linear-gradient(135deg, #0B1221 0%, #1e293b 100%); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .query-tab-btn { padding: 8px 16px; font-size: 10px; font-weight: bold; text-transform: uppercase; border-radius: 9999px; border: 1px solid transparent; transition: all 0.3s; color: #94a3b8; }
         .query-tab-active { background-color: rgba(251, 191, 36, 0.1); color: #FBBF24; border-color: #FBBF24; }
         .leed-level-box { transition: all 0.3s; border: 1px solid transparent; opacity: 0.5; cursor: pointer; }
-        .leed-level-box.active { opacity: 1; border-color: #FBBF24; background: rgba(251, 191, 36, 0.1); }
-        .well-toggle-group { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+        .leed-level-box.active { opacity: 1; border-color: #FBBF24; background: rgba(251, 191, 36, 0.1); transform: scale(1.05); }
+        .well-toggle-group { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; }
         .well-toggle-group.active { border-color: #22d3ee; background: rgba(34, 211, 238, 0.05); }
-        .cert-tab { cursor: pointer; padding: 8px 16px; border-radius: 6px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .cert-tab { cursor: pointer; padding: 8px 16px; border-radius: 6px; transition: all 0.3s; font-size: 11px; font-weight: bold; text-transform: uppercase; }
         .cert-tab.active { background: rgba(132, 204, 22, 0.15); color: #84cc16; border: 1px solid rgba(132, 204, 22, 0.3); }
-        input[type="radio"] { appearance: none; background-color: transparent; color: #FBBF24; width: 1.15em; height: 1.15em; border: 1px solid #FBBF24; border-radius: 50%; display: grid; place-content: center; }
+        input[type="radio"] { appearance: none; background-color: transparent; margin: 0; font: inherit; color: #FBBF24; width: 1.15em; height: 1.15em; border: 1px solid #FBBF24; border-radius: 50%; display: grid; place-content: center; }
         input[type="radio"]::before { content: ""; width: 0.65em; height: 0.65em; background-color: #FBBF24; border-radius: 50%; transform: scale(0); transition: 120ms transform ease-in-out; }
         input[type="radio"]:checked::before { transform: scale(1); }
         .bar-container { width: 100%; height: 6px; background-color: rgba(255, 255, 255, 0.1); border-radius: 9999px; overflow: hidden; margin-top: 6px; }
@@ -78,26 +79,26 @@
 
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-500">
         <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm"></div>
-        <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative z-10 animate-fade-in-up border border-luminous-gold/20">
+        <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative z-10 animate-fade-in-up border border-luminous-gold/20 shadow-[0_0_50px_rgba(251,191,36,0.1)]">
             <div class="text-center mb-8">
-                <div class="text-2xl font-bold tracking-[0.2em] text-luminous-gold mb-2">LUX<span class="text-white font-light opacity-60">SINTAX</span></div>
+                <div class="text-2xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)] mb-2">LUX<span class="text-white font-light opacity-60">SINTAX</span></div>
                 <p class="text-[10px] text-dim-gray uppercase tracking-widest">CADASTRE-SE GRATUITAMENTE</p>
             </div>
             <div class="flex border-b border-white/10 mb-6">
-                <button onclick="window.AuthManager.switchTab('login')" id="tab-auth-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold">Login</button>
-                <button onclick="window.AuthManager.switchTab('register')" id="tab-auth-register" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white">Cadastro</button>
+                <button onclick="window.AuthManager.switchTab('login')" id="tab-auth-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all">Login</button>
+                <button onclick="window.AuthManager.switchTab('register')" id="tab-auth-register" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all">Cadastro</button>
             </div>
             <div id="form-login" class="space-y-6">
                 <div class="auth-input-group"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"></div>
                 <div class="auth-input-group"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••"></div>
-                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded-lg uppercase tracking-widest text-xs">Acessar Plataforma</button>
+                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-white transition-colors shadow-[0_0_20px_rgba(251,191,36,0.3)]">Acessar Plataforma</button>
             </div>
             <div id="form-register" class="space-y-5 hidden">
                 <div class="grid grid-cols-2 gap-4"><div class="auth-input-group"><label>Nome</label><input type="text" id="reg-name" placeholder="Nome"></div><div class="auth-input-group"><label>Sobrenome</label><input type="text" id="reg-surname" placeholder="Sobrenome"></div></div>
                 <div class="auth-input-group"><label>E-mail Corporativo</label><input type="email" id="reg-email" placeholder="nome@empresa.com"></div>
                 <div class="auth-input-group"><label>Senha</label><input type="password" id="reg-password" placeholder="Crie uma senha forte"></div>
                 <div class="flex items-start gap-2 mt-2"><input type="checkbox" id="reg-terms" class="mt-1 w-3 h-3 accent-luminous-gold"><label for="reg-terms" class="text-[9px] leading-tight text-dim-gray cursor-pointer">Concordo com os termos de uso.</label></div>
-                <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border border-luminous-gold text-luminous-gold font-bold rounded-lg uppercase tracking-widest text-xs">Criar Conta Gratuita</button>
+                <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border border-luminous-gold text-luminous-gold font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-midnight transition-colors">Criar Conta Gratuita</button>
             </div>
         </div>
     </div>
@@ -106,7 +107,7 @@
         <nav class="fixed w-full z-50 bg-midnight/90 backdrop-blur-xl border-b border-white/5">
             <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold">LUX<span class="text-white font-light opacity-60">SINTAX</span></a>
+                    <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">LUX<span class="text-white font-light opacity-60">SINTAX</span></a>
                     <span class="bg-luminous-gold/20 text-luminous-gold text-[9px] font-black px-2 py-0.5 rounded border border-luminous-gold/30 tracking-widest animate-pulse">BETA</span>
                 </div>
                 <div class="hidden md:flex gap-8 items-center">
@@ -134,52 +135,62 @@
                     <div id="visual-tools" class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full hidden">
                         <div class="lg:col-span-3 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
-                                <div class="mb-4 text-center border-b border-white/10 pb-3">
-                                    <h3 class="text-md text-white mb-2 font-bold uppercase" data-i18n="calc_params">Parâmetros da Fonte</h3>
-                                    <div class="flex flex-row flex-wrap items-center justify-center gap-3">
-                                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] font-bold uppercase" data-i18n="lbl_intensity">INTENSIDADE</span></label>
-                                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] font-bold uppercase" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
-                                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" id="radio-ies" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] font-bold uppercase">IES</span></label>
-                                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" id="radio-ldt" name="calc_mode" value="ldt" onchange="window.updateCalcMode('ldt')"><span class="text-[9px] font-bold uppercase">LDT</span></label>
+                                <div class="mb-4">
+                                    <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center pb-3 border-b border-white/10 uppercase" data-i18n="calc_params">Parâmetros da Fonte</h3>
+                                    <div class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6">
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" id="radio-ies" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">IES</span></label>
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" id="radio-ldt" name="calc_mode" value="ldt" onchange="window.updateCalcMode('ldt')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap">LDT</span></label>
                                     </div>
                                 </div>
                                 <div id="inputs-ponto" class="hidden">
-                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Altura (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" step="0.1"><span class="text-[9px] font-bold">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Plano Trab. (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" step="0.05"><span class="text-[9px] font-bold">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
-                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Orientação (Tilt)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0"><span class="text-[9px] font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
-                                    <div class="mode-direct-group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Intensidade (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Altura (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Plano (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
+                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Orientação (Tilt)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
+                                    <div class="mode-direct-group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Intensidade (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-photo-group hidden space-y-6">
-                                        <div><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Fluxo (Lm)</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
-                                        <div><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Cd/Klm</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
+                                        <div><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Fluxo</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
+                                        <div><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Fotometria</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
                                     </div>
                                     <div class="mode-ies-group hidden border-t border-white/5 pt-4 mt-4">
-                                        <label class="text-[10px] text-luminous-gold font-bold block mb-2">CARREGAR .IES / .LDT</label>
-                                        <input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleUnifiedUpload(this)" class="w-full pb-2">
-                                        <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo.</p>
+                                        <label class="text-[10px] text-luminous-gold font-bold block mb-2">CARREGAR ARQUIVO .IES</label>
+                                        <input type="file" id="p-ies-input" accept=".ies" onchange="window.handleUnifiedUpload(this)" class="w-full pb-2">
+                                        <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                    </div>
+                                    <div class="mode-ldt-group hidden border-t border-white/5 pt-4 mt-4">
+                                        <label class="text-[10px] text-luminous-gold font-bold block mb-2">CARREGAR ARQUIVO .LDT</label>
+                                        <input type="file" id="p-ldt-input" accept=".ldt" onchange="window.handleUnifiedUpload(this)" class="w-full pb-2">
+                                        <p id="p-ldt-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                     </div>
                                 </div>
                                 <div id="inputs-vertical" class="hidden">
-                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Altura (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" step="0.1"><span class="text-[9px] font-bold">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Dist. Parede (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" step="0.1"><span class="text-[9px] font-bold">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
-                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Tilt</label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30"><span class="text-[9px] font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
-                                    <div class="mode-direct-group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Intensidade</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Altura (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Distância (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
+                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Tilt</label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
+                                    <div class="mode-direct-group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase">Intensidade (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-ies-group hidden border-t border-white/5 pt-4 mt-4">
-                                        <label class="text-[10px] text-luminous-gold font-bold block mb-2">CARREGAR .IES / .LDT</label>
-                                        <input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleUnifiedUpload(this)" class="w-full pb-2">
-                                        <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo.</p>
+                                        <label class="text-[10px] text-luminous-gold font-bold block mb-2">CARREGAR ARQUIVO .IES</label>
+                                        <input type="file" id="v-ies-input" accept=".ies" onchange="window.handleUnifiedUpload(this)" class="w-full pb-2">
+                                        <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                    </div>
+                                    <div class="mode-ldt-group hidden border-t border-white/5 pt-4 mt-4">
+                                        <label class="text-[10px] text-luminous-gold font-bold block mb-2">CARREGAR ARQUIVO .LDT</label>
+                                        <input type="file" id="v-ldt-input" accept=".ldt" onchange="window.handleUnifiedUpload(this)" class="w-full pb-2">
+                                        <p id="v-ldt-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                     </div>
                                 </div>
                                 <div id="inputs-homog" class="hidden">
-                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Altura</label><input type="number" id="h-height" value="3.0" step="0.1"></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] font-bold uppercase">Espaçamento</label><input type="number" id="h-spacing" value="2.0" step="0.1"></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
+                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold uppercase">Altura (H)</label><input type="number" id="h-height" value="3.0" step="0.1"></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                    <div class="mb-6"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold uppercase">Distância (D)</label><input type="number" id="h-spacing" value="2.0" step="0.1"></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="lg:col-span-9 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col min-h-[600px]">
-                                <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 font-bold uppercase">Resultados em Tempo Real</h3>
-                                <div class="relative w-full flex-grow bg-twilight/50 border border-white/10 rounded-2xl overflow-hidden canvas-container">
+                                <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 uppercase tracking-widest font-bold">Resultados em Tempo Real</h3>
+                                <div class="relative w-full flex-grow bg-twilight/50 border border-white/10 rounded-2xl overflow-hidden canvas-container shadow-inner">
                                     <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
                                 </div>
                             </div>
@@ -189,25 +200,26 @@
                     <div id="query-tool" class="w-full animate-fade-in-up col-span-12">
                         <div class="glass-panel p-6 rounded-2xl">
                             <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-white/10 pb-4 gap-4">
-                                <div><h3 class="text-lg text-luminous-gold font-bold uppercase">Centro de Consultas</h3><p class="text-xs text-muted-blue">Acesso rápido a normas técnicas.</p></div>
+                                <div><h3 class="text-lg text-luminous-gold font-bold tracking-widest uppercase">Centro de Consultas</h3><p class="text-xs text-muted-blue mt-1">Acesso rápido a normas e referências técnicas.</p></div>
                                 <div class="flex gap-2">
-                                    <button onclick="window.switchQueryTab('nbr8995')" id="btn-q-nbr8995" class="query-tab-btn query-tab-active">NBR 8995</button>
-                                    <button onclick="window.switchQueryTab('nbr5101')" id="btn-q-nbr5101" class="query-tab-btn">NBR 5101</button>
+                                    <button onclick="window.switchQueryTab('nbr8995')" id="btn-q-nbr8995" class="query-tab-btn query-tab-active">Interiores (NBR 8995)</button>
+                                    <button onclick="window.switchQueryTab('nbr5101')" id="btn-q-nbr5101" class="query-tab-btn">Viária (NBR 5101)</button>
                                 </div>
                             </div>
-                            <div id="content-nbr8995" class="query-content">
-                                <div class="overflow-x-auto custom-scrollbar"><table class="w-full text-left border-collapse"><thead class="bg-white/5 text-xs text-white uppercase sticky top-0 bg-midnight"><tr><th class="p-4 border-b border-white/10">Categoria</th><th class="p-4 border-b border-white/10">Ambiente</th><th class="p-4 border-b border-white/10 text-center">Lux</th><th class="p-4 border-b border-white/10 text-center">Ra</th></tr></thead><tbody id="nbr8995-tbody" class="text-sm text-muted-blue"></tbody></table></div>
-                            </div>
+                            <div id="search-container" class="mb-6"><select id="category-filter" onchange="window.filterNorms()" class="w-full bg-black/40 border border-white/10 rounded-full py-3 px-6 text-sm text-white uppercase outline-none focus:border-luminous-gold"><option value="all">Todas as Categorias</option></select></div>
+                            <div id="content-nbr8995" class="query-content overflow-x-auto custom-scrollbar"><table class="w-full text-left border-collapse"><thead class="bg-white/5 text-xs text-white uppercase sticky top-0 bg-midnight"><tr><th class="p-4 border-b border-white/10">Categoria</th><th class="p-4 border-b border-white/10">Ambiente</th><th class="p-4 border-b border-white/10 text-center">Lux (Em)</th><th class="p-4 border-b border-white/10 text-center">Ra Min</th></tr></thead><tbody id="nbr8995-tbody" class="text-sm text-muted-blue divide-y divide-white/5"></tbody></table></div>
                             <div id="content-nbr5101" class="query-content hidden">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
                                     <div class="glass-panel p-6 rounded-xl space-y-4">
-                                        <h4 class="text-sm font-bold text-luminous-gold uppercase">Parâmetros da Via</h4>
-                                        <select id="m-speed" onchange="window.calc5101()" class="w-full bg-midnight border border-white/10 p-2 text-xs"><option value="2">Alta Velocidade</option><option value="0">Urbana Normal</option></select>
-                                        <select id="m-volume" onchange="window.calc5101()" class="w-full bg-midnight border border-white/10 p-2 text-xs"><option value="1">Alto Tráfego</option><option value="0">Médio</option></select>
+                                        <h4 class="text-sm font-bold text-luminous-gold uppercase tracking-wider">Parâmetros da Via</h4>
+                                        <div class="space-y-4">
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block">Velocidade (km/h)</label><select id="m-speed" onchange="window.calc5101()" class="w-full bg-midnight border border-white/10 rounded px-2 py-2 text-xs"><option value="2">Muito Alta (> 100)</option><option value="0">Normal</option></select></div>
+                                            <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block">Volume Tráfego</label><select id="m-volume" onchange="window.calc5101()" class="w-full bg-midnight border border-white/10 rounded px-2 py-2 text-xs"><option value="1">Alto</option><option value="0">Moderado</option></select></div>
+                                        </div>
                                     </div>
                                     <div class="flex flex-col justify-center text-center">
-                                        <div id="m-result-class" class="text-6xl font-black text-white">M3</div>
-                                        <p id="res-lmed-val" class="text-luminous-gold font-bold">1.0 cd/m²</p>
+                                        <div id="m-result-class" class="text-7xl font-black text-white drop-shadow-xl">M3</div>
+                                        <p id="res-lmed-val" class="text-luminous-gold font-bold text-lg mt-2">1.0 cd/m²</p>
                                     </div>
                                 </div>
                             </div>
@@ -218,8 +230,8 @@
         </section>
 
         <section id="fundamentos" class="py-24 px-6 border-t border-white/5 bg-midnight text-center">
-            <h2 class="text-3xl text-luminous-gold font-bold mb-6">SOBRE</h2>
-            <p class="text-sm text-dim-line font-light max-w-4xl mx-auto text-justify">O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares.</p>
+            <h2 class="text-3xl text-luminous-gold font-bold tracking-widest mb-6 uppercase">SOBRE</h2>
+            <p class="text-sm text-dim-line font-light max-w-4xl mx-auto leading-relaxed text-justify">O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares.</p>
         </section>
     </div>
 
@@ -231,12 +243,12 @@
 
         window.state = {
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null },
-            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, hq: 1.6, iesData: null }, 
-            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30 },
+            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null }, 
+            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0, iesData: null },
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct';
 
-        // --- AUTH MANAGER ---
+        // --- AUTH ---
         window.AuthManager = {
             init: async function() {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -245,7 +257,8 @@
             },
             handleSessionUpdate: function(s) {
                 if (s) {
-                    document.getElementById('user-name-display').innerText = (s.user.email.split('@')[0]).toUpperCase();
+                    const name = s.user.email.split('@')[0].toUpperCase();
+                    document.getElementById('user-name-display').innerText = name;
                     document.getElementById('auth-modal').classList.add('hidden');
                     document.getElementById('app-content').classList.remove('app-locked');
                 }
@@ -255,49 +268,56 @@
                 document.getElementById('form-register').classList.toggle('hidden', tab === 'login');
             },
             handleLogin: async function() {
-                const { error } = await supabase.auth.signInWithPassword({ email: document.getElementById('login-email').value, password: document.getElementById('login-password').value });
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) alert(error.message);
             },
             logout: async function() { await supabase.auth.signOut(); location.reload(); }
         };
 
-        // --- LDT PARSER (TANQUE DE GUERRA) ---
+        // --- LDT PARSER (ULTRA RESILIENT) ---
         window.parseLDT = function(content) {
             try {
-                // Tokenização unificada: limpa tudo que não é número ou texto estrutural
-                const tokens = content.replace(/,/g, '.').split(/\s+/).filter(t => t.length > 0);
+                // Tokenização: converte vírgula em ponto e separa por espaços em branco
+                const cleanContent = content.replace(/,/g, '.');
+                const tokens = cleanContent.split(/\s+/).filter(t => t.length > 0);
                 
-                // Extração baseada em posições fixas do cabeçalho LDT
-                // Posição 3: Mc (C-planes), Posição 5: Ng (G-angles)
-                // Usamos Regex para pegar apenas números caso venha "not equidistan"
-                const getCleanNum = (s) => parseFloat(s.replace(/[^0-9.-]/g, '')) || 1;
+                // Sanitização: Remove qualquer caractere não numérico dos tokens de controle (Mc, Ng)
+                const getCleanInt = (idx) => parseInt(tokens[idx].replace(/[^0-9]/g, '')) || 1;
+                const getCleanFloat = (idx) => parseFloat(tokens[idx].replace(/[^0-9.-]/g, '')) || 0;
+
+                // Conforme Norma EULUMDAT (LDT):
+                const Mc = getCleanInt(3); // Número de planos C (Linha 4)
+                const Ng = getCleanInt(5); // Número de intensidades em cada plano (Linha 6)
+                const totalFlux = getCleanFloat(25); // Fluxo Luminoso Total (Linha 26)
+
+                // A geometria real começa após o cabeçalho de 42 linhas nominais. 
+                // Devido a variações de exportadores, buscamos o início dos dados numéricos pós-cabeçalho.
+                let ptr = 42; 
                 
-                const Mc = getCleanNum(tokens[3]);
-                const Ng = getCleanNum(tokens[5]);
-                const totalFlux = parseFloat(tokens[25]) || 1000;
-                
-                let ptr = 42; // Início padrão da geometria no EULUMDAT
-                
-                // Consumir Ângulos C
+                // 1. Ler ângulos C (Mc valores)
                 const cAngles = [];
-                for(let i=0; i<Mc; i++) cAngles.push(parseFloat(tokens[ptr++]));
-                
-                // Consumir Ângulos G (Vertical)
+                for(let i=0; i<Mc; i++) cAngles.push(getCleanFloat(ptr++));
+
+                // 2. Ler ângulos G (Ng valores)
                 const vAngles = [];
-                for(let i=0; i<Ng; i++) vAngles.push(parseFloat(tokens[ptr++]));
-                
-                // Consumir Matriz de Intensidade (Candelas)
+                for(let i=0; i<Ng; i++) vAngles.push(getCleanFloat(ptr++));
+
+                // 3. Ler Matriz de Candelas (Intensidade)
                 const candelas = [];
                 for(let c=0; c<Mc; c++) {
                     const row = [];
-                    for(let g=0; g<Ng; g++) row.push(parseFloat(tokens[ptr++]));
+                    for(let g=0; g<Ng; g++) {
+                        row.push(getCleanFloat(ptr++));
+                    }
                     candelas.push(row);
                 }
 
                 const multiplier = (totalFlux > 0 ? totalFlux : 1000) / 1000;
                 return { vAngles, candelas, multiplier };
             } catch (e) {
-                console.error("LDT Parser failed", e);
+                console.error("Critical LDT Error:", e);
                 return null;
             }
         };
@@ -307,49 +327,44 @@
             try {
                 const tokens = content.replace(/,/g, '.').split(/\s+/).filter(t => t.length > 0);
                 let ptr = tokens.findIndex(t => t.includes("TILT=")) + 1;
-                ptr += 3; // Pula metadados iniciais
-                const multiplier = parseFloat(tokens[ptr++]);
+                ptr += 3; // Metadados
+                const mult = parseFloat(tokens[ptr++]);
                 const vCount = parseInt(tokens[ptr++]);
                 const hCount = parseInt(tokens[ptr++]);
-                ptr += 8; // Pula o restante do cabeçalho
-                const vAngles = [];
-                for(let i=0; i<vCount; i++) vAngles.push(parseFloat(tokens[ptr++]));
-                const hAngles = [];
-                for(let i=0; i<hCount; i++) hAngles.push(parseFloat(tokens[ptr++]));
-                const candelas = [];
-                for(let h=0; h<hCount; h++) {
-                    const row = [];
-                    for(let v=0; v<vCount; v++) row.push(parseFloat(tokens[ptr++]));
+                ptr += 8; // Resto do header
+                const vAngles = []; for(let i=0; i<vCount; i++) vAngles.push(parseFloat(tokens[ptr++]));
+                const hAngles = []; for(let i=0; i<hCount; i++) hAngles.push(parseFloat(tokens[ptr++]));
+                const candelas = []; for(let h=0; h<hCount; h++) {
+                    const row = []; for(let v=0; v<vCount; v++) row.push(parseFloat(tokens[ptr++]));
                     candelas.push(row);
                 }
-                return { vAngles, candelas, multiplier };
+                return { vAngles, candelas, multiplier: mult };
             } catch(e) { return null; }
         };
 
-        // --- UPLOAD UNIFICADO ---
+        // --- UPLOAD HANDLER ---
         window.handleUnifiedUpload = function(input) {
             const file = input.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 const content = e.target.result;
-                let parsed = null;
                 const isLDT = file.name.toLowerCase().endsWith('.ldt');
+                const parsed = isLDT ? window.parseLDT(content) : window.parseIES(content);
                 
-                parsed = isLDT ? window.parseLDT(content) : window.parseIES(content);
-
                 if (parsed) {
                     window.state[window.currentTool].iesData = parsed;
                     const mode = isLDT ? 'ldt' : 'ies';
                     document.getElementById('radio-' + mode).checked = true;
                     window.updateCalcMode(mode);
-                    document.getElementById(window.currentTool[0] + '-ies-status').innerText = "ARQUIVO OK: " + file.name;
+                    document.getElementById(window.currentTool[0] + '-' + (isLDT ? 'ldt' : 'ies') + '-status').innerText = "OK: " + file.name;
                 } else {
-                    alert("Erro ao processar arquivo.");
+                    alert("Erro ao ler arquivo fotométrico.");
                 }
             };
             reader.readAsText(file);
         };
 
+        // --- CALCULATIONS ---
         window.getIESIntensity = function(s, angleDeg) {
             if (!s.iesData) return 0;
             const { vAngles, candelas, multiplier } = s.iesData;
@@ -377,8 +392,10 @@
             let I;
             if (window.calcMode === 'ies' || window.calcMode === 'ldt') {
                 I = window.getIESIntensity(s, s.tilt);
+            } else if (window.calcMode === 'photometric') {
+                I = (s.cdklm * s.flux) / 1000;
             } else {
-                I = window.calcMode === 'photometric' ? (s.cdklm * s.flux)/1000 : s.intensity;
+                I = s.intensity;
             }
 
             const tr = s.tilt * Math.PI / 180;
@@ -391,7 +408,7 @@
             ctx.fillStyle = "#FBBF24"; ctx.font = "bold 12px Manrope";
             ctx.fillText(Math.round(lux) + " Lux", hitX, floorY - 10);
             
-            // Desenho da curva fotométrica no gráfico se houver dados
+            // Desenho da curva amarela (Facho)
             if (s.iesData && (window.calcMode === 'ies' || window.calcMode === 'ldt')) {
                 ctx.beginPath(); ctx.setLineDash([]); ctx.strokeStyle = "rgba(251,191,36,0.3)";
                 const { vAngles, candelas } = s.iesData;
@@ -399,22 +416,13 @@
                 for(let i=0; i<vAngles.length; i++) {
                     const ang = (vAngles[i] + s.tilt) * Math.PI / 180;
                     const r = (row[i] / maxI) * 100;
-                    const vx = centerX + r * Math.sin(ang);
-                    const vy = sy + r * Math.cos(ang);
-                    if(i===0) ctx.moveTo(vx,vy); else ctx.lineTo(vx,vy);
+                    ctx.lineTo(centerX + r * Math.sin(ang), sy + r * Math.cos(ang));
                 }
                 ctx.stroke();
             }
         };
 
-        window.updateCalcMode = function(mode) {
-            window.calcMode = mode;
-            document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
-            document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
-            document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies' && mode !== 'ldt'));
-            window.updateCalculations();
-        };
-
+        // --- INTERFACE ---
         window.switchTool = function(id) { 
             window.currentTool = id; 
             ['ponto','vertical','homog','query'].forEach(t => document.getElementById('tab-'+t).className = `mode-tab-btn tab-${t===id?'active':'inactive'}`);
@@ -425,10 +433,26 @@
             window.updateCalculations();
         };
 
-        // --- NBR MOCK ---
+        window.updateCalcMode = function(mode) {
+            window.calcMode = mode;
+            document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
+            document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
+            document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
+            document.querySelectorAll('.mode-ldt-group').forEach(el => el.classList.toggle('hidden', mode !== 'ldt'));
+            window.updateCalculations();
+        };
+
+        window.switchQueryTab = function(t) {
+            ['nbr8995','nbr5101'].forEach(k => {
+                document.getElementById('content-'+k).classList.toggle('hidden', k!==t);
+                document.getElementById('btn-q-'+k).className = `query-tab-btn ${k===t?'query-tab-active':''}`;
+            });
+            if(t==='nbr8995') window.filterNorms();
+        };
+
         window.filterNorms = function() {
-            const data = [{cat:"Escritório", room:"Escrita e Leitura", lux:500, ra:80}, {cat:"Industrial", room:"Montagem Fina", lux:750, ra:80}];
-            document.getElementById('nbr8995-tbody').innerHTML = data.map(n => `<tr><td class="p-4 border-b border-white/5">${n.cat}</td><td class="p-4 border-b border-white/5">${n.room}</td><td class="p-4 border-b border-white/5 text-center">${n.lux}</td><td class="p-4 border-b border-white/5 text-center">${n.ra}</td></tr>`).join('');
+            const data = [{cat:"Escritório", room:"Tarefa Geral", lux:500, ra:80}, {cat:"Varejo", room:"Venda Geral", lux:300, ra:80}];
+            document.getElementById('nbr8995-tbody').innerHTML = data.map(n => `<tr><td class="p-4 border-b border-white/5 font-bold">${n.cat}</td><td class="p-4 border-b border-white/5">${n.room}</td><td class="p-4 border-b border-white/5 text-center text-luminous-gold">${n.lux}</td><td class="p-4 border-b border-white/5 text-center">${n.ra}</td></tr>`).join('');
         };
 
         function bind(id, key, param) {
@@ -445,7 +469,6 @@
 
         window.AuthManager.init();
         window.switchTool('ponto');
-        window.filterNorms();
     </script>
 </body>
 </html>
