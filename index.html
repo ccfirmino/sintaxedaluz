@@ -173,7 +173,7 @@
                                     <div class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6">
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
-                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">IES OU LDT</span></label>
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">IES</span></label>
                                     </div>
                                 </div>
                                 <div id="inputs-ponto" class="hidden">
@@ -190,8 +190,8 @@
                                     </div>
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                         <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <input type="file" id="p-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
                                             <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
@@ -211,8 +211,8 @@
                                     </div>
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                         <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <input type="file" id="v-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
                                             <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
@@ -229,8 +229,8 @@
                                     </div>
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                         <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="h-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <input type="file" id="h-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
                                             <p id="h-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
@@ -422,7 +422,7 @@
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
-                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES OU LDT", lbl_ies_upload: "CARREGAR ARQUIVO .IES / .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
+                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
                 tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
@@ -438,7 +438,7 @@
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
-                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES OR LDT", lbl_ies_upload: "UPLOAD .IES / .LDT FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
+                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES", lbl_ies_upload: "UPLOAD .IES FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
                 hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
                 tab_interiors: "Interiores (ISO/NBR)", tab_roadway: "Roadway (IES/NBR)", filter_all: "All Categories", col_cat: "Category", col_room: "Room",
