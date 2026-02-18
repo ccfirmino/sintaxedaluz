@@ -717,14 +717,11 @@
         }
 
         window.parseLDT = function(content) {
-            // EULUMDAT Parser (Robust & Position-Safe)
+            // EULUMDAT Parser (Fixed Index & Scaling)
             try {
-                // 1. Sanitize: Replace commas with dots and remove carriage returns
-                // BUT DO NOT filter empty lines, as LDT is line-position dependent.
                 const cleanContent = content.replace(/\r/g, "").replace(/,/g, ".");
                 const lines = cleanContent.split('\n');
 
-                // Helper to safely get float from a specific line index
                 const getVal = (idx) => {
                     if (idx >= lines.length) return 0;
                     const val = parseFloat(lines[idx].trim());
@@ -733,23 +730,23 @@
 
                 if (lines.length < 26) return null;
 
-                // Fixed Header Indices (Standard EULUMDAT)
                 const mc = parseInt(lines[14]) || 1; // Count C-planes
-                const dc = parseFloat(lines[15]) || 0; // Distance C-planes
+                const dc = parseFloat(lines[15]) || 0; 
                 const ng = parseInt(lines[16]) || 1; // Count Gamma-angles
-                const dg = parseFloat(lines[17]) || 0; // Distance Gamma-angles
+                const dg = parseFloat(lines[17]) || 0; 
 
-                const totalFlux = getVal(25); // Line 26 is Index 25
-                // Normalization: LDT is cd/klm. Convert to Absolute cd.
+                const totalFlux = getVal(25); // Line 26: Total Flux in lumens
+                
+                // CRITICAL FIX: LDT values are cd/1000lm. 
+                // To get Absolute Candelas (cd): Value * (Flux / 1000)
+                // We store this multiplier here.
                 const multiplier = (totalFlux > 0 ? totalFlux : 1000) / 1000;
 
                 let vAngles = []; 
                 let hAngles = [];
                 let candelas = [];
 
-                // Data starts after standard header (42 lines usually).
-                // Indices 0-41 are header info. Index 42 starts data.
-                let lineCursor = 42; 
+                let lineCursor = 42; // Standard start of intensity data
 
                 // Angles G (Gamma)
                 if (dg === 0) {
@@ -772,7 +769,6 @@
                 }
 
                 // Luminous Intensity Matrix
-                // Order: C0 (all Gammas), C1 (all Gammas)...
                 for(let c=0; c<mc; c++) {
                     let row = [];
                     for(let g=0; g<ng; g++) {
@@ -812,6 +808,9 @@
             const c1 = candelaRow[idx];
             const c2 = candelaRow[idx+1];
             
+            // Avoid division by zero
+            if (a2 === a1) return c1 * mult;
+
             const t = (angleDeg - a1) / (a2 - a1);
             const rawVal = c1 + t * (c2 - c1);
             
