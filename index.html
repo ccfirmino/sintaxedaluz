@@ -717,11 +717,18 @@
         }
 
         window.parseLDT = function(content) {
-            // EULUMDAT Parser (Robust)
+            // EULUMDAT Parser (Robust & Sanitized)
             try {
-                // Remove carriage returns and empty lines to prevent NaN
-                const lines = content.replace(/\r/g, "").split('\n').filter(l => l.trim().length > 0);
-                const getVal = (lineIdx) => parseFloat(lines[lineIdx]);
+                // BUG FIX: Replace commas with dots for European format compatibility
+                // Also remove carriage returns
+                const cleanContent = content.replace(/\r/g, "").replace(/,/g, ".");
+                
+                // Do NOT filter empty lines here to preserve index structure of standard EULUMDAT
+                const lines = cleanContent.split('\n');
+                const getVal = (lineIdx) => {
+                     if(lineIdx >= lines.length) return 0;
+                     return parseFloat(lines[lineIdx].trim());
+                };
                 
                 if (lines.length < 26) return null;
 
@@ -731,21 +738,18 @@
                 const dg = parseFloat(lines[17]); // Distance Gamma-angles
 
                 const totalFlux = parseFloat(lines[25]); // Total Luminous Flux (Line 26)
-                // LDT values are typically cd/klm. We need to normalize to Absolute Candelas.
-                // Multiplier = Flux / 1000
-                const multiplier = totalFlux / 1000;
+                
+                // Normalization: LDT is usually cd/klm. We convert to Absolute.
+                // If Flux is invalid (NaN), assume 1000 (no scaling) to prevent crash
+                const safeFlux = isNaN(totalFlux) ? 1000 : totalFlux;
+                const multiplier = safeFlux / 1000;
 
                 let vAngles = []; 
                 let hAngles = [];
                 let candelas = [];
 
-                let lineCursor = 41; // Standard start of intensity data after DFF/LOR (approx)
-                // In standard EULUMDAT, DFF/LOR percentages occupy lines 26..41 (depending on structure). 
-                // Line 26 is Flux. Line 26+1 to 26+10 (Direct Ratios). Then C0 factors.
-                // Robustness: Just parse sequentially from Line 42 (Index 41) usually works for standard LDT.
-                // Better Robustness: Skip 26 + 16 lines? No, fixed indices.
-                // Indices 0-25 used. 26-41 are usually ratios/factors. Data starts 42.
-                
+                let lineCursor = 41; // Standard start of intensity data
+
                 // Angles G (Gamma)
                 if (dg === 0) {
                     for(let i=0; i<ng; i++) {
