@@ -276,89 +276,35 @@
 
         window.parseLDT = function(content) {
             try {
-                // 1. Normalização Universal de Quebras de Linha
-                const rawLines = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
-                
-                // 2. Validação Rápida do Cabeçalho
-                if (rawLines.length < 42) {
-                    console.error("LDT inválido: Cabeçalho muito curto.");
-                    return null;
-                }
-
-                // 3. Extração Segura do Cabeçalho (Linhas Fixas)
-                // Mc = Número de planos C (Linha 15, Index 14)
-                const Mc = parseInt(rawLines[14]);
-                // Ng = Número de intensidades (Linha 17, Index 16)
-                const Ng = parseInt(rawLines[16]);
-                // Fluxo Total (Linha 26, Index 25)
-                const totalFlux = parseFloat(rawLines[25].replace(',', '.'));
-
-                if (isNaN(Mc) || isNaN(Ng)) {
-                    console.error("LDT inválido: Geometria (Mc/Ng) não encontrada.");
-                    return null;
-                }
-
-                console.log(`LDT Header: Mc=${Mc}, Ng=${Ng}, Flux=${totalFlux}`);
-
-                // 4. Tokenização do Corpo (Ignora formatação de linhas)
-                // Pega tudo a partir da linha 42, junta numa string só e separa por whitespace
-                const bodyStream = rawLines.slice(42).join(' ').trim().split(/\s+/);
-                // Filtra vazios e converte para float
-                const tokens = bodyStream.filter(t => t !== "").map(t => parseFloat(t.replace(',', '.')));
-
-                // 5. Consumo do Stream (Ordem EULUMDAT: Ng -> Mc -> Intensidades)
-                let ptr = 0;
-
-                // A. Ângulos Verticais (G-Angles) - Ng valores
-                const vAngles = [];
-                for (let i = 0; i < Ng; i++) vAngles.push(tokens[ptr++] || 0);
-
-                // B. Ângulos Horizontais (C-Angles) - Mc valores
-                const cAngles = [];
-                for (let i = 0; i < Mc; i++) cAngles.push(tokens[ptr++] || 0);
-
-                // C. Intensidades - Mc * Ng valores
+                const clean = content.replace(/\r/g, "").replace(/,/g, ".");
+                const lines = clean.split('\n').map(l => l.trim());
+                if (lines.length < 26) return null;
+                const mc = parseInt(lines[14]) || 1;
+                const ng = parseInt(lines[16]) || 1;
+                const totalFlux = parseFloat(lines[25]); // Linha 26 (Index 25)
+                const multiplier = (totalFlux > 0 ? totalFlux : 1000) / 1000;
+                let lineCursor = 42; 
+                let vAngles = [];
+                for(let i=0; i<ng; i++) vAngles.push(parseFloat(lines[lineCursor++]) || 0);
                 let candelas = [];
-                for (let c = 0; c < Mc; c++) {
+                for(let c=0; c<mc; c++) {
                     let row = [];
-                    for (let g = 0; g < Ng; g++) {
-                        row.push(tokens[ptr++] || 0);
-                    }
+                    for(let g=0; g<ng; g++) row.push(parseFloat(lines[lineCursor++]) || 0);
                     candelas.push(row);
                 }
-
-                // Normalização CD/KLM se o fluxo não for 1000
-                const multiplier = (totalFlux > 0 ? totalFlux : 1000) / 1000;
-
                 return { vAngles, candelas, multiplier };
-
-            } catch (e) {
-                console.error("LDT Parser Crítico:", e);
-                return null;
-            }
+            } catch (e) { return null; }
         };
 
         window.getIESIntensity = function(s, angleDeg) {
             if (!s.iesData) return 0;
             const { vAngles, candelas, multiplier } = s.iesData;
-            
-            // Assume plano C0 (primeira linha) para visualização 2D
             const row = candelas[0];
-            
-            if (!row || row.length === 0) return 0;
-
-            // Busca binária simples ou linear para encontrar o intervalo do ângulo
             if (angleDeg <= vAngles[0]) return row[0] * multiplier;
             if (angleDeg >= vAngles[vAngles.length-1]) return row[vAngles.length-1] * multiplier;
-            
-            let i = 0; 
-            while(i < vAngles.length - 1 && angleDeg > vAngles[i+1]) i++;
-            
-            // Interpolação Linear
+            let i = 0; while(angleDeg > vAngles[i+1]) i++;
             const t = (angleDeg - vAngles[i]) / (vAngles[i+1] - vAngles[i]);
-            const val = row[i] + t * (row[i+1] - row[i]);
-            
-            return val * multiplier;
+            return (row[i] + t * (row[i+1] - row[i])) * multiplier;
         };
 
         window.updateCalculations = function() {
@@ -403,18 +349,7 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 const parsed = window.parseLDT(e.target.result);
-                if(parsed) { 
-                    window.state[window.currentTool].iesData = parsed; 
-                    window.updateCalculations(); 
-                    const statusId = window.currentTool === 'ponto' ? 'p-ies-status' : 'v-ies-status';
-                    document.getElementById(statusId).innerText = "LDT processado com sucesso!";
-                    document.getElementById(statusId).classList.remove('text-dim-gray', 'text-red-400');
-                    document.getElementById(statusId).classList.add('text-green-400');
-                } else {
-                    const statusId = window.currentTool === 'ponto' ? 'p-ies-status' : 'v-ies-status';
-                    document.getElementById(statusId).innerText = "Erro ao ler arquivo LDT.";
-                    document.getElementById(statusId).classList.add('text-red-400');
-                }
+                if(parsed) { window.state[window.currentTool].iesData = parsed; window.updateCalculations(); }
             };
             reader.readAsText(file);
         };
