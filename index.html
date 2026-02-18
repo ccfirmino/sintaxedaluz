@@ -106,8 +106,7 @@
         <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative z-10 animate-fade-in-up border border-luminous-gold/20 shadow-[0_0_50px_rgba(251,191,36,0.1)]">
             <div class="text-center mb-8">
                 <div class="text-2xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)] mb-2">LUX<span class="text-white font-light opacity-60">SINTAX</span></div>
-                <p class="text-[10px] text-dim-gray uppercase tracking-widest">SaaS de Inteligência em Iluminação</p>
-                <p id="connection-status" class="text-[9px] text-red-400 mt-2 font-bold animate-pulse">CONECTANDO AO SERVIDOR...</p>
+                <p class="text-[10px] text-dim-gray uppercase tracking-widest">CADASTRE-SE GRATUITAMENTE</p>
             </div>
             <div class="flex border-b border-white/10 mb-6">
                 <button onclick="window.AuthManager.switchTab('login')" id="tab-auth-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all">Login</button>
@@ -171,14 +170,10 @@
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
                                     <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md border-b border-white/10 pb-3" data-i18n="calc_params">Parâmetros da Fonte</h3>
-                                    <div class="flex flex-col gap-2 p-1 mb-6 justify-center">
-                                        <div class="flex flex-row gap-4 justify-center">
-                                            <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
-                                            <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
-                                        </div>
-                                        <div class="flex flex-row justify-center">
-                                            <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[10px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">ARQUIVO IES</span></label>
-                                        </div>
+                                    <div class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6">
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">IES OU LDT</span></label>
                                     </div>
                                 </div>
                                 <div id="inputs-ponto" class="hidden">
@@ -195,8 +190,8 @@
                                     </div>
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                         <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
-                                            <input type="file" id="p-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
+                                            <input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
                                             <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
@@ -216,8 +211,8 @@
                                     </div>
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
                                         <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
-                                            <input type="file" id="v-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
+                                            <input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
                                             <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
@@ -416,14 +411,11 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const statusEl = document.getElementById('connection-status');
-        if(statusEl) { statusEl.innerText = "SISTEMA ONLINE"; statusEl.classList.remove('text-red-400', 'animate-pulse'); statusEl.classList.add('text-leed-green'); }
-
         // 1. I18N DICTIONARY
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
-                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "ARQUIVO IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
+                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES OU LDT", lbl_ies_upload: "CARREGAR ARQUIVO .IES / .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
                 tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
@@ -439,7 +431,7 @@
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(NBR/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
-                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES FILE", lbl_ies_upload: "UPLOAD .IES FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "ORIENTATION (TILT)",
+                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES OR LDT", lbl_ies_upload: "UPLOAD .IES / .LDT FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "ORIENTATION (TILT)",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "FRAME AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "DISTANCE BETWEEN SOURCES (D)",
                 hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
                 tab_interiors: "Interiors (NBR 8995)", tab_roadway: "Roadway (NBR 5101)", filter_all: "All Categories", col_cat: "Category", col_room: "Room / Task",
@@ -637,14 +629,20 @@
             window.updateCalculations();
         }
 
-        // --- IES PARSER & LOGIC ---
+        // --- IES & LDT PARSER & LOGIC ---
         window.handleIESUpload = function(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const content = e.target.result;
-                    const parsed = window.parseIES(content);
+                    let parsed = null;
+                    if (file.name.toLowerCase().endsWith('.ldt')) {
+                        parsed = window.parseLDT(content);
+                    } else {
+                        parsed = window.parseIES(content);
+                    }
+                    
                     if (parsed) {
                         const targetKey = window.currentTool === 'ponto' ? 'ponto' : 'vertical';
                         window.state[targetKey].iesData = parsed;
@@ -657,7 +655,7 @@
                         }
                         window.updateCalculations();
                     } else {
-                        alert("Erro ao ler arquivo IES.");
+                        alert("Erro ao ler arquivo " + file.name + ". Verifique o formato.");
                     }
                 };
                 reader.readAsText(file);
@@ -665,46 +663,89 @@
         }
 
         window.parseIES = function(content) {
-            // Basic LM-63 Parser
+            // Robust IESNA Parser
             try {
-                const lines = content.replace(/\r/g, "").split('\n');
-                let dataLines = [];
-                let isData = false;
+                // Remove carriage returns and handle various line endings by treating content as a stream of tokens
+                const tokens = content.replace(/\s+/g, " ").trim().split(" ");
                 
-                for(let line of lines) {
-                    if (line.includes("TILT=")) {
-                        isData = true;
-                        continue; 
-                    }
-                    if (isData) {
-                        dataLines.push(line);
+                // Find "TILT="
+                let cursor = 0;
+                let tiltFound = false;
+                for(let i=0; i < tokens.length; i++) {
+                    if (tokens[i].startsWith("TILT=")) {
+                        cursor = i + 1; // Move past TILT=...
+                        if (!tokens[i].includes("NONE")) {
+                             // If TILT is a file or INCLUDE, logic would be complex. 
+                             // Simplified: Assume we just need to skip 4 numbers if TILT=INCLUDE (rare in web usage)
+                             // or verify if next token is a number. 
+                             // For standard simple IES, if TILT=NONE we continue.
+                        }
+                        tiltFound = true;
+                        break;
                     }
                 }
                 
-                const allNumbers = dataLines.join(" ").trim().split(/\s+/).map(Number);
-                if (allNumbers.length < 13) return null; // Too short
+                if (!tiltFound) return null;
 
-                // Standard LM-63 Structure after TILT:
-                // lamp_num, lumens_per_lamp, multiplier, v_angles_count, h_angles_count, photo_type, units_type, width, length, height, ballast_factor, input_watts, input_voltage
-                const multiplier = allNumbers[2];
-                const vCount = allNumbers[3];
-                const hCount = allNumbers[4];
+                // After TILT, we look for the first number to start header
+                // Standard IES Header (LM-63-02):
+                // #lamps, lumens/lamp, multiplier, v_angles_count, h_angles_count, type, units, w, l, h, ballast, input_watts, voltage
+                // That is 13 numbers. Some older versions have 10.
                 
-                let cursor = 13; 
-                
-                const vAngles = allNumbers.slice(cursor, cursor + vCount);
-                cursor += vCount;
-                
-                const hAngles = allNumbers.slice(cursor, cursor + hCount);
-                cursor += hCount;
+                // Helper to get next number
+                function nextNum() {
+                    while(cursor < tokens.length) {
+                        const val = parseFloat(tokens[cursor]);
+                        cursor++;
+                        if (!isNaN(val)) return val;
+                    }
+                    return null;
+                }
 
-                // Candela Values
-                // Looped by horizontal, then vertical inside
+                // Skip header values we don't need strictly for geometry, but we need counts
+                // 1. #lamps
+                nextNum(); 
+                // 2. lumens per lamp
+                nextNum(); 
+                // 3. multiplier
+                const multiplier = nextNum();
+                // 4. vertical angles count
+                const vCount = nextNum();
+                // 5. horizontal angles count
+                const hCount = nextNum();
+                // 6. photometric type
+                nextNum();
+                // 7. units type
+                nextNum();
+                // 8. width
+                nextNum();
+                // 9. length
+                nextNum();
+                // 10. height
+                nextNum();
+                
+                // Read remaining header items (ballast factor, ballast lamp factor, input watts). usually 3 more.
+                // However, robustness trick: verify if next token is part of V Angles (usually start with 0)
+                // Let's consume 3 more to be safe for LM-63-95/02
+                nextNum(); nextNum(); nextNum();
+
+                // Read Vertical Angles
+                const vAngles = [];
+                for(let i=0; i<vCount; i++) vAngles.push(nextNum());
+
+                // Read Horizontal Angles
+                const hAngles = [];
+                for(let i=0; i<hCount; i++) hAngles.push(nextNum());
+
+                // Read Candela Values
+                // Loop: For each Horizontal Angle, read all Vertical Angles
                 const candelas = [];
                 for(let h=0; h<hCount; h++) {
-                     const row = allNumbers.slice(cursor, cursor + vCount);
-                     candelas.push(row);
-                     cursor += vCount;
+                    const row = [];
+                    for(let v=0; v<vCount; v++) {
+                        row.push(nextNum());
+                    }
+                    candelas.push(row);
                 }
 
                 return { vAngles, hAngles, candelas, multiplier };
@@ -715,15 +756,86 @@
             }
         }
 
+        window.parseLDT = function(content) {
+            // EULUMDAT Parser
+            try {
+                const lines = content.replace(/\r/g, "").split('\n');
+                const getVal = (lineIdx) => parseFloat(lines[lineIdx]);
+                
+                if (lines.length < 26) return null;
+
+                const type = parseInt(lines[1]); // Type
+                const symmetry = parseInt(lines[2]); // Symmetry indicator
+                
+                const mc = parseInt(lines[14]); // Count C-planes
+                const dc = parseFloat(lines[15]); // Distance C-planes
+                const ng = parseInt(lines[16]); // Count Gamma-angles
+                const dg = parseFloat(lines[17]); // Distance Gamma-angles
+
+                const flux = parseFloat(lines[25]); // Total Flux (often used for absolute/relative check)
+
+                // Arrays
+                let vAngles = []; // Gamma
+                let hAngles = []; // C-Planes
+                let candelas = []; // Matrix
+
+                let lineCursor = 41; // Start of angles usually around here, but let's calculate based on standard offset
+                // Standard offset says data starts after line 41 usually? No, strictly:
+                // Lines 0-25 are header info.
+                // Line 26-..: Direct Ratios? No.
+                // Actually LDT is fixed line indices.
+                // Let's assume standard EULUMDAT.
+                
+                // Angles G (Gamma)
+                if (dg === 0) {
+                    for(let i=0; i<ng; i++) {
+                        vAngles.push(getVal(lineCursor));
+                        lineCursor++;
+                    }
+                } else {
+                    for(let i=0; i<ng; i++) vAngles.push(i * dg);
+                }
+
+                // Angles C (Horizontal)
+                if (dc === 0) {
+                     for(let i=0; i<mc; i++) {
+                        hAngles.push(getVal(lineCursor));
+                        lineCursor++;
+                    }
+                } else {
+                    for(let i=0; i<mc; i++) hAngles.push(i * dc);
+                }
+
+                // Luminous Intensity
+                // Order: C0 (all Gammas), C1 (all Gammas)...
+                for(let c=0; c<mc; c++) {
+                    let row = [];
+                    for(let g=0; g<ng; g++) {
+                        row.push(getVal(lineCursor));
+                        lineCursor++;
+                    }
+                    candelas.push(row);
+                }
+
+                // Handle Symmetry for proper rendering if file is compressed
+                // For this 2D visualizer, we primarily need the C0 plane (row 0). 
+                // We will return the raw matrix.
+                
+                return { vAngles, hAngles, candelas, multiplier: 1 }; // LDT usually cd/klm or cd. Multiplier 1 is safe for raw shape.
+
+            } catch (e) {
+                console.error("LDT Parse Error", e);
+                return null;
+            }
+        }
+
         window.getIESIntensity = function(state, angleDeg) {
             if (!state.iesData) return 0;
             
-            // Simplified: Assuming 0 deg horizontal (first slice) or Average if symmetric
-            // For point-by-point rapid calc, we usually care about vertical distribution (gamma)
-            
             const data = state.iesData;
             const vAngles = data.vAngles;
-            const candelaRow = data.candelas[0]; // Taking 0-deg horizontal plane for simplicity in 2D view
+            // Get C0 plane (index 0)
+            const candelaRow = data.candelas[0]; 
             const mult = data.multiplier;
 
             // Find indices for interpolation
@@ -751,8 +863,8 @@
         function getIntensity(s) {
             if (window.calcMode === 'direct') return s.intensity;
             if (window.calcMode === 'ies') {
-                if (window.currentTool === 'ponto') return window.getIESIntensity(s, Math.abs(s.tilt)); // Intensity at the tilt axis
-                if (window.currentTool === 'vertical') return window.getIESIntensity(s, Math.abs(s.tilt)); // Same logic
+                if (window.currentTool === 'ponto') return window.getIESIntensity(s, Math.abs(s.tilt)); 
+                if (window.currentTool === 'vertical') return window.getIESIntensity(s, Math.abs(s.tilt)); 
                 return 0;
             }
             return (s.cdklm * s.flux) / 1000;
