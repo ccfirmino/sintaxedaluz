@@ -276,60 +276,24 @@
 
         window.parseLDT = function(content) {
             try {
-                // Normalize line endings to handle different file origins (Windows/Unix)
-                const cleanContent = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-                const lines = cleanContent.split('\n');
-                
-                // Basic structural validation
+                const clean = content.replace(/\r/g, "").replace(/,/g, ".");
+                const lines = clean.split('\n').map(l => l.trim());
                 if (lines.length < 26) return null;
-
-                // --- Header Parsing (Fixed Line Indices) ---
-                // EULUMDAT format specifies fixed lines for metadata
-                const mc = parseInt(lines[14]) || 1; // Number of C-planes
-                const ng = parseInt(lines[16]) || 1; // Number of vertical angles
-                
-                // Flux usually on line 26 (index 25)
-                const fluxLine = lines[25].replace(',', '.'); 
-                const totalFlux = parseFloat(fluxLine) || 1000;
-                // Multiplier to normalize or use absolute values
+                const mc = parseInt(lines[14]) || 1;
+                const ng = parseInt(lines[16]) || 1;
+                const totalFlux = parseFloat(lines[25]); // Linha 26 (Index 25)
                 const multiplier = (totalFlux > 0 ? totalFlux : 1000) / 1000;
-
-                // --- Data Body Parsing (Robust Tokenization) ---
-                // LDT geometry data starts after the header (Line 42 / Index 42).
-                // Key Fix: Instead of assuming 1 value per line, we treat the rest of the file
-                // as a stream of whitespace-separated numbers. This handles all valid formatting variations.
-                const bodyContent = lines.slice(42).join(' ').replace(/,/g, '.');
-                const tokens = bodyContent.trim().split(/\s+/).map(Number);
-                
-                // Verify data integrity
-                if (tokens.length < ng + (mc * ng)) {
-                    console.error("LDT Parser: Insufficient data points found.");
-                    return null;
-                }
-
-                let cursor = 0;
-                
-                // 1. Extract Vertical Angles (G-Angles)
+                let lineCursor = 42; 
                 let vAngles = [];
-                for(let i = 0; i < ng; i++) {
-                    vAngles.push(tokens[cursor++] || 0);
-                }
-
-                // 2. Extract Luminous Intensities (C-Planes)
+                for(let i=0; i<ng; i++) vAngles.push(parseFloat(lines[lineCursor++]) || 0);
                 let candelas = [];
-                for(let c = 0; c < mc; c++) {
+                for(let c=0; c<mc; c++) {
                     let row = [];
-                    for(let g = 0; g < ng; g++) {
-                        row.push(tokens[cursor++] || 0);
-                    }
+                    for(let g=0; g<ng; g++) row.push(parseFloat(lines[lineCursor++]) || 0);
                     candelas.push(row);
                 }
-
                 return { vAngles, candelas, multiplier };
-            } catch (e) { 
-                console.error("LDT Parse Error:", e);
-                return null; 
-            }
+            } catch (e) { return null; }
         };
 
         window.getIESIntensity = function(s, angleDeg) {
