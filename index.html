@@ -731,18 +731,25 @@
                     drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#22d3ee", true);
                 }
                  if (s.tilt > 0) {
-                    ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, hitY_px); ctx.strokeStyle = "rgba(255, 255, 255, 0.4)"; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+                     // CHANGED: Yellow Axis Line for Vertical
+                    ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, hitY_px); ctx.strokeStyle = "#FBBF24"; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+                     
                      if (hitY_metric > -10 && hitY_metric < s.height * 3) {
                         ctx.beginPath(); ctx.arc(wx, hitY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
                         drawTextVal(ctx, Math.round(ev) + " Lux", wx - 40, hitY_px);
+                        
+                        // NEW: Dimension from Beam Center to Floor
+                        if (hitY_px < floorY) {
+                            drawDimLineVertical(ctx, wx + 35, hitY_px, floorY, `${hitY_metric.toFixed(2)}m`);
+                        }
                      }
                      
-                    // NEW: Top of Beam Dimension
+                    // Top of Beam Dimension
                     if (s.tilt + s.beam/2 < 89) {
                         const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + s.beam/2) * Math.PI/180));
                         const hTopPx = floorY - (hTopMetric * scale);
                         if(hTopPx > -100 && hTopPx < floorY + 100) {
-                           drawDimLineVertical(ctx, wx + 20, hTopPx, floorY, `${hTopMetric.toFixed(2)}m`);
+                           drawDimLineVertical(ctx, wx + 15, hTopPx, floorY, `${hTopMetric.toFixed(2)}m`);
                         }
                     }
                 }
@@ -761,6 +768,9 @@
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(148, 163, 184, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
 
                 [leftX, rightX].forEach(lx => {
+                    // NEW: Axis Line for Homog
+                    ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(251, 191, 36, 0.4)"; ctx.moveTo(lx, sy); ctx.lineTo(lx, floorY); ctx.stroke(); ctx.setLineDash([]);
+                    
                     ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(lx, sy, 5, 0, Math.PI * 2); ctx.fill();
                     ctx.save(); ctx.translate(lx, sy);
                     const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
@@ -817,6 +827,10 @@
                 document.getElementById('content-'+k).classList.toggle('hidden', k!==t);
                 document.getElementById('btn-q-'+k).className = `query-tab-btn ${k===t ? 'query-tab-active' : ''}`;
             });
+            // NEW: Toggle filter visibility based on tab
+            const searchContainer = document.getElementById('search-container');
+            if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
+
             if(t==='nbr8995') window.filterNorms();
             if(t==='nbr5101') window.calc5101();
             if(t==='leed') window.updateLeedTargets();
