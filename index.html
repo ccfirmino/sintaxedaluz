@@ -44,57 +44,33 @@
     <style>
         body { font-family: 'Manrope', sans-serif; background-color: #020617; color: #f8fafc; background: linear-gradient(180deg, #020617 0%, #0f172a 100%); letter-spacing: 0.5px; min-height: 100vh; }
         h1, h2, h3, h4, .nav-link, button, input, label, select { text-transform: uppercase !important; }
-        
-        /* Glassmorphism & UI Components */
         .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
-        
-        /* Form Inputs */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: #FBBF24; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(251, 191, 36, 0.8); border: 2px solid #0f172a; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1e293b; border-radius: 2px; }
         input[type=number], select, input[type=text], input[type=date], input[type=email], input[type=password] { background-color: transparent; color: #f8fafc; border: none; border-bottom: 1px solid #334155; text-align: left; width: 100%; font-family: 'Manrope', sans-serif; font-weight: 300; -moz-appearance: textfield; padding: 8px 0; }
         input[type=number] { text-align: right; width: 65px; } 
         input:focus, select:focus { outline: none; border-bottom: 1px solid #FBBF24 !important; color: #FBBF24; }
-        select.custom-select option { background-color: #0f172a; color: #f8fafc; }
-        /* File Input Style */
         input[type="file"] { font-size: 10px; color: #94a3b8; }
         input[type="file"]::file-selector-button { margin-right: 10px; border: 1px solid rgba(251, 191, 36, 0.3); background: rgba(251, 191, 36, 0.1); padding: 5px 10px; border-radius: 4px; color: #FBBF24; cursor: pointer; transition: all 0.2s; font-weight: bold; text-transform: uppercase; font-size: 9px; }
-        input[type="file"]::file-selector-button:hover { background: rgba(251, 191, 36, 0.2); }
-
-        /* Auth & Locking */
         .auth-input-group label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #FBBF24 !important; }
-        .auth-input-group input { width: 100%; text-align: left; }
         .app-locked { filter: blur(8px) grayscale(0.5); pointer-events: none; user-select: none; overflow: hidden; height: 100vh; transition: filter 0.5s ease; }
-        
-        /* Navigation & Tabs */
         .nav-link { position: relative; font-size: 0.85rem; letter-spacing: 2px; color: #94a3b8; transition: color 0.3s; }
-        .nav-link:hover { color: #FBBF24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.4); }
         .tab-active { border-bottom: 2px solid #FBBF24 !important; color: #FBBF24 !important; opacity: 1 !important; }
         .tab-inactive { border-bottom: 2px solid transparent !important; color: #94a3b8 !important; opacity: 0.6; }
-        .mode-tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px 20px; min-width: 130px; height: 90px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); background: rgba(255, 255, 255, 0.02); transition: all 0.3s ease; backdrop-filter: blur(5px); position: relative; }
-        .mode-tab-btn:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.2); }
-        
-        /* Visual Tools */
+        .mode-tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px 20px; min-width: 130px; height: 90px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); background: rgba(255, 255, 255, 0.02); transition: all 0.3s ease; backdrop-filter: blur(5px); }
         .canvas-container { background: linear-gradient(135deg, #0B1221 0%, #1e293b 100%); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.3); border-radius: 4px; }
-        
-        /* Tool Specifics */
         .query-tab-btn { padding: 8px 16px; font-size: 10px; font-weight: bold; text-transform: uppercase; border-radius: 9999px; border: 1px solid transparent; transition: all 0.3s; color: #94a3b8; }
         .query-tab-active { background-color: rgba(251, 191, 36, 0.1); color: #FBBF24; border-color: #FBBF24; }
         .leed-level-box { transition: all 0.3s; border: 1px solid transparent; opacity: 0.5; cursor: pointer; }
         .leed-level-box.active { opacity: 1; border-color: #FBBF24; background: rgba(251, 191, 36, 0.1); transform: scale(1.05); }
         .well-toggle-group { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; }
         .well-toggle-group.active { border-color: #22d3ee; background: rgba(34, 211, 238, 0.05); }
-        .cert-tab { cursor: pointer; padding: 8px 16px; border-radius: 6px; transition: all 0.3s; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; }
+        .cert-tab { cursor: pointer; padding: 8px 16px; border-radius: 6px; transition: all 0.3s; font-size: 11px; font-weight: bold; text-transform: uppercase; }
         .cert-tab.active { background: rgba(132, 204, 22, 0.15); color: #84cc16; border: 1px solid rgba(132, 204, 22, 0.3); }
-        .cert-tab.inactive { color: #94a3b8; opacity: 0.6; }
-        
         input[type="radio"] { appearance: none; background-color: transparent; margin: 0; font: inherit; color: #FBBF24; width: 1.15em; height: 1.15em; border: 1px solid #FBBF24; border-radius: 50%; display: grid; place-content: center; }
         input[type="radio"]::before { content: ""; width: 0.65em; height: 0.65em; background-color: #FBBF24; border-radius: 50%; transform: scale(0); transition: 120ms transform ease-in-out; }
         input[type="radio"]:checked::before { transform: scale(1); }
-
         .bar-container { width: 100%; height: 6px; background-color: rgba(255, 255, 255, 0.1); border-radius: 9999px; overflow: hidden; margin-top: 6px; }
         .bar-fill { height: 100%; border-radius: 9999px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
@@ -103,26 +79,26 @@
 
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-500">
         <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm"></div>
-        <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative z-10 animate-fade-in-up border border-luminous-gold/20 shadow-[0_0_50px_rgba(251,191,36,0.1)]">
+        <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative z-10 animate-fade-in-up border border-luminous-gold/20">
             <div class="text-center mb-8">
-                <div class="text-2xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)] mb-2">LUX<span class="text-white font-light opacity-60">SINTAX</span></div>
+                <div class="text-2xl font-bold tracking-[0.2em] text-luminous-gold mb-2">LUX<span class="text-white font-light opacity-60">SINTAX</span></div>
                 <p class="text-[10px] text-dim-gray uppercase tracking-widest">CADASTRE-SE GRATUITAMENTE</p>
             </div>
             <div class="flex border-b border-white/10 mb-6">
-                <button onclick="window.AuthManager.switchTab('login')" id="tab-auth-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all">Login</button>
-                <button onclick="window.AuthManager.switchTab('register')" id="tab-auth-register" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all">Cadastro</button>
+                <button onclick="window.AuthManager.switchTab('login')" id="tab-auth-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold">Login</button>
+                <button onclick="window.AuthManager.switchTab('register')" id="tab-auth-register" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white">Cadastro</button>
             </div>
             <div id="form-login" class="space-y-6">
                 <div class="auth-input-group"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"></div>
                 <div class="auth-input-group"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••"></div>
-                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-white transition-colors shadow-[0_0_20px_rgba(251,191,36,0.3)]">Acessar Plataforma</button>
+                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-midnight font-bold rounded-lg uppercase tracking-widest text-xs">Acessar Plataforma</button>
             </div>
             <div id="form-register" class="space-y-5 hidden">
                 <div class="grid grid-cols-2 gap-4"><div class="auth-input-group"><label>Nome</label><input type="text" id="reg-name" placeholder="Nome"></div><div class="auth-input-group"><label>Sobrenome</label><input type="text" id="reg-surname" placeholder="Sobrenome"></div></div>
                 <div class="auth-input-group"><label>E-mail Corporativo</label><input type="email" id="reg-email" placeholder="nome@empresa.com"></div>
                 <div class="auth-input-group"><label>Senha</label><input type="password" id="reg-password" placeholder="Crie uma senha forte"></div>
                 <div class="flex items-start gap-2 mt-2"><input type="checkbox" id="reg-terms" class="mt-1 w-3 h-3 accent-luminous-gold"><label for="reg-terms" class="text-[9px] leading-tight text-dim-gray cursor-pointer">Concordo com os termos de uso.</label></div>
-                <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border border-luminous-gold text-luminous-gold font-bold rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-midnight transition-colors">Criar Conta Gratuita</button>
+                <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border border-luminous-gold text-luminous-gold font-bold rounded-lg uppercase tracking-widest text-xs">Criar Conta Gratuita</button>
             </div>
         </div>
     </div>
@@ -131,7 +107,7 @@
         <nav class="fixed w-full z-50 bg-midnight/90 backdrop-blur-xl border-b border-white/5">
             <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">LUX<span class="text-white font-light opacity-60">SINTAX</span></a>
+                    <a href="#" class="text-xl font-bold tracking-[0.2em] text-luminous-gold">LUX<span class="text-white font-light opacity-60">SINTAX</span></a>
                     <span class="bg-luminous-gold/20 text-luminous-gold text-[9px] font-black px-2 py-0.5 rounded border border-luminous-gold/30 tracking-widest animate-pulse">BETA</span>
                 </div>
                 <div class="hidden md:flex gap-8 items-center">
@@ -143,21 +119,12 @@
                         <div class="flex flex-col"><span id="user-name-display" class="text-[10px] font-bold text-white uppercase leading-none">Usuário</span><button onclick="window.AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-400 text-left uppercase font-bold">Sair</button></div>
                     </div>
                 </div>
-                <div class="md:hidden text-luminous-gold text-2xl cursor-pointer" onclick="window.toggleMobileMenu()"><i class="fas fa-bars"></i></div>
-            </div>
-            <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-midnight/95 backdrop-blur-xl border-b border-white/5 p-6 flex flex-col gap-6 shadow-2xl transition-all duration-300">
-                 <a href="#calculadora" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
-                 <a href="#fundamentos" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
-                 <button onclick="window.AuthManager.logout()" class="text-sm font-bold tracking-widest text-red-400 text-left">SAIR</button>
-                 <div class="h-[1px] bg-white/10 w-full"></div>
-                 <button onclick="window.toggleLanguage(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-white hover:text-luminous-gold text-left lang-display">PT / EN</button>
             </div>
         </nav>
 
         <section id="calculadora" class="pt-24 pb-10 px-4 md:px-8 relative min-h-screen">
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-30"></div>
             <div class="max-w-[1800px] mx-auto flex flex-col items-center">
-                <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
+                <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 overflow-x-auto pb-2">
                     <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines"></i><span data-i18n="tab_horiz">SUPERFÍCIE<br>HORIZONTAL</span></button>
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
                     <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-border-all"></i><span data-i18n="tab_dist">DISTRIBUIÇÃO<br>& DESENHO</span></button>
@@ -165,11 +132,11 @@
                 </div>
 
                 <div id="calculator-interface" class="w-full relative">
-                    <div id="visual-tools" class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full transition-opacity duration-300 hidden">
+                    <div id="visual-tools" class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full hidden">
                         <div class="lg:col-span-3 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
-                                    <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center drop-shadow-md border-b border-white/10 pb-3" data-i18n="calc_params">Parâmetros da Fonte</h3>
+                                    <h3 class="text-md text-white mb-2 font-bold whitespace-nowrap text-center pb-3 border-b border-white/10" data-i18n="calc_params">Parâmetros da Fonte</h3>
                                     <div class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6">
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-muted-blue group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
@@ -179,9 +146,7 @@
                                 <div id="inputs-ponto" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
-                                    <div class="mode-standard-only">
-                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
-                                    </div>
+                                    <div class="mode-standard-only"><div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
                                     <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
@@ -189,20 +154,14 @@
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
                                     </div>
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
-                                        <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
-                                            <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-                                        </div>
+                                        <div class="group"><label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label><input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2"><p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p></div>
                                     </div>
                                 </div>
                                 <div id="inputs-vertical" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
-                                    <div class="mode-standard-only">
-                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
-                                    </div>
+                                    <div class="mode-standard-only"><div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div></div>
                                     <div class="mb-2 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
                                     <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
                                     <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
@@ -210,39 +169,22 @@
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-v-cdklm" min="0" max="10000" step="10" value="2000"></div>
                                     </div>
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
-                                        <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
-                                            <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-                                        </div>
+                                        <div class="group"><label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label><input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2"><p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p></div>
                                     </div>
                                 </div>
                                 <div id="inputs-homog" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_spacing">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-muted-blue font-bold">M</span></div></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
-                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
-                                    <div class="mode-direct-group mb-6 group border-t border-white/5 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-muted-blue font-bold">CD</span></div></div><input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000"></div>
-                                    <div class="mode-photo-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="h-flux" value="1500"><span class="text-[9px] text-muted-blue font-bold">LM</span></div></div><input type="range" id="range-h-flux" min="0" max="10000" step="10" value="1500"></div>
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="h-cdklm" value="2000"><span class="text-[9px] text-muted-blue font-bold">CD/KLM</span></div></div><input type="range" id="range-h-cdklm" min="0" max="10000" step="10" value="2000"></div>
-                                    </div>
-                                    <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-white/5 pt-4">
-                                        <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="h-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-white/10 pb-2">
-                                            <p id="h-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-                                        </div>
-                                    </div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-muted-blue font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-muted-blue font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="lg:col-span-9 flex flex-col gap-6">
-                            <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full min-h-[600px]">
-                                <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 drop-shadow-md uppercase tracking-widest font-bold" data-i18n="hdr_results">Resultados em Tempo Real</h3>
-                                <div class="relative w-full flex-grow bg-twilight/50 border border-white/10 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner">
-                                    <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 40px 40px;"></div>
+                            <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col min-h-[600px]">
+                                <h3 class="text-sm text-white mb-6 border-b border-white/10 pb-4 uppercase tracking-widest font-bold" data-i18n="hdr_results">Resultados em Tempo Real</h3>
+                                <div class="relative w-full flex-grow bg-twilight/50 border border-white/10 rounded-2xl mb-6 overflow-hidden canvas-container">
                                     <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
                                 </div>
                             </div>
@@ -252,119 +194,19 @@
                     <div id="query-tool" class="w-full animate-fade-in-up col-span-12">
                         <div class="glass-panel p-6 rounded-2xl">
                             <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-white/10 pb-4 gap-4">
-                                <div><h3 class="text-lg text-luminous-gold font-bold tracking-widest flex items-center gap-2 uppercase"><i class="fas fa-search"></i> <span data-i18n="hdr_query">Centro de Consultas</span></h3><p class="text-xs text-muted-blue mt-1" data-i18n="query_subtitle">Acesso rápido a normas e referências técnicas.</p></div>
+                                <div><h3 class="text-lg text-luminous-gold font-bold tracking-widest uppercase flex items-center gap-2"><i class="fas fa-search"></i> <span data-i18n="hdr_query">Centro de Consultas</span></h3><p class="text-xs text-muted-blue mt-1" data-i18n="query_subtitle">Acesso rápido a normas e referências técnicas.</p></div>
                                 <div class="flex gap-2">
                                     <button onclick="window.switchQueryTab('nbr8995')" id="btn-q-nbr8995" class="query-tab-btn query-tab-active" data-i18n="tab_interiors">Interiores (NBR 8995)</button>
                                     <button onclick="window.switchQueryTab('nbr5101')" id="btn-q-nbr5101" class="query-tab-btn" data-i18n="tab_roadway">Viária (NBR 5101)</button>
                                     <button onclick="window.switchQueryTab('leed')" id="btn-q-leed" class="query-tab-btn">LEED / WELL</button>
                                 </div>
                             </div>
-
-                            <div id="search-container" class="flex flex-col md:flex-row gap-4 mb-6 w-full">
-                                <div class="w-full">
-                                    <select id="category-filter" onchange="window.filterNorms()" class="w-full bg-black/40 border border-white/10 rounded-full py-3 px-6 text-sm text-white focus:border-luminous-gold outline-none transition-all custom-select uppercase cursor-pointer">
-                                        <option value="all" data-i18n="filter_all">Todas as Categorias</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div id="content-nbr8995" class="query-content">
-                                <div class="overflow-hidden rounded-xl border border-white/10">
-                                    <div class="overflow-x-auto max-h-[550px] overflow-y-auto custom-scrollbar">
-                                        <table class="w-full text-left border-collapse">
-                                            <thead class="bg-white/5 text-xs text-white font-bold uppercase tracking-wider sticky top-0 bg-midnight z-10">
-                                                <tr><th class="p-4 border-b border-white/10" data-i18n="col_cat">Categoria</th><th class="p-4 border-b border-white/10" data-i18n="col_room">Ambiente / Tarefa</th><th class="p-4 border-b border-white/10 text-center text-white">Lux (Em)</th><th class="p-4 border-b border-white/10 text-center">UGR Máx</th><th class="p-4 border-b border-white/10 text-center">Ra Min</th></tr>
-                                            </thead>
-                                            <tbody id="nbr8995-tbody" class="text-sm text-muted-blue divide-y divide-white/5"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
+                            <div id="search-container" class="mb-6"><select id="category-filter" onchange="window.filterNorms()" class="w-full bg-black/40 border border-white/10 rounded-full py-3 px-6 text-sm text-white uppercase"><option value="all" data-i18n="filter_all">Todas as Categorias</option></select></div>
+                            <div id="content-nbr8995" class="query-content"><div class="overflow-x-auto max-h-[550px] custom-scrollbar"><table class="w-full text-left border-collapse"><thead class="bg-white/5 text-xs text-white uppercase sticky top-0 bg-midnight"><tr><th class="p-4 border-b border-white/10" data-i18n="col_cat">Categoria</th><th class="p-4 border-b border-white/10" data-i18n="col_room">Ambiente</th><th class="p-4 border-b border-white/10 text-center">Lux (Em)</th><th class="p-4 border-b border-white/10 text-center">UGR Máx</th><th class="p-4 border-b border-white/10 text-center">Ra Min</th></tr></thead><tbody id="nbr8995-tbody" class="text-sm text-muted-blue divide-y divide-white/5"></tbody></table></div></div>
                             <div id="content-nbr5101" class="query-content hidden">
                                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-                                    <div class="lg:col-span-5 flex flex-col gap-4">
-                                        <div class="glass-panel p-5 rounded-xl border border-white/5">
-                                            <h4 class="text-sm font-bold text-luminous-gold mb-4 flex items-center gap-2 uppercase tracking-wider"><i class="fas fa-sliders-h"></i> <span data-i18n="road_params">Parâmetros da Via (Classe M)</span></h4>
-                                            <div class="space-y-4">
-                                                <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_speed">Velocidade (km/h)</label><select id="m-speed" onchange="window.calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="2">Muito Alta (> 100)</option><option value="1">Alta (70 - 100)</option><option value="-1">Moderada (40 - 70)</option><option value="-2">Baixa (< 40)</option></select></div>
-                                                <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_volume">Volume de Tráfego</label><select id="m-volume" onchange="window.calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alto (> 65% capacidade)</option><option value="0" selected>Moderado (35-65%)</option><option value="-1">Baixo (< 35%)</option></select></div>
-                                                <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_separation">Separação de Tráfego</label><select id="m-separation" onchange="window.calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="0">Não (Pista Simples)</option><option value="-1">Sim (Canteiro Central)</option></select></div>
-                                                <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_density">Densidade de Interseções</label><select id="m-density" onchange="window.calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta (> 3 por km)</option><option value="0" selected>Moderada (< 3 por km)</option></select></div>
-                                                <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_complexity">Complexidade / Guiagem</label><select id="m-complexity" onchange="window.calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta / Guiagem Pobre</option><option value="0" selected>Normal / Guiagem Boa</option></select></div>
-                                                <div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block" data-i18n="lbl_ambient">Luminância do Entorno</label><select id="m-ambient" onchange="window.calc5101()" class="w-full bg-midnight/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold transition-colors"><option value="1">Alta (Comercial/Urbano)</option><option value="0" selected>Moderada (Residencial)</option><option value="-1">Baixa (Rural)</option></select></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="lg:col-span-7">
-                                        <div class="glass-panel p-6 rounded-xl border border-white/10 h-full flex flex-col justify-center relative overflow-hidden">
-                                            <div class="absolute inset-0 bg-gradient-to-br from-luminous-gold/5 to-transparent pointer-events-none"></div>
-                                            <div class="text-center mb-8">
-                                                <div class="text-[10px] text-dim-gray font-bold uppercase tracking-[0.2em] mb-2" data-i18n="road_rec_class">Classe Recomendada</div>
-                                                <div id="m-result-class" class="text-7xl font-black text-white mb-2 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tracking-tighter">M3</div>
-                                                <div id="m-result-desc" class="text-xs text-luminous-gold font-bold uppercase tracking-widest bg-luminous-gold/10 px-4 py-1.5 rounded-full border border-luminous-gold/20 inline-block">Vias Arteriais Secundárias</div>
-                                            </div>
-                                            <div class="space-y-5 px-4 max-w-md mx-auto w-full">
-                                                <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_lmed">Luminância Média (Lmed)</span><span class="text-xs font-bold text-luminous-gold"><span id="res-lmed-val">1.0</span> <span class="text-[9px] text-dim-gray">cd/m²</span></span></div><div class="bar-container"><div id="bar-lmed" class="bar-fill bg-gradient-to-r from-luminous-gold/50 to-luminous-gold" style="width: 50%;"></div></div><div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_ref_m1">Referência: M1 (2.0)</div></div>
-                                                <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_emed">Iluminância Média (Emed)</span><span class="text-xs font-bold text-white"><span id="res-emed-val">15</span> <span class="text-[9px] text-dim-gray">Lux</span></span></div><div class="bar-container"><div id="bar-emed" class="bar-fill bg-gradient-to-r from-white/30 to-white" style="width: 50%;"></div></div><div class="text-[9px] text-dim-gray mt-1 text-right" data-i18n="road_approx">Aprox. para Asfalto Padrão</div></div>
-                                                <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_u0">Uniformidade Geral (U0)</span><span class="text-xs font-bold text-tech-cyan"><span id="res-u0-val">0.40</span></span></div><div class="bar-container"><div id="bar-u0" class="bar-fill bg-gradient-to-r from-tech-cyan/50 to-tech-cyan" style="width: 80%;"></div></div></div>
-                                                <div><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase" data-i18n="road_ti">Ofuscamento Máx (TI)</span><span class="text-xs font-bold text-red-400"><span id="res-ti-val">15</span>%</span></div><div class="bar-container"><div id="bar-ti" class="bar-fill bg-gradient-to-r from-red-400/50 to-red-400" style="width: 60%;"></div></div></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="content-leed" class="query-content hidden">
-                                <div class="flex gap-2 mb-4 border-b border-white/5 pb-2">
-                                    <span onclick="window.switchCertTab('leed')" id="cert-tab-leed" class="cert-tab active">LEED v4.1 (BD+C)</span>
-                                    <span onclick="window.switchCertTab('well')" id="cert-tab-well" class="cert-tab inactive">WELL v2</span>
-                                </div>
-                                <div id="pane-leed" class="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                                    <div class="mb-6 bg-black/30 p-4 rounded-xl border border-white/5 shadow-lg">
-                                        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-                                            <h4 class="text-sm font-bold text-luminous-gold flex items-center gap-2"><i class="fas fa-calculator"></i> <span data-i18n="leed_calc_title">Calculadora de Orçamento (LPD)</span></h4>
-                                            <div class="text-[9px] bg-leed-green/20 px-2 py-1 rounded text-leed-green font-bold">ASHRAE 90.1-2016</div>
-                                        </div>
-                                        <div class="flex flex-col md:flex-row gap-6 items-end mb-6">
-                                            <div class="w-full md:w-1/2">
-                                                <label class="text-[10px] text-dim-gray font-bold uppercase block mb-3" data-i18n="leed_select_target">Selecione a Meta de Certificação</label>
-                                                <div class="grid grid-cols-4 gap-2 text-center">
-                                                    <div onclick="window.setLeedTarget('certified')" id="lvl-certified" class="leed-level-box bg-white/5 p-2 rounded border border-transparent hover:border-white/20"><div class="text-[9px] font-bold text-gray-400">CERTIFIED</div></div>
-                                                    <div onclick="window.setLeedTarget('silver')" id="lvl-silver" class="leed-level-box bg-white/5 p-2 rounded border border-transparent hover:border-white/20"><div class="text-[9px] font-bold text-gray-300">SILVER</div></div>
-                                                    <div onclick="window.setLeedTarget('gold')" id="lvl-gold" class="leed-level-box bg-white/5 p-2 rounded border border-luminous-gold/20 active"><div class="text-[9px] font-bold text-luminous-gold">GOLD</div></div>
-                                                    <div onclick="window.setLeedTarget('platinum')" id="lvl-platinum" class="leed-level-box bg-white/5 p-2 rounded border border-transparent hover:border-white/20"><div class="text-[9px] font-bold text-cyan-200">PLATINUM</div></div>
-                                                </div>
-                                            </div>
-                                            <div class="w-full md:w-1/4 text-right md:text-left"><div class="text-[10px] text-dim-gray font-bold uppercase mb-1" data-i18n="leed_reduction">Redução Aplicada</div><div id="leed-reduction-display" class="text-xl font-bold text-leed-green">20%</div></div>
-                                            <div class="w-full md:w-1/4"><label class="text-[10px] text-tech-cyan font-bold uppercase block mb-2" data-i18n="leed_area">Área do Projeto (m²)</label><div class="relative"><input type="number" id="leed-area-input" value="100" oninput="window.updateLeedTargets()" class="w-full bg-midnight border border-white/20 rounded px-3 py-2 text-xs text-white outline-none focus:border-luminous-gold text-right pr-8"><span class="absolute right-3 top-2 text-xs text-tech-cyan">m²</span></div></div>
-                                        </div>
-                                        <table class="w-full text-xs text-left border-collapse">
-                                            <thead class="text-white border-b border-white/10 bg-white/5"><tr><th class="p-3 font-bold" data-i18n="leed_type">Tipologia</th><th class="p-3 text-center font-bold text-dim-gray">Base ASHRAE<br><span class="text-[9px] opacity-70">(W/m²)</span></th><th class="p-3 text-center font-bold text-luminous-gold">Meta LPD<br><span class="text-[9px] opacity-70">(W/m²)</span></th><th class="p-3 text-right font-bold text-tech-cyan"><span data-i18n="leed_allowance">CARGA PERMITIDA</span><br><span class="text-[9px] opacity-70">(Watts)</span></th></tr></thead>
-                                            <tbody id="leed-lpd-body" class="text-dim-line text-xs font-medium"></tbody>
-                                        </table>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div class="bg-black/20 p-4 rounded-xl border border-white/5"><h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">EQ: Interior Lighting <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">1-2 Pts</span></h4><ul class="list-disc pl-4 text-xs text-dim-gray space-y-2"><li data-i18n="leed_eq_1"><strong class="text-white">Controle:</strong> Individual para 90% dos ocupantes.</li><li data-i18n="leed_eq_2"><strong class="text-white">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.</li></ul></div>
-                                        <div class="bg-black/20 p-4 rounded-xl border border-white/5"><h4 class="text-sm font-bold text-leed-green mb-3 flex justify-between">SS: Light Pollution <span class="text-[10px] bg-leed-green/20 px-2 py-1 rounded text-leed-green">Req</span></h4><div class="text-xs text-dim-gray" data-i18n="leed_ss_1">Requisito <strong class="text-white">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).</div></div>
-                                    </div>
-                                </div>
-                                <div id="pane-well" class="hidden max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                                    <div class="mb-6 bg-black/30 p-5 rounded-xl border border-white/5 shadow-lg">
-                                        <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                                            <div><h4 class="text-sm font-bold text-tech-cyan flex items-center gap-2"><i class="fas fa-check-circle"></i> <span data-i18n="well_sim_title">Simulador de Créditos de Iluminação</span></h4><p class="text-[10px] text-dim-gray mt-1" data-i18n="well_concept">Conceito: LIGHT (WELL v2)</p></div>
-                                            <div class="text-right"><div class="text-[9px] text-dim-gray uppercase font-bold" data-i18n="well_est_pts">Pontos Estimados</div><div id="well-total-score" class="text-2xl font-black text-white">0 <span class="text-xs text-dim-gray font-normal">/ 8</span></div></div>
-                                        </div>
-                                        <div class="mb-6"><div class="flex justify-between text-[9px] text-dim-gray mb-1 uppercase font-bold"><span data-i18n="well_contrib">Contribuição para Certificação</span><span id="well-progress-text">0%</span></div><div class="w-full bg-white/10 h-2 rounded-full overflow-hidden"><div id="well-progress-bar" class="h-full bg-gradient-to-r from-tech-cyan/40 to-tech-cyan transition-all duration-500" style="width: 0%"></div></div></div>
-                                        <div class="space-y-3">
-                                            <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green"><div><div class="text-xs font-bold text-white">L01: Light Exposure</div><div class="text-[10px] text-dim-gray" data-i18n="well_l01">Acesso à luz natural e visualização.</div></div><div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div></div>
-                                            <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border-l-2 border-leed-green"><div><div class="text-xs font-bold text-white">L02: Visual Lighting Design</div><div class="text-[10px] text-dim-gray" data-i18n="well_l02">Níveis de iluminância adequados.</div></div><div class="text-[9px] bg-leed-green/20 text-leed-green px-2 py-1 rounded font-bold uppercase" data-i18n="well_req">Obrigatório</div></div>
-                                            <div onclick="window.toggleWellFeature(this, 3)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="3"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L03: Circadian Lighting Design</div><div class="text-[10px] text-dim-gray" data-i18n="well_l03">Melanopic Lux > 240 (Workstations).</div></div></div><div class="text-xs font-bold text-tech-cyan">+3 pts</div></div>
-                                            <div onclick="window.toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="2"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L04: Glare Control</div><div class="text-[10px] text-dim-gray" data-i18n="well_l04">UGR < 16 / Gestão de brilho solar.</div></div></div><div class="text-xs font-bold text-tech-cyan">+2 pts</div></div>
-                                            <div onclick="window.toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="2"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L07: Electric Light Quality</div><div class="text-[10px] text-dim-gray" data-i18n="well_l07">CRI > 90, R9 > 50, Flicker < 90Hz.</div></div></div><div class="text-xs font-bold text-tech-cyan">+2 pts</div></div>
-                                            <div onclick="window.toggleWellFeature(this, 1)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="1"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity"></i></div><div><div class="text-xs font-bold text-white">L08: Occupant Control</div><div class="text-[10px] text-dim-gray" data-i18n="well_l08">Controle de zonas e intensidade.</div></div></div><div class="text-xs font-bold text-tech-cyan">+1 pt</div></div>
-                                        </div>
-                                    </div>
+                                    <div class="lg:col-span-5"><div class="glass-panel p-5 rounded-xl border border-white/5 space-y-4"><h4 class="text-sm font-bold text-luminous-gold uppercase tracking-wider"><i class="fas fa-sliders-h"></i> <span data-i18n="road_params">Parâmetros da Via</span></h4><div class="space-y-4"><div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block">Velocidade (km/h)</label><select id="m-speed" onchange="window.calc5101()" class="w-full bg-midnight border border-white/10 rounded-lg px-3 py-2 text-xs text-white"><option value="2">Muito Alta (> 100)</option><option value="1">Alta (70 - 100)</option><option value="-1">Moderada (40 - 70)</option><option value="-2">Baixa (< 40)</option></select></div><div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block">Volume de Tráfego</label><select id="m-volume" onchange="window.calc5101()" class="w-full bg-midnight border border-white/10 rounded-lg px-3 py-2 text-xs text-white"><option value="1">Alto</option><option value="0" selected>Moderado</option><option value="-1">Baixo</option></select></div><div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block">Separação de Tráfego</label><select id="m-separation" onchange="window.calc5101()" class="w-full bg-midnight border border-white/10 rounded-lg px-3 py-2 text-xs text-white"><option value="0">Não</option><option value="-1">Sim</option></select></div><div class="group"><label class="text-[10px] text-dim-gray font-bold uppercase mb-1 block">Luminância Entorno</label><select id="m-ambient" onchange="window.calc5101()" class="w-full bg-midnight border border-white/10 rounded-lg px-3 py-2 text-xs text-white"><option value="1">Alta</option><option value="0" selected>Moderada</option><option value="-1">Baixa</option></select></div></div></div></div>
+                                    <div class="lg:col-span-7"><div class="glass-panel p-6 rounded-xl border border-white/10 h-full flex flex-col justify-center text-center space-y-6"><div id="m-result-class" class="text-7xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">M3</div><div id="m-result-desc" class="text-xs text-luminous-gold font-bold uppercase tracking-widest bg-luminous-gold/10 px-4 py-1.5 rounded-full border border-luminous-gold/20 inline-block">Vias Arteriais</div><div class="space-y-4 max-w-md mx-auto w-full"><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-white uppercase">Lmed (cd/m²)</span><span id="res-lmed-val" class="text-xs font-bold text-luminous-gold">1.0</span></div><div class="bar-container"><div id="bar-lmed" class="bar-fill bg-luminous-gold" style="width: 50%;"></div></div></div></div></div>
                                 </div>
                             </div>
                         </div>
@@ -373,43 +215,7 @@
             </div>
         </section>
 
-        <section id="fundamentos" class="py-24 px-6 border-t border-white/5 bg-midnight">
-            <div class="max-w-[1800px] mx-auto">
-                <div class="text-center mb-16">
-                    <h2 class="text-3xl text-luminous-gold font-bold tracking-widest mb-6 uppercase" data-i18n="about_title">SOBRE</h2>
-                    <p class="text-sm text-dim-line font-light max-w-6xl mx-auto leading-relaxed text-justify" data-i18n="about_text">O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.</p>
-                </div>
-                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-luminous-gold/30 transition-all h-full"><div class="absolute top-0 right-0 p-4 opacity-30 text-luminous-gold"><i class="fas fa-calculator text-2xl"></i></div><h3 class="text-starlight text-xs font-bold mb-4 tracking-wider border-b border-luminous-gold/30 pb-2 inline-block" data-i18n="card_1_title">INTENSIDADE ABSOLUTA</h3><p class="text-muted-blue text-xs mb-4 font-light leading-relaxed min-h-[50px]" data-i18n="card_1_desc">Converte dados fotométricos relativos para intensidade absoluta (Candelas).</p><div class="bg-black/40 p-3 rounded-lg text-center shadow-inner"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-medium whitespace-nowrap">I = (Φ · γ) / 1000</span></div></div>
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-luminous-gold/30 transition-all h-full"><div class="absolute top-0 right-0 p-4 opacity-30 text-luminous-gold"><i class="fas fa-lightbulb text-2xl"></i></div><h3 class="text-starlight text-xs font-bold mb-4 tracking-wider border-b border-luminous-gold/30 pb-2 inline-block" data-i18n="card_2_title">LEI DO COSSENO CÚBICO</h3><p class="text-muted-blue text-xs mb-4 font-light leading-relaxed min-h-[50px]" data-i18n="card_2_desc">Variação da Lei do Inverso do Quadrado para superfícies horizontais.</p><div class="bg-black/40 p-3 rounded-lg text-center shadow-inner"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-medium whitespace-nowrap">E = (I · cos³θ) / h²</span></div></div>
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-luminous-gold/30 transition-all h-full"><div class="absolute top-0 right-0 p-4 opacity-30 text-luminous-gold"><i class="fas fa-ruler-combined text-2xl"></i></div><h3 class="text-starlight text-xs font-bold mb-4 tracking-wider border-b border-luminous-gold/30 pb-2 inline-block" data-i18n="card_3_title">GEOMETRIA DO FACHO</h3><p class="text-muted-blue text-xs mb-4 font-light leading-relaxed min-h-[50px]" data-i18n="card_3_desc">Cálculo trigonométrico do diâmetro da mancha luminosa projetada.</p><div class="bg-black/40 p-3 rounded-lg text-center shadow-inner"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-medium whitespace-nowrap">Ø = 2 · d · tan(α/2)</span></div></div>
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-luminous-gold/30 transition-all h-full"><div class="absolute top-0 right-0 p-4 opacity-30 text-luminous-gold"><i class="fas fa-search-plus text-2xl"></i></div><h3 class="text-starlight text-xs font-bold mb-4 tracking-wider border-b border-luminous-gold/30 pb-2 inline-block" data-i18n="card_4_title">CONSULTA NORMATIVA</h3><p class="text-muted-blue text-xs mb-4 font-light leading-relaxed min-h-[50px]" data-i18n="card_4_desc">Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.</p><div class="bg-black/40 p-3 rounded-lg text-center shadow-inner"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-medium whitespace-nowrap">Database + Compliance</span></div></div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="bg-midnight py-12 px-6 border-t border-white/5 mt-auto text-[10px] tracking-widest text-muted-blue opacity-60">
-            <div class="max-w-[1800px] mx-auto text-center uppercase font-black">
-                <a href="#" class="text-lg font-bold tracking-[0.2em] text-luminous-gold uppercase">LuxSintax</a>
-                <p class="mt-2">© 2026 LuxSintax. All rights reserved.</p>
-                <div class="mt-4"><button onclick="window.openTerms()" class="hover:text-luminous-gold transition-colors border-b border-transparent hover:border-luminous-gold" data-i18n="footer_terms">Termo de Responsabilidade</button></div>
-            </div>
-        </footer>
-    </div>
-
-    <div id="terms-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-midnight/90 backdrop-blur-sm" onclick="window.closeTerms()"></div>
-        <div class="relative w-full max-w-lg bg-twilight border border-white/10 rounded-2xl shadow-2xl p-8 animate-fade-in-up z-10">
-            <h3 class="text-luminous-gold font-bold tracking-widest text-lg mb-6 uppercase text-center" data-i18n="terms_title">Termo de Responsabilidade e Uso</h3>
-            <div class="text-xs text-dim-gray leading-relaxed text-justify space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2" id="terms-content">
-                <p><strong class="text-white">1. Natureza do Serviço e Otimização de Workflow</strong><br>O LuxSintax é uma plataforma SaaS projetada para otimizar o tempo e a produtividade do Lighting Designer na fase de concepção e pré-dimensionamento. O objetivo desta ferramenta é fornecer agilidade na validação de premissas e consultas normativas rápidas (NBR/ISO/CIE), permitindo que o profissional foque na estratégia criativa e técnica inicial.</p>
-                <p><strong class="text-white">2. Caráter Preliminar e Simulação Teórica</strong><br>Os resultados gerados — incluindo, mas não se limitando a, níveis de iluminância (Lux), cálculos de carga (LPD) e simulações de facho — são baseados em modelos matemáticos teóricos (como a Lei do Cosseno Cúbico e a Lei do Inverso do Quadrado).<br><br><strong class="text-white">Limitação Técnica:</strong> Esta ferramenta não processa cálculos complexos de inter-reflexão de superfícies (radiosidade/ray-tracing) nem considera obstruções físicas reais do ambiente, depreciação luminosa por manutenção ou tolerâncias de fabricação de hardware.</p>
-                <p><strong class="text-white">3. Isenção de Responsabilidade Profissional (Hold Harmless)</strong><br>O uso dos dados gerados pelo LuxSintax para fins de execução de obra, compra de materiais ou submissão a órgãos certificadores (LEED, WELL, Procel, Prefeituras) é de inteira e exclusiva responsabilidade do usuário.<br><br><strong class="text-white">Não Substituição:</strong> Os estudos realizados nesta plataforma não substituem o projeto executivo luminotécnico assinado por profissional habilitado, nem dispensam a validação final em softwares de cálculo global (ex: DIALux, Relux, AGi32).<br><strong class="text-white">Danos Indiretos:</strong> A LuxSintax e seus desenvolvedores não se responsabilizam por erros de dimensionamento, prejuízos financeiros em compras de luminárias baseadas em estimativas preliminares, ou qualquer desconformidade encontrada em medições in loco após a instalação.</p>
-                <p><strong class="text-white">4. Responsabilidade do Profissional (User Warranty)</strong><br>Ao utilizar a plataforma, o usuário declara ser profissional capacitado e ciente de que a ferramenta funciona como um suporte à decisão. É dever do projetista verificar a vigência das normas técnicas citadas e aplicar os coeficientes de segurança adequados para cada tipologia de projeto.</p>
-                <p><strong class="text-white">5. Propriedade Intelectual e Disponibilidade (SaaS Terms)</strong><br>A plataforma é fornecida "as-is" (como está). Reservamo-nos o direito de realizar atualizações nos algoritmos de cálculo para melhor precisão, sem aviso prévio, visando sempre a evolução do estado-da-arte da ferramenta.</p>
-            </div>
-            <div class="mt-8 flex justify-center"><button onclick="window.closeTerms()" class="px-8 py-3 bg-luminous-gold text-midnight font-bold rounded-full hover:bg-white transition-colors text-xs tracking-widest uppercase" data-i18n="terms_accept">Li, Compreendi e Aceito os Riscos</button></div>
-        </div>
+        <section id="fundamentos" class="py-24 px-6 border-t border-white/5 bg-midnight"><div class="max-w-[1800px] mx-auto text-center"><h2 class="text-3xl text-luminous-gold font-bold tracking-widest mb-6 uppercase" data-i18n="about_title">SOBRE</h2><p class="text-sm text-dim-line font-light max-w-6xl mx-auto leading-relaxed text-justify" data-i18n="about_text">O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica. Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares.</p></div></section>
     </div>
 
     <script type="module">
@@ -418,766 +224,145 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 1. I18N DICTIONARY
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
                 calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES OU LDT", lbl_ies_upload: "CARREGAR ARQUIVO .IES / .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
-                tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
-                road_params: "Parâmetros da Via (Classe M)", lbl_speed: "Velocidade (km/h)", lbl_volume: "Volume de Tráfego", lbl_separation: "Separação de Tráfego", lbl_density: "Densidade de Interseções", lbl_complexity: "Complexidade / Guiagem", lbl_ambient: "Luminância do Entorno",
-                road_rec_class: "Classe Recomendada", road_lmed: "Luminância Média (Lmed)", road_ref_m1: "Referência: M1 (2.0)", road_emed: "Iluminância Média (Emed)", road_approx: "Aprox. para Asfalto Padrão", road_u0: "Uniformidade Geral (U0)", road_ti: "Ofuscamento Máx (TI)",
-                leed_calc_title: "Calculadora de Orçamento (LPD)", leed_select_target: "Selecione a Meta de Certificação", leed_reduction: "Redução Aplicada", leed_area: "Área do Projeto (m²)", leed_type: "Tipologia", leed_allowance: "CARGA PERMITIDA",
-                leed_eq_1: "<strong class=\"text-white\">Controle:</strong> Individual para 90% dos ocupantes.", leed_eq_2: "<strong class=\"text-white\">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.", leed_ss_1: "Requisito <strong class=\"text-white\">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).",
-                well_sim_title: "Simulador de Créditos de Iluminação", well_concept: "Conceito: LIGHT (WELL v2)", well_est_pts: "Pontos Estimados", well_contrib: "Contribuição para Certificação",
-                well_l01: "Acesso à luz natural e visualização.", well_req: "Obrigatório", well_l02: "Níveis de iluminância adequados.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Gestão de brilho solar.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Zoning and intensity control.",
-                about_title: "SOBRE", about_text: "O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.",
-                card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).", card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.", card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", card_4_title: "NORMATIVE QUERY", card_4_desc: "Intelligence hub integrating NBR 8995-1, NBR 5101, and LEED/WELL requirements.",
-                footer_terms: "Termo de Responsabilidade", terms_title: "Terms of Responsibility and Use", terms_accept: "Li, Compreendi e Aceito os Riscos"
-            },
-            en: {
-                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(NBR/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
-                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES OR LDT", lbl_ies_upload: "UPLOAD .IES / .LDT FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "ORIENTATION (TILT)",
-                lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "FRAME AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "DISTANCE BETWEEN SOURCES (D)",
-                hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
-                tab_interiors: "Interiors (NBR 8995)", tab_roadway: "Roadway (NBR 5101)", filter_all: "All Categories", col_cat: "Category", col_room: "Room / Task",
-                road_params: "Road Parameters (Class M)", lbl_speed: "Speed (km/h)", lbl_volume: "Traffic Volume", lbl_separation: "Traffic Separation", lbl_density: "Intersection Density", lbl_complexity: "Complexity / Guidance", lbl_ambient: "Ambient Luminance",
-                road_rec_class: "Recommended Class", road_lmed: "Average Luminance (Lmed)", road_ref_m1: "Reference: M1 (2.0)", road_emed: "Average Illuminance (Emed)", road_approx: "Approx. for Standard Asphalt", road_u0: "General Uniformity (U0)", road_ti: "Max Glare (TI)",
-                leed_calc_title: "Budget Calculator (LPD)", leed_select_target: "Select Certification Target", leed_reduction: "Applied Reduction", leed_area: "Project Area (m²)", leed_type: "Typology", leed_allowance: "ALLOWED LOAD",
-                leed_eq_1: "<strong class=\"text-white\">Control:</strong> Individual for 90% of occupants.", leed_eq_2: "<strong class=\"text-white\">Quality:</strong> CRI > 80, Life > 24kh, High reflection.", leed_ss_1: "Requirement <strong class=\"text-white\">BUG Rating</strong> (Backlight-Uplight-Glare) mandatory per Zone (LZ0 to LZ4).",
-                well_sim_title: "Lighting Credits Simulator", well_concept: "Concept: LIGHT (WELL v2)", well_est_pts: "Estimated Points", well_contrib: "Contribution to Certification",
-                well_l01: "Access to daylight and views.", well_req: "Mandatory", well_l02: "Adequate illuminance levels.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Solar glare management.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Zoning and intensity control.",
-                about_title: "ABOUT", about_text: "LuxSintax was born with a clear commitment: to transform agility into the Lighting Designer's greatest ally. In a market where time is scarce, we designed an ecosystem that eliminates friction between creative conception and technical validation.<br><br>More than a point-to-point calculator, we are a productivity hub. We integrate agile calculation tools with an intelligent standards search engine (NBR ISO/CIE 8995-1 / NBR 5101:2024), allowing you to validate illuminance levels and regulatory compliance in seconds.<br><br><strong>Technical Note:</strong> Based on the principles of trigonometry and classical photometry (Cubic Cosine Law), this tool offers mathematical precision for preliminary studies. We emphasize that the results are theoretical simulations to support decision-making and do not replace complex global calculation (radiosity) of a final executive project signed by a qualified professional.",
-                card_1_title: "ABSOLUTE INTENSITY", card_1_desc: "Converts relative photometric data to absolute intensity (Candelas).", card_2_title: "CUBIC COSINE LAW", card_2_desc: "Variation of the Inverse Square Law for horizontal surfaces.", card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", card_4_title: "NORMATIVE QUERY", card_4_desc: "Intelligence hub integrating NBR 8995-1, NBR 5101, and LEED/WELL requirements.",
-                footer_terms: "Liability Disclaimer", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood, and Accept the Risks"
+                tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente",
+                about_title: "SOBRE", about_text: "O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica. Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares."
             }
         };
 
-        // 2. GLOBAL STATE
         window.state = {
-            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null, iesFileName: null }, 
-            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
+            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null },
+            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null }, 
+            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0, iesData: null },
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
-        window.currentLeedTarget = 'gold';
 
-        // 3. DATABASES (FULL RESTORATION)
-        window.normsDatabase = [
-            { cat: "Áreas de Tráfego", room: "Áreas de circulação e corredores", lux: 100, ugr: 28, ra: 40 },
-            { cat: "Áreas de Tráfego", room: "Escadas, escadas rolantes, esteiras", lux: 150, ugr: 25, ra: 40 },
-            { cat: "Áreas de Tráfego", room: "Rampas de carregamento", lux: 150, ugr: 25, ra: 40 },
-            { cat: "Edifícios (Geral)", room: "Cantinas", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Salas de descanso", lux: 100, ugr: 22, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Salas de exercícios físicos", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Vestiários, banheiros, toaletes", lux: 200, ugr: 25, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Sala de primeiros socorros", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Edifícios (Geral)", room: "Salas para atendimento médico", lux: 500, ugr: 16, ra: 90 },
-            { cat: "Edifícios (Geral)", room: "Salas de controle de instalações", lux: 150, ugr: 25, ra: 60 },
-            { cat: "Indústria", room: "Armazenamento (Depósitos)", lux: 100, ugr: 25, ra: 60 },
-            { cat: "Indústria", room: "Expedição e embalagem", lux: 300, ugr: 25, ra: 60 },
-            { cat: "Indústria (Alim.)", room: "Preparação de alimentos", lux: 500, ugr: 22, ra: 80 },
-            { cat: "Indústria (Alim.)", room: "Inspeção de cor", lux: 1000, ugr: 19, ra: 90 },
-            { cat: "Indústria (Metal)", room: "Forjamento (livre)", lux: 200, ugr: 25, ra: 60 },
-            { cat: "Indústria (Metal)", room: "Soldagem", lux: 300, ugr: 22, ra: 60 },
-            { cat: "Indústria (Metal)", room: "Usinagem grosseira", lux: 300, ugr: 22, ra: 60 },
-            { cat: "Indústria (Metal)", room: "Usinagem média", lux: 500, ugr: 22, ra: 60 },
-            { cat: "Indústria (Metal)", room: "Usinagem fina", lux: 750, ugr: 19, ra: 60 },
-            { cat: "Indústria (Eletr.)", room: "Montagem de componentes (Geral)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Indústria (Eletr.)", room: "Montagem fina / Inspeção", lux: 1000, ugr: 16, ra: 80 },
-            { cat: "Indústria (Textil)", room: "Costura fina", lux: 750, ugr: 19, ra: 80 },
-            { cat: "Indústria (Gráfica)", room: "Impressão à máquina", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Indústria (Gráfica)", room: "Inspeção de cores (Controle)", lux: 1500, ugr: 16, ra: 90 },
-            { cat: "Indústria (Madeira)", room: "Marcenaria (bancada)", lux: 300, ugr: 22, ra: 60 },
-            { cat: "Indústria (Madeira)", room: "Acabamento / Pintura", lux: 750, ugr: 22, ra: 80 },
-            { cat: "Escritório", room: "Arquivamento, cópia, circulação", lux: 300, ugr: 25, ra: 80 },
-            { cat: "Escritório", room: "Escrita, digitação, leitura", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Desenho técnico", lux: 750, ugr: 16, ra: 80 },
-            { cat: "Escritório", room: "Estações de trabalho CAD", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Salas de conferência / reunião", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Escritório", room: "Recepção / Balcão", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Varejo", room: "Área de vendas (pequenas lojas)", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Varejo", room: "Área de vendas (grandes lojas)", lux: 500, ugr: 22, ra: 80 },
-            { cat: "Varejo", room: "Caixa / Empacotamento", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Varejo", room: "Vitrine (Destaque)", lux: 1000, ugr: "-", ra: 80 },
-            { cat: "Locais Públicos", room: "Saguões de entrada", lux: 100, ugr: 22, ra: 60 },
-            { cat: "Locais Públicos", room: "Bilheterias", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Locais Públicos", room: "Restaurantes (Salão)", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Locais Públicos", room: "Restaurantes (Cozinha)", lux: 500, ugr: 22, ra: 80 },
-            { cat: "Locais Públicos", room: "Teatros / Cinemas (Foyer)", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Locais Públicos", room: "Museus (Exposição geral)", lux: 300, ugr: 19, ra: 80 },
-            { cat: "Locais Públicos", room: "Bibliotecas (Estantes)", lux: 200, ugr: 19, ra: 80 },
-            { cat: "Locais Públicos", room: "Bibliotecas (Leitura)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Locais Públicos", room: "Estacionamento Coberto", lux: 75, ugr: 25, ra: 40 },
-            { cat: "Educação", room: "Sala de aula", lux: 300, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Sala de aula (Noturno/Adultos)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Quadro negro (Vertical)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Auditório / Anfiteatro", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Laboratórios", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Salas de arte / desenho", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Educação", room: "Ginásios esportivos", lux: 300, ugr: 22, ra: 80 },
-            { cat: "Saúde", room: "Salas de espera", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Saúde", room: "Corredores (dia)", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Saúde", room: "Enfermaria (Geral)", lux: 100, ugr: 19, ra: 80 },
-            { cat: "Saúde", room: "Enfermaria (Exame simples)", lux: 300, ugr: 19, ra: 80 },
-            { cat: "Saúde", room: "Exame e tratamento (Geral)", lux: 1000, ugr: 19, ra: 90 },
-            { cat: "Saúde", room: "Salas de cirurgia (Geral)", lux: 1000, ugr: 19, ra: 90 },
-            { cat: "Saúde", room: "Salas de cirurgia (Cavidade)", lux: 10000, ugr: "-", ra: 90 },
-            { cat: "Saúde", room: "Dentista (Iluminação geral)", lux: 500, ugr: 19, ra: 90 },
-            { cat: "Saúde", room: "Dentista (No paciente)", lux: 1000, ugr: "-", ra: 90 },
-            { cat: "Transporte", room: "Aeroportos (Embarque/Check-in)", lux: 500, ugr: 19, ra: 80 },
-            { cat: "Transporte", room: "Aeroportos (Saguões)", lux: 200, ugr: 22, ra: 80 },
-            { cat: "Transporte", room: "Estações ferroviárias (Plataforma)", lux: 50, ugr: 28, ra: 40 }
-        ];
-
-        window.lpdBaselines = [
-            { type: "Escritório (Office)", base: 6.9 }, { type: "Varejo (Retail)", base: 9.0 },
-            { type: "Escola / Educacional", base: 7.5 }, { type: "Hospital / Saúde", base: 9.0 },
-            { type: "Indústria / Galpão", base: 6.0 }, { type: "Estacionamento (Garagem)", base: 1.6 }
-        ];
-
-        window.mClassTable = {
-            M1: { desc: "Vias Expressas / Alta Vel.", lmed: 2.0, emed: 30, u0: 0.40, ul: 0.70, ti: 10, eir: 0.35 },
-            M2: { desc: "Avenidas Principais", lmed: 1.5, emed: 20, u0: 0.40, ul: 0.60, ti: 10, eir: 0.35 },
-            M3: { desc: "Vias Arteriais", lmed: 1.0, emed: 15, u0: 0.40, ul: 0.60, ti: 15, eir: 0.30 },
-            M4: { desc: "Vias Coletoras", lmed: 0.75, emed: 10, u0: 0.40, ul: 0.50, ti: 15, eir: 0.30 },
-            M5: { desc: "Vias Locais", lmed: 0.50, emed: 7.5, u0: 0.35, ul: 0.40, ti: 15, eir: 0.30 },
-            M6: { desc: "Vias Residenciais Leves", lmed: 0.30, emed: 5, u0: 0.35, ul: 0.40, ti: 20, eir: 0.30 }
-        };
-
-        // --- AUTH MANAGER (AUTO-LOGIN READY) ---
         window.AuthManager = {
             init: async function() {
                 const { data: { session } } = await supabase.auth.getSession();
                 this.handleSessionUpdate(session);
-                supabase.auth.onAuthStateChange((event, session) => this.handleSessionUpdate(session));
+                supabase.auth.onAuthStateChange((_, session) => this.handleSessionUpdate(session));
             },
             handleSessionUpdate: function(session) {
                 if (session) {
-                    const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
+                    const name = session.user.user_metadata.first_name || session.user.email.split('@')[0];
                     document.getElementById('user-name-display').innerText = name.toUpperCase();
-                    this.unlockApp();
-                } else { this.lockApp(); }
-            },
-            lockApp: function() { document.getElementById('auth-modal').classList.remove('hidden'); document.getElementById('app-content').classList.add('app-locked'); },
-            unlockApp: function() { 
-                document.getElementById('auth-modal').classList.add('hidden'); 
-                document.getElementById('app-content').classList.remove('app-locked'); 
-                window.populateCategoryFilter();
-                window.filterNorms();
-                setTimeout(() => window.updateCalculations(), 100); 
-            },
-            switchTab: function(tab) {
-                const loginForm = document.getElementById('form-login'); const regForm = document.getElementById('form-register');
-                const btnLogin = document.getElementById('tab-auth-login'); const btnReg = document.getElementById('tab-auth-register');
-                if (tab === 'login') {
-                    loginForm.classList.remove('hidden'); regForm.classList.add('hidden');
-                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
-                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all";
+                    document.getElementById('auth-modal').classList.add('hidden');
+                    document.getElementById('app-content').classList.remove('app-locked');
                 } else {
-                    loginForm.classList.add('hidden'); regForm.classList.remove('hidden');
-                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
-                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-white transition-all";
+                    document.getElementById('auth-modal').classList.remove('hidden');
+                    document.getElementById('app-content').classList.add('app-locked');
                 }
             },
+            switchTab: function(tab) {
+                document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+                document.getElementById('form-register').classList.toggle('hidden', tab === 'login');
+            },
             handleLogin: async function() {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                const { error } = await supabase.auth.signInWithPassword({ email: document.getElementById('login-email').value, password: document.getElementById('login-password').value });
                 if (error) alert(error.message);
             },
             handleRegister: async function() {
-                const email = document.getElementById('reg-email').value;
-                const password = document.getElementById('reg-password').value;
-                const firstName = document.getElementById('reg-name').value;
-                const lastName = document.getElementById('reg-surname').value;
-                if (!document.getElementById('reg-terms').checked) return alert("Aceite os termos.");
-                const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName, last_name: lastName } } });
-                if (error) alert(error.message); 
-                else if (data.session) this.unlockApp();
-                else alert("Cadastro feito. Verifique e-mail.");
+                const { error } = await supabase.auth.signUp({ email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value, options: { data: { first_name: document.getElementById('reg-name').value } } });
+                if (error) alert(error.message); else alert("Verifique o seu e-mail.");
             },
-            logout: async function() { await supabase.auth.signOut(); location.reload(); }
+            logout: async function() { await supabase.auth.signOut(); }
         };
-
-        // --- CORE FUNCTIONS ---
-        window.switchTool = function(toolId) {
-            window.currentTool = toolId;
-            ['ponto', 'vertical', 'homog', 'query'].forEach(id => {
-                const btn = document.getElementById('tab-' + id);
-                if(btn) {
-                    let cls = "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ";
-                    if (id === 'query') cls += "text-luminous-gold ml-auto "; 
-                    
-                    btn.className = cls + (id === toolId ? "tab-active" : "tab-inactive");
-                }
-            });
-            document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query');
-            document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
-            
-            if (toolId !== 'query') {
-                ['inputs-ponto', 'inputs-vertical', 'inputs-homog'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
-                const selectedInput = document.getElementById('inputs-' + (toolId === 'homog' ? 'homog' : toolId));
-                if (selectedInput) selectedInput.classList.remove('hidden');
-                window.updateCalcMode(window.calcMode);
-                window.updateCalculations();
-            } else {
-                 window.switchQueryTab('nbr8995');
-            }
-        }
-
-        window.updateCalcMode = function(mode) {
-            window.calcMode = mode;
-            document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
-            document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
-            document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
-            document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
-            window.updateCalculations();
-        }
-
-        // --- IES & LDT PARSER & LOGIC ---
-        window.handleIESUpload = function(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result;
-                    let parsed = null;
-                    if (file.name.toLowerCase().endsWith('.ldt')) {
-                        parsed = window.parseLDT(content);
-                    } else {
-                        parsed = window.parseIES(content);
-                    }
-                    
-                    if (parsed) {
-                        const targetKey = window.currentTool === 'homog' ? 'homog' : (window.currentTool === 'ponto' ? 'ponto' : 'vertical');
-                        window.state[targetKey].iesData = parsed;
-                        window.state[targetKey].iesFileName = file.name;
-                        
-                        let statusId = 'p-ies-status';
-                        if(window.currentTool === 'vertical') statusId = 'v-ies-status';
-                        if(window.currentTool === 'homog') statusId = 'h-ies-status';
-
-                        const statusEl = document.getElementById(statusId);
-                        if(statusEl) {
-                            statusEl.innerText = `Carregado: ${file.name}`;
-                            statusEl.classList.add('text-luminous-gold');
-                        }
-                        window.updateCalculations();
-                    } else {
-                        alert("Erro ao ler arquivo " + file.name + ". Verifique o formato.");
-                    }
-                };
-                reader.readAsText(file);
-            }
-        }
-
-        window.parseIES = function(content) {
-            try {
-                const tokens = content.replace(/\s+/g, " ").trim().split(" ");
-                let cursor = 0;
-                let tiltFound = false;
-                for(let i=0; i < tokens.length; i++) {
-                    if (tokens[i].startsWith("TILT=")) {
-                        cursor = i + 1; 
-                        tiltFound = true;
-                        break;
-                    }
-                }
-                
-                if (!tiltFound) return null;
-
-                function nextNum() {
-                    while(cursor < tokens.length) {
-                        const val = parseFloat(tokens[cursor]);
-                        cursor++;
-                        if (!isNaN(val)) return val;
-                    }
-                    return null;
-                }
-
-                nextNum(); nextNum(); 
-                const multiplier = nextNum();
-                const vCount = nextNum();
-                const hCount = nextNum();
-                nextNum(); nextNum(); nextNum(); nextNum(); nextNum();
-                nextNum(); nextNum(); nextNum();
-
-                const vAngles = [];
-                for(let i=0; i<vCount; i++) vAngles.push(nextNum());
-
-                const hAngles = [];
-                for(let i=0; i<hCount; i++) hAngles.push(nextNum());
-
-                const candelas = [];
-                for(let h=0; h<hCount; h++) {
-                    const row = [];
-                    for(let v=0; v<vCount; v++) {
-                        row.push(nextNum());
-                    }
-                    candelas.push(row);
-                }
-
-                return { vAngles, hAngles, candelas, multiplier };
-
-            } catch (e) {
-                console.error("IES Parse Error", e);
-                return null;
-            }
-        }
 
         window.parseLDT = function(content) {
-            // EULUMDAT Parser (Fixed Index & Scaling)
             try {
-                const cleanContent = content.replace(/\r/g, "").replace(/,/g, ".");
-                const lines = cleanContent.split('\n');
-
-                const getVal = (idx) => {
-                    if (idx >= lines.length) return 0;
-                    const val = parseFloat(lines[idx].trim());
-                    return isNaN(val) ? 0 : val;
-                };
-
+                const clean = content.replace(/\r/g, "").replace(/,/g, ".");
+                const lines = clean.split('\n').map(l => l.trim());
                 if (lines.length < 26) return null;
-
-                const mc = parseInt(lines[14]) || 1; // Count C-planes (Line 15)
-                const dc = parseFloat(lines[15]) || 0; 
-                const ng = parseInt(lines[16]) || 1; // Count Gamma-angles (Line 17)
-                const dg = parseFloat(lines[17]) || 0; 
-
-                // Correct Index for Total Flux in standard EULUMDAT is Line 26 (Index 25)
-                const totalFlux = getVal(25); 
-                
-                // Normalization: LDT values are cd/1000lm. 
-                // To get Absolute Candelas (cd): Value * (Flux / 1000)
+                const mc = parseInt(lines[14]) || 1;
+                const ng = parseInt(lines[16]) || 1;
+                const totalFlux = parseFloat(lines[25]); // Linha 26 (Index 25)
                 const multiplier = (totalFlux > 0 ? totalFlux : 1000) / 1000;
-
-                let vAngles = []; 
-                let hAngles = [];
+                let lineCursor = 42; 
+                let vAngles = [];
+                for(let i=0; i<ng; i++) vAngles.push(parseFloat(lines[lineCursor++]) || 0);
                 let candelas = [];
-
-                let lineCursor = 42; // Standard start of intensity data
-
-                // Angles G (Gamma)
-                if (dg === 0) {
-                    for(let i=0; i<ng; i++) {
-                        vAngles.push(getVal(lineCursor));
-                        lineCursor++;
-                    }
-                } else {
-                    for(let i=0; i<ng; i++) vAngles.push(i * dg);
-                }
-
-                // Angles C (Horizontal)
-                if (dc === 0) {
-                     for(let i=0; i<mc; i++) {
-                        hAngles.push(getVal(lineCursor));
-                        lineCursor++;
-                    }
-                } else {
-                    for(let i=0; i<mc; i++) hAngles.push(i * dc);
-                }
-
-                // Luminous Intensity Matrix
                 for(let c=0; c<mc; c++) {
                     let row = [];
-                    for(let g=0; g<ng; g++) {
-                        let val = getVal(lineCursor);
-                        row.push(val);
-                        lineCursor++;
-                    }
+                    for(let g=0; g<ng; g++) row.push(parseFloat(lines[lineCursor++]) || 0);
                     candelas.push(row);
                 }
-                
-                return { vAngles, hAngles, candelas, multiplier };
-
-            } catch (e) {
-                console.error("LDT Parse Error", e);
-                return null;
-            }
-        }
-
-        window.getIESIntensity = function(state, angleDeg) {
-            if (!state.iesData) return 0;
-            
-            const data = state.iesData;
-            const vAngles = data.vAngles;
-            const candelaRow = data.candelas[0]; 
-            const mult = data.multiplier;
-
-            let idx = 0;
-            if (angleDeg <= vAngles[0]) return candelaRow[0] * mult;
-            if (angleDeg >= vAngles[vAngles.length-1]) return candelaRow[vAngles.length-1] * mult;
-
-            while(idx < vAngles.length - 1 && angleDeg > vAngles[idx+1]) {
-                idx++;
-            }
-            
-            const a1 = vAngles[idx];
-            const a2 = vAngles[idx+1];
-            const c1 = candelaRow[idx];
-            const c2 = candelaRow[idx+1];
-            
-            if (a2 === a1) return c1 * mult;
-
-            const t = (angleDeg - a1) / (a2 - a1);
-            const rawVal = c1 + t * (c2 - c1);
-            
-            return rawVal * mult;
-        }
-
-        function getIntensity(s) {
-            if (window.calcMode === 'direct') return s.intensity;
-            if (window.calcMode === 'ies') {
-                const tiltVal = (window.currentTool === 'homog') ? 0 : Math.abs(s.tilt);
-                return window.getIESIntensity(s, tiltVal); 
-            }
-            return (s.cdklm * s.flux) / 1000;
-        }
-
-        // --- CANVAS ENGINE (FULL RESTORATION) ---
-        const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
-            ctx.beginPath(); ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1; 
-            ctx.moveTo(x1, y1 - 3); ctx.lineTo(x1, y1 + 3); ctx.moveTo(x1, y1); ctx.lineTo(x2, y1); ctx.moveTo(x2, y1 - 3); ctx.lineTo(x2, y1 + 3); ctx.stroke(); 
-            ctx.font = "11px Manrope"; const mx = (x1 + x2) / 2; const my = (y1 + y2) / 2; const tw = ctx.measureText(text).width; 
-            ctx.fillStyle = "rgba(2, 6, 23, 0.95)"; ctx.fillRect(mx - tw / 2 - 4, my - 8, tw + 8, 16); 
-            ctx.fillStyle = "#cbd5e1"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, mx, my); 
-            ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
+                return { vAngles, candelas, multiplier };
+            } catch (e) { return null; }
         };
-        const drawDimLineVertical = (ctx, x, y1, y2, text) => { 
-            ctx.beginPath(); ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1; ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke(); 
-            const cy = (y1 + y2) / 2; ctx.save(); ctx.translate(x, cy); ctx.rotate(-Math.PI/2); 
-            ctx.font = "11px Manrope"; const tw = ctx.measureText(text).width; 
-            ctx.fillStyle = "rgba(2, 6, 23, 0.95)"; ctx.fillRect(-tw/2-4, -8, tw+8, 16); 
-            ctx.fillStyle = "#cbd5e1"; ctx.fillText(text, -tw/2, 4); ctx.restore(); 
+
+        window.getIESIntensity = function(s, angleDeg) {
+            if (!s.iesData) return 0;
+            const { vAngles, candelas, multiplier } = s.iesData;
+            const row = candelas[0];
+            if (angleDeg <= vAngles[0]) return row[0] * multiplier;
+            if (angleDeg >= vAngles[vAngles.length-1]) return row[vAngles.length-1] * multiplier;
+            let i = 0; while(angleDeg > vAngles[i+1]) i++;
+            const t = (angleDeg - vAngles[i]) / (vAngles[i+1] - vAngles[i]);
+            return (row[i] + t * (row[i+1] - row[i])) * multiplier;
         };
-        const drawAngleDim = (ctx, x, y, angle, tilt, radius, color, isTilt = false) => {
-            const tr = tilt * Math.PI / 180;
-            let startAngle, endAngle, centerAngle;
-            if (isTilt) { centerAngle = (Math.PI / 2) - (tr / 2); startAngle = (Math.PI / 2) - tr; endAngle = (Math.PI / 2); } 
-            else { const br = angle * Math.PI / 180; const beamAxis = (Math.PI / 2) - tr; centerAngle = beamAxis; startAngle = beamAxis - (br / 2); endAngle = beamAxis + (br / 2); }
-            ctx.beginPath(); ctx.arc(x, y, radius, startAngle, endAngle); ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
-            const textRadius = radius + 15; const tx = x + textRadius * Math.cos(centerAngle); const ty = y + textRadius * Math.sin(centerAngle);
-            ctx.font = "bold 11px Manrope"; const text = angle + "°"; const tw = ctx.measureText(text).width;
-            ctx.fillStyle = "rgba(2, 6, 23, 0.9)"; ctx.fillRect(tx - tw/2 - 2, ty - 8, tw + 4, 16);
-            ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, tx, ty);
-            ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
-        };
-        const drawTextVal = (ctx, text, x, y) => {
-            ctx.font = "bold 11px Manrope"; const tw = ctx.measureText(text).width;
-            ctx.fillStyle = "rgba(15, 23, 42, 0.9)"; ctx.fillRect(x - tw/2 - 4, y - 16, tw + 8, 20);
-            ctx.fillStyle = "#FBBF24"; ctx.textAlign = "center"; ctx.fillText(text, x, y - 2); ctx.textAlign = "start"; 
-        }
 
         window.updateCalculations = function() {
             const canvas = document.getElementById('beamCanvas');
-            if (!canvas) return;
-            const dpr = window.devicePixelRatio || 1;
-            const parent = canvas.parentElement;
-            const rect = parent.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
             const ctx = canvas.getContext('2d');
-            ctx.scale(dpr, dpr);
-            const cw = rect.width;
-            const ch = rect.height;
-            const floorY = ch - 70;
-            const centerX = cw / 2;
-            let boundsH = 3.0;
-            let boundsW = 3.0; 
-            const s = window.state[window.currentTool === 'homog' ? 'homog' : window.currentTool];
-
-            // Scaling Logic
-            if (window.currentTool === 'ponto') {
-                boundsH = s.height;
-                const maxAngleRad = (Math.abs(s.tilt) + s.beam/2) * Math.PI / 180;
-                const limitRad = Math.min(maxAngleRad, 1.48);
-                boundsW = s.height * Math.tan(limitRad);
-            } else if (window.currentTool === 'vertical') {
-                boundsH = s.height;
-                boundsW = Math.max(s.dist * 1.6, 3.5); 
-            } else if (window.currentTool === 'homog') {
-                boundsH = s.height;
-                const halfBeamRad = (s.beam/2) * Math.PI / 180;
-                boundsW = (s.spacing / 2) + (s.height * Math.tan(halfBeamRad));
-            }
-            const availH = floorY - 60; const availW = (cw / 2) - 50; 
-            let scaleH = availH / Math.max(boundsH, 0.5); let scaleW = availW / Math.max(boundsW, 0.5);
-            let scale = Math.min(scaleH, scaleW); scale = Math.min(Math.max(scale, 12), 160);
-
-            ctx.clearRect(0, 0, cw, ch);
+            const cw = canvas.width = canvas.parentElement.clientWidth;
+            const ch = canvas.height = canvas.parentElement.clientHeight;
+            const floorY = ch - 70; const centerX = cw / 2;
+            const s = window.state[window.currentTool];
+            const scale = 50; 
             
-            // DRAW FLOOR
-            ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
-            if (window.currentTool === 'ponto') {
-                ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 15); ctx.fillText("lp: 0.00m", 10, floorY - 5); ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(5, floorY); ctx.stroke();
-            } else if (window.currentTool === 'vertical') {
-                ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 15); ctx.fillText("lp: 0.00m", 10, floorY - 5);
-            } else if (window.currentTool === 'homog') {
-                 ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 15); ctx.fillText("lp: 0.00m", 10, floorY - 5);
-            }
+            ctx.clearRect(0, 0, cw, ch);
+            ctx.strokeStyle = '#334155'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
 
-            // DRAW BEAMS
-             if (window.currentTool === 'ponto') {
-                const tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
-                
-                let I;
-                if(window.calcMode === 'ies') {
-                    I = window.getIESIntensity(s, s.tilt);
-                } else {
-                    I = getIntensity(s);
-                }
+            let I = window.calcMode === 'ies' ? window.getIESIntensity(s, Math.abs(s.tilt)) : (window.calcMode === 'photometric' ? (s.cdklm * s.flux)/1000 : s.intensity);
+            
+            const sy = floorY - (s.height * scale);
+            const tr = s.tilt * Math.PI / 180;
+            const lux = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
 
-                const sy = floorY - (s.height * scale), py = floorY - (s.plane * scale);
-                const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
-                const hEff = s.height - s.plane;
-                const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
-                const dia = 2 * (s.height / Math.cos(tr)) * Math.tan(br / 2); 
-                
-                // Source & Beam
-                ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
-                ctx.save(); ctx.translate(centerX, sy);
-                const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
+            ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI*2); ctx.fill();
+            
+            const hitX = centerX + (s.height * scale) * Math.tan(tr);
+            ctx.beginPath(); ctx.setLineDash([5,5]); ctx.moveTo(centerX, sy); ctx.lineTo(hitX, floorY); ctx.stroke();
+            
+            ctx.fillStyle = "#FBBF24"; ctx.font = "bold 12px Manrope";
+            ctx.fillText(Math.round(lux) + " Lux", hitX, floorY - 10);
+        };
 
-                // Height & Plane Lines
-                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = '#475569'; ctx.stroke(); ctx.setLineDash([]); 
-                ctx.font = "11px Manrope"; ctx.fillStyle = "#94a3b8"; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 45, sy + 3); 
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(148, 163, 184, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
+        window.switchTool = function(id) { 
+            window.currentTool = id; 
+            ['ponto','vertical','homog','query'].forEach(t => document.getElementById('tab-'+t).className = `mode-tab-btn tab-${t===id?'active':'inactive'}`);
+            document.getElementById('visual-tools').classList.toggle('hidden', id==='query');
+            document.getElementById('query-tool').classList.toggle('hidden', id!=='query');
+            ['inputs-ponto','inputs-vertical','inputs-homog'].forEach(i => document.getElementById(i).classList.add('hidden'));
+            if(id!=='query') document.getElementById('inputs-'+id).classList.remove('hidden');
+            window.updateCalculations();
+        };
 
-                if (window.calcMode !== 'ies') {
-                    drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false); 
-                }
+        window.handleIESUpload = function(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const parsed = window.parseLDT(e.target.result);
+                if(parsed) { window.state[window.currentTool].iesData = parsed; window.updateCalculations(); }
+            };
+            reader.readAsText(file);
+        };
 
-                const axisX = centerX + (s.height * scale) * Math.tan(tr);
-                ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(148, 163, 184, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
-                
-                if (s.tilt > 0) {
-                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = "rgba(148, 163, 184, 0.3)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
-                    drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#22d3ee", true);
-                    const distH = s.height * Math.tan(tr);
-                    drawDimLine(ctx, centerX, floorY + 20, axisX, floorY + 20, `d: ${distH.toFixed(2)}m`);
-                }
-
-                const hitXFloor = centerX + (s.height * scale) * Math.tan(tr);
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(251, 191, 36, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(hitXFloor, floorY); ctx.stroke(); ctx.setLineDash([]);
-                ctx.beginPath(); ctx.arc(hitXFloor, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
-                
-                // Result Display
-                let valText = Math.round(luxFloor) + " Lux";
-                if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
-                drawTextVal(ctx, valText, hitXFloor, floorY - 10); 
-                
-                if (hEff > 0) { 
-                    const ix = centerX + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill(); 
-                    let valTextPlane = Math.round(luxPlane) + " Lux";
-                    if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD FILE";
-                    drawTextVal(ctx, valTextPlane, ix, py - 10); 
-                    
-                    if (window.calcMode !== 'ies') {
-                        const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
-                        const hPx_plane = py - sy;
-                        const xL_p = hPx_plane * Math.tan(tr - br / 2);
-                        const xR_p = hPx_plane * Math.tan(tr + br / 2);
-                        drawDimLine(ctx, centerX + xL_p, py + 15, centerX + xR_p, py + 15, `Ø ${diaPlane.toFixed(2)}m`);
-                    }
-                }
-                
-                if (window.calcMode !== 'ies') {
-                    const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
-                    drawDimLine(ctx, centerX + xL, floorY + 45, centerX + xR, floorY + 45, `Ø ${dia.toFixed(2)}m`);
-                }
-            }
-             else if (window.currentTool === 'vertical') {
-                const sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
-                
-                let ev = 0; 
-                let I_v;
-                 if(window.calcMode === 'ies') {
-                    I_v = window.getIESIntensity(s, s.tilt);
-                 } else {
-                    I_v = getIntensity(s);
-                 }
-                 
-                 if (s.tilt > 0) {
-                    ev = (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
-                 }
-
-                let hitY_metric = s.height - (s.dist / Math.tan(tr)); let hitY_px = floorY - (hitY_metric * scale);
-                
-                ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; 
-                ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
-
-                const hqY = floorY - (s.hq * scale);
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(148, 163, 184, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
-                ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${s.hq.toFixed(2)}m`, 10, hqY - 5);
-                
-                ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip(); 
-                ctx.save(); ctx.translate(centerX, sy);
-                const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
-                ctx.restore();
-
-                if (window.calcMode !== 'ies') {
-                    drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false);
-                }
-
-                if (s.tilt > 0) {
-                    const axisX = centerX + (s.height * scale) * Math.tan(tr);
-                    ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(148, 163, 184, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
-                    drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#22d3ee", true);
-                }
-                 if (s.tilt > 0) {
-                    ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, hitY_px); ctx.strokeStyle = "#FBBF24"; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
-                     
-                     if (hitY_metric > -10 && hitY_metric < s.height * 3) {
-                        ctx.beginPath(); ctx.arc(wx, hitY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
-                        
-                        let valText = Math.round(ev) + " Lux";
-                        if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
-                        drawTextVal(ctx, valText, wx - 40, hitY_px);
-                        
-                        if (hitY_px < floorY) {
-                            drawDimLineVertical(ctx, wx + 35, hitY_px, floorY, `${hitY_metric.toFixed(2)}m`);
-                        }
-                     }
-                     
-                    if (window.calcMode !== 'ies' && s.tilt + s.beam/2 < 89) {
-                        const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + s.beam/2) * Math.PI/180));
-                        const hTopPx = floorY - (hTopMetric * scale);
-                        if(hTopPx > -100 && hTopPx < floorY + 100) {
-                           drawDimLineVertical(ctx, wx + 15, hTopPx, floorY, `${hTopMetric.toFixed(2)}m`);
-                        }
-                    }
-                }
-                drawDimLine(ctx, centerX, sy - 30, wx, sy - 30, `d: ${s.dist.toFixed(1)}m`); 
-            } else if (window.currentTool === 'homog') {
-                const I = getIntensity(window.state.homog); 
-                const sy = floorY - (s.height * scale); const py = floorY - (s.plane * scale); const hS = (s.spacing * scale) / 2;
-                const br = s.beam * Math.PI / 180; const tl = 0; 
-                const dia = 2 * s.height * Math.tan(br / 2);
-                const hEff = s.height - s.plane;
-                const diaPlane = hEff > 0 ? 2 * hEff * Math.tan(br / 2) : 0;
-                const luxFloor = I / (s.height ** 2);
-                const luxPlane = hEff > 0 ? I / (hEff ** 2) : 0;
-                const leftX = centerX - hS; const rightX = centerX + hS;
-                
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(148, 163, 184, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
-
-                [leftX, rightX].forEach(lx => {
-                    ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(251, 191, 36, 0.4)"; ctx.moveTo(lx, sy); ctx.lineTo(lx, floorY); ctx.stroke(); ctx.setLineDash([]);
-                    
-                    ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(lx, sy, 5, 0, Math.PI * 2); ctx.fill();
-                    ctx.save(); ctx.translate(lx, sy);
-                    const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tl - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tl + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
-                });
-                
-                drawDimLine(ctx, leftX, sy - 20, rightX, sy - 20, `D: ${s.spacing.toFixed(1)}m`);
-                
-                ctx.beginPath(); ctx.arc(leftX, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
-                
-                let valText = Math.round(luxFloor) + " Lux";
-                if (window.calcMode === 'ies' && !window.state.homog.iesData) valText = "LOAD FILE";
-                drawTextVal(ctx, valText, leftX, floorY - 10);
-
-                const rFloor = (floorY - sy) * Math.tan(br/2);
-                if (window.calcMode !== 'ies') {
-                    drawDimLine(ctx, leftX - rFloor, floorY + 25, leftX + rFloor, floorY + 25, `Ø ${dia.toFixed(2)}m`);
-                }
-
-                if (hEff > 0) {
-                     ctx.beginPath(); ctx.arc(leftX, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
-                     
-                     let valTextPlane = Math.round(luxPlane) + " Lux";
-                     if (window.calcMode === 'ies' && !window.state.homog.iesData) valTextPlane = "LOAD FILE";
-                     drawTextVal(ctx, valTextPlane, leftX, py - 10);
-                     
-                     if (window.calcMode !== 'ies') {
-                        const rPlane = (py - sy) * Math.tan(br/2);
-                        drawDimLine(ctx, leftX - rPlane, py + 15, leftX + rPlane, py + 15, `Ø ${diaPlane.toFixed(2)}m`);
-                     }
-                }
-            }
+        function bind(id, key, param) {
+            const el = document.getElementById(id);
+            if(el) el.oninput = (e) => { window.state[key][param] = parseFloat(e.target.value); window.updateCalculations(); };
         }
-
-        // --- NBR 5101 LOGIC ---
-        window.calc5101 = function() {
-            const s = parseInt(document.getElementById('m-speed').value), v = parseInt(document.getElementById('m-volume').value), sep = parseInt(document.getElementById('m-separation').value);
-            const d = parseInt(document.getElementById('m-density').value), c = parseInt(document.getElementById('m-complexity').value), a = parseInt(document.getElementById('m-ambient').value);
-            let score = s + v + sep + d + c + a;
-            let m = 6 - score; if(m<1) m=1; if(m>6) m=6;
-            const res = window.mClassTable["M"+m];
-            document.getElementById('m-result-class').innerText = "M"+m;
-            document.getElementById('m-result-desc').innerText = res.desc;
-            document.getElementById('res-lmed-val').innerText = res.lmed.toFixed(1); document.getElementById('bar-lmed').style.width = (res.lmed/2.0*100)+'%';
-            document.getElementById('res-emed-val').innerText = res.emed; document.getElementById('bar-emed').style.width = (res.emed/30*100)+'%';
-            document.getElementById('res-u0-val').innerText = res.u0.toFixed(2); document.getElementById('bar-u0').style.width = (res.u0/0.4*100)+'%';
-            document.getElementById('res-ti-val').innerText = res.ti; document.getElementById('bar-ti').style.width = (res.ti/20*100)+'%';
-        }
-
-        window.populateCategoryFilter = function() {
-            const sel = document.getElementById('category-filter');
-            if(!sel || sel.options.length > 1) return;
-            const uniqueCats = [...new Set(window.normsDatabase.map(n => n.cat))].sort();
-            uniqueCats.forEach(c => { const o = document.createElement('option'); o.value=c; o.innerText=c; sel.appendChild(o); });
-        }
-        window.filterNorms = function() {
-            const cat = document.getElementById('category-filter').value;
-            const filtered = window.normsDatabase.filter(n => cat === 'all' || n.cat === cat);
-            document.getElementById('nbr8995-tbody').innerHTML = filtered.map(n => `<tr class="hover:bg-white/5 transition-colors border-b border-white/5"><td class="p-4 font-bold text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-dim-gray">${n.room}</td><td class="p-4 text-center font-bold text-white bg-white/5">${n.lux}</td><td class="p-4 text-center text-muted-blue">${n.ugr}</td><td class="p-4 text-center text-muted-blue">${n.ra}</td></tr>`).join('');
-        }
-        window.switchQueryTab = function(t) {
-            ['nbr8995','nbr5101','leed'].forEach(k => {
-                document.getElementById('content-'+k).classList.toggle('hidden', k!==t);
-                document.getElementById('btn-q-'+k).className = `query-tab-btn ${k===t ? 'query-tab-active' : ''}`;
-            });
-            // NEW: Toggle filter visibility based on tab
-            const searchContainer = document.getElementById('search-container');
-            if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
-
-            if(t==='nbr8995') window.filterNorms();
-            if(t==='nbr5101') window.calc5101();
-            if(t==='leed') window.updateLeedTargets();
-        }
-        
-        window.switchCertTab = function(t) { ['leed','well'].forEach(k => { document.getElementById('pane-'+k).classList.toggle('hidden', k!==t); document.getElementById('cert-tab-'+k).className = `cert-tab ${k===t?'active':'inactive'}`; }); }
-        
-        window.updateLeedTargets = function() {
-            const area = parseFloat(document.getElementById('leed-area-input').value) || 0;
-            const red = window.currentLeedTarget === 'gold' ? 0.20 : (window.currentLeedTarget === 'platinum' ? 0.30 : (window.currentLeedTarget === 'silver' ? 0.10 : 0.05));
-            document.getElementById('leed-reduction-display').innerText = (red*100).toFixed(0)+'%';
-            document.getElementById('leed-lpd-body').innerHTML = window.lpdBaselines.map(b => `<tr class="border-b border-white/5"><td class="p-3 text-white">${b.type}</td><td class="p-3 text-center text-dim-gray font-mono">${b.base}</td><td class="p-3 text-center text-luminous-gold font-bold">${(b.base*(1-red)).toFixed(2)}</td><td class="p-3 text-right text-tech-cyan font-bold">${(b.base*(1-red)*area).toFixed(0)} W</td></tr>`).join('');
-        }
-        window.setLeedTarget = function(t) { window.currentLeedTarget = t; document.querySelectorAll('.leed-level-box').forEach(b => b.classList.remove('active')); document.getElementById('lvl-'+t).classList.add('active'); window.updateLeedTargets(); }
-        window.toggleWellFeature = function(el, pts) { el.classList.toggle('active'); let total=0; document.querySelectorAll('.well-toggle-group.active').forEach(i => total += parseInt(i.getAttribute('data-points'))); document.getElementById('well-total-score').innerHTML = `${total} <span class="text-xs text-dim-gray font-normal">/ 8</span>`; document.getElementById('well-progress-bar').style.width = (total/8*100)+'%'; document.getElementById('well-progress-text').innerText = (total/8*100).toFixed(0)+'%'; const icon = el.querySelector('.fa-check'); if(el.classList.contains('active')) icon.classList.remove('opacity-0'); else icon.classList.add('opacity-0'); }
-
-        window.openTerms = function() { document.getElementById('terms-modal').classList.remove('hidden'); }
-        window.closeTerms = function() { document.getElementById('terms-modal').classList.add('hidden'); }
-        window.toggleLanguage = function() { 
-            window.currentLang = window.currentLang === 'pt' ? 'en' : 'pt'; 
-            document.querySelectorAll('.lang-display').forEach(e => e.innerText = window.currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
-            document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { el.innerHTML = window.i18n[window.currentLang][key]; } });
-            window.updateCalculations(); 
-        }
-        window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
-
-        // BINDING
-        function bind(id, key, param) { 
-            const el = document.getElementById(id); if(!el) return;
-            el.addEventListener('input', (e) => { 
-                let val = parseFloat(e.target.value); 
-                const pairId = id.includes('range') ? id.replace('range-', '') : 'range-' + id;
-                if(document.getElementById(pairId)) document.getElementById(pairId).value = val;
-                window.state[key][param] = val; 
-                window.updateCalculations(); 
-            }); 
-        }
-        ['ponto', 'vertical', 'homog'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto','vertical','homog'].forEach(k => ['height','intensity','tilt','beam','flux','cdklm','plane','dist','spacing'].forEach(p => bind(k[0]+'-'+p, k, p)));
 
         window.AuthManager.init();
         window.switchTool('ponto');
+        window.updateCalculations();
     </script>
 </body>
 </html>
