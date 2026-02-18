@@ -155,10 +155,10 @@
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-30"></div>
             <div class="max-w-[1800px] mx-auto flex flex-col items-center">
                 <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
-                    <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold"><i class="fas fa-search"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                     <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines"></i><span data-i18n="tab_horiz">SUPERFÍCIE<br>HORIZONTAL</span></button>
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
                     <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-border-all"></i><span data-i18n="tab_dist">DISTRIBUIÇÃO<br>& DESENHO</span></button>
+                    <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                 </div>
 
                 <div id="calculator-interface" class="w-full relative">
@@ -397,7 +397,7 @@
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6 }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
         };
-        window.currentTool = 'query'; window.calcMode = 'direct'; window.currentLang = 'pt';
+        window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
 
         // 2. DATABASES (FULL RESTORATION)
@@ -545,7 +545,11 @@
                 const btn = document.getElementById('tab-' + id);
                 if(btn) {
                     let cls = "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ";
-                    if (id === 'query') cls += "text-luminous-gold "; 
+                    // Adjusted logic: text-luminous-gold persists on query button regardless of state in original design,
+                    // but we re-add it only if it's the specific button or if active.
+                    // However, query button has 'ml-auto' now. We must ensure that class persists.
+                    if (id === 'query') cls += "text-luminous-gold ml-auto "; 
+                    
                     btn.className = cls + (id === toolId ? "tab-active" : "tab-inactive");
                 }
             });
@@ -871,7 +875,7 @@
         ['ponto', 'vertical', 'homog'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 
         window.AuthManager.init();
-        window.switchTool('query');
+        window.switchTool('ponto');
     </script>
 </body>
 </html>
