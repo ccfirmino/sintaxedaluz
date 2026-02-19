@@ -878,10 +878,6 @@
                 ctx.font = "bold 11px Manrope"; ctx.fillStyle = "#64748b"; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 45, sy + 3); 
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#64748b"; ctx.font = "bold 11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
 
-                if (window.calcMode !== 'ies' || s.iesData) {
-                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
-                }
-
                 const axisX = centerX + (s.height * scale) * Math.tan(tr);
                 ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
                 
@@ -890,6 +886,10 @@
                     drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
                     const distH = s.height * Math.tan(tr);
                     drawDimLine(ctx, centerX, floorY + 20, axisX, floorY + 20, `d: ${distH.toFixed(2)}m`);
+                }
+
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
                 }
 
                 const hitXFloor = centerX + (s.height * scale) * Math.tan(tr);
@@ -950,15 +950,16 @@
                 ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                 ctx.restore();
 
-                if (window.calcMode !== 'ies' || s.iesData) {
-                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false);
-                }
-
                 if (s.tilt > 0) {
                     const axisX = centerX + (s.height * scale) * Math.tan(tr);
                     ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
                     drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
                 }
+
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false);
+                }
+
                  if (s.tilt > 0) {
                     ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, hitY_px); ctx.strokeStyle = "#d97706"; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
                      
