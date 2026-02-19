@@ -738,6 +738,31 @@
             return (s.cdklm * s.flux) / 1000;
         }
 
+        // FWHM (Full Width at Half Maximum) calculator to extract effective beam angle from IES
+        window.getEffectiveBeam = function(s) {
+            if (window.calcMode === 'ies' && s.iesData) {
+                const data = s.iesData;
+                const vAngles = data.vAngles;
+                const row = data.candelas[0];
+                const maxI = Math.max(...row);
+                if (maxI <= 0) return s.beam; 
+                const targetI = maxI / 2;
+                let halfAngle = 0;
+                for (let i = 0; i < vAngles.length - 1; i++) {
+                    if ((row[i] >= targetI && row[i+1] <= targetI) || (row[i] <= targetI && row[i+1] >= targetI)) {
+                        const t = (targetI - row[i]) / (row[i+1] - row[i]);
+                        halfAngle = vAngles[i] + t * (vAngles[i+1] - vAngles[i]);
+                        break;
+                    }
+                }
+                if (halfAngle === 0 && row[row.length-1] > targetI) {
+                    halfAngle = vAngles[vAngles.length-1];
+                }
+                return halfAngle * 2 || s.beam; 
+            }
+            return s.beam;
+        }
+
         // --- CANVAS ENGINE (FULL RESTORATION) ---
         const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
             ctx.beginPath(); ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1; 
@@ -791,9 +816,10 @@
             const s = window.state[window.currentTool === 'homog' ? 'homog' : window.currentTool];
 
             // Scaling Logic
+            const currentBeam = window.getEffectiveBeam(s);
             if (window.currentTool === 'ponto') {
                 boundsH = s.height;
-                const maxAngleRad = (Math.abs(s.tilt) + s.beam/2) * Math.PI / 180;
+                const maxAngleRad = (Math.abs(s.tilt) + currentBeam/2) * Math.PI / 180;
                 const limitRad = Math.min(maxAngleRad, 1.48);
                 boundsW = s.height * Math.tan(limitRad);
             } else if (window.currentTool === 'vertical') {
@@ -801,7 +827,7 @@
                 boundsW = Math.max(s.dist * 1.6, 3.5); 
             } else if (window.currentTool === 'homog') {
                 boundsH = s.height;
-                const halfBeamRad = (s.beam/2) * Math.PI / 180;
+                const halfBeamRad = (currentBeam/2) * Math.PI / 180;
                 boundsW = (s.spacing / 2) + (s.height * Math.tan(halfBeamRad));
             }
             const availH = floorY - 60; const availW = (cw / 2) - 50; 
@@ -822,7 +848,7 @@
 
             // DRAW BEAMS
              if (window.currentTool === 'ponto') {
-                const tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
                 
                 let I;
                 if(window.calcMode === 'ies') {
@@ -848,8 +874,8 @@
                 ctx.font = "11px Manrope"; ctx.fillStyle = "#94a3b8"; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 45, sy + 3); 
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(148, 163, 184, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#94a3b8"; ctx.font = "11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
 
-                if (window.calcMode !== 'ies') {
-                    drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false); 
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(251, 191, 36, 0.8)", false); 
                 }
 
                 const axisX = centerX + (s.height * scale) * Math.tan(tr);
@@ -877,7 +903,7 @@
                     if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD FILE";
                     drawTextVal(ctx, valTextPlane, ix, py - 10); 
                     
-                    if (window.calcMode !== 'ies') {
+                    if (window.calcMode !== 'ies' || s.iesData) {
                         const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
                         const hPx_plane = py - sy;
                         const xL_p = hPx_plane * Math.tan(tr - br / 2);
@@ -886,13 +912,13 @@
                     }
                 }
                 
-                if (window.calcMode !== 'ies') {
+                if (window.calcMode !== 'ies' || s.iesData) {
                     const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
                     drawDimLine(ctx, centerX + xL, floorY + 45, centerX + xR, floorY + 45, `Ø ${dia.toFixed(2)}m`);
                 }
             }
              else if (window.currentTool === 'vertical') {
-                const sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = s.beam * Math.PI / 180;
+                const sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
                 
                 let ev = 0; 
                 let I_v;
@@ -921,8 +947,8 @@
                 ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                 ctx.restore();
 
-                if (window.calcMode !== 'ies') {
-                    drawAngleDim(ctx, centerX, sy, s.beam, s.tilt, 40, "rgba(251, 191, 36, 0.8)", false);
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(251, 191, 36, 0.8)", false);
                 }
 
                 if (s.tilt > 0) {
@@ -945,8 +971,8 @@
                         }
                      }
                      
-                    if (window.calcMode !== 'ies' && s.tilt + s.beam/2 < 89) {
-                        const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + s.beam/2) * Math.PI/180));
+                    if ((window.calcMode !== 'ies' || s.iesData) && s.tilt + currentBeam/2 < 89) {
+                        const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + currentBeam/2) * Math.PI/180));
                         const hTopPx = floorY - (hTopMetric * scale);
                         if(hTopPx > -100 && hTopPx < floorY + 100) {
                            drawDimLineVertical(ctx, wx + 15, hTopPx, floorY, `${hTopMetric.toFixed(2)}m`);
@@ -957,7 +983,7 @@
             } else if (window.currentTool === 'homog') {
                 const I = getIntensity(window.state.homog); 
                 const sy = floorY - (s.height * scale); const py = floorY - (s.plane * scale); const hS = (s.spacing * scale) / 2;
-                const br = s.beam * Math.PI / 180; const tl = 0; 
+                const br = currentBeam * Math.PI / 180; const tl = 0; 
                 const dia = 2 * s.height * Math.tan(br / 2);
                 const hEff = s.height - s.plane;
                 const diaPlane = hEff > 0 ? 2 * hEff * Math.tan(br / 2) : 0;
@@ -976,8 +1002,8 @@
                     ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tl - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tl + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                 });
                 
-                if (window.calcMode !== 'ies') {
-                    drawAngleDim(ctx, leftX, sy, s.beam, 0, 40, "rgba(251, 191, 36, 0.8)", false);
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, leftX, sy, Math.round(currentBeam), 0, 40, "rgba(251, 191, 36, 0.8)", false);
                 }
 
                 drawDimLine(ctx, leftX, sy - 20, rightX, sy - 20, `D: ${s.spacing.toFixed(1)}m`);
@@ -989,7 +1015,7 @@
                 drawTextVal(ctx, valText, leftX, floorY - 10);
 
                 const rFloor = (floorY - sy) * Math.tan(br/2);
-                if (window.calcMode !== 'ies') {
+                if (window.calcMode !== 'ies' || s.iesData) {
                     drawDimLine(ctx, leftX - rFloor, floorY + 25, leftX + rFloor, floorY + 25, `Ø ${dia.toFixed(2)}m`);
                 }
 
@@ -1000,7 +1026,7 @@
                      if (window.calcMode === 'ies' && !window.state.homog.iesData) valTextPlane = "LOAD FILE";
                      drawTextVal(ctx, valTextPlane, leftX, py - 10);
                      
-                     if (window.calcMode !== 'ies') {
+                     if (window.calcMode !== 'ies' || s.iesData) {
                         const rPlane = (py - sy) * Math.tan(br/2);
                         drawDimLine(ctx, leftX - rPlane, py + 15, leftX + rPlane, py + 15, `Ø ${diaPlane.toFixed(2)}m`);
                      }
