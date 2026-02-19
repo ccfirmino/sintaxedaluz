@@ -976,6 +976,10 @@
                     ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tl - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tl + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                 });
                 
+                if (window.calcMode !== 'ies') {
+                    drawAngleDim(ctx, leftX, sy, s.beam, 0, 40, "rgba(251, 191, 36, 0.8)", false);
+                }
+
                 drawDimLine(ctx, leftX, sy - 20, rightX, sy - 20, `D: ${s.spacing.toFixed(1)}m`);
                 
                 ctx.beginPath(); ctx.arc(leftX, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#FBBF24"; ctx.fill();
