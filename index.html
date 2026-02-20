@@ -773,16 +773,16 @@
         const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
             ctx.beginPath(); ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1; 
             ctx.moveTo(x1, y1 - 3); ctx.lineTo(x1, y1 + 3); ctx.moveTo(x1, y1); ctx.lineTo(x2, y1); ctx.moveTo(x2, y1 - 3); ctx.lineTo(x2, y1 + 3); ctx.stroke(); 
-            ctx.font = "bold 11px Manrope"; const mx = (x1 + x2) / 2; const my = (y1 + y2) / 2; const tw = ctx.measureText(text).width; 
-            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(mx - tw / 2 - 4, my - 8, tw + 8, 16); 
+            ctx.font = "bold 13px Manrope"; const mx = (x1 + x2) / 2; const my = (y1 + y2) / 2; const tw = ctx.measureText(text).width; 
+            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(mx - tw / 2 - 6, my - 10, tw + 12, 20); 
             ctx.fillStyle = "#475569"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, mx, my); 
             ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
         };
         const drawDimLineVertical = (ctx, x, y1, y2, text) => { 
             ctx.beginPath(); ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1; ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke(); 
             const cy = (y1 + y2) / 2; ctx.save(); ctx.translate(x, cy); ctx.rotate(-Math.PI/2); 
-            ctx.font = "bold 11px Manrope"; const tw = ctx.measureText(text).width; 
-            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(-tw/2-4, -8, tw+8, 16); 
+            ctx.font = "bold 13px Manrope"; const tw = ctx.measureText(text).width; 
+            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(-tw/2-6, -10, tw+12, 20); 
             ctx.fillStyle = "#475569"; ctx.fillText(text, -tw/2, 4); ctx.restore(); 
         };
         const drawAngleDim = (ctx, x, y, angle, tilt, radius, color, isTilt = false) => {
@@ -792,14 +792,14 @@
             else { const br = angle * Math.PI / 180; const beamAxis = (Math.PI / 2) - tr; centerAngle = beamAxis; startAngle = beamAxis - (br / 2); endAngle = beamAxis + (br / 2); }
             ctx.beginPath(); ctx.arc(x, y, radius, startAngle, endAngle); ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
             const textRadius = radius + 15; const tx = x + textRadius * Math.cos(centerAngle); const ty = y + textRadius * Math.sin(centerAngle);
-            ctx.font = "bold 11px Manrope"; const text = angle + "°"; const tw = ctx.measureText(text).width;
-            ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; ctx.fillRect(tx - tw/2 - 2, ty - 8, tw + 4, 16);
+            ctx.font = "bold 13px Manrope"; const text = angle + "°"; const tw = ctx.measureText(text).width;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; ctx.fillRect(tx - tw/2 - 4, ty - 10, tw + 8, 20);
             ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, tx, ty);
             ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
         };
         const drawTextVal = (ctx, text, x, y) => {
-            ctx.font = "black 11px Manrope"; const tw = ctx.measureText(text).width;
-            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(x - tw/2 - 4, y - 16, tw + 8, 20);
+            ctx.font = "900 13px Manrope"; const tw = ctx.measureText(text).width;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(x - tw/2 - 6, y - 18, tw + 12, 24);
             ctx.fillStyle = "#d97706"; ctx.textAlign = "center"; ctx.fillText(text, x, y - 2); ctx.textAlign = "start"; 
         }
 
@@ -844,11 +844,11 @@
             // DRAW FLOOR
             ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
             if (window.currentTool === 'ponto') {
-                ctx.fillStyle = "#64748b"; ctx.font = "bold 11px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 15); ctx.fillText("lp: 0.00m", 10, floorY - 5); ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(5, floorY); ctx.stroke();
+                ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8); ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(5, floorY); ctx.stroke();
             } else if (window.currentTool === 'vertical') {
-                ctx.fillStyle = "#64748b"; ctx.font = "bold 11px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 15); ctx.fillText("lp: 0.00m", 10, floorY - 5);
+                ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8);
             } else if (window.currentTool === 'homog') {
-                 ctx.fillStyle = "#64748b"; ctx.font = "bold 11px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 15); ctx.fillText("lp: 0.00m", 10, floorY - 5);
+                 ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8);
             }
 
              if (window.currentTool === 'ponto') {
@@ -875,8 +875,8 @@
 
                 // Height & Plane Lines
                 ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
-                ctx.font = "bold 11px Manrope"; ctx.fillStyle = "#64748b"; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 45, sy + 3); 
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#64748b"; ctx.font = "bold 11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
+                ctx.font = "bold 13px Manrope"; ctx.fillStyle = "#64748b"; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 50, sy + 4); 
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 8); 
 
                 const axisX = centerX + (s.height * scale) * Math.tan(tr);
                 ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
@@ -885,7 +885,7 @@
                     ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
                     drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
                     const distH = s.height * Math.tan(tr);
-                    drawDimLine(ctx, centerX, floorY + 20, axisX, floorY + 20, `d: ${distH.toFixed(2)}m`);
+                    drawDimLine(ctx, centerX, floorY + 25, axisX, floorY + 25, `d: ${distH.toFixed(2)}m`);
                 }
 
                 if (window.calcMode !== 'ies' || s.iesData) {
@@ -898,26 +898,26 @@
                 
                 let valText = Math.round(luxFloor) + " Lux";
                 if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
-                drawTextVal(ctx, valText, hitXFloor, floorY - 10); 
+                drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
                 
                 if (hEff > 0) { 
                     const ix = centerX + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
                     let valTextPlane = Math.round(luxPlane) + " Lux";
                     if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD FILE";
-                    drawTextVal(ctx, valTextPlane, ix, py - 10); 
+                    drawTextVal(ctx, valTextPlane, ix, py - 12); 
                     
                     if (window.calcMode !== 'ies' || s.iesData) {
                         const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
                         const hPx_plane = py - sy;
                         const xL_p = hPx_plane * Math.tan(tr - br / 2);
                         const xR_p = hPx_plane * Math.tan(tr + br / 2);
-                        drawDimLine(ctx, centerX + xL_p, py + 15, centerX + xR_p, py + 15, `Ø ${diaPlane.toFixed(2)}m`);
+                        drawDimLine(ctx, centerX + xL_p, py + 20, centerX + xR_p, py + 20, `Ø ${diaPlane.toFixed(2)}m`);
                     }
                 }
                 
                 if (window.calcMode !== 'ies' || s.iesData) {
                     const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
-                    drawDimLine(ctx, centerX + xL, floorY + 45, centerX + xR, floorY + 45, `Ø ${dia.toFixed(2)}m`);
+                    drawDimLine(ctx, centerX + xL, floorY + 50, centerX + xR, floorY + 50, `Ø ${dia.toFixed(2)}m`);
                 }
             }
              else if (window.currentTool === 'vertical') {
@@ -942,7 +942,7 @@
 
                 const hqY = floorY - (s.hq * scale);
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
-                ctx.fillStyle = "#64748b"; ctx.font = "bold 11px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${s.hq.toFixed(2)}m`, 10, hqY - 5);
+                ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${s.hq.toFixed(2)}m`, 10, hqY - 8);
                 
                 ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip(); 
                 ctx.save(); ctx.translate(centerX, sy);
@@ -968,10 +968,10 @@
                         
                         let valText = Math.round(ev) + " Lux";
                         if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
-                        drawTextVal(ctx, valText, wx - 40, hitY_px);
+                        drawTextVal(ctx, valText, wx - 45, hitY_px);
                         
                         if (hitY_px < floorY) {
-                            drawDimLineVertical(ctx, wx + 35, hitY_px, floorY, `${hitY_metric.toFixed(2)}m`);
+                            drawDimLineVertical(ctx, wx + 45, hitY_px, floorY, `${hitY_metric.toFixed(2)}m`);
                         }
                      }
                      
@@ -979,11 +979,11 @@
                         const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + currentBeam/2) * Math.PI/180));
                         const hTopPx = floorY - (hTopMetric * scale);
                         if(hTopPx > -100 && hTopPx < floorY + 100) {
-                           drawDimLineVertical(ctx, wx + 15, hTopPx, floorY, `${hTopMetric.toFixed(2)}m`);
+                           drawDimLineVertical(ctx, wx + 20, hTopPx, floorY, `${hTopMetric.toFixed(2)}m`);
                         }
                     }
                 }
-                drawDimLine(ctx, centerX, sy - 30, wx, sy - 30, `d: ${s.dist.toFixed(1)}m`); 
+                drawDimLine(ctx, centerX, sy - 35, wx, sy - 35, `d: ${s.dist.toFixed(1)}m`); 
             } else if (window.currentTool === 'homog') {
                 const I = getIntensity(window.state.homog); 
                 const sy = floorY - (s.height * scale); const py = floorY - (s.plane * scale); const hS = (s.spacing * scale) / 2;
@@ -995,7 +995,7 @@
                 const luxPlane = hEff > 0 ? I / (hEff ** 2) : 0;
                 const leftX = centerX - hS; const rightX = centerX + hS;
                 
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#64748b"; ctx.font = "bold 11px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 5); 
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 8); 
 
                 [leftX, rightX].forEach(lx => {
                     ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(217, 119, 6, 0.4)"; ctx.moveTo(lx, sy); ctx.lineTo(lx, floorY); ctx.stroke(); ctx.setLineDash([]);
@@ -1010,17 +1010,17 @@
                     drawAngleDim(ctx, leftX, sy, Math.round(currentBeam), 0, 40, "rgba(217, 119, 6, 0.8)", false);
                 }
 
-                drawDimLine(ctx, leftX, sy - 20, rightX, sy - 20, `D: ${s.spacing.toFixed(1)}m`);
+                drawDimLine(ctx, leftX, sy - 25, rightX, sy - 25, `D: ${s.spacing.toFixed(1)}m`);
                 
                 ctx.beginPath(); ctx.arc(leftX, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
                 
                 let valText = Math.round(luxFloor) + " Lux";
                 if (window.calcMode === 'ies' && !window.state.homog.iesData) valText = "LOAD FILE";
-                drawTextVal(ctx, valText, leftX, floorY - 10);
+                drawTextVal(ctx, valText, leftX, floorY - 12);
 
                 const rFloor = (floorY - sy) * Math.tan(br/2);
                 if (window.calcMode !== 'ies' || s.iesData) {
-                    drawDimLine(ctx, leftX - rFloor, floorY + 25, leftX + rFloor, floorY + 25, `Ø ${dia.toFixed(2)}m`);
+                    drawDimLine(ctx, leftX - rFloor, floorY + 30, leftX + rFloor, floorY + 30, `Ø ${dia.toFixed(2)}m`);
                 }
 
                 if (hEff > 0) {
@@ -1028,11 +1028,11 @@
                      
                      let valTextPlane = Math.round(luxPlane) + " Lux";
                      if (window.calcMode === 'ies' && !window.state.homog.iesData) valTextPlane = "LOAD FILE";
-                     drawTextVal(ctx, valTextPlane, leftX, py - 10);
+                     drawTextVal(ctx, valTextPlane, leftX, py - 12);
                      
                      if (window.calcMode !== 'ies' || s.iesData) {
                         const rPlane = (py - sy) * Math.tan(br/2);
-                        drawDimLine(ctx, leftX - rPlane, py + 15, leftX + rPlane, py + 15, `Ø ${diaPlane.toFixed(2)}m`);
+                        drawDimLine(ctx, leftX - rPlane, py + 20, leftX + rPlane, py + 20, `Ø ${diaPlane.toFixed(2)}m`);
                      }
                 }
             }
