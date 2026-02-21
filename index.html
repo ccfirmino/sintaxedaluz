@@ -111,6 +111,8 @@
         html.dark .tab-active { background-color: rgba(217, 119, 6, 0.1); border-color: #d97706 !important; }
         html.dark .tab-inactive { color: #94a3b8 !important; }
         html.dark .canvas-container { background: #0f172a; border-color: #334155; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
+        /* Grid Override para Dark Mode - Mais sutil e elegante */
+        html.dark .canvas-container > div.pointer-events-none { background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px) !important; opacity: 0.7 !important; }
         html.dark .query-tab-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
         html.dark .query-tab-active { background-color: rgba(217, 119, 6, 0.1); color: #d97706; border-color: #d97706; }
         html.dark .leed-level-box { background: #1e293b; border-color: #334155; }
