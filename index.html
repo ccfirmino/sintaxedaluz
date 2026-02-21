@@ -25,16 +25,16 @@
             theme: {
                 extend: {
                     colors: {
-                        'midnight': '#f8fafc', /* Light Slate 50 Main Bg */
-                        'twilight': '#ffffff', /* White Card Bg */
+                        'midnight': '#f8fafc',
+                        'twilight': '#ffffff',
                         'glass': 'rgba(255, 255, 255, 0.9)',
-                        'luminous-gold': '#d97706', /* Amber 600 - Sophisticated Gold for Light Theme */
-                        'tech-cyan': '#0284c7', /* Sky 600 */
-                        'dim-gray': '#64748b', /* Slate 500 */
-                        'dim-line': '#e2e8f0', /* Slate 200 */
-                        'starlight': '#0f172a', /* Slate 900 for Primary Text */
-                        'leed-green': '#4d7c0f', /* Lime 700 */
-                        'muted-blue': '#475569' /* Slate 600 */
+                        'luminous-gold': '#d97706',
+                        'tech-cyan': '#0284c7',
+                        'dim-gray': '#64748b',
+                        'dim-line': '#e2e8f0',
+                        'starlight': '#0f172a',
+                        'leed-green': '#4d7c0f',
+                        'muted-blue': '#475569'
                     },
                     fontFamily: { sans: ['Manrope', 'sans-serif'] },
                     backgroundImage: {
@@ -49,17 +49,17 @@
     </script>
 
     <style>
-        body { font-family: 'Manrope', sans-serif; background-color: #f8fafc; color: #334155; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); letter-spacing: 0.5px; min-height: 100vh; }
+        body { font-family: 'Manrope', sans-serif; background-color: #f8fafc; color: #334155; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); letter-spacing: 0.5px; min-height: 100vh; transition: background 0.3s, color 0.3s; }
         h1, h2, h3, h4, .nav-link, button, input, label, select { text-transform: uppercase !important; }
-        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(0, 0, 0, 0.06); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03); }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(0, 0, 0, 0.06); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03); transition: background 0.3s, border-color 0.3s; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #d97706; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(217, 119, 6, 0.3); border: 2px solid #ffffff; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 2px; }
-        input[type=number], select, input[type=text], input[type=date], input[type=email], input[type=password] { background-color: transparent; color: #0f172a; border: none; border-bottom: 1px solid #cbd5e1; text-align: left; width: 100%; font-family: 'Manrope', sans-serif; font-weight: 600; -moz-appearance: textfield; padding: 8px 0; transition: border-color 0.3s; }
+        input[type=number], select, input[type=text], input[type=date], input[type=email], input[type=password] { background-color: transparent; color: #0f172a; border: none; border-bottom: 1px solid #cbd5e1; text-align: left; width: 100%; font-family: 'Manrope', sans-serif; font-weight: 600; -moz-appearance: textfield; padding: 8px 0; transition: border-color 0.3s, color 0.3s; }
         input[type=number] { text-align: right; width: 65px; } 
         input:focus, select:focus { outline: none; border-bottom: 1px solid #d97706 !important; color: #d97706; }
         select.custom-select option { background-color: #ffffff; color: #0f172a; }
-        input[type="file"] { font-size: 10px; color: #64748b; }
+        input[type="file"] { font-size: 10px; color: #64748b; transition: color 0.3s; }
         input[type="file"]::file-selector-button { margin-right: 10px; border: 1px solid rgba(217, 119, 6, 0.3); background: rgba(217, 119, 6, 0.1); padding: 5px 10px; border-radius: 6px; color: #d97706; cursor: pointer; transition: all 0.2s; font-weight: bold; text-transform: uppercase; font-size: 9px; }
         input[type="file"]::file-selector-button:hover { background: rgba(217, 119, 6, 0.2); }
         .auth-input-group label { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #d97706 !important; }
@@ -67,11 +67,11 @@
         .app-locked { filter: blur(8px) grayscale(0.2); pointer-events: none; user-select: none; overflow: hidden; height: 100vh; transition: filter 0.5s ease; }
         .nav-link { position: relative; font-size: 0.85rem; letter-spacing: 2px; color: #64748b; font-weight: 700; transition: color 0.3s; }
         .nav-link:hover { color: #d97706; }
-        .tab-active { border-bottom: 3px solid #d97706 !important; color: #d97706 !important; opacity: 1 !important; background-color: #fffbeb; font-weight: 800; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.08); }
+        .tab-active { border-bottom: 3px solid #d97706 !important; color: #d97706 !important; opacity: 1 !important; background-color: #fffbeb; font-weight: 800; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.08); transition: background 0.3s, color 0.3s, border-color 0.3s; }
         .tab-inactive { border-bottom: 3px solid transparent !important; color: #64748b !important; opacity: 0.8; }
         .mode-tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px 20px; min-width: 130px; height: 90px; border-radius: 12px; border: 1px solid #e2e8f0; background: #ffffff; transition: all 0.3s ease; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .mode-tab-btn:hover { background: #f8fafc; transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 6px 15px rgba(0,0,0,0.05); }
-        .canvas-container { background: #ffffff; box-shadow: inset 0 0 15px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; border-radius: 16px; }
+        .canvas-container { background: #ffffff; box-shadow: inset 0 0 15px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; border-radius: 16px; transition: background 0.3s, border-color 0.3s; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(217, 119, 6, 0.3); border-radius: 4px; }
@@ -88,11 +88,55 @@
         input[type="radio"]::before { content: ""; width: 0.65em; height: 0.65em; background-color: #d97706; border-radius: 50%; transform: scale(0); transition: 120ms transform ease-in-out; }
         input[type="radio"]:checked { border-color: #d97706; }
         input[type="radio"]:checked::before { transform: scale(1); }
-        .bar-container { width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 9999px; overflow: hidden; margin-top: 6px; }
+        .bar-container { width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 9999px; overflow: hidden; margin-top: 6px; transition: background 0.3s; }
         .bar-fill { height: 100%; border-radius: 9999px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* DARK MODE CSS INJECT - LUXSINTAX ARCHITECTURE */
+        html.dark body { background: linear-gradient(180deg, #0f172a 0%, #020617 100%); color: #cbd5e1; }
+        html.dark nav { background: rgba(15, 23, 42, 0.95); border-color: #1e293b; }
+        html.dark .glass-panel { background: rgba(30, 41, 59, 0.85); border-color: rgba(255, 255, 255, 0.05); }
+        html.dark .text-starlight { color: #f8fafc; }
+        html.dark .text-dim-gray { color: #94a3b8; }
+        html.dark .bg-white { background-color: #1e293b; }
+        html.dark .border-slate-200 { border-color: #334155; }
+        html.dark .border-slate-300 { border-color: #475569; }
+        html.dark .border-slate-100 { border-color: #1e293b; }
+        html.dark .bg-slate-50 { background-color: #0f172a; }
+        html.dark .bg-slate-100 { background-color: #1e293b; }
+        html.dark .bg-slate-200 { background-color: #334155; }
+        html.dark input, html.dark select, html.dark input[type=number], html.dark input[type=text], html.dark input[type=date], html.dark input[type=email], html.dark input[type=password] { color: #f8fafc; border-bottom-color: #475569; }
+        html.dark select.custom-select option { background-color: #1e293b; color: #f8fafc; }
+        html.dark .mode-tab-btn { background: #1e293b; border-color: #334155; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        html.dark .mode-tab-btn:hover { background: #0f172a; border-color: #475569; }
+        html.dark .tab-active { background-color: rgba(217, 119, 6, 0.1); border-color: #d97706 !important; }
+        html.dark .tab-inactive { color: #94a3b8 !important; }
+        html.dark .canvas-container { background: #0f172a; border-color: #334155; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
+        html.dark .query-tab-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
+        html.dark .query-tab-active { background-color: rgba(217, 119, 6, 0.1); color: #d97706; border-color: #d97706; }
+        html.dark .leed-level-box { background: #1e293b; border-color: #334155; }
+        html.dark .leed-level-box.active { background: rgba(217, 119, 6, 0.1); border-color: #d97706; }
+        html.dark .well-toggle-group { background: #1e293b; border-color: #334155; }
+        html.dark .well-toggle-group.active { background: rgba(2, 132, 199, 0.1); border-color: #0284c7; }
+        html.dark .cert-tab.active { background: rgba(77, 124, 15, 0.2); border-color: #bef264; color: #bef264; }
+        html.dark #mobile-menu { background: #0f172a; border-color: #334155; }
+        html.dark .bar-container { background-color: #334155; }
+        html.dark th { background-color: #0f172a; color: #cbd5e1; border-color: #1e293b; }
+        html.dark td { border-color: #1e293b; }
+        html.dark tr.border-b { border-color: #1e293b; }
+        html.dark .hover\:bg-slate-50:hover { background-color: #1e293b; }
+        html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #1e293b; }
+        html.dark .bg-amber-100 { background-color: rgba(217,119,6,0.2); border-color: rgba(217,119,6,0.3); }
+        html.dark .bg-amber-50 { background-color: rgba(217,119,6,0.05); }
+        html.dark .bg-lime-100 { background-color: rgba(77, 124, 15, 0.2); color: #a3e635; }
+        html.dark .text-leed-green { color: #a3e635; }
+        html.dark .border-leed-green { border-color: #a3e635; }
+        html.dark .text-slate-600 { color: #94a3b8; }
+        html.dark .text-slate-500 { color: #cbd5e1; }
+        html.dark .text-slate-400 { color: #64748b; }
+        html.dark input[type=range]::-webkit-slider-runnable-track { background: #334155; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-white">
+<body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-white transition-colors duration-300">
 
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-500">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
@@ -121,7 +165,7 @@
     </div>
 
     <div id="app-content" class="transition-all duration-700 app-locked flex flex-col min-h-screen">
-        <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm">
+        <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm transition-colors duration-300">
             <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <a href="#" class="text-xl font-black tracking-[0.2em] text-starlight">LUX<span class="text-luminous-gold font-light">SINTAX</span></a>
@@ -131,6 +175,9 @@
                     <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
                     <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
                     <button onclick="window.toggleLanguage()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase"><span class="lang-display">PT / EN</span></button>
+                    <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase" title="Alternar Tema">
+                        <i class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:inline"></i>
+                    </button>
                     <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-slate-300">
                         <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-starlight font-bold text-xs border border-slate-200"><i class="fas fa-user"></i></div>
                         <div class="flex flex-col"><span id="user-name-display" class="text-[10px] font-black text-starlight uppercase leading-none">Usuário</span><button onclick="window.AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-500 text-left uppercase font-bold mt-1">Sair</button></div>
@@ -144,6 +191,9 @@
                  <button onclick="window.AuthManager.logout()" class="text-sm font-bold tracking-widest text-red-500 text-left">SAIR</button>
                  <div class="h-[1px] bg-slate-200 w-full"></div>
                  <button onclick="window.toggleLanguage(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left lang-display">PT / EN</button>
+                 <button onclick="window.toggleTheme(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase">
+                    <i class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:inline"></i> TEMA
+                 </button>
             </div>
         </nav>
 
@@ -234,7 +284,7 @@
                         <div class="lg:col-span-9 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full min-h-[600px]">
                                 <h3 class="text-sm text-starlight mb-6 border-b border-slate-200 pb-4 uppercase tracking-widest font-black" data-i18n="hdr_results">Resultados em Tempo Real</h3>
-                                <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner">
+                                <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
                                     <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                     <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
                                 </div>
@@ -314,7 +364,7 @@
                                     <span onclick="window.switchCertTab('well')" id="cert-tab-well" class="cert-tab inactive">WELL v2</span>
                                 </div>
                                 <div id="pane-leed" class="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                                    <div class="mb-6 bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm">
+                                    <div class="mb-6 bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm transition-colors">
                                         <div class="flex justify-between items-center mb-4 border-b border-slate-200 pb-2">
                                             <h4 class="text-sm font-black text-luminous-gold flex items-center gap-2"><i class="fas fa-calculator"></i> <span data-i18n="leed_calc_title">Calculadora de Orçamento (LPD)</span></h4>
                                             <div class="text-[9px] bg-lime-100 px-2 py-1 rounded text-leed-green font-black">ASHRAE 90.1-2016</div>
@@ -332,26 +382,26 @@
                                             <div class="w-full md:w-1/4 text-right md:text-left"><div class="text-[10px] text-slate-500 font-bold uppercase mb-1" data-i18n="leed_reduction">Redução Aplicada</div><div id="leed-reduction-display" class="text-xl font-black text-leed-green">20%</div></div>
                                             <div class="w-full md:w-1/4"><label class="text-[10px] text-tech-cyan font-bold uppercase block mb-2" data-i18n="leed_area">Área do Projeto (m²)</label><div class="relative"><input type="number" id="leed-area-input" value="100" oninput="window.updateLeedTargets()" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-xs text-starlight font-bold outline-none focus:border-luminous-gold text-right pr-8"><span class="absolute right-3 top-2 text-xs text-tech-cyan font-bold">m²</span></div></div>
                                         </div>
-                                        <table class="w-full text-xs text-left border-collapse bg-white rounded-lg overflow-hidden border border-slate-200">
-                                            <thead class="text-starlight border-b border-slate-200 bg-slate-100"><tr><th class="p-3 font-bold" data-i18n="leed_type">Tipologia</th><th class="p-3 text-center font-bold text-slate-500">Base ASHRAE<br><span class="text-[9px] opacity-70 font-normal">(W/m²)</span></th><th class="p-3 text-center font-bold text-luminous-gold">Meta LPD<br><span class="text-[9px] opacity-70 font-normal">(W/m²)</span></th><th class="p-3 text-right font-bold text-tech-cyan"><span data-i18n="leed_allowance">CARGA PERMITIDA</span><br><span class="text-[9px] opacity-70 font-normal">(Watts)</span></th></tr></thead>
-                                            <tbody id="leed-lpd-body" class="text-slate-600 text-xs font-semibold divide-y divide-slate-100"></tbody>
+                                        <table class="w-full text-xs text-left border-collapse bg-white rounded-lg overflow-hidden border border-slate-200 transition-colors">
+                                            <thead class="text-starlight border-b border-slate-200 bg-slate-100 transition-colors"><tr><th class="p-3 font-bold" data-i18n="leed_type">Tipologia</th><th class="p-3 text-center font-bold text-slate-500">Base ASHRAE<br><span class="text-[9px] opacity-70 font-normal">(W/m²)</span></th><th class="p-3 text-center font-bold text-luminous-gold">Meta LPD<br><span class="text-[9px] opacity-70 font-normal">(W/m²)</span></th><th class="p-3 text-right font-bold text-tech-cyan"><span data-i18n="leed_allowance">CARGA PERMITIDA</span><br><span class="text-[9px] opacity-70 font-normal">(Watts)</span></th></tr></thead>
+                                            <tbody id="leed-lpd-body" class="text-slate-600 text-xs font-semibold divide-y divide-slate-100 transition-colors"></tbody>
                                         </table>
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h4 class="text-sm font-black text-leed-green mb-3 flex justify-between">EQ: Interior Lighting <span class="text-[10px] bg-lime-100 px-2 py-1 rounded text-leed-green">1-2 Pts</span></h4><ul class="list-disc pl-4 text-xs text-slate-600 space-y-2 font-medium"><li data-i18n="leed_eq_1"><strong class="text-starlight font-black">Controle:</strong> Individual para 90% dos ocupantes.</li><li data-i18n="leed_eq_2"><strong class="text-starlight font-black">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.</li></ul></div>
-                                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h4 class="text-sm font-black text-leed-green mb-3 flex justify-between">SS: Light Pollution <span class="text-[10px] bg-lime-100 px-2 py-1 rounded text-leed-green">Req</span></h4><div class="text-xs text-slate-600 font-medium" data-i18n="leed_ss_1">Requisito <strong class="text-starlight font-black">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).</div></div>
+                                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition-colors"><h4 class="text-sm font-black text-leed-green mb-3 flex justify-between">EQ: Interior Lighting <span class="text-[10px] bg-lime-100 px-2 py-1 rounded text-leed-green">1-2 Pts</span></h4><ul class="list-disc pl-4 text-xs text-slate-600 space-y-2 font-medium"><li data-i18n="leed_eq_1"><strong class="text-starlight font-black">Controle:</strong> Individual para 90% dos ocupantes.</li><li data-i18n="leed_eq_2"><strong class="text-starlight font-black">Qualidade:</strong> CRI > 80, Vida > 24kh, Reflexão alta.</li></ul></div>
+                                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition-colors"><h4 class="text-sm font-black text-leed-green mb-3 flex justify-between">SS: Light Pollution <span class="text-[10px] bg-lime-100 px-2 py-1 rounded text-leed-green">Req</span></h4><div class="text-xs text-slate-600 font-medium" data-i18n="leed_ss_1">Requisito <strong class="text-starlight font-black">BUG Rating</strong> (Backlight-Uplight-Glare) obrigatório conforme a Zona (LZ0 a LZ4).</div></div>
                                     </div>
                                 </div>
                                 <div id="pane-well" class="hidden max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                                    <div class="mb-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                    <div class="mb-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-colors">
                                         <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
                                             <div><h4 class="text-sm font-black text-tech-cyan flex items-center gap-2"><i class="fas fa-check-circle"></i> <span data-i18n="well_sim_title">Simulador de Créditos de Iluminação</span></h4><p class="text-[10px] text-slate-500 mt-1 font-bold" data-i18n="well_concept">Conceito: LIGHT (WELL v2)</p></div>
                                             <div class="text-right"><div class="text-[9px] text-slate-500 uppercase font-black" data-i18n="well_est_pts">Pontos Estimados</div><div id="well-total-score" class="text-2xl font-black text-starlight">0 <span class="text-xs text-slate-400 font-normal">/ 8</span></div></div>
                                         </div>
                                         <div class="mb-6"><div class="flex justify-between text-[9px] text-slate-500 mb-1 uppercase font-black"><span data-i18n="well_contrib">Contribuição para Certificação</span><span id="well-progress-text">0%</span></div><div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div id="well-progress-bar" class="h-full bg-tech-cyan transition-all duration-500" style="width: 0%"></div></div></div>
                                         <div class="space-y-3">
-                                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border-l-4 border-leed-green shadow-sm"><div><div class="text-xs font-black text-starlight">L01: Light Exposure</div><div class="text-[10px] text-slate-600 font-medium" data-i18n="well_l01">Acesso à luz natural e visualização.</div></div><div class="text-[9px] bg-lime-100 text-leed-green px-2 py-1 rounded font-black uppercase" data-i18n="well_req">Obrigatório</div></div>
-                                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border-l-4 border-leed-green shadow-sm"><div><div class="text-xs font-black text-starlight">L02: Visual Lighting Design</div><div class="text-[10px] text-slate-600 font-medium" data-i18n="well_l02">Níveis de iluminância adequados.</div></div><div class="text-[9px] bg-lime-100 text-leed-green px-2 py-1 rounded font-black uppercase" data-i18n="well_req">Obrigatório</div></div>
+                                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border-l-4 border-leed-green shadow-sm transition-colors"><div><div class="text-xs font-black text-starlight">L01: Light Exposure</div><div class="text-[10px] text-slate-600 font-medium" data-i18n="well_l01">Acesso à luz natural e visualização.</div></div><div class="text-[9px] bg-lime-100 text-leed-green px-2 py-1 rounded font-black uppercase" data-i18n="well_req">Obrigatório</div></div>
+                                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border-l-4 border-leed-green shadow-sm transition-colors"><div><div class="text-xs font-black text-starlight">L02: Visual Lighting Design</div><div class="text-[10px] text-slate-600 font-medium" data-i18n="well_l02">Níveis de iluminância adequados.</div></div><div class="text-[9px] bg-lime-100 text-leed-green px-2 py-1 rounded font-black uppercase" data-i18n="well_req">Obrigatório</div></div>
                                             <div onclick="window.toggleWellFeature(this, 3)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="3"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity text-tech-cyan"></i></div><div><div class="text-xs font-black text-starlight">L03: Circadian Lighting Design</div><div class="text-[10px] text-slate-600 font-medium" data-i18n="well_l03">Melanopic Lux > 240 (Workstations).</div></div></div><div class="text-xs font-black text-tech-cyan">+3 pts</div></div>
                                             <div onclick="window.toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="2"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity text-tech-cyan"></i></div><div><div class="text-xs font-black text-starlight">L04: Glare Control</div><div class="text-[10px] text-slate-600 font-medium" data-i18n="well_l04">UGR < 16 / Gestão de brilho solar.</div></div></div><div class="text-xs font-black text-tech-cyan">+2 pts</div></div>
                                             <div onclick="window.toggleWellFeature(this, 2)" class="well-toggle-group p-3 rounded-lg flex items-center justify-between" data-points="2"><div class="flex items-center gap-3"><div class="well-check"><i class="fas fa-check text-[10px] opacity-0 transition-opacity text-tech-cyan"></i></div><div><div class="text-xs font-black text-starlight">L07: Electric Light Quality</div><div class="text-[10px] text-slate-600 font-medium" data-i18n="well_l07">CRI > 90, R9 > 50, Flicker < 90Hz.</div></div></div><div class="text-xs font-black text-tech-cyan">+2 pts</div></div>
@@ -366,22 +416,22 @@
             </div>
         </section>
 
-        <section id="fundamentos" class="py-24 px-6 border-t border-slate-200 bg-white">
+        <section id="fundamentos" class="py-24 px-6 border-t border-slate-200 bg-white transition-colors duration-300">
             <div class="max-w-[1800px] mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="text-3xl text-starlight font-black tracking-widest mb-6 uppercase" data-i18n="about_title">SOBRE</h2>
                     <p class="text-sm text-slate-600 font-medium max-w-6xl mx-auto leading-relaxed text-justify" data-i18n="about_text">O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.</p>
                 </div>
                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white"><div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-calculator text-3xl"></i></div><h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_1_title">INTENSIDADE ABSOLUTA</h3><p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_1_desc">Converte dados fotométricos relativos para intensidade absoluta (Candelas).</p><div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">I = (Φ · γ) / 1000</span></div></div>
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white"><div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-lightbulb text-3xl"></i></div><h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_2_title">LEI DO COSSENO CÚBICO</h3><p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_2_desc">Variação da Lei do Inverso do Quadrado para superfícies horizontais.</p><div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">E = (I · cos³θ) / h²</span></div></div>
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white"><div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-ruler-combined text-3xl"></i></div><h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_3_title">GEOMETRIA DO FACHO</h3><p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_3_desc">Cálculo trigonométrico do diâmetro da mancha luminosa projetada.</p><div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">Ø = 2 · d · tan(α/2)</span></div></div>
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white"><div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-search-plus text-3xl"></i></div><h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_4_title">CONSULTA NORMATIVA</h3><p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_4_desc">Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.</p><div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">Database + Compliance</span></div></div>
+                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white"><div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-calculator text-3xl"></i></div><h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_1_title">INTENSIDADE ABSOLUTA</h3><p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_1_desc">Converte dados fotométricos relativos para intensidade absoluta (Candelas).</p><div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm transition-colors"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">I = (Φ · γ) / 1000</span></div></div>
+                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white"><div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-lightbulb text-3xl"></i></div><h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_2_title">LEI DO COSSENO CÚBICO</h3><p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_2_desc">Variação da Lei do Inverso do Quadrado para superfícies horizontais.</p><div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm transition-colors"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">E = (I · cos³θ) / h²</span></div></div>
+                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white"><div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-ruler-combined text-3xl"></i></div><h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_3_title">GEOMETRIA DO FACHO</h3><p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_3_desc">Cálculo trigonométrico do diâmetro da mancha luminosa projetada.</p><div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm transition-colors"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">Ø = 2 · d · tan(α/2)</span></div></div>
+                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white"><div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-search-plus text-3xl"></i></div><h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_4_title">CONSULTA NORMATIVA</h3><p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_4_desc">Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.</p><div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm transition-colors"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">Database + Compliance</span></div></div>
                 </div>
             </div>
         </section>
 
-        <footer class="bg-white py-12 px-6 border-t border-slate-200 mt-auto text-[10px] tracking-widest text-slate-400">
+        <footer class="bg-white py-12 px-6 border-t border-slate-200 mt-auto text-[10px] tracking-widest text-slate-400 transition-colors duration-300">
             <div class="max-w-[1800px] mx-auto text-center uppercase font-black">
                 <a href="#" class="text-lg font-black tracking-[0.2em] text-starlight uppercase">Lux<span class="text-luminous-gold font-light">Sintax</span></a>
                 <p class="mt-2">© 2026 LuxSintax. All rights reserved.</p>
@@ -392,7 +442,7 @@
 
     <div id="terms-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="window.closeTerms()"></div>
-        <div class="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl shadow-2xl p-8 animate-fade-in-up z-10">
+        <div class="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl shadow-2xl p-8 animate-fade-in-up z-10 transition-colors">
             <h3 class="text-starlight font-black tracking-widest text-lg mb-6 uppercase text-center" data-i18n="terms_title">Termo de Responsabilidade e Uso</h3>
             <div class="text-xs text-slate-600 font-medium leading-relaxed text-justify space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2" id="terms-content">
                 <p><strong class="text-starlight font-black">1. Natureza do Serviço e Otimização de Workflow</strong><br>O LuxSintax é uma plataforma SaaS projetada para otimizar o tempo e a produtividade do Lighting Designer na fase de concepção e pré-dimensionamento. O objetivo desta ferramenta é fornecer agilidade na validação de premissas e consultas normativas rápidas (NBR/ISO/CIE), permitindo que o profissional foque na estratégia criativa e técnica inicial.</p>
@@ -410,6 +460,20 @@
         const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- THEME INITIALIZATION ---
+        window.toggleTheme = function() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('luxsintax_theme', isDark ? 'dark' : 'light');
+            if (window.updateCalculations) window.updateCalculations();
+        };
+
+        if (localStorage.getItem('luxsintax_theme') === 'dark' || (!('luxsintax_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
 
         // 1. I18N DICTIONARY
         window.i18n = {
@@ -769,23 +833,26 @@
             return s.beam;
         }
 
-        // --- CANVAS ENGINE ---
+        // --- CANVAS ENGINE (THEME-AWARE) ---
         const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
-            ctx.beginPath(); ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1; 
+            const isDark = document.documentElement.classList.contains('dark');
+            ctx.beginPath(); ctx.strokeStyle = isDark ? "#475569" : "#94a3b8"; ctx.lineWidth = 1; 
             ctx.moveTo(x1, y1 - 3); ctx.lineTo(x1, y1 + 3); ctx.moveTo(x1, y1); ctx.lineTo(x2, y1); ctx.moveTo(x2, y1 - 3); ctx.lineTo(x2, y1 + 3); ctx.stroke(); 
             ctx.font = "bold 13px Manrope"; const mx = (x1 + x2) / 2; const my = (y1 + y2) / 2; const tw = ctx.measureText(text).width; 
-            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(mx - tw / 2 - 6, my - 10, tw + 12, 20); 
-            ctx.fillStyle = "#475569"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, mx, my); 
+            ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)"; ctx.fillRect(mx - tw / 2 - 6, my - 10, tw + 12, 20); 
+            ctx.fillStyle = isDark ? "#94a3b8" : "#475569"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, mx, my); 
             ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
         };
         const drawDimLineVertical = (ctx, x, y1, y2, text) => { 
-            ctx.beginPath(); ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1; ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke(); 
+            const isDark = document.documentElement.classList.contains('dark');
+            ctx.beginPath(); ctx.strokeStyle = isDark ? "#475569" : "#94a3b8"; ctx.lineWidth = 1; ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke(); 
             const cy = (y1 + y2) / 2; ctx.save(); ctx.translate(x, cy); ctx.rotate(-Math.PI/2); 
             ctx.font = "bold 13px Manrope"; const tw = ctx.measureText(text).width; 
-            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(-tw/2-6, -10, tw+12, 20); 
-            ctx.fillStyle = "#475569"; ctx.fillText(text, -tw/2, 4); ctx.restore(); 
+            ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)"; ctx.fillRect(-tw/2-6, -10, tw+12, 20); 
+            ctx.fillStyle = isDark ? "#94a3b8" : "#475569"; ctx.fillText(text, -tw/2, 4); ctx.restore(); 
         };
         const drawAngleDim = (ctx, x, y, angle, tilt, radius, color, isTilt = false) => {
+            const isDark = document.documentElement.classList.contains('dark');
             const tr = tilt * Math.PI / 180;
             let startAngle, endAngle, centerAngle;
             if (isTilt) { centerAngle = (Math.PI / 2) - (tr / 2); startAngle = (Math.PI / 2) - tr; endAngle = (Math.PI / 2); } 
@@ -793,19 +860,24 @@
             ctx.beginPath(); ctx.arc(x, y, radius, startAngle, endAngle); ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
             const textRadius = radius + 15; const tx = x + textRadius * Math.cos(centerAngle); const ty = y + textRadius * Math.sin(centerAngle);
             ctx.font = "bold 13px Manrope"; const text = angle + "°"; const tw = ctx.measureText(text).width;
-            ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; ctx.fillRect(tx - tw/2 - 4, ty - 10, tw + 8, 20);
+            ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.9)"; ctx.fillRect(tx - tw/2 - 4, ty - 10, tw + 8, 20);
             ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, tx, ty);
             ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
         };
         const drawTextVal = (ctx, text, x, y) => {
+            const isDark = document.documentElement.classList.contains('dark');
             ctx.font = "900 13px Manrope"; const tw = ctx.measureText(text).width;
-            ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillRect(x - tw/2 - 6, y - 18, tw + 12, 24);
+            ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)"; ctx.fillRect(x - tw/2 - 6, y - 18, tw + 12, 24);
             ctx.fillStyle = "#d97706"; ctx.textAlign = "center"; ctx.fillText(text, x, y - 2); ctx.textAlign = "start"; 
         }
 
         window.updateCalculations = function() {
             const canvas = document.getElementById('beamCanvas');
             if (!canvas) return;
+            const isDark = document.documentElement.classList.contains('dark');
+            const cBaseText = isDark ? "#94a3b8" : "#64748b";
+            const cFloorLine = isDark ? "#334155" : "#cbd5e1";
+            
             const dpr = window.devicePixelRatio || 1;
             const parent = canvas.parentElement;
             const rect = parent.getBoundingClientRect();
@@ -842,13 +914,13 @@
             ctx.clearRect(0, 0, cw, ch);
             
             // DRAW FLOOR
-            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
+            ctx.strokeStyle = cFloorLine; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
             if (window.currentTool === 'ponto') {
-                ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8); ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(5, floorY); ctx.stroke();
+                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8); ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(5, floorY); ctx.stroke();
             } else if (window.currentTool === 'vertical') {
-                ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8);
+                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8);
             } else if (window.currentTool === 'homog') {
-                 ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8);
+                 ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText("LINHA DE PISO (lp)", 10, floorY + 18); ctx.fillText("lp: 0.00m", 10, floorY - 8);
             }
 
              if (window.currentTool === 'ponto') {
@@ -874,15 +946,15 @@
                 ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
 
                 // Height & Plane Lines
-                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
-                ctx.font = "bold 13px Manrope"; ctx.fillStyle = "#64748b"; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 50, sy + 4); 
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 8); 
+                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
+                ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${s.height.toFixed(1)}m`, centerX - 50, sy + 4); 
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 8); 
 
                 const axisX = centerX + (s.height * scale) * Math.tan(tr);
-                ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
+                ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
                 
                 if (s.tilt > 0) {
-                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
                     drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
                     const distH = s.height * Math.tan(tr);
                     drawDimLine(ctx, centerX, floorY + 25, axisX, floorY + 25, `d: ${distH.toFixed(2)}m`);
@@ -937,12 +1009,12 @@
 
                 let hitY_metric = s.height - (s.dist / Math.tan(tr)); let hitY_px = floorY - (hitY_metric * scale);
                 
-                ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; 
+                ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = cFloorLine; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; 
                 ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
 
                 const hqY = floorY - (s.hq * scale);
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
-                ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${s.hq.toFixed(2)}m`, 10, hqY - 8);
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${s.hq.toFixed(2)}m`, 10, hqY - 8);
                 
                 ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip(); 
                 ctx.save(); ctx.translate(centerX, sy);
@@ -952,7 +1024,7 @@
 
                 if (s.tilt > 0) {
                     const axisX = centerX + (s.height * scale) * Math.tan(tr);
-                    ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
                     drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
                 }
 
@@ -995,7 +1067,7 @@
                 const luxPlane = hEff > 0 ? I / (hEff ** 2) : 0;
                 const leftX = centerX - hS; const rightX = centerX + hS;
                 
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#64748b"; ctx.font = "bold 13px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 8); 
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.fillText(`hp: ${s.plane}m`, 10, py - 8); 
 
                 [leftX, rightX].forEach(lx => {
                     ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(217, 119, 6, 0.4)"; ctx.moveTo(lx, sy); ctx.lineTo(lx, floorY); ctx.stroke(); ctx.setLineDash([]);
