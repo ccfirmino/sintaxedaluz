@@ -111,7 +111,6 @@
         html.dark .tab-active { background-color: rgba(217, 119, 6, 0.1); border-color: #d97706 !important; }
         html.dark .tab-inactive { color: #94a3b8 !important; }
         html.dark .canvas-container { background: #0f172a; border-color: #334155; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
-        /* Grid Override para Dark Mode - Mais sutil e elegante */
         html.dark .canvas-container > div.pointer-events-none { background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px) !important; opacity: 0.7 !important; }
         html.dark .query-tab-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
         html.dark .query-tab-active { background-color: rgba(217, 119, 6, 0.1); color: #d97706; border-color: #d97706; }
@@ -1014,6 +1013,8 @@
                 ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = cFloorLine; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; 
                 ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
 
+                drawDimLineVertical(ctx, centerX - 35, sy, floorY, `H: ${s.height.toFixed(1)}m`);
+
                 const hqY = floorY - (s.hq * scale);
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
                 ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${s.hq.toFixed(2)}m`, 10, hqY - 8);
@@ -1080,6 +1081,8 @@
                     ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tl - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tl + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                 });
                 
+                drawDimLineVertical(ctx, leftX - 35, sy, floorY, `H: ${s.height.toFixed(1)}m`);
+
                 if (window.calcMode !== 'ies' || s.iesData) {
                     drawAngleDim(ctx, leftX, sy, Math.round(currentBeam), 0, 40, "rgba(217, 119, 6, 0.8)", false);
                 }
