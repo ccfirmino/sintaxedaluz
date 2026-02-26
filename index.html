@@ -181,7 +181,14 @@
                     </button>
                     <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-slate-300">
                         <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-starlight font-bold text-xs border border-slate-200"><i class="fas fa-user"></i></div>
-                        <div class="flex flex-col"><span id="user-name-display" class="text-[10px] font-black text-starlight uppercase leading-none">Usuário</span><button onclick="window.AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-500 text-left uppercase font-bold mt-1">Sair</button></div>
+                        <div class="flex flex-col">
+                            <span id="user-name-display" class="text-[10px] font-black text-starlight uppercase leading-none">Usuário</span>
+                            <div class="flex items-center gap-2 mt-1">
+                                <button onclick="window.AuthManager.openProfile()" class="text-[9px] text-dim-gray hover:text-luminous-gold text-left uppercase font-bold transition-colors" data-i18n="nav_profile">PERFIL</button>
+                                <span class="text-slate-300 text-[8px]">|</span>
+                                <button onclick="window.AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-500 text-left uppercase font-bold transition-colors" data-i18n="nav_logout">SAIR</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="md:hidden text-starlight text-2xl cursor-pointer" onclick="window.toggleMobileMenu()"><i class="fas fa-bars"></i></div>
@@ -189,7 +196,8 @@
             <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-200 p-6 flex flex-col gap-6 shadow-2xl transition-all duration-300">
                  <a href="#calculadora" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
                  <a href="#fundamentos" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
-                 <button onclick="window.AuthManager.logout()" class="text-sm font-bold tracking-widest text-red-500 text-left">SAIR</button>
+                 <button onclick="window.AuthManager.openProfile(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase" data-i18n="nav_profile">PERFIL</button>
+                 <button onclick="window.AuthManager.logout()" class="text-sm font-bold tracking-widest text-red-500 text-left" data-i18n="nav_logout">SAIR</button>
                  <div class="h-[1px] bg-slate-200 w-full"></div>
                  <button onclick="window.toggleLanguage(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left lang-display">PT / EN</button>
                  <button onclick="window.toggleTheme(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase">
@@ -456,6 +464,29 @@
         </div>
     </div>
 
+    <div id="profile-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="window.AuthManager.closeProfile()"></div>
+        <div class="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-2xl p-8 animate-fade-in-up z-10 transition-colors">
+            <h3 class="text-starlight font-black tracking-widest text-lg mb-6 uppercase text-center" data-i18n="profile_title">Configurações de Conta</h3>
+            
+            <div class="space-y-5">
+                <div class="auth-input-group">
+                    <label data-i18n="profile_email">E-mail de Cadastro</label>
+                    <input type="text" id="profile-email-display" disabled class="disabled:opacity-60 disabled:cursor-not-allowed bg-slate-50 border-b border-slate-200 p-2">
+                </div>
+                <div class="auth-input-group">
+                    <label data-i18n="profile_new_pass">Nova Senha</label>
+                    <input type="password" id="profile-new-pass" placeholder="••••••••">
+                </div>
+                <div class="auth-input-group">
+                    <label data-i18n="profile_confirm_pass">Confirmar Nova Senha</label>
+                    <input type="password" id="profile-confirm-pass" placeholder="••••••••">
+                </div>
+                <button onclick="window.AuthManager.updatePassword()" class="w-full py-4 mt-2 bg-luminous-gold text-white font-black rounded-lg uppercase tracking-widest text-xs hover:bg-amber-700 transition-colors shadow-lg" data-i18n="profile_save">Atualizar Senha</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
@@ -492,7 +523,8 @@
                 well_l01: "Acesso à luz natural e visualização.", well_req: "Obrigatório", well_l02: "Níveis de iluminância adequados.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Gestão de brilho solar.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Zoning and intensity control.",
                 about_title: "SOBRE", about_text: "O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.",
                 card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).", card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.", card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.", card_4_title: "CONSULTA NORMATIVA", card_4_desc: "Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.",
-                footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade e Uso", terms_accept: "Li, Compreendi e Aceito os Riscos"
+                footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade e Uso", terms_accept: "Li, Compreendi e Aceito os Riscos",
+                nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem."
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
@@ -512,7 +544,8 @@
                 card_2_title: "COSINE CUBED LAW", card_2_desc: "Variation of the Inverse Square Law for horizontal surfaces.", 
                 card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", 
                 card_4_title: "NORMATIVE QUERY", card_4_desc: "Intelligence hub integrating NBR 8995-1, NBR 5101, and LEED/WELL requirements.",
-                footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood and Accept the Risks"
+                footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood and Accept the Risks",
+                nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match."
             }
         };
 
@@ -638,6 +671,10 @@
                 if (session) {
                     const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
                     document.getElementById('user-name-display').innerText = name.toUpperCase();
+                    
+                    const emailDisplay = document.getElementById('profile-email-display');
+                    if (emailDisplay) emailDisplay.value = session.user.email;
+
                     this.unlockApp();
                 } else { this.lockApp(); }
             },
@@ -679,7 +716,33 @@
                 else if (data.session) this.unlockApp();
                 else alert("Cadastro feito. Verifique e-mail.");
             },
-            logout: async function() { await supabase.auth.signOut(); location.reload(); }
+            logout: async function() { await supabase.auth.signOut(); location.reload(); },
+            openProfile: function() {
+                document.getElementById('profile-modal').classList.remove('hidden');
+            },
+            closeProfile: function() {
+                document.getElementById('profile-modal').classList.add('hidden');
+                document.getElementById('profile-new-pass').value = '';
+                document.getElementById('profile-confirm-pass').value = '';
+            },
+            updatePassword: async function() {
+                const pass1 = document.getElementById('profile-new-pass').value;
+                const pass2 = document.getElementById('profile-confirm-pass').value;
+                
+                if (!pass1 || pass1 !== pass2) {
+                    alert(window.currentLang === 'en' ? window.i18n.en.msg_pass_mismatch : window.i18n.pt.msg_pass_mismatch);
+                    return;
+                }
+                
+                const { error } = await supabase.auth.updateUser({ password: pass1 });
+                
+                if (error) {
+                    alert(error.message);
+                } else {
+                    alert(window.currentLang === 'en' ? window.i18n.en.msg_pass_success : window.i18n.pt.msg_pass_success);
+                    this.closeProfile();
+                }
+            }
         };
 
         // --- CORE FUNCTIONS ---
