@@ -152,13 +152,25 @@
             </div>
             <div id="form-login" class="space-y-6">
                 <div class="auth-input-group"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"></div>
-                <div class="auth-input-group"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••"></div>
+                <div class="auth-input-group">
+                    <label>Senha</label>
+                    <div class="relative">
+                        <input type="password" id="login-password" placeholder="••••••••" style="padding-right: 30px;">
+                        <button type="button" onclick="window.togglePassword('login-password')" tabindex="-1" class="absolute right-0 bottom-2 text-slate-400 hover:text-luminous-gold transition-colors outline-none"><i id="icon-login-password" class="fas fa-eye"></i></button>
+                    </div>
+                </div>
                 <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-white font-black rounded-lg uppercase tracking-widest text-xs hover:bg-amber-700 transition-colors shadow-lg">Acessar Plataforma</button>
             </div>
             <div id="form-register" class="space-y-5 hidden">
                 <div class="grid grid-cols-2 gap-4"><div class="auth-input-group"><label>Nome</label><input type="text" id="reg-name" placeholder="Nome"></div><div class="auth-input-group"><label>Sobrenome</label><input type="text" id="reg-surname" placeholder="Sobrenome"></div></div>
                 <div class="auth-input-group"><label>E-mail Corporativo</label><input type="email" id="reg-email" placeholder="nome@empresa.com"></div>
-                <div class="auth-input-group"><label>Senha</label><input type="password" id="reg-password" placeholder="Crie uma senha forte"></div>
+                <div class="auth-input-group">
+                    <label>Senha</label>
+                    <div class="relative">
+                        <input type="password" id="reg-password" placeholder="Crie uma senha forte" style="padding-right: 30px;">
+                        <button type="button" onclick="window.togglePassword('reg-password')" tabindex="-1" class="absolute right-0 bottom-2 text-slate-400 hover:text-luminous-gold transition-colors outline-none"><i id="icon-reg-password" class="fas fa-eye"></i></button>
+                    </div>
+                </div>
                 <div class="flex items-start gap-2 mt-2"><input type="checkbox" id="reg-terms" class="mt-1 w-3 h-3 accent-luminous-gold"><label for="reg-terms" class="text-[10px] leading-tight text-dim-gray font-bold cursor-pointer">Concordo com os termos de uso.</label></div>
                 <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border-2 border-luminous-gold text-luminous-gold font-black rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-white transition-colors">Criar Conta Gratuita</button>
             </div>
@@ -177,7 +189,7 @@
                     <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
                     <button onclick="window.toggleLanguage()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase"><span class="lang-display">PT / EN</span></button>
                     <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase" title="Alternar Tema">
-                        <i class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:inline"></i>
+                        <i class="fas fa-moon dark:hidden"></i><i class="far fa-sun hidden dark:inline"></i>
                     </button>
                     <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-slate-300">
                         <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-starlight font-bold text-xs border border-slate-200"><i class="fas fa-user"></i></div>
@@ -201,7 +213,7 @@
                  <div class="h-[1px] bg-slate-200 w-full"></div>
                  <button onclick="window.toggleLanguage(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left lang-display">PT / EN</button>
                  <button onclick="window.toggleTheme(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase">
-                    <i class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:inline"></i> TEMA
+                    <i class="fas fa-moon dark:hidden"></i><i class="far fa-sun hidden dark:inline"></i> TEMA
                  </button>
             </div>
         </nav>
@@ -476,13 +488,25 @@
                 </div>
                 <div class="auth-input-group">
                     <label data-i18n="profile_new_pass">Nova Senha</label>
-                    <input type="password" id="profile-new-pass" placeholder="••••••••">
+                    <div class="relative">
+                        <input type="password" id="profile-new-pass" placeholder="••••••••" style="padding-right: 30px;">
+                        <button type="button" onclick="window.togglePassword('profile-new-pass')" tabindex="-1" class="absolute right-0 bottom-2 text-slate-400 hover:text-luminous-gold transition-colors outline-none"><i id="icon-profile-new-pass" class="fas fa-eye"></i></button>
+                    </div>
                 </div>
                 <div class="auth-input-group">
                     <label data-i18n="profile_confirm_pass">Confirmar Nova Senha</label>
-                    <input type="password" id="profile-confirm-pass" placeholder="••••••••">
+                    <div class="relative">
+                        <input type="password" id="profile-confirm-pass" placeholder="••••••••" style="padding-right: 30px;">
+                        <button type="button" onclick="window.togglePassword('profile-confirm-pass')" tabindex="-1" class="absolute right-0 bottom-2 text-slate-400 hover:text-luminous-gold transition-colors outline-none"><i id="icon-profile-confirm-pass" class="fas fa-eye"></i></button>
+                    </div>
                 </div>
                 <button onclick="window.AuthManager.updatePassword()" class="w-full py-4 mt-2 bg-luminous-gold text-white font-black rounded-lg uppercase tracking-widest text-xs hover:bg-amber-700 transition-colors shadow-lg" data-i18n="profile_save">Atualizar Senha</button>
+                
+                <div class="border-t border-slate-200 mt-6 pt-6 text-center">
+                    <a href="mailto:sintaxedalux@gmail.com" class="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-black text-slate-400 hover:text-luminous-gold transition-colors" data-i18n="profile_help">
+                        <i class="fas fa-envelope"></i> Ajuda e Suporte
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -507,6 +531,21 @@
             document.documentElement.classList.remove('dark');
         }
 
+        // --- PASSWORD REVEAL ---
+        window.togglePassword = function(id) {
+            const input = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        };
+
         // 1. I18N DICTIONARY
         window.i18n = {
             pt: {
@@ -524,7 +563,7 @@
                 about_title: "SOBRE", about_text: "O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.",
                 card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).", card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.", card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.", card_4_title: "CONSULTA NORMATIVA", card_4_desc: "Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.",
                 footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade e Uso", terms_accept: "Li, Compreendi e Aceito os Riscos",
-                nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem."
+                nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem.", profile_help: "<i class=\"fas fa-envelope\"></i> Ajuda e Suporte"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
@@ -545,7 +584,7 @@
                 card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", 
                 card_4_title: "NORMATIVE QUERY", card_4_desc: "Intelligence hub integrating NBR 8995-1, NBR 5101, and LEED/WELL requirements.",
                 footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood and Accept the Risks",
-                nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match."
+                nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support"
             }
         };
 
