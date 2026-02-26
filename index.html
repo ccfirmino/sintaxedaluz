@@ -142,11 +142,11 @@
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-500">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
         <div class="bg-white w-full max-w-md p-8 rounded-2xl relative z-10 animate-fade-in-up border border-slate-200 shadow-[0_20px_60px_rgba(0,0,0,0.15)]">
-            <div class="text-center mb-8">
+            <div id="auth-header-container" class="text-center mb-8">
                 <div class="text-2xl font-black tracking-[0.2em] text-starlight mb-2">LUX<span class="text-luminous-gold font-light">SINTAX</span></div>
                 <p class="text-[10px] text-dim-gray uppercase tracking-widest font-bold">CADASTRE-SE GRATUITAMENTE</p>
             </div>
-            <div class="flex border-b border-slate-200 mb-6">
+            <div id="auth-tabs" class="flex border-b border-slate-200 mb-6">
                 <button onclick="window.AuthManager.switchTab('login')" id="tab-auth-login" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all">Login</button>
                 <button onclick="window.AuthManager.switchTab('register')" id="tab-auth-register" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all">Cadastro</button>
             </div>
@@ -157,6 +157,9 @@
                     <div class="relative">
                         <input type="password" id="login-password" placeholder="••••••••" style="padding-right: 30px;">
                         <button type="button" onclick="window.togglePassword('login-password')" tabindex="-1" class="absolute right-0 bottom-2 text-slate-400 hover:text-luminous-gold transition-colors outline-none"><i id="icon-login-password" class="fas fa-eye"></i></button>
+                    </div>
+                    <div class="flex justify-end mt-2">
+                        <button type="button" onclick="window.AuthManager.showForgotPassword()" class="text-[9px] text-slate-400 hover:text-luminous-gold transition-colors font-bold uppercase tracking-widest outline-none" data-i18n="auth_forgot">Esqueceu a senha?</button>
                     </div>
                 </div>
                 <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-white font-black rounded-lg uppercase tracking-widest text-xs hover:bg-amber-700 transition-colors shadow-lg">Acessar Plataforma</button>
@@ -173,6 +176,20 @@
                 </div>
                 <div class="flex items-start gap-2 mt-2"><input type="checkbox" id="reg-terms" class="mt-1 w-3 h-3 accent-luminous-gold"><label for="reg-terms" class="text-[10px] leading-tight text-dim-gray font-bold cursor-pointer">Concordo com os termos de uso.</label></div>
                 <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border-2 border-luminous-gold text-luminous-gold font-black rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-white transition-colors">Criar Conta Gratuita</button>
+            </div>
+            
+            <div id="form-forgot-password" class="space-y-5 hidden">
+                <div class="text-center mb-4">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest" data-i18n="auth_forgot_desc">Digite seu e-mail para receber um link de recuperação.</p>
+                </div>
+                <div class="auth-input-group">
+                    <label>E-mail</label>
+                    <input type="email" id="forgot-email" placeholder="seu@email.com">
+                </div>
+                <button onclick="window.AuthManager.handlePasswordResetRequest()" class="w-full py-4 bg-luminous-gold text-white font-black rounded-lg uppercase tracking-widest text-xs hover:bg-amber-700 transition-colors shadow-lg" data-i18n="auth_send_link">Enviar Link</button>
+                <div class="text-center mt-2">
+                    <button type="button" onclick="window.AuthManager.backToLogin()" class="text-[9px] text-slate-400 hover:text-luminous-gold transition-colors font-bold uppercase tracking-widest outline-none" data-i18n="auth_back_login">Voltar ao Login</button>
+                </div>
             </div>
         </div>
     </div>
@@ -283,7 +300,7 @@
                                 </div>
                                 <div id="inputs-homog" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-h-plane" min="0" max="5" step="0.05" value="0.75"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-h-plane" min="0.5" max="5" step="0.05" value="0.75"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_spacing">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
                                      <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
                                     <div class="mode-direct-group mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000"></div>
@@ -546,7 +563,7 @@
             }
         };
 
-        // 1. I18N DICTIONARY
+        // 1. I18N DICTIONARY (LUXSINTAX UPDATE)
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO",
@@ -563,7 +580,8 @@
                 about_title: "SOBRE", about_text: "O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.",
                 card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).", card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.", card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.", card_4_title: "CONSULTA NORMATIVA", card_4_desc: "Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.",
                 footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade e Uso", terms_accept: "Li, Compreendi e Aceito os Riscos",
-                nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem.", profile_help: "<i class=\"fas fa-envelope\"></i> Ajuda e Suporte"
+                nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem.", profile_help: "<i class=\"fas fa-envelope\"></i> Ajuda e Suporte",
+                auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora."
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING",
@@ -584,7 +602,8 @@
                 card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", 
                 card_4_title: "NORMATIVE QUERY", card_4_desc: "Intelligence hub integrating NBR 8995-1, NBR 5101, and LEED/WELL requirements.",
                 footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood and Accept the Risks",
-                nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support"
+                nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support",
+                auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now."
             }
         };
 
@@ -699,12 +718,22 @@
             return Math.round(lux) + ' Lux';
         };
 
-        // --- AUTH MANAGER (AUTO-LOGIN READY) ---
+        // --- AUTH MANAGER (LUXSINTAX V2 - RECOVERY ENABLED) ---
         window.AuthManager = {
             init: async function() {
                 const { data: { session } } = await supabase.auth.getSession();
                 this.handleSessionUpdate(session);
-                supabase.auth.onAuthStateChange((event, session) => this.handleSessionUpdate(session));
+                
+                // LUXSINTAX: Event Listener Atualizado para capturar PASSWORD_RECOVERY
+                supabase.auth.onAuthStateChange((event, session) => {
+                    this.handleSessionUpdate(session);
+                    if (event === 'PASSWORD_RECOVERY') {
+                        setTimeout(() => {
+                            alert(window.currentLang === 'en' ? window.i18n.en.msg_recovery_prompt : window.i18n.pt.msg_recovery_prompt);
+                            this.openProfile();
+                        }, 500);
+                    }
+                });
             },
             handleSessionUpdate: function(session) {
                 if (session) {
@@ -726,8 +755,17 @@
                 setTimeout(() => window.updateCalculations(), 100); 
             },
             switchTab: function(tab) {
-                const loginForm = document.getElementById('form-login'); const regForm = document.getElementById('form-register');
-                const btnLogin = document.getElementById('tab-auth-login'); const btnReg = document.getElementById('tab-auth-register');
+                const loginForm = document.getElementById('form-login'); 
+                const regForm = document.getElementById('form-register');
+                const forgotForm = document.getElementById('form-forgot-password');
+                const authTabs = document.getElementById('auth-tabs');
+                
+                const btnLogin = document.getElementById('tab-auth-login'); 
+                const btnReg = document.getElementById('tab-auth-register');
+                
+                authTabs.classList.remove('hidden');
+                forgotForm.classList.add('hidden');
+
                 if (tab === 'login') {
                     loginForm.classList.remove('hidden'); regForm.classList.add('hidden');
                     btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
@@ -738,6 +776,35 @@
                     btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
                 }
             },
+            
+            // LUXSINTAX: Novos fluxos de recuperação
+            showForgotPassword: function() {
+                document.getElementById('form-login').classList.add('hidden');
+                document.getElementById('form-register').classList.add('hidden');
+                document.getElementById('auth-tabs').classList.add('hidden');
+                document.getElementById('form-forgot-password').classList.remove('hidden');
+            },
+            backToLogin: function() {
+                this.switchTab('login');
+            },
+            handlePasswordResetRequest: async function() {
+                const email = document.getElementById('forgot-email').value;
+                if (!email) {
+                    alert("Por favor, insira um e-mail.");
+                    return;
+                }
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + window.location.pathname,
+                });
+                
+                if (error) {
+                    alert(error.message);
+                } else {
+                    alert(window.currentLang === 'en' ? window.i18n.en.msg_reset_sent : window.i18n.pt.msg_reset_sent);
+                    this.backToLogin();
+                }
+            },
+
             handleLogin: async function() {
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
