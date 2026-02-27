@@ -1234,16 +1234,20 @@
                 const totalFixtures = rows * cols;
                 const achievedLux = (totalFixtures * flux * cu * mf) / (L * W);
                 const totalPower = totalFixtures * power;
-                const lpd = totalPower / (L * W);
 
                 const spacingX = L / cols;
                 const spacingY = W / rows;
                 const maxSpacing = 2 * Hm * Math.tan((beam/2) * Math.PI/180);
-                const isUniform = (spacingX <= maxSpacing) && (spacingY <= maxSpacing);
+                
+                // Estimativa de Uniformidade baseada na sobreposição
+                const beamDiameter = maxSpacing;
+                const overlap = (beamDiameter / ((spacingX + spacingY) / 2));
+                let uo = 0.3 + (overlap * 0.15); 
+                if (uo > 0.75) uo = 0.75; 
 
                 // --- RENDERIZAÇÃO TOP-DOWN ---
                 ctx.clearRect(0, 0, cw, ch);
-                const pad = 60;
+                const pad = 100; // Aumentado padding para acomodar cotas
                 const availW = cw - pad*2;
                 const availH = ch - pad*2;
                 const scale = Math.min(availW / L, availH / W);
@@ -1267,8 +1271,8 @@
 
                         // Gradiente Radial (Facho de luz)
                         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, beamRadius);
-                        g.addColorStop(0, `rgba(217, 119, 6, 0.4)`);
-                        g.addColorStop(1, `rgba(217, 119, 6, 0.0)`);
+                        g.addColorStop(0, isDark ? 'rgba(217, 119, 6, 0.3)' : 'rgba(217, 119, 6, 0.2)');
+                        g.addColorStop(1, 'rgba(217, 119, 6, 0)');
                         ctx.fillStyle = g;
                         ctx.beginPath();
                         ctx.arc(cx, cy, beamRadius, 0, Math.PI * 2);
@@ -1282,36 +1286,68 @@
                     }
                 }
 
-                // --- DASHBOARD DE RESULTADOS (OVERLAY) ---
-                ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.85)" : "rgba(255, 255, 255, 0.85)";
-                ctx.fillRect(10, 10, 260, 160);
-                ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
-                ctx.strokeRect(10, 10, 260, 160);
+                // --- COTAS VISUAIS ---
+                ctx.lineWidth = 1;
+                ctx.setLineDash([]);
+                const cotaColor = "#d97706";
+                ctx.strokeStyle = cotaColor;
+                ctx.fillStyle = cotaColor;
+                ctx.font = "bold 11px Manrope";
 
-                ctx.fillStyle = isDark ? "#cbd5e1" : "#334155";
-                ctx.font = "900 12px Manrope";
-                ctx.fillText(window.currentLang === 'en' ? `DISTRIBUTION (GRID)` : `DISTRIBUIÇÃO (GRID)`, 20, 30);
-                ctx.font = "600 11px Manrope";
-                ctx.fillText(window.currentLang === 'en' ? `Grid: ${cols} cols x ${rows} rows` : `Malha Sugerida: ${cols} colunas x ${rows} linhas`, 20, 50);
-                ctx.fillText(window.currentLang === 'en' ? `Total Fixtures: ${totalFixtures} units` : `Total de Luminárias: ${totalFixtures} unidades`, 20, 65);
-                ctx.fillText(window.currentLang === 'en' ? `Achieved Illuminance: ${Math.round(achievedLux)} lx` : `Iluminância Calculada: ${Math.round(achievedLux)} lx`, 20, 80);
+                // Cota de Espaçamento X
+                if (cols > 1) {
+                    const x1 = offsetX + (spacingX / 2) * scale;
+                    const x2 = offsetX + (spacingX / 2 + spacingX) * scale;
+                    const yCota = offsetY - 30;
+                    drawDimLine(ctx, x1, yCota, x2, yCota, `S: ${window.formatDist(spacingX)}`);
+                }
                 
-                ctx.fillStyle = lpd > 8.0 ? "#ef4444" : "#10b981"; 
-                ctx.fillText(window.currentLang === 'en' ? `LPD (Density): ${lpd.toFixed(2)} W/m²` : `LPD (Carga): ${lpd.toFixed(2)} W/m²`, 20, 100);
+                // Cota de Afastamento Parede X (S/2)
+                const xStart = offsetX;
+                const xFirst = offsetX + (spacingX / 2) * scale;
+                drawDimLine(ctx, xStart, offsetY - 55, xFirst, offsetY - 55, `${window.formatDist(spacingX/2)}`);
 
-                if (isUniform) {
-                    ctx.fillStyle = "#10b981";
-                    ctx.fillText(window.currentLang === 'en' ? `✓ Optimized Uniformity` : `✓ Uniformidade Otimizada (S <= Smax)`, 20, 120);
-                } else {
-                    ctx.fillStyle = "#ef4444";
-                    ctx.fillText(window.currentLang === 'en' ? `⚠ Risk of Dark Zones` : `⚠ Risco de Zonas Escuras (Manchas)`, 20, 120);
-                    ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-                    ctx.fillText(window.currentLang === 'en' ? `(Fixture spacing exceeds beam diameter)` : `(Espaçamento excede diâmetro do facho)`, 20, 135);
+                // Cota de Espaçamento Y
+                if (rows > 1) {
+                    const y1 = offsetY + (spacingY / 2) * scale;
+                    const y2 = offsetY + (spacingY / 2 + spacingY) * scale;
+                    const xCota = offsetX - 30;
+                    drawDimLineVertical(ctx, xCota, y1, y2, `S: ${window.formatDist(spacingY)}`);
                 }
 
-                // Linhas de Cota de Dimensões (Sala)
-                drawDimLine(ctx, offsetX, offsetY - 20, offsetX + scaledL, offsetY - 20, `${window.formatDist(L)}`);
-                drawDimLineVertical(ctx, offsetX - 20, offsetY, offsetY + scaledW, `${window.formatDist(W)}`);
+                // Cota de Afastamento Parede Y (S/2)
+                const yStart = offsetY;
+                const yFirst = offsetY + (spacingY / 2) * scale;
+                drawDimLineVertical(ctx, offsetX - 55, yStart, yFirst, `${window.formatDist(spacingY/2)}`);
+
+                // --- DASHBOARD DE RESULTADOS (OVERLAY) ---
+                const dashX = 20, dashY = 20;
+                ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.9)";
+                if (ctx.roundRect) {
+                    ctx.beginPath();
+                    ctx.roundRect(dashX, dashY, 220, 110, 10);
+                    ctx.fill();
+                    ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
+                    ctx.stroke();
+                } else {
+                    ctx.fillRect(dashX, dashY, 220, 110);
+                    ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
+                    ctx.strokeRect(dashX, dashY, 220, 110);
+                }
+
+                ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
+                ctx.font = "900 11px Manrope";
+                ctx.fillText(window.currentLang === 'en' ? `DISTRIBUTION ANALYSIS` : `ANÁLISE DE DISTRIBUIÇÃO`, dashX + 15, dashY + 25);
+                
+                ctx.font = "bold 10px Manrope";
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.fillText(`LAYOUT: ${cols} x ${rows} (${totalFixtures} un)`, dashX + 15, dashY + 50);
+                
+                ctx.fillStyle = achievedLux >= s.targetLux ? "#10b981" : "#ef4444";
+                ctx.fillText(window.currentLang === 'en' ? `EVALUATED AVG: ${Math.round(achievedLux)} LX` : `MÉDIA AVALIADA: ${Math.round(achievedLux)} LX`, dashX + 15, dashY + 70);
+                
+                ctx.fillStyle = uo >= 0.4 ? "#10b981" : "#f59e0b";
+                ctx.fillText(window.currentLang === 'en' ? `UNIFORMITY (Uo): ~${uo.toFixed(2)}` : `UNIFORMIDADE (Uo): ~${uo.toFixed(2)}`, dashX + 15, dashY + 90);
 
                 return; // Encerra o update para o modo lúmens.
             }
