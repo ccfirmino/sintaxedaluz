@@ -330,9 +330,20 @@
                                     
                                     <div class="mb-6 mt-4 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap" data-i18n="lbl_targetlux">ILUMINÂNCIA ALVO (Em)</label><div class="flex items-baseline gap-1"><input type="number" id="l-targetLux" value="500" min="50" max="2000" step="50" class="text-luminous-gold border-luminous-gold"><span class="text-[9px] text-luminous-gold font-bold">LX</span></div></div><input type="range" id="range-l-targetLux" min="50" max="2000" step="50" value="500"></div>
                                     
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO DA FONTE</label><div class="flex items-baseline gap-1"><input type="number" id="l-flux" value="3000" min="500" max="50000" step="100"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-l-flux" min="500" max="50000" step="100" value="3000"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_power">POTÊNCIA DA FONTE</label><div class="flex items-baseline gap-1"><input type="number" id="l-power" value="30" min="1" max="500" step="1"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-l-power" min="1" max="500" step="1" value="30"></div>
-                                    <div class="mb-6 group border-b border-slate-200 pb-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="l-beam" value="90" min="10" max="180" step="5"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-l-beam" min="10" max="180" step="5" value="90"></div>
+                                    <div class="mode-standard-only">
+                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO DA FONTE</label><div class="flex items-baseline gap-1"><input type="number" id="l-flux" value="3000" min="500" max="50000" step="100"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-l-flux" min="500" max="50000" step="100" value="3000"></div>
+                                        <div class="mb-6 group border-b border-slate-200 pb-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="l-beam" value="90" min="10" max="180" step="5"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-l-beam" min="10" max="180" step="5" value="90"></div>
+                                    </div>
+
+                                    <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-slate-200 pt-4 border-b pb-4">
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <input type="file" id="l-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                                            <p id="l-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-6 group mt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_power">POTÊNCIA DA FONTE</label><div class="flex items-baseline gap-1"><input type="number" id="l-power" value="30" min="1" max="500" step="1"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-l-power" min="1" max="500" step="1" value="30"></div>
                                     
                                     <div class="mb-6 mt-4 group">
                                         <div class="flex justify-between items-end mb-2">
@@ -621,7 +632,7 @@
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_lumen: "DISTRIBUIÇÃO",
                 calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
-                lbl_intensity_i: "INTENSITY (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
+                lbl_intensity_i: "INTENSITY (I)", lbl_flux: "FLUXO LUMINOSO DA FONTE", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 lbl_length: "COMPRIMENTO (L)", lbl_width: "LARGURA (W)", lbl_hm: "ALTURA ÚTIL (Hm)", lbl_targetlux: "ILUMINÂNCIA ALVO (Em)", lbl_cu: "FATOR DE UTILIZAÇÃO (CU)", lbl_mf: "FATOR DE MANUTENÇÃO (MF)", lbl_power: "POTÊNCIA DA FONTE",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
                 tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
@@ -666,8 +677,8 @@
         window.state = {
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null, iesFileName: null }, 
-            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
-            lumen: { length: 10.0, width: 8.0, height: 2.25, targetLux: 500, flux: 3000, power: 30, beam: 90, cu: 0.65, mf: 0.80 }
+            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0, iesData: null, iesFileName: null },
+            lumen: { length: 10.0, width: 8.0, height: 2.25, targetLux: 500, flux: 3000, power: 30, beam: 90, cu: 0.65, mf: 0.80, iesData: null, iesFileName: null }
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
@@ -922,6 +933,11 @@
             if (cuPreset.value !== 'manual') {
                 const s = window.state.lumen;
                 
+                let currentBeam = s.beam;
+                if (window.calcMode === 'ies' && s.iesData) {
+                    currentBeam = window.getEffectiveBeam(s);
+                }
+
                 // Índice do Recinto (k) = (L * W) / (Hm * (L + W))
                 let k = (s.length * s.width) / (s.height * (s.length + s.width));
                 if (k <= 0 || isNaN(k)) k = 1;
@@ -933,8 +949,8 @@
 
                 // Modificador de Facho (fachos fechados perdem menos luz para as paredes)
                 let beamFactor = 1.0;
-                if (s.beam <= 40) beamFactor = 1.15;
-                else if (s.beam >= 100) beamFactor = 0.90;
+                if (currentBeam <= 40) beamFactor = 1.15;
+                else if (currentBeam >= 100) beamFactor = 0.90;
 
                 // Curva de proporção de ganho pelo Índice do Recinto
                 let kFactor = 0.6 + (k * 0.15);
@@ -979,9 +995,6 @@
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 
-                const modeToggles = document.getElementById('mode-toggles-container');
-                if(modeToggles) modeToggles.classList.toggle('hidden', toolId === 'lumen');
-
                 window.updateCalcMode(window.calcMode);
                 window.updateCalculations();
             } else {
@@ -1008,19 +1021,26 @@
                     const parsed = window.parseIES(content);
                     
                     if (parsed) {
-                        const targetKey = window.currentTool === 'homog' ? 'homog' : (window.currentTool === 'ponto' ? 'ponto' : 'vertical');
+                        const targetKey = window.currentTool;
                         window.state[targetKey].iesData = parsed;
                         window.state[targetKey].iesFileName = file.name;
                         
-                        let statusId = 'p-ies-status';
-                        if(window.currentTool === 'vertical') statusId = 'v-ies-status';
-                        if(window.currentTool === 'homog') statusId = 'h-ies-status';
-
+                        let statusId = targetKey[0] + '-ies-status'; // l-ies-status, p-ies-status, etc.
                         const statusEl = document.getElementById(statusId);
                         if(statusEl) {
                             statusEl.innerText = `Carregado: ${file.name}`;
                             statusEl.classList.add('text-luminous-gold');
                         }
+
+                        // Auto-fill power in lumen mode if available
+                        if (targetKey === 'lumen' && parsed.inputWatts && parsed.inputWatts > 0) {
+                            window.state.lumen.power = parsed.inputWatts;
+                            const pInput = document.getElementById('l-power');
+                            if(pInput) pInput.value = parsed.inputWatts;
+                            const pRange = document.getElementById('range-l-power');
+                            if(pRange) pRange.value = parsed.inputWatts;
+                        }
+
                         window.updateCalculations();
                     } else {
                         alert("Erro ao ler arquivo " + file.name + ". Verifique se é um arquivo IES válido.");
@@ -1054,12 +1074,14 @@
                     return null;
                 }
 
-                nextNum(); nextNum(); 
+                const numLamps = nextNum(); 
+                const lumensPerLamp = nextNum(); 
                 const multiplier = nextNum();
                 const vCount = nextNum();
                 const hCount = nextNum();
-                nextNum(); nextNum(); nextNum(); nextNum(); nextNum();
-                nextNum(); nextNum(); nextNum();
+                nextNum(); nextNum(); nextNum(); nextNum(); nextNum(); // Skip fotometria params
+                nextNum(); nextNum(); // Skip ballast and future
+                const inputWatts = nextNum(); // Extraindo potencia real do IES
 
                 const vAngles = [];
                 for(let i=0; i<vCount; i++) vAngles.push(nextNum());
@@ -1076,7 +1098,27 @@
                     candelas.push(row);
                 }
 
-                return { vAngles, hAngles, candelas, multiplier };
+                // Integração Analítica (Cálculo do Fluxo Luminoso Total)
+                let calculatedFlux = 0;
+                if (lumensPerLamp === -1) {
+                    let total = 0;
+                    for(let i=0; i<vCount-1; i++) {
+                        let theta1 = vAngles[i] * Math.PI/180;
+                        let theta2 = vAngles[i+1] * Math.PI/180;
+                        let iAvg = 0;
+                        for(let j=0; j<hCount; j++) {
+                            iAvg += (candelas[j][i] + candelas[j][i+1])/2;
+                        }
+                        iAvg /= hCount; 
+                        let solidAngle = 2 * Math.PI * Math.abs(Math.cos(theta1) - Math.cos(theta2));
+                        total += iAvg * multiplier * solidAngle;
+                    }
+                    calculatedFlux = total;
+                } else {
+                    calculatedFlux = numLamps * lumensPerLamp * multiplier;
+                }
+
+                return { vAngles, hAngles, candelas, multiplier, calculatedFlux, inputWatts };
 
             } catch (e) {
                 console.error("IES Parse Error", e);
@@ -1214,32 +1256,48 @@
                 const W = s.width;
                 const Hm = s.height;
                 const Em = s.targetLux;
-                const flux = s.flux;
-                const power = s.power;
-                const beam = s.beam;
+                
+                let currentFlux = s.flux;
+                let currentBeam = s.beam;
+
+                // Extração Inteligente IES (Lumen Mode)
+                if (window.calcMode === 'ies' && s.iesData) {
+                    currentBeam = window.getEffectiveBeam(s);
+                    if (s.iesData.calculatedFlux > 0) {
+                        currentFlux = s.iesData.calculatedFlux;
+                    }
+                }
+
                 const cu = s.cu;
                 const mf = s.mf;
 
-                // --- LÓGICA DO MÉTODO DOS LÚMENS ---
+                const beamRad = (currentBeam / 2) * Math.PI / 180;
+
+                // --- CÁLCULO DE ENGENHARIA (Otimização de Grid) ---
                 const requiredTotalFlux = (Em * L * W) / (cu * mf);
-                const N = Math.ceil(requiredTotalFlux / flux);
+                const nRequiredByLux = requiredTotalFlux / currentFlux;
                 
-                // Grid Optimizer
-                const ratio = L / W;
-                let rows = Math.round(Math.sqrt(N / ratio));
+                const sMax = 2 * Hm * Math.tan(beamRad) * 0.8; // Critério de Uniformidade Limite
+                
+                let cols = Math.ceil(L / sMax);
+                let rows = Math.ceil(W / sMax);
+                if (cols < 1) cols = 1;
                 if (rows < 1) rows = 1;
-                let cols = Math.ceil(N / rows);
-                if (rows * cols < N) rows++; // Garante o mínimo
                 
-                const totalFixtures = rows * cols;
-                const achievedLux = (totalFixtures * flux * cu * mf) / (L * W);
-                const totalPower = totalFixtures * power;
+                // Ajuste Iterativo para Garantir Lux
+                while ((cols * rows) < nRequiredByLux) {
+                    if (L / cols > W / rows) cols++;
+                    else rows++;
+                }
+                
+                const totalFixtures = cols * rows;
+                const achievedLux = (totalFixtures * currentFlux * cu * mf) / (L * W);
 
                 const spacingX = L / cols;
                 const spacingY = W / rows;
-                const maxSpacing = 2 * Hm * Math.tan((beam/2) * Math.PI/180);
+                const maxSpacing = 2 * Hm * Math.tan(beamRad);
                 
-                // Estimativa de Uniformidade baseada na sobreposição
+                // Estimativa de Uniformidade baseada na sobreposição geométrica
                 const beamDiameter = maxSpacing;
                 const overlap = (beamDiameter / ((spacingX + spacingY) / 2));
                 let uo = 0.3 + (overlap * 0.15); 
@@ -1247,7 +1305,7 @@
 
                 // --- RENDERIZAÇÃO TOP-DOWN ---
                 ctx.clearRect(0, 0, cw, ch);
-                const pad = 100; // Aumentado padding para acomodar cotas
+                const pad = 100; // Espaço para as cotas
                 const availW = cw - pad*2;
                 const availH = ch - pad*2;
                 const scale = Math.min(availW / L, availH / W);
@@ -1256,13 +1314,13 @@
                 const offsetX = (cw - scaledL) / 2;
                 const offsetY = (ch - scaledW) / 2;
 
-                // Desenha as Paredes (Retângulo da Sala)
+                // 1. Desenho das Paredes (Retângulo da Sala)
                 ctx.strokeStyle = isDark ? "#475569" : "#94a3b8";
                 ctx.lineWidth = 2;
                 ctx.strokeRect(offsetX, offsetY, scaledL, scaledW);
 
-                // Raios do facho projetado no piso
-                const beamRadius = Hm * Math.tan((beam/2) * Math.PI/180) * scale;
+                // 2. Raios do facho projetado no piso
+                const beamRadiusPx = Hm * Math.tan(beamRad) * scale;
 
                 for (let i = 0; i < cols; i++) {
                     for (let j = 0; j < rows; j++) {
@@ -1270,12 +1328,12 @@
                         const cy = offsetY + (spacingY / 2 + j * spacingY) * scale;
 
                         // Gradiente Radial (Facho de luz)
-                        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, beamRadius);
+                        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, beamRadiusPx);
                         g.addColorStop(0, isDark ? 'rgba(217, 119, 6, 0.3)' : 'rgba(217, 119, 6, 0.2)');
                         g.addColorStop(1, 'rgba(217, 119, 6, 0)');
                         ctx.fillStyle = g;
                         ctx.beginPath();
-                        ctx.arc(cx, cy, beamRadius, 0, Math.PI * 2);
+                        ctx.arc(cx, cy, beamRadiusPx, 0, Math.PI * 2);
                         ctx.fill();
 
                         // Marcador da Luminária
@@ -1675,89 +1733,4 @@
             
             const distParams = ['height', 'plane', 'dist', 'spacing', 'hq', 'length', 'width'];
             ['ponto', 'vertical', 'homog', 'lumen'].forEach(key => {
-                distParams.forEach(param => {
-                    const numInput = document.getElementById(`${key[0]}-${param}`);
-                    const rangeInput = document.getElementById(`range-${key[0]}-${param}`);
-                    if (numInput && rangeInput && window.state[key][param] !== undefined) {
-                        const valMeters = window.state[key][param];
-                        if (isEn) {
-                            const valFt = valMeters * 3.28084;
-                            numInput.value = valFt.toFixed(2);
-                            rangeInput.min = (parseFloat(rangeInput.getAttribute('data-base-min')) * 3.28084).toFixed(2);
-                            rangeInput.max = (parseFloat(rangeInput.getAttribute('data-base-max')) * 3.28084).toFixed(2);
-                            rangeInput.step = '0.1';
-                            rangeInput.value = valFt.toFixed(2);
-                        } else {
-                            numInput.value = valMeters.toFixed(2);
-                            rangeInput.min = rangeInput.getAttribute('data-base-min');
-                            rangeInput.max = rangeInput.getAttribute('data-base-max');
-                            rangeInput.step = rangeInput.getAttribute('data-base-step');
-                            rangeInput.value = valMeters.toFixed(2);
-                        }
-                    }
-                });
-            });
-        };
-
-        window.toggleLanguage = function() { 
-            window.currentLang = window.currentLang === 'pt' ? 'en' : 'pt'; 
-            document.querySelectorAll('.lang-display').forEach(e => e.innerText = window.currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
-            document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { el.innerHTML = window.i18n[window.currentLang][key]; } });
-            window.updateInputsForLanguage();
-            window.updateCalculations(); 
-        }
-        window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
-
-        // BINDING
-        function bind(id, key, param) { 
-            const el = document.getElementById(id); if(!el) return;
-            
-            if (!el.hasAttribute('data-base-min')) {
-                el.setAttribute('data-base-min', el.min);
-                el.setAttribute('data-base-max', el.max);
-                el.setAttribute('data-base-step', el.step || '1');
-            }
-
-            el.addEventListener('input', (e) => { 
-                let val = parseFloat(e.target.value); 
-                const isEn = window.currentLang === 'en';
-                const isDist = ['height', 'plane', 'dist', 'spacing', 'hq', 'length', 'width'].includes(param);
-                
-                const valInMeters = (isEn && isDist) ? val / 3.28084 : val;
-
-                const pairId = id.includes('range') ? id.replace('range-', '') : 'range-' + id;
-                if(document.getElementById(pairId)) document.getElementById(pairId).value = val;
-                
-                window.state[key][param] = valInMeters; 
-
-                // LUXSINTAX - PRESETS AUTOMATION LINK
-                if (key === 'lumen') {
-                    if (param === 'cu' && document.getElementById('l-cu-preset')) {
-                        document.getElementById('l-cu-preset').value = 'manual';
-                    }
-                    if (param === 'mf' && document.getElementById('l-mf-preset')) {
-                        document.getElementById('l-mf-preset').value = 'manual';
-                    }
-                    if (['length', 'width', 'height', 'beam'].includes(param)) {
-                        if (window.applyLumenPresets) {
-                            window.applyLumenPresets(true);
-                        }
-                    }
-                }
-                
-                window.updateCalculations(); 
-            }); 
-        }
-        
-        ['ponto', 'vertical', 'homog', 'lumen'].forEach(key => { 
-            ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'length', 'width', 'targetLux', 'power', 'cu', 'mf'].forEach(param => { 
-                bind(`${key[0]}-${param}`, key, param); 
-                bind(`range-${key[0]}-${param}`, key, param); 
-            }); 
-        });
-
-        window.AuthManager.init();
-        window.switchTool('ponto');
-    </script>
-</body>
-</html>
+                distParams.forEach(param =>
