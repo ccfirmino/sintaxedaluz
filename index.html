@@ -241,9 +241,9 @@
                 <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
                     <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines text-lg mb-1"></i><span data-i18n="tab_horiz">SUPERFÍCIE<br>HORIZONTAL</span></button>
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
-                    <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-border-all text-lg mb-1"></i><span data-i18n="tab_dist">DISTRIBUIÇÃO<br>& DESENHO</span></button>
+                    <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-border-all text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
                     
-                    <button onclick="window.switchTool('lumen')" id="tab-lumen" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_lumen">MÉTODO DOS<br>LÚMENS</span></button>
+                    <button onclick="window.switchTool('lumen')" id="tab-lumen" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_lumen">DISTRIBUIÇÃO</span></button>
                     
                     <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                 </div>
@@ -334,8 +334,39 @@
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_power">POTÊNCIA DA FONTE</label><div class="flex items-baseline gap-1"><input type="number" id="l-power" value="30" min="1" max="500" step="1"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-l-power" min="1" max="500" step="1" value="30"></div>
                                     <div class="mb-6 group border-b border-slate-200 pb-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="l-beam" value="90" min="10" max="180" step="5"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-l-beam" min="10" max="180" step="5" value="90"></div>
                                     
-                                    <div class="mb-6 mt-4 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_cu">FATOR DE UTILIZAÇÃO (CU)</label><div class="flex items-baseline gap-1"><input type="number" id="l-cu" value="0.65" min="0.1" max="1.0" step="0.05"></div></div><input type="range" id="range-l-cu" min="0.1" max="1.0" step="0.05" value="0.65"></div>
-                                    <div class="mb-2 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_mf">FATOR DE MANUTENÇÃO (MF)</label><div class="flex items-baseline gap-1"><input type="number" id="l-mf" value="0.80" min="0.1" max="1.0" step="0.05"></div></div><input type="range" id="range-l-mf" min="0.1" max="1.0" step="0.05" value="0.80"></div>
+                                    <div class="mb-6 mt-4 group">
+                                        <div class="flex justify-between items-end mb-2">
+                                            <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_cu">FATOR DE UTILIZAÇÃO (CU)</label>
+                                        </div>
+                                        <select id="l-cu-preset" onchange="window.applyLumenPresets()" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-2 text-[10px] text-starlight font-bold mb-2 outline-none focus:border-luminous-gold transition-colors custom-select">
+                                            <option value="claro">Ambiente Claro (70/50/20)</option>
+                                            <option value="medio" selected>Ambiente Médio (50/30/10)</option>
+                                            <option value="escuro">Ambiente Escuro (30/30/10)</option>
+                                            <option value="manual">Ajuste Manual</option>
+                                        </select>
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-[9px] text-slate-400 font-bold uppercase">VALOR MANUAL:</span>
+                                            <div class="flex items-baseline gap-1"><input type="number" id="l-cu" value="0.65" min="0.1" max="1.0" step="0.05"></div>
+                                        </div>
+                                        <input type="range" id="range-l-cu" min="0.1" max="1.0" step="0.05" value="0.65">
+                                    </div>
+                                    
+                                    <div class="mb-2 group border-t border-slate-200 pt-4">
+                                        <div class="flex justify-between items-end mb-2">
+                                            <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_mf">FATOR DE MANUTENÇÃO (MF)</label>
+                                        </div>
+                                        <select id="l-mf-preset" onchange="window.applyLumenPresets()" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-2 text-[10px] text-starlight font-bold mb-2 outline-none focus:border-luminous-gold transition-colors custom-select">
+                                            <option value="0.80" selected>Limpo (Escritórios, Escolas)</option>
+                                            <option value="0.70">Normal (Lojas, Indústria Leve)</option>
+                                            <option value="0.60">Sujo (Serralherias, Proc. Pesado)</option>
+                                            <option value="manual">Ajuste Manual</option>
+                                        </select>
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-[9px] text-slate-400 font-bold uppercase">VALOR MANUAL:</span>
+                                            <div class="flex items-baseline gap-1"><input type="number" id="l-mf" value="0.80" min="0.1" max="1.0" step="0.05"></div>
+                                        </div>
+                                        <input type="range" id="range-l-mf" min="0.1" max="1.0" step="0.05" value="0.80">
+                                    </div>
                                 </div>
 
                             </div>
@@ -588,7 +619,7 @@
         // 1. I18N DICTIONARY
         window.i18n = {
             pt: {
-                nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "DISTRIBUIÇÃO<br>& DESENHO", tab_lumen: "MÉTODO DOS<br>LÚMENS",
+                nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_lumen: "DISTRIBUIÇÃO",
                 calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 lbl_length: "COMPRIMENTO (L)", lbl_width: "LARGURA (W)", lbl_hm: "ALTURA ÚTIL (Hm)", lbl_targetlux: "ILUMINÂNCIA ALVO (Em)", lbl_cu: "FATOR DE UTILIZAÇÃO (CU)", lbl_mf: "FATOR DE MANUTENÇÃO (MF)", lbl_power: "POTÊNCIA DA FONTE",
@@ -607,7 +638,7 @@
                 auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora."
             },
             en: {
-                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "DISTRIBUTION<br>& DRAWING", tab_lumen: "LUMEN<br>METHOD",
+                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_lumen: "DISTRIBUTION",
                 calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES", lbl_ies_upload: "UPLOAD .IES FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
                 lbl_length: "LENGTH (L)", lbl_width: "WIDTH (W)", lbl_hm: "MOUNTING HEIGHT (Hm)", lbl_targetlux: "TARGET ILLUMINANCE (Em)", lbl_cu: "UTILIZATION FACTOR (CU)", lbl_mf: "MAINTENANCE FACTOR (MF)", lbl_power: "SOURCE POWER",
@@ -872,6 +903,62 @@
             }
         };
 
+        // --- PRESETS AUTOMATION LOGIC ---
+        window.applyLumenPresets = function(skipUpdate = false) {
+            const cuPreset = document.getElementById('l-cu-preset');
+            const mfPreset = document.getElementById('l-mf-preset');
+            
+            if (!cuPreset || !mfPreset) return;
+
+            // Lógica do Fator de Manutenção
+            if (mfPreset.value !== 'manual') {
+                const mfVal = parseFloat(mfPreset.value);
+                document.getElementById('l-mf').value = mfVal.toFixed(2);
+                document.getElementById('range-l-mf').value = mfVal;
+                window.state.lumen.mf = mfVal;
+            }
+
+            // Lógica Inteligente do Fator de Utilização (CU)
+            if (cuPreset.value !== 'manual') {
+                const s = window.state.lumen;
+                
+                // Índice do Recinto (k) = (L * W) / (Hm * (L + W))
+                let k = (s.length * s.width) / (s.height * (s.length + s.width));
+                if (k <= 0 || isNaN(k)) k = 1;
+                
+                // Modificador de Refletância Base
+                let refFactor = 0.65; // médio
+                if (cuPreset.value === 'claro') refFactor = 0.85;
+                else if (cuPreset.value === 'escuro') refFactor = 0.45;
+
+                // Modificador de Facho (fachos fechados perdem menos luz para as paredes)
+                let beamFactor = 1.0;
+                if (s.beam <= 40) beamFactor = 1.15;
+                else if (s.beam >= 100) beamFactor = 0.90;
+
+                // Curva de proporção de ganho pelo Índice do Recinto
+                let kFactor = 0.6 + (k * 0.15);
+                if (kFactor > 1.2) kFactor = 1.2;
+                if (kFactor < 0.6) kFactor = 0.6;
+
+                let calculatedCU = refFactor * kFactor * beamFactor;
+                
+                // Limites físicos de CU (0.1 a 1.0)
+                if (calculatedCU > 1.0) calculatedCU = 1.0;
+                if (calculatedCU < 0.1) calculatedCU = 0.1;
+
+                calculatedCU = Math.round(calculatedCU * 100) / 100;
+
+                document.getElementById('l-cu').value = calculatedCU.toFixed(2);
+                document.getElementById('range-l-cu').value = calculatedCU;
+                window.state.lumen.cu = calculatedCU;
+            }
+
+            if (!skipUpdate) {
+                window.updateCalculations();
+            }
+        };
+
         // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
             window.currentTool = toolId;
@@ -1120,142 +1207,113 @@
             let boundsH = 3.0;
             let boundsW = 3.0; 
 
-            // --- LÓGICA DO MÉTODO DOS LÚMENS (Otimização de Layout e Cotas) ---
+            // --- LÓGICA DO MÉTODO DOS LÚMENS ---
             if (window.currentTool === 'lumen') {
                 const s = window.state.lumen;
-                const L = s.length, W = s.width, Hm = s.height;
-                const beamRad = (s.beam / 2) * Math.PI / 180;
+                const L = s.length;
+                const W = s.width;
+                const Hm = s.height;
+                const Em = s.targetLux;
+                const flux = s.flux;
+                const power = s.power;
+                const beam = s.beam;
+                const cu = s.cu;
+                const mf = s.mf;
 
-                // 1. CÁLCULO DE ENGENHARIA (Otimização de Grid)
-                const nRequiredByLux = (s.targetLux * L * W) / (s.flux * s.cu * s.mf);
-                const sMax = 2 * Hm * Math.tan(beamRad) * 0.8; // Critério de Uniformidade (80% do facho)
-
-                let cols = Math.ceil(L / sMax);
-                let rows = Math.ceil(W / sMax);
-                if (cols < 1) cols = 1;
+                // --- LÓGICA DO MÉTODO DOS LÚMENS ---
+                const requiredTotalFlux = (Em * L * W) / (cu * mf);
+                const N = Math.ceil(requiredTotalFlux / flux);
+                
+                // Grid Optimizer
+                const ratio = L / W;
+                let rows = Math.round(Math.sqrt(N / ratio));
                 if (rows < 1) rows = 1;
+                let cols = Math.ceil(N / rows);
+                if (rows * cols < N) rows++; // Garante o mínimo
+                
+                const totalFixtures = rows * cols;
+                const achievedLux = (totalFixtures * flux * cu * mf) / (L * W);
+                const totalPower = totalFixtures * power;
+                const lpd = totalPower / (L * W);
 
-                // Ajuste iterativo para bater a meta de Lux mantendo a uniformidade
-                while ((cols * rows) < nRequiredByLux) {
-                    if (L / cols > W / rows) cols++;
-                    else rows++;
-                }
-
-                const totalFixtures = cols * rows;
                 const spacingX = L / cols;
                 const spacingY = W / rows;
-                const achievedLux = (totalFixtures * s.flux * s.cu * s.mf) / (L * W);
-                
-                // Estimativa de Uniformidade baseada na sobreposição
-                const beamDiameter = 2 * Hm * Math.tan(beamRad);
-                const overlap = (beamDiameter / ((spacingX + spacingY) / 2));
-                let uo = 0.3 + (overlap * 0.15); 
-                if (uo > 0.75) uo = 0.75; 
+                const maxSpacing = 2 * Hm * Math.tan((beam/2) * Math.PI/180);
+                const isUniform = (spacingX <= maxSpacing) && (spacingY <= maxSpacing);
 
-                // --- CONFIGURAÇÃO DE ESCALA ---
+                // --- RENDERIZAÇÃO TOP-DOWN ---
                 ctx.clearRect(0, 0, cw, ch);
-                const padding = 100;
-                const scale = Math.min((cw - padding * 2) / L, (ch - padding * 2) / W);
-                const offsetX = (cw - L * scale) / 2;
-                const offsetY = (ch - W * scale) / 2;
+                const pad = 60;
+                const availW = cw - pad*2;
+                const availH = ch - pad*2;
+                const scale = Math.min(availW / L, availH / W);
+                const scaledL = L * scale;
+                const scaledW = W * scale;
+                const offsetX = (cw - scaledL) / 2;
+                const offsetY = (ch - scaledW) / 2;
 
-                // 2. DESENHO DAS MANCHAS DE LUZ (LAYER INFERIOR)
-                for (let i = 0; i < cols; i++) {
-                    for (let j = 0; j < rows; j++) {
-                        const cx = offsetX + (spacingX / 2 + i * spacingX) * scale;
-                        const cy = offsetY + (spacingY / 2 + j * spacingY) * scale;
-                        const rPx = (beamDiameter / 2) * scale;
-
-                        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rPx);
-                        g.addColorStop(0, isDark ? 'rgba(217, 119, 6, 0.3)' : 'rgba(217, 119, 6, 0.2)');
-                        g.addColorStop(1, 'rgba(217, 119, 6, 0)');
-                        ctx.fillStyle = g;
-                        ctx.beginPath(); ctx.arc(cx, cy, rPx, 0, Math.PI * 2); ctx.fill();
-                    }
-                }
-
-                // 3. DESENHO DA SALA E GRID (LAYER MÉDIO)
+                // Desenha as Paredes (Retângulo da Sala)
                 ctx.strokeStyle = isDark ? "#475569" : "#94a3b8";
                 ctx.lineWidth = 2;
-                ctx.strokeRect(offsetX, offsetY, L * scale, W * scale);
+                ctx.strokeRect(offsetX, offsetY, scaledL, scaledW);
+
+                // Raios do facho projetado no piso
+                const beamRadius = Hm * Math.tan((beam/2) * Math.PI/180) * scale;
 
                 for (let i = 0; i < cols; i++) {
                     for (let j = 0; j < rows; j++) {
                         const cx = offsetX + (spacingX / 2 + i * spacingX) * scale;
                         const cy = offsetY + (spacingY / 2 + j * spacingY) * scale;
-                        ctx.fillStyle = isDark ? "#fff" : "#0f172a";
-                        ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI * 2); ctx.fill();
+
+                        // Gradiente Radial (Facho de luz)
+                        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, beamRadius);
+                        g.addColorStop(0, `rgba(217, 119, 6, 0.4)`);
+                        g.addColorStop(1, `rgba(217, 119, 6, 0.0)`);
+                        ctx.fillStyle = g;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, beamRadius, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Marcador da Luminária
+                        ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                        ctx.fill();
                     }
                 }
 
-                // 4. DESENHO DAS COTAS (VISUAL É TUDO)
-                ctx.lineWidth = 1;
-                ctx.setLineDash([]);
-                const cotaColor = "#d97706";
-                ctx.strokeStyle = cotaColor;
-                ctx.fillStyle = cotaColor;
-                ctx.font = "bold 11px Manrope";
+                // --- DASHBOARD DE RESULTADOS (OVERLAY) ---
+                ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.85)" : "rgba(255, 255, 255, 0.85)";
+                ctx.fillRect(10, 10, 260, 160);
+                ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
+                ctx.strokeRect(10, 10, 260, 160);
 
-                // Cota de Espaçamento X (Entre as duas primeiras)
-                if (cols > 1) {
-                    const x1 = offsetX + (spacingX / 2) * scale;
-                    const x2 = offsetX + (spacingX / 2 + spacingX) * scale;
-                    const yCota = offsetY - 30;
-                    drawDimLine(ctx, x1, yCota, x2, yCota, `S: ${window.formatDist(spacingX)}`);
-                }
+                ctx.fillStyle = isDark ? "#cbd5e1" : "#334155";
+                ctx.font = "900 12px Manrope";
+                ctx.fillText(window.currentLang === 'en' ? `DISTRIBUTION (GRID)` : `DISTRIBUIÇÃO (GRID)`, 20, 30);
+                ctx.font = "600 11px Manrope";
+                ctx.fillText(window.currentLang === 'en' ? `Grid: ${cols} cols x ${rows} rows` : `Malha Sugerida: ${cols} colunas x ${rows} linhas`, 20, 50);
+                ctx.fillText(window.currentLang === 'en' ? `Total Fixtures: ${totalFixtures} units` : `Total de Luminárias: ${totalFixtures} unidades`, 20, 65);
+                ctx.fillText(window.currentLang === 'en' ? `Achieved Illuminance: ${Math.round(achievedLux)} lx` : `Iluminância Calculada: ${Math.round(achievedLux)} lx`, 20, 80);
                 
-                // Cota de Afastamento Parede X (S/2)
-                const xStart = offsetX;
-                const xFirst = offsetX + (spacingX / 2) * scale;
-                drawDimLine(ctx, xStart, offsetY - 55, xFirst, offsetY - 55, `${window.formatDist(spacingX/2)}`);
+                ctx.fillStyle = lpd > 8.0 ? "#ef4444" : "#10b981"; 
+                ctx.fillText(window.currentLang === 'en' ? `LPD (Density): ${lpd.toFixed(2)} W/m²` : `LPD (Carga): ${lpd.toFixed(2)} W/m²`, 20, 100);
 
-                // Cota de Espaçamento Y
-                if (rows > 1) {
-                    const y1 = offsetY + (spacingY / 2) * scale;
-                    const y2 = offsetY + (spacingY / 2 + spacingY) * scale;
-                    const xCota = offsetX - 30;
-                    drawDimLineVertical(ctx, xCota, y1, y2, `S: ${window.formatDist(spacingY)}`);
-                }
-
-                // Cota de Afastamento Parede Y (S/2)
-                const yStart = offsetY;
-                const yFirst = offsetY + (spacingY / 2) * scale;
-                drawDimLineVertical(ctx, offsetX - 55, yStart, yFirst, `${window.formatDist(spacingY/2)}`);
-
-                // 5. DASHBOARD TÉCNICO (PIVÔ DE PERFORMANCE)
-                const dashX = 20, dashY = 20;
-                ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.9)";
-                if (ctx.roundRect) {
-                    ctx.beginPath();
-                    ctx.roundRect(dashX, dashY, 220, 130, 10);
-                    ctx.fill();
-                    ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
-                    ctx.stroke();
+                if (isUniform) {
+                    ctx.fillStyle = "#10b981";
+                    ctx.fillText(window.currentLang === 'en' ? `✓ Optimized Uniformity` : `✓ Uniformidade Otimizada (S <= Smax)`, 20, 120);
                 } else {
-                    ctx.fillRect(dashX, dashY, 220, 130);
-                    ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
-                    ctx.strokeRect(dashX, dashY, 220, 130);
+                    ctx.fillStyle = "#ef4444";
+                    ctx.fillText(window.currentLang === 'en' ? `⚠ Risk of Dark Zones` : `⚠ Risco de Zonas Escuras (Manchas)`, 20, 120);
+                    ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                    ctx.fillText(window.currentLang === 'en' ? `(Fixture spacing exceeds beam diameter)` : `(Espaçamento excede diâmetro do facho)`, 20, 135);
                 }
 
-                ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
-                ctx.font = "900 11px Manrope";
-                ctx.fillText("ANALISE DE DISTRIBUIÇÃO", dashX + 15, dashY + 25);
-                
-                ctx.font = "bold 10px Manrope";
-                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-                ctx.fillText(`LAYOUT: ${cols} x ${rows} (${totalFixtures} un)`, dashX + 15, dashY + 50);
-                
-                ctx.fillStyle = achievedLux >= s.targetLux ? "#10b981" : "#ef4444";
-                ctx.fillText(`MÉDIA AVALIADA: ${Math.round(achievedLux)} LX`, dashX + 15, dashY + 70);
-                
-                ctx.fillStyle = uo >= 0.4 ? "#10b981" : "#f59e0b";
-                ctx.fillText(`UNIFORMIDADE (Uo): ~${uo.toFixed(2)}`, dashX + 15, dashY + 90);
-                
-                const efficiency = achievedLux / ( (totalFixtures * s.power) / (L*W) );
-                ctx.fillStyle = "#0284c7";
-                ctx.fillText(`LPD: ${( (totalFixtures * s.power) / (L*W) ).toFixed(2)} W/m²`, dashX + 15, dashY + 110);
+                // Linhas de Cota de Dimensões (Sala)
+                drawDimLine(ctx, offsetX, offsetY - 20, offsetX + scaledL, offsetY - 20, `${window.formatDist(L)}`);
+                drawDimLineVertical(ctx, offsetX - 20, offsetY, offsetY + scaledW, `${window.formatDist(W)}`);
 
-                return;
+                return; // Encerra o update para o modo lúmens.
             }
 
             // --- CÓDIGO ORIGINAL (PONTO, VERTICAL, HOMOG) ---
@@ -1635,6 +1693,22 @@
                 if(document.getElementById(pairId)) document.getElementById(pairId).value = val;
                 
                 window.state[key][param] = valInMeters; 
+
+                // LUXSINTAX - PRESETS AUTOMATION LINK
+                if (key === 'lumen') {
+                    if (param === 'cu' && document.getElementById('l-cu-preset')) {
+                        document.getElementById('l-cu-preset').value = 'manual';
+                    }
+                    if (param === 'mf' && document.getElementById('l-mf-preset')) {
+                        document.getElementById('l-mf-preset').value = 'manual';
+                    }
+                    if (['length', 'width', 'height', 'beam'].includes(param)) {
+                        if (window.applyLumenPresets) {
+                            window.applyLumenPresets(true);
+                        }
+                    }
+                }
+                
                 window.updateCalculations(); 
             }); 
         }
