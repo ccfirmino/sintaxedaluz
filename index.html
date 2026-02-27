@@ -242,6 +242,7 @@
                     <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines text-lg mb-1"></i><span data-i18n="tab_horiz">SUPERFÍCIE<br>HORIZONTAL</span></button>
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
                     <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-drafting-compass text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
+                    <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">DISTRIBUIÇÃO<br>EM PLANTA</span></button>
                     <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                 </div>
 
@@ -315,6 +316,14 @@
                                             <p id="h-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
+                                </div>
+                                <div id="inputs-grid" class="hidden">
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
+                                    <div class="mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_w">LARGURA DO AMB. (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_l">COMPRIMENTO DO AMB. (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomL" value="4.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
+                                    <div class="mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_grid_x">QTD. LUMINÁRIAS (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-cols" value="2" min="1" max="20" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div><input type="range" id="range-g-cols" min="1" max="20" step="1" value="2"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_grid_y">QTD. LUMINÁRIAS (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-rows" value="2" min="1" max="20" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div><input type="range" id="range-g-rows" min="1" max="20" step="1" value="2"></div>
                                 </div>
                             </div>
                         </div>
@@ -566,9 +575,10 @@
         // 1. I18N DICTIONARY (LUXSINTAX UPDATE)
         window.i18n = {
             pt: {
-                nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO",
+                nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "DISTRIBUIÇÃO<br>EM PLANTA",
                 calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
+                lbl_room_w: "LARGURA DO AMB. (X)", lbl_room_l: "COMPRIMENTO DO AMB. (Y)", lbl_grid_x: "QTD. LUMINÁRIAS (X)", lbl_grid_y: "QTD. LUMINÁRIAS (Y)",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
                 tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
                 road_params: "Parâmetros da Via (Classe M)", lbl_speed: "Velocidade (km/h)", lbl_volume: "Volume de Tráfego", lbl_separation: "Separação de Tráfego", lbl_density: "Densidade de Interseções", lbl_complexity: "Complexidade / Guiagem", lbl_ambient: "Luminância do Entorno",
@@ -584,9 +594,10 @@
                 auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora."
             },
             en: {
-                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY",
+                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "FLOOR PLAN<br>GRID",
                 calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES", lbl_ies_upload: "UPLOAD .IES FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
+                lbl_room_w: "ROOM WIDTH (X)", lbl_room_l: "ROOM LENGTH (Y)", lbl_grid_x: "FIXTURES QTY (X)", lbl_grid_y: "FIXTURES QTY (Y)",
                 hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
                 tab_interiors: "Interiors (ISO/IES)", tab_roadway: "Roadway (IES/NBR)", filter_all: "All Categories", col_cat: "Category", col_room: "Room / Task",
                 road_params: "Roadway Parameters (M Class)", lbl_speed: "Speed (km/h)", lbl_volume: "Traffic Volume", lbl_separation: "Traffic Separation", lbl_density: "Intersection Density", lbl_complexity: "Complexity / Guidance", lbl_ambient: "Ambient Luminance",
@@ -612,6 +623,7 @@
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null, iesFileName: null }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
+            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2 }
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
@@ -854,7 +866,7 @@
         // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
             window.currentTool = toolId;
-            ['ponto', 'vertical', 'homog', 'query'].forEach(id => {
+            ['ponto', 'vertical', 'homog', 'grid', 'query'].forEach(id => {
                 const btn = document.getElementById('tab-' + id);
                 if(btn) {
                     let cls = "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ";
@@ -867,8 +879,8 @@
             document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
             
             if (toolId !== 'query') {
-                ['inputs-ponto', 'inputs-vertical', 'inputs-homog'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
-                const selectedInput = document.getElementById('inputs-' + (toolId === 'homog' ? 'homog' : toolId));
+                ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
+                const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 window.updateCalcMode(window.calcMode);
                 window.updateCalculations();
@@ -1092,9 +1104,13 @@
             const centerX = cw / 2;
             let boundsH = 3.0;
             let boundsW = 3.0; 
-            const s = window.state[window.currentTool === 'homog' ? 'homog' : window.currentTool];
+            const s = window.state[window.currentTool];
 
-            const currentBeam = window.getEffectiveBeam(s);
+            let currentBeam = 30;
+            if(window.currentTool !== 'grid') {
+                currentBeam = window.getEffectiveBeam(s);
+            }
+
             if (window.currentTool === 'ponto') {
                 boundsH = s.height;
                 const maxAngleRad = (Math.abs(s.tilt) + currentBeam/2) * Math.PI / 180;
@@ -1107,14 +1123,82 @@
                 boundsH = s.height;
                 const halfBeamRad = (currentBeam/2) * Math.PI / 180;
                 boundsW = (s.spacing / 2) + (s.height * Math.tan(halfBeamRad));
+            } else if (window.currentTool === 'grid') {
+                boundsW = s.roomW;
+                boundsH = s.roomL;
             }
+
+            ctx.clearRect(0, 0, cw, ch);
+
+            if (window.currentTool === 'grid') {
+                const padX = 80;
+                const padY = 80;
+                const availW = cw - padX * 2;
+                const availH = ch - padY * 2;
+                let scale = Math.min(availW / boundsW, availH / boundsH);
+                
+                const roomPxW = boundsW * scale;
+                const roomPxH = boundsH * scale;
+                const offsetX = (cw - roomPxW) / 2;
+                const offsetY = (ch - roomPxH) / 2;
+
+                ctx.fillStyle = isDark ? "#0f172a" : "#f8fafc";
+                ctx.fillRect(offsetX, offsetY, roomPxW, roomPxH);
+                
+                ctx.strokeStyle = cFloorLine;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(offsetX, offsetY, roomPxW, roomPxH);
+
+                drawDimLine(ctx, offsetX, offsetY - 20, offsetX + roomPxW, offsetY - 20, window.formatDist(s.roomW));
+                drawDimLineVertical(ctx, offsetX - 20, offsetY, offsetY + roomPxH, window.formatDist(s.roomL));
+
+                const br = s.beam * Math.PI / 180;
+                const radiusM = s.height * Math.tan(br / 2);
+                const radiusPx = radiusM * scale;
+
+                const spacingX = s.roomW / s.cols;
+                const spacingY = s.roomL / s.rows;
+
+                for (let i = 0; i < s.cols; i++) {
+                    for (let j = 0; j < s.rows; j++) {
+                        const cxM = (i + 0.5) * spacingX;
+                        const cyM = (j + 0.5) * spacingY;
+                        const cxPx = offsetX + cxM * scale;
+                        const cyPx = offsetY + cyM * scale;
+
+                        ctx.beginPath();
+                        ctx.arc(cxPx, cyPx, radiusPx, 0, Math.PI * 2);
+                        ctx.fillStyle = isDark ? "rgba(217, 119, 6, 0.15)" : "rgba(251, 191, 36, 0.15)";
+                        ctx.fill();
+                        ctx.strokeStyle = "rgba(217, 119, 6, 0.3)";
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.arc(cxPx, cyPx, 4, 0, Math.PI * 2);
+                        ctx.fillStyle = "#d97706";
+                        ctx.fill();
+                    }
+                }
+
+                if (s.cols > 1) {
+                    const cx1 = offsetX + 0.5 * spacingX * scale;
+                    const cx2 = offsetX + 1.5 * spacingX * scale;
+                    drawDimLine(ctx, cx1, offsetY + roomPxH + 25, cx2, offsetY + roomPxH + 25, window.formatDist(spacingX));
+                }
+                if (s.rows > 1) {
+                    const cy1 = offsetY + 0.5 * spacingY * scale;
+                    const cy2 = offsetY + 1.5 * spacingY * scale;
+                    drawDimLineVertical(ctx, offsetX + roomPxW + 25, cy1, cy2, window.formatDist(spacingY));
+                }
+                return; 
+            }
+
             const availH = floorY - 60; const availW = (cw / 2) - 50; 
             let scaleH = availH / Math.max(boundsH, 0.5); let scaleW = availW / Math.max(boundsW, 0.5);
             let scale = Math.min(scaleH, scaleW); scale = Math.min(Math.max(scale, 12), 160);
 
-            ctx.clearRect(0, 0, cw, ch);
-            
-            // DRAW FLOOR
+            // DRAW FLOOR (For Standard Modes)
             ctx.strokeStyle = cFloorLine; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
             if (window.currentTool === 'ponto') {
                 ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
@@ -1411,8 +1495,8 @@
             const isEn = window.currentLang === 'en';
             document.querySelectorAll('.unit-m-ft').forEach(el => el.innerText = isEn ? 'FT' : 'M');
             
-            const distParams = ['height', 'plane', 'dist', 'spacing', 'hq'];
-            ['ponto', 'vertical', 'homog'].forEach(key => {
+            const distParams = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL'];
+            ['ponto', 'vertical', 'homog', 'grid'].forEach(key => {
                 distParams.forEach(param => {
                     const numInput = document.getElementById(`${key[0]}-${param}`);
                     const rangeInput = document.getElementById(`range-${key[0]}-${param}`);
@@ -1459,7 +1543,7 @@
             el.addEventListener('input', (e) => { 
                 let val = parseFloat(e.target.value); 
                 const isEn = window.currentLang === 'en';
-                const isDist = ['height', 'plane', 'dist', 'spacing', 'hq'].includes(param);
+                const isDist = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL'].includes(param);
                 
                 const valInMeters = (isEn && isDist) ? val / 3.28084 : val;
 
@@ -1470,7 +1554,7 @@
                 window.updateCalculations(); 
             }); 
         }
-        ['ponto', 'vertical', 'homog'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'cols', 'rows'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 
         window.AuthManager.init();
         window.switchTool('ponto');
