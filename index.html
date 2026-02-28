@@ -88,8 +88,8 @@
         input[type="radio"]::before { content: ""; width: 0.65em; height: 0.65em; background-color: #d97706; border-radius: 50%; transform: scale(0); transition: 120ms transform ease-in-out; }
         input[type="radio"]:checked { border-color: #d97706; }
         input[type="radio"]:checked::before { transform: scale(1); }
-        .bar-container { width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 9999px; overflow: hidden; margin-top: 6px; transition: background-color 0.3s; }
-        .bar-fill { height: 100%; border-radius: 9999px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
+        .bar-container { width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 9999px; overflow: hidden; margin-top: 6px; transition: background 0.3s; }
+        .bar-fill { height: 100%; border-radius: 9999px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
 
         /* DARK MODE CSS INJECT - LUXSINTAX ARCHITECTURE */
         html.dark body { background: linear-gradient(180deg, #0f172a 0%, #020617 100%); color: #cbd5e1; }
@@ -250,17 +250,6 @@
                     <div id="visual-tools" class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full transition-opacity duration-300 hidden">
                         <div class="lg:col-span-3 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
-                                <div class="mb-6 border-b border-slate-200 pb-4">
-                                    <label class="text-[10px] text-luminous-gold font-black uppercase tracking-widest mb-2 block" data-i18n="lbl_env_context">Contexto do Projeto (Uso)</label>
-                                    <select id="global-env-selector" onchange="window.updateProjectContext(this.value)" class="w-full bg-slate-50 border-none rounded-lg py-2 px-3 text-[11px] text-starlight font-bold focus:ring-2 focus:ring-amber-100 outline-none transition-all custom-select uppercase cursor-pointer">
-                                        <option value="none" data-i18n="opt_custom">Personalizado / Genérico</option>
-                                    </select>
-                                    <div id="target-display-box" class="hidden mt-3 flex items-center gap-2">
-                                        <span class="text-[9px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold uppercase tracking-wider dark:bg-slate-800">Target: <span id="target-lux-val">0</span> lx</span>
-                                        <span class="text-[9px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold uppercase tracking-wider dark:bg-slate-800">Ra: <span id="target-ra-val">0</span></span>
-                                    </div>
-                                </div>
-
                                 <div class="mb-4">
                                     <h3 class="text-md text-starlight mb-2 font-black whitespace-nowrap text-center border-b border-slate-200 pb-3" data-i18n="calc_params">Parâmetros da Fonte</h3>
                                     <div id="calc-mode-selector" class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6 mt-4 transition-opacity duration-300">
@@ -367,10 +356,7 @@
 
                         <div class="lg:col-span-9 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full min-h-[600px]">
-                                <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
-                                    <h3 class="text-sm text-starlight uppercase tracking-widest font-black" data-i18n="hdr_results">Resultados em Tempo Real</h3>
-                                    <div id="compliance-tag" class="hidden px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase transition-all duration-500"></div>
-                                </div>
+                                <h3 class="text-sm text-starlight mb-6 border-b border-slate-200 pb-4 uppercase tracking-widest font-black" data-i18n="hdr_results">Resultados em Tempo Real</h3>
                                 <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
                                     <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                     <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
@@ -639,8 +625,7 @@
                 nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem.", profile_help: "<i class=\"fas fa-envelope\"></i> Ajuda e Suporte",
                 auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora.",
                 search_placeholder: "Buscar ambiente ou tarefa...",
-                lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)",
-                lbl_env_context: "Contexto do Projeto (Uso)", opt_custom: "Personalizado / Genérico", tag_compliant: "Conforme NBR", tag_noncompliant: "Lux Insuficiente"
+                lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "FLOOR PLAN<br>GRID",
@@ -665,8 +650,7 @@
                 nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support",
                 auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now.",
                 search_placeholder: "Search room or task...",
-                lbl_lumen_mode: "LUMEN METHOD (SMART)", lbl_target_lux: "TARGET ILLUMINANCE (EM)", lbl_fixture_flux: "FIXTURE FLUX (LM)", lbl_util_factor: "UTILIZATION FACTOR (U)", lbl_maint_factor: "MAINTENANCE FACTOR (FM)",
-                lbl_env_context: "Project Context (Usage)", opt_custom: "Custom / Generic", tag_compliant: "NBR Compliant", tag_noncompliant: "Low Illuminance"
+                lbl_lumen_mode: "LUMEN METHOD (SMART)", lbl_target_lux: "TARGET ILLUMINANCE (EM)", lbl_fixture_flux: "FIXTURE FLUX (LM)", lbl_util_factor: "UTILIZATION FACTOR (U)", lbl_maint_factor: "MAINTENANCE FACTOR (FM)"
             }
         };
 
@@ -675,8 +659,7 @@
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null, iesFileName: null }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
-            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 },
-            currentNormTarget: 0 
+            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 }
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
@@ -789,6 +772,7 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 this.handleSessionUpdate(session);
                 
+                // LUXSINTAX: Event Listener Atualizado para capturar PASSWORD_RECOVERY
                 supabase.auth.onAuthStateChange((event, session) => {
                     this.handleSessionUpdate(session);
                     if (event === 'PASSWORD_RECOVERY') {
@@ -815,7 +799,6 @@
                 document.getElementById('auth-modal').classList.add('hidden'); 
                 document.getElementById('app-content').classList.remove('app-locked'); 
                 window.populateCategoryFilter();
-                window.populateGlobalEnvSelector(); 
                 window.filterNorms();
                 setTimeout(() => window.updateCalculations(), 100); 
             },
@@ -842,6 +825,7 @@
                 }
             },
             
+            // LUXSINTAX: Novos fluxos de recuperação
             showForgotPassword: function() {
                 document.getElementById('form-login').classList.add('hidden');
                 document.getElementById('form-register').classList.add('hidden');
@@ -953,6 +937,7 @@
             window.updateCalculations();
         }
         
+        // LUXSINTAX: Alternador do Modo Lúmens (Smart Grid)
         window.toggleLumenMode = function(checked) {
             window.state.grid.lumenMode = checked;
             document.getElementById('lumen-inputs').classList.toggle('hidden', !checked);
@@ -966,39 +951,6 @@
                 bg.classList.remove('bg-luminous-gold');
                 bg.classList.add('bg-slate-200', 'dark:bg-slate-600');
                 dot.classList.remove('translate-x-3');
-            }
-            window.updateCalculations();
-        }
-
-        // LUXSINTAX - Lógica de Integração de Contexto (NBR 8995)
-        window.populateGlobalEnvSelector = function() {
-            const sel = document.getElementById('global-env-selector');
-            if(!sel || sel.options.length > 1) return;
-            window.normsDatabase.forEach((n, index) => {
-                const o = document.createElement('option');
-                o.value = index;
-                o.innerText = `${n.room} (${n.lux}lx)`;
-                sel.appendChild(o);
-            });
-        }
-
-        window.updateProjectContext = function(index) {
-            const displayBox = document.getElementById('target-display-box');
-            if (index === 'none') {
-                window.state.currentNormTarget = 0;
-                displayBox.classList.add('hidden');
-            } else {
-                const norm = window.normsDatabase[index];
-                window.state.currentNormTarget = norm.lux;
-                document.getElementById('target-lux-val').innerText = norm.lux;
-                document.getElementById('target-ra-val').innerText = norm.ra;
-                displayBox.classList.remove('hidden');
-                
-                // Se estiver no modo Grid/Lúmens, sincroniza o input de lux
-                if (window.currentTool === 'grid') {
-                    document.getElementById('g-targetLux').value = norm.lux;
-                    window.state.grid.targetLux = norm.lux;
-                }
             }
             window.updateCalculations();
         }
@@ -1091,6 +1043,7 @@
 
         window.getIESIntensity = function(state, angleDeg) {
             if (!state.iesData) return 0;
+            
             const data = state.iesData;
             const vAngles = data.vAngles;
             const candelaRow = data.candelas[0]; 
@@ -1100,12 +1053,21 @@
             if (angleDeg <= vAngles[0]) return candelaRow[0] * mult;
             if (angleDeg >= vAngles[vAngles.length-1]) return candelaRow[vAngles.length-1] * mult;
 
-            while(idx < vAngles.length - 1 && angleDeg > vAngles[idx+1]) { idx++; }
-            const a1 = vAngles[idx], a2 = vAngles[idx+1];
-            const c1 = candelaRow[idx], c2 = candelaRow[idx+1];
+            while(idx < vAngles.length - 1 && angleDeg > vAngles[idx+1]) {
+                idx++;
+            }
+            
+            const a1 = vAngles[idx];
+            const a2 = vAngles[idx+1];
+            const c1 = candelaRow[idx];
+            const c2 = candelaRow[idx+1];
+            
             if (a2 === a1) return c1 * mult;
+
             const t = (angleDeg - a1) / (a2 - a1);
-            return (c1 + t * (c2 - c1)) * mult;
+            const rawVal = c1 + t * (c2 - c1);
+            
+            return rawVal * mult;
         }
 
         function getIntensity(s) {
@@ -1133,17 +1095,20 @@
                         break;
                     }
                 }
+                if (halfAngle === 0 && row[row.length-1] > targetI) {
+                    halfAngle = vAngles[vAngles.length-1];
+                }
                 return halfAngle * 2 || s.beam; 
             }
             return s.beam;
         }
 
-        // --- CANVAS ENGINE ---
+        // --- CANVAS ENGINE (THEME-AWARE) ---
         const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
             const isDark = document.documentElement.classList.contains('dark');
             ctx.beginPath(); ctx.strokeStyle = isDark ? "#475569" : "#94a3b8"; ctx.lineWidth = 1; 
             ctx.moveTo(x1, y1 - 3); ctx.lineTo(x1, y1 + 3); ctx.moveTo(x1, y1); ctx.lineTo(x2, y1); ctx.moveTo(x2, y1 - 3); ctx.lineTo(x2, y1 + 3); ctx.stroke(); 
-            ctx.font = "bold 11px Manrope"; const mx = (x1 + x2) / 2; const my = (y1 + y2) / 2; const tw = ctx.measureText(text).width; 
+            ctx.font = "bold 13px Manrope"; const mx = (x1 + x2) / 2; const my = (y1 + y2) / 2; const tw = ctx.measureText(text).width; 
             ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)"; ctx.fillRect(mx - tw / 2 - 6, my - 10, tw + 12, 20); 
             ctx.fillStyle = isDark ? "#94a3b8" : "#475569"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, mx, my); 
             ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
@@ -1152,17 +1117,29 @@
             const isDark = document.documentElement.classList.contains('dark');
             ctx.beginPath(); ctx.strokeStyle = isDark ? "#475569" : "#94a3b8"; ctx.lineWidth = 1; ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke(); 
             const cy = (y1 + y2) / 2; ctx.save(); ctx.translate(x, cy); ctx.rotate(-Math.PI/2); 
-            ctx.font = "bold 11px Manrope"; const tw = ctx.measureText(text).width; 
+            ctx.font = "bold 13px Manrope"; const tw = ctx.measureText(text).width; 
             ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)"; ctx.fillRect(-tw/2-6, -10, tw+12, 20); 
             ctx.fillStyle = isDark ? "#94a3b8" : "#475569"; ctx.fillText(text, -tw/2, 4); ctx.restore(); 
         };
         const drawAngleDim = (ctx, x, y, angle, tilt, radius, color, isTilt = false) => {
+            const isDark = document.documentElement.classList.contains('dark');
             const tr = tilt * Math.PI / 180;
             let startAngle, endAngle, centerAngle;
             if (isTilt) { centerAngle = (Math.PI / 2) - (tr / 2); startAngle = (Math.PI / 2) - tr; endAngle = (Math.PI / 2); } 
             else { const br = angle * Math.PI / 180; const beamAxis = (Math.PI / 2) - tr; centerAngle = beamAxis; startAngle = beamAxis - (br / 2); endAngle = beamAxis + (br / 2); }
             ctx.beginPath(); ctx.arc(x, y, radius, startAngle, endAngle); ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
+            const textRadius = radius + 15; const tx = x + textRadius * Math.cos(centerAngle); const ty = y + textRadius * Math.sin(centerAngle);
+            ctx.font = "bold 13px Manrope"; const text = angle + "°"; const tw = ctx.measureText(text).width;
+            ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.9)"; ctx.fillRect(tx - tw/2 - 4, ty - 10, tw + 8, 20);
+            ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, tx, ty);
+            ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
         };
+        const drawTextVal = (ctx, text, x, y) => {
+            const isDark = document.documentElement.classList.contains('dark');
+            ctx.font = "900 13px Manrope"; const tw = ctx.measureText(text).width;
+            ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)"; ctx.fillRect(x - tw/2 - 6, y - 18, tw + 12, 24);
+            ctx.fillStyle = "#d97706"; ctx.textAlign = "center"; ctx.fillText(text, x, y - 2); ctx.textAlign = "start"; 
+        }
 
         window.updateCalculations = function() {
             const canvas = document.getElementById('beamCanvas');
@@ -1174,102 +1151,430 @@
             const dpr = window.devicePixelRatio || 1;
             const parent = canvas.parentElement;
             const rect = parent.getBoundingClientRect();
-            canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
-            const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
-            const cw = rect.width, ch = rect.height;
-            const floorY = ch - 70, centerX = cw / 2;
-            let boundsH = 3.0, boundsW = 3.0; 
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const cw = rect.width;
+            const ch = rect.height;
+            const floorY = ch - 70;
+            const centerX = cw / 2;
+            let boundsH = 3.0;
+            let boundsW = 3.0; 
             const s = window.state[window.currentTool];
 
-            let currentBeam = (window.currentTool !== 'grid') ? window.getEffectiveBeam(s) : 60;
+            let currentBeam = 30;
+            if(window.currentTool !== 'grid') {
+                currentBeam = window.getEffectiveBeam(s);
+            }
 
             if (window.currentTool === 'ponto') {
                 boundsH = s.height;
                 const maxAngleRad = (Math.abs(s.tilt) + currentBeam/2) * Math.PI / 180;
-                boundsW = s.height * Math.tan(Math.min(maxAngleRad, 1.48));
+                const limitRad = Math.min(maxAngleRad, 1.48);
+                boundsW = s.height * Math.tan(limitRad);
             } else if (window.currentTool === 'vertical') {
-                boundsH = s.height; boundsW = Math.max(s.dist * 1.6, 3.5); 
+                boundsH = s.height;
+                boundsW = Math.max(s.dist * 1.6, 3.5); 
             } else if (window.currentTool === 'homog') {
-                boundsH = s.height; boundsW = (s.spacing / 2) + (s.height * Math.tan((currentBeam/2) * Math.PI / 180));
+                boundsH = s.height;
+                const halfBeamRad = (currentBeam/2) * Math.PI / 180;
+                boundsW = (s.spacing / 2) + (s.height * Math.tan(halfBeamRad));
             } else if (window.currentTool === 'grid') {
-                boundsW = s.roomW; boundsH = s.roomL;
+                boundsW = s.roomW;
+                boundsH = s.roomL;
             }
 
             ctx.clearRect(0, 0, cw, ch);
 
-            // --- LÓGICA DE CONFORMIDADE VISUAL (Traffic Light) ---
-            const checkCompliance = (val) => {
-                const tag = document.getElementById('compliance-tag');
-                if (window.state.currentNormTarget === 0) { tag.classList.add('hidden'); return "#d97706"; }
-                tag.classList.remove('hidden');
-                if (val >= window.state.currentNormTarget) {
-                    tag.innerText = window.i18n[window.currentLang].tag_compliant;
-                    tag.className = "px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase transition-all bg-leed-green text-white";
-                    return "#4d7c0f"; // LEED Green
-                } else {
-                    tag.innerText = window.i18n[window.currentLang].tag_noncompliant;
-                    tag.className = "px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase transition-all bg-red-500 text-white animate-pulse";
-                    return "#ef4444"; // Red
-                }
-            };
-
             if (window.currentTool === 'grid') {
+                const gridDisplay = document.getElementById('grid-suggestion-display');
+                const gridDesc = document.getElementById('grid-desc-display');
+
+                // LUXSINTAX - AUTONOMOUS GRID CALCULATION OU LUMEN METHOD
                 if (s.lumenMode) {
-                    const N = Math.max(1, Math.ceil((s.targetLux * s.roomW * s.roomL) / (s.flux * s.utilFactor * s.maintFactor)));
+                    const area = s.roomW * s.roomL;
+                    const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
+                    const N = Math.max(1, Math.ceil(targetN));
+                    
                     const ratio = s.roomW / s.roomL;
-                    let calcCols = Math.round(Math.sqrt(N * ratio)), calcRows = Math.round(Math.sqrt(N / ratio));
-                    while (calcCols * calcRows < N) { if ((calcCols / calcRows) < ratio) calcCols++; else calcRows++; }
-                    s.cols = calcCols; s.rows = calcRows;
-                    document.getElementById('grid-desc-display').innerText = `${N} luminárias requeridas.`;
-                }
-                const pad = 80; let scale = Math.min((cw - pad*2) / boundsW, (ch - pad*2) / boundsH);
-                const rW = boundsW * scale, rH = boundsH * scale;
-                const oX = (cw - rW) / 2, oY = (ch - rH) / 2;
-                ctx.fillStyle = isDark ? "#0f172a" : "#f8fafc"; ctx.fillRect(oX, oY, rW, rH);
-                ctx.save(); ctx.beginPath(); ctx.rect(oX, oY, rW, rH); ctx.clip();
-                const radiusPx = (s.height * Math.tan((s.beam * Math.PI / 180) / 2)) * scale;
-                const spX = s.roomW / s.cols, spY = s.roomL / s.rows;
-                for (let i = 0; i < s.cols; i++) {
-                    for (let j = 0; j < s.rows; j++) {
-                        const cx = oX + (i + 0.5) * spX * scale, cy = oY + (j + 0.5) * spY * scale;
-                        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radiusPx);
-                        const c = isDark ? "217, 119, 6" : "251, 191, 36";
-                        g.addColorStop(0, `rgba(${c}, 0.4)`); g.addColorStop(0.5, `rgba(${c}, 0.15)`); g.addColorStop(1, `rgba(${c}, 0)`);
-                        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, radiusPx, 0, Math.PI * 2); ctx.fill();
-                        ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                    let calcCols = Math.round(Math.sqrt(N * ratio));
+                    let calcRows = Math.round(Math.sqrt(N / ratio));
+                    
+                    calcCols = Math.max(1, calcCols);
+                    calcRows = Math.max(1, calcRows);
+                    
+                    while (calcCols * calcRows < N) {
+                        if ((calcCols / calcRows) < ratio) {
+                            calcCols++;
+                        } else {
+                            calcRows++;
+                        }
+                    }
+                    s.cols = calcCols;
+                    s.rows = calcRows;
+                    
+                    if (gridDesc) {
+                        gridDesc.innerHTML = window.currentLang === 'en' ? `Total required: ${N} fixtures to reach ${s.targetLux} lx.` : `Total calculado: ${N} luminárias para atingir ${s.targetLux} lx.`;
+                        gridDesc.classList.add('text-luminous-gold');
+                    }
+                } else {
+                    const brCalc = s.beam * Math.PI / 180;
+                    const diaCalc = 2 * s.height * Math.tan(brCalc / 2);
+                    const effectiveSpacing = diaCalc > 0.1 ? diaCalc * 0.75 : 1; 
+                    s.cols = Math.max(1, Math.ceil(s.roomW / effectiveSpacing));
+                    s.rows = Math.max(1, Math.ceil(s.roomL / effectiveSpacing));
+                    
+                    if (gridDesc) {
+                        gridDesc.innerHTML = window.currentLang === 'en' ? 'Autonomous distribution aiming for 25% beam overlap.' : 'Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.';
+                        gridDesc.classList.remove('text-luminous-gold');
                     }
                 }
-                ctx.restore(); ctx.strokeStyle = cFloorLine; ctx.lineWidth = 3; ctx.strokeRect(oX, oY, rW, rH);
-                drawDimLine(ctx, oX, oY - 20, oX + rW, oY - 20, window.formatDist(s.roomW));
-                drawDimLineVertical(ctx, oX - 20, oY, oY + rH, window.formatDist(s.roomL));
+
+                if (gridDisplay) {
+                    gridDisplay.innerHTML = `${s.cols} <span class="text-sm text-slate-400 font-normal mx-1">X</span> ${s.rows}`;
+                }
+
+                const padX = 80;
+                const padY = 80;
+                const availW = cw - padX * 2;
+                const availH = ch - padY * 2;
+                let scale = Math.min(availW / boundsW, availH / boundsH);
+                
+                const roomPxW = boundsW * scale;
+                const roomPxH = boundsH * scale;
+                const offsetX = (cw - roomPxW) / 2;
+                const offsetY = (ch - roomPxH) / 2;
+
+                // Desenha o fundo da sala
+                ctx.fillStyle = isDark ? "#0f172a" : "#f8fafc";
+                ctx.fillRect(offsetX, offsetY, roomPxW, roomPxH);
+                
+                // LUXSINTAX - CLIpping MASK (Conteção das manchas de luz no ambiente)
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(offsetX, offsetY, roomPxW, roomPxH);
+                ctx.clip();
+
+                const br = s.beam * Math.PI / 180;
+                const radiusM = s.height * Math.tan(br / 2);
+                const radiusPx = radiusM * scale;
+
+                const spacingX = s.roomW / s.cols;
+                const spacingY = s.roomL / s.rows;
+
+                // Loop para desenhar as manchas luminosas com clipping
+                for (let i = 0; i < s.cols; i++) {
+                    for (let j = 0; j < s.rows; j++) {
+                        const cxM = (i + 0.5) * spacingX;
+                        const cyM = (j + 0.5) * spacingY;
+                        const cxPx = offsetX + cxM * scale;
+                        const cyPx = offsetY + cyM * scale;
+
+                        ctx.beginPath();
+                        ctx.arc(cxPx, cyPx, radiusPx, 0, Math.PI * 2);
+                        
+                        // LUXSINTAX - Radial Gradient para simular dispersão fotométrica (fade nas bordas)
+                        const spotGradient = ctx.createRadialGradient(cxPx, cyPx, 0, cxPx, cyPx, radiusPx);
+                        if (isDark) {
+                            spotGradient.addColorStop(0, "rgba(217, 119, 6, 0.4)");
+                            spotGradient.addColorStop(0.5, "rgba(217, 119, 6, 0.15)");
+                            spotGradient.addColorStop(1, "rgba(217, 119, 6, 0)");
+                        } else {
+                            spotGradient.addColorStop(0, "rgba(251, 191, 36, 0.4)");
+                            spotGradient.addColorStop(0.5, "rgba(251, 191, 36, 0.15)");
+                            spotGradient.addColorStop(1, "rgba(251, 191, 36, 0)");
+                        }
+                        
+                        ctx.fillStyle = spotGradient;
+                        ctx.fill();
+                        ctx.strokeStyle = "rgba(217, 119, 6, 0.3)";
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+                
+                // Restaura o contexto para desenhar fora do clip e manter arestas limpas
+                ctx.restore();
+
+                // Desenha a borda do ambiente (por cima do corte para acabamento perfeito)
+                ctx.strokeStyle = cFloorLine;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(offsetX, offsetY, roomPxW, roomPxH);
+
+                // Desenha os pontos de luz (sources) e as linhas de cota
+                for (let i = 0; i < s.cols; i++) {
+                    for (let j = 0; j < s.rows; j++) {
+                        const cxM = (i + 0.5) * spacingX;
+                        const cyM = (j + 0.5) * spacingY;
+                        const cxPx = offsetX + cxM * scale;
+                        const cyPx = offsetY + cyM * scale;
+
+                        ctx.beginPath();
+                        ctx.arc(cxPx, cyPx, 4, 0, Math.PI * 2);
+                        ctx.fillStyle = "#d97706";
+                        ctx.fill();
+                    }
+                }
+
+                drawDimLine(ctx, offsetX, offsetY - 20, offsetX + roomPxW, offsetY - 20, window.formatDist(s.roomW));
+                drawDimLineVertical(ctx, offsetX - 20, offsetY, offsetY + roomPxH, window.formatDist(s.roomL));
+
+                if (s.cols > 1) {
+                    const cx1 = offsetX + 0.5 * spacingX * scale;
+                    const cx2 = offsetX + 1.5 * spacingX * scale;
+                    drawDimLine(ctx, cx1, offsetY + roomPxH + 25, cx2, offsetY + roomPxH + 25, window.formatDist(spacingX));
+                }
+                if (s.rows > 1) {
+                    const cy1 = offsetY + 0.5 * spacingY * scale;
+                    const cy2 = offsetY + 1.5 * spacingY * scale;
+                    drawDimLineVertical(ctx, offsetX + roomPxW + 25, cy1, cy2, window.formatDist(spacingY));
+                }
                 return; 
             }
 
-            const availH = floorY - 60, availW = (cw / 2) - 50; 
-            let scale = Math.min(availH / Math.max(boundsH, 0.5), availW / Math.max(boundsW, 0.5));
-            scale = Math.min(Math.max(scale, 12), 160);
+            const availH = floorY - 60; const availW = (cw / 2) - 50; 
+            let scaleH = availH / Math.max(boundsH, 0.5); let scaleW = availW / Math.max(boundsW, 0.5);
+            let scale = Math.min(scaleH, scaleW); scale = Math.min(Math.max(scale, 12), 160);
 
+            // DRAW FLOOR (For Standard Modes)
             ctx.strokeStyle = cFloorLine; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
-
             if (window.currentTool === 'ponto') {
+                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
+                ctx.fillText(window.currentLang === 'en' ? "FLOOR LINE (fl)" : "LINHA DE PISO (lp)", 10, floorY + 18); 
+                ctx.fillText(window.currentLang === 'en' ? "fl: 0' 0\"" : "lp: 0.00m", 10, floorY - 8); 
+                ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(5, floorY); ctx.stroke();
+            } else if (window.currentTool === 'vertical') {
+                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
+                ctx.fillText(window.currentLang === 'en' ? "FLOOR LINE (fl)" : "LINHA DE PISO (lp)", 10, floorY + 18); 
+                ctx.fillText(window.currentLang === 'en' ? "fl: 0' 0\"" : "lp: 0.00m", 10, floorY - 8);
+            } else if (window.currentTool === 'homog') {
+                 ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
+                 ctx.fillText(window.currentLang === 'en' ? "FLOOR LINE (fl)" : "LINHA DE PISO (lp)", 10, floorY + 18); 
+                 ctx.fillText(window.currentLang === 'en' ? "fl: 0' 0\"" : "lp: 0.00m", 10, floorY - 8);
+            }
+
+             if (window.currentTool === 'ponto') {
                 const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
-                const I = getIntensity(s);
+                
+                let I;
+                if(window.calcMode === 'ies') {
+                    I = window.getIESIntensity(s, s.tilt);
+                } else {
+                    I = getIntensity(s);
+                }
+
                 const sy = floorY - (s.height * scale), py = floorY - (s.plane * scale);
                 const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
-                const resColor = checkCompliance(luxFloor);
+                const hEff = s.height - s.plane;
+                const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
+                const dia = 2 * (s.height / Math.cos(tr)) * Math.tan(br / 2); 
                 
+                // Source & Beam
                 ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
                 ctx.save(); ctx.translate(centerX, sy);
                 const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
                 ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
 
-                const hitX = centerX + (s.height * scale) * Math.tan(tr);
-                ctx.beginPath(); ctx.arc(hitX, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = resColor; ctx.fill();
+                // Height & Plane Lines
+                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
+                ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4); 
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; 
+                ctx.fillText(`${window.currentLang === 'en' ? 'wp' : 'hp'}: ${window.formatDist(s.plane)}`, 10, py - 8); 
+
+                const axisX = centerX + (s.height * scale) * Math.tan(tr);
+                ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
                 
-                ctx.font = "900 13px Manrope"; ctx.fillStyle = resColor; ctx.textAlign = "center";
-                ctx.fillText(window.formatIllum(luxFloor), hitX, floorY - 12);
+                if (s.tilt > 0) {
+                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
+                    drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
+                    const distH = s.height * Math.tan(tr);
+                    drawDimLine(ctx, centerX, floorY + 25, axisX, floorY + 25, `d: ${window.formatDist(distH)}`);
+                }
+
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                }
+
+                const hitXFloor = centerX + (s.height * scale) * Math.tan(tr);
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(217, 119, 6, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(hitXFloor, floorY); ctx.stroke(); ctx.setLineDash([]);
+                ctx.beginPath(); ctx.arc(hitXFloor, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                
+                let valText = window.formatIllum(luxFloor);
+                if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
+                drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
+                
+                if (hEff > 0) { 
+                    const ix = centerX + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
+                    let valTextPlane = window.formatIllum(luxPlane);
+                    if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD FILE";
+                    drawTextVal(ctx, valTextPlane, ix, py - 12); 
+                    
+                    if (window.calcMode !== 'ies' || s.iesData) {
+                        const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
+                        const hPx_plane = py - sy;
+                        const xL_p = hPx_plane * Math.tan(tr - br / 2);
+                        const xR_p = hPx_plane * Math.tan(tr + br / 2);
+                        drawDimLine(ctx, centerX + xL_p, py + 20, centerX + xR_p, py + 20, `Ø ${window.formatDist(diaPlane)}`);
+                    }
+                }
+                
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
+                    drawDimLine(ctx, centerX + xL, floorY + 50, centerX + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
+                }
             }
-            // (Outros desenhos de canvas simplificados para brevidade, lógica segue o padrão acima)
+             else if (window.currentTool === 'vertical') {
+                const sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
+                
+                let ev = 0; 
+                let I_v;
+                 if(window.calcMode === 'ies') {
+                    I_v = window.getIESIntensity(s, s.tilt);
+                 } else {
+                    I_v = getIntensity(s);
+                 }
+                 
+                 if (s.tilt > 0) {
+                    ev = (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
+                 }
+
+                let hitY_metric = s.height - (s.dist / Math.tan(tr)); let hitY_px = floorY - (hitY_metric * scale);
+                
+                ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = cFloorLine; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; 
+                ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
+
+                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
+                ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4);
+
+                const hqY = floorY - (s.hq * scale);
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, 10, hqY - 8);
+                
+                ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip(); 
+                ctx.save(); ctx.translate(centerX, sy);
+                const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
+                ctx.restore();
+
+                if (s.tilt > 0) {
+                    const axisX = centerX + (s.height * scale) * Math.tan(tr);
+                    ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
+                    drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
+                }
+
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false);
+                }
+
+                 if (s.tilt > 0) {
+                    ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, hitY_px); ctx.strokeStyle = "#d97706"; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+                     
+                     if (hitY_metric > -10 && hitY_metric < s.height * 3) {
+                        ctx.beginPath(); ctx.arc(wx, hitY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                        
+                        let valText = window.formatIllum(ev);
+                        if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
+                        drawTextVal(ctx, valText, wx - 45, hitY_px);
+                        
+                        if (hitY_px < floorY) {
+                            drawDimLineVertical(ctx, wx + 45, hitY_px, floorY, `${window.formatDist(hitY_metric)}`);
+                        }
+                     }
+                     
+                    if ((window.calcMode !== 'ies' || s.iesData) && s.tilt + currentBeam/2 < 89) {
+                        const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + currentBeam/2) * Math.PI/180));
+                        const hTopPx = floorY - (hTopMetric * scale);
+                        if(hTopPx > -100 && hTopPx < floorY + 100) {
+                           drawDimLineVertical(ctx, wx + 20, hTopPx, floorY, `${window.formatDist(hTopMetric)}`);
+                        }
+                    }
+                }
+                drawDimLine(ctx, centerX, sy - 35, wx, sy - 35, `d: ${window.formatDist(s.dist)}`); 
+            } else if (window.currentTool === 'homog') {
+                const I = getIntensity(window.state.homog); 
+                const sy = floorY - (s.height * scale); const py = floorY - (s.plane * scale); const hS = (s.spacing * scale) / 2;
+                const br = currentBeam * Math.PI / 180; const tl = 0; 
+                const dia = 2 * s.height * Math.tan(br / 2);
+                const hEff = s.height - s.plane;
+                const diaPlane = hEff > 0 ? 2 * hEff * Math.tan(br / 2) : 0;
+                const luxFloor = I / (s.height ** 2);
+                const luxPlane = hEff > 0 ? I / (hEff ** 2) : 0;
+                const leftX = centerX - hS; const rightX = centerX + hS;
+                
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; 
+                ctx.fillText(`${window.currentLang === 'en' ? 'wp' : 'hp'}: ${window.formatDist(s.plane)}`, 10, py - 8); 
+
+                [leftX, rightX].forEach(lx => {
+                    ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(217, 119, 6, 0.4)"; ctx.moveTo(lx, sy); ctx.lineTo(lx, floorY); ctx.stroke(); ctx.setLineDash([]);
+                    
+                    ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(lx, sy, 5, 0, Math.PI * 2); ctx.fill();
+                    ctx.save(); ctx.translate(lx, sy);
+                    const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tl - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tl + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
+                });
+                
+                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(leftX - 20, sy); ctx.lineTo(leftX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
+                ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, leftX - 50, sy + 4);
+
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, leftX, sy, Math.round(currentBeam), 0, 40, "rgba(217, 119, 6, 0.8)", false);
+                }
+
+                drawDimLine(ctx, leftX, sy - 25, rightX, sy - 25, `D: ${window.formatDist(s.spacing)}`);
+                
+                ctx.beginPath(); ctx.arc(leftX, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                
+                let valText = window.formatIllum(luxFloor);
+                if (window.calcMode === 'ies' && !window.state.homog.iesData) valText = "LOAD FILE";
+                drawTextVal(ctx, valText, leftX, floorY - 12);
+
+                const rFloor = (floorY - sy) * Math.tan(br/2);
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawDimLine(ctx, leftX - rFloor, floorY + 30, leftX + rFloor, floorY + 30, `Ø ${window.formatDist(dia)}`);
+                }
+
+                if (hEff > 0) {
+                     ctx.beginPath(); ctx.arc(leftX, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                     
+                     let valTextPlane = window.formatIllum(luxPlane);
+                     if (window.calcMode === 'ies' && !window.state.homog.iesData) valTextPlane = "LOAD FILE";
+                     drawTextVal(ctx, valTextPlane, leftX, py - 12);
+                     
+                     if (window.calcMode !== 'ies' || s.iesData) {
+                        const rPlane = (py - sy) * Math.tan(br/2);
+                        drawDimLine(ctx, leftX - rPlane, py + 20, leftX + rPlane, py + 20, `Ø ${window.formatDist(diaPlane)}`);
+                     }
+                }
+            }
+            
+            // Draw Photometric Curve
+            if (window.calcMode === 'ies' && s.iesData) {
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba(217, 119, 6, 0.4)";
+                ctx.setLineDash([]);
+                const { vAngles, candelas } = s.iesData;
+                const row = candelas[0];
+                const maxI = Math.max(...row);
+                
+                // Draw Right Side
+                for(let i=0; i<vAngles.length; i++) {
+                    const ang = (vAngles[i] + s.tilt) * Math.PI / 180;
+                    const r = (row[i] / maxI) * (s.height * scale * 0.9);
+                    const x = centerX + r * Math.sin(ang);
+                    const y = sy + r * Math.cos(ang);
+                    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                }
+                // Draw Left Side (Mirror)
+                for(let i=0; i<vAngles.length; i++) {
+                     const ang = (-vAngles[i] + s.tilt) * Math.PI / 180;
+                     const r = (row[i] / maxI) * (s.height * scale * 0.9);
+                     const x = centerX + r * Math.sin(ang);
+                     const y = sy + r * Math.cos(ang);
+                     ctx.lineTo(x,y);
+                }
+                ctx.stroke();
+            }
         }
 
         // --- NBR 5101 LOGIC ---
@@ -1298,9 +1603,13 @@
             const cat = document.getElementById('category-filter').value;
             const searchInput = document.getElementById('search-filter');
             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            
             const filtered = window.normsDatabase.filter(n => {
-                return (cat === 'all' || n.cat === cat) && (n.room.toLowerCase().includes(searchTerm) || n.cat.toLowerCase().includes(searchTerm));
+                const matchCat = cat === 'all' || n.cat === cat;
+                const matchSearch = n.room.toLowerCase().includes(searchTerm) || n.cat.toLowerCase().includes(searchTerm);
+                return matchCat && matchSearch;
             });
+            
             document.getElementById('nbr8995-tbody').innerHTML = filtered.map(n => `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-slate-500 font-bold">${n.room}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`).join('');
         }
         
@@ -1309,12 +1618,16 @@
                 document.getElementById('content-'+k).classList.toggle('hidden', k!==t);
                 document.getElementById('btn-q-'+k).className = `query-tab-btn ${k===t ? 'query-tab-active' : ''}`;
             });
+            const searchContainer = document.getElementById('search-container');
+            if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
+
             if(t==='nbr8995') window.filterNorms();
             if(t==='nbr5101') window.calc5101();
             if(t==='leed') window.updateLeedTargets();
         }
         
         window.switchCertTab = function(t) { ['leed','well'].forEach(k => { document.getElementById('pane-'+k).classList.toggle('hidden', k!==t); document.getElementById('cert-tab-'+k).className = `cert-tab ${k===t?'active':'inactive'}`; }); }
+        
         window.updateLeedTargets = function() {
             const area = parseFloat(document.getElementById('leed-area-input').value) || 0;
             const red = window.currentLeedTarget === 'gold' ? 0.20 : (window.currentLeedTarget === 'platinum' ? 0.30 : (window.currentLeedTarget === 'silver' ? 0.10 : 0.05));
@@ -1330,6 +1643,7 @@
         window.updateInputsForLanguage = function() {
             const isEn = window.currentLang === 'en';
             document.querySelectorAll('.unit-m-ft').forEach(el => el.innerText = isEn ? 'FT' : 'M');
+            
             const distParams = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL'];
             ['ponto', 'vertical', 'homog', 'grid'].forEach(key => {
                 distParams.forEach(param => {
@@ -1338,10 +1652,17 @@
                     if (numInput && rangeInput) {
                         const valMeters = window.state[key][param];
                         if (isEn) {
-                            numInput.value = (valMeters * 3.28084).toFixed(2);
-                            rangeInput.value = (valMeters * 3.28084).toFixed(2);
+                            const valFt = valMeters * 3.28084;
+                            numInput.value = valFt.toFixed(2);
+                            rangeInput.min = (parseFloat(rangeInput.getAttribute('data-base-min')) * 3.28084).toFixed(2);
+                            rangeInput.max = (parseFloat(rangeInput.getAttribute('data-base-max')) * 3.28084).toFixed(2);
+                            rangeInput.step = '0.1';
+                            rangeInput.value = valFt.toFixed(2);
                         } else {
                             numInput.value = valMeters.toFixed(2);
+                            rangeInput.min = rangeInput.getAttribute('data-base-min');
+                            rangeInput.max = rangeInput.getAttribute('data-base-max');
+                            rangeInput.step = rangeInput.getAttribute('data-base-step');
                             rangeInput.value = valMeters.toFixed(2);
                         }
                     }
@@ -1354,22 +1675,36 @@
             document.querySelectorAll('.lang-display').forEach(e => e.innerText = window.currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
             document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { el.innerHTML = window.i18n[window.currentLang][key]; } });
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.getAttribute('data-i18n-placeholder'); if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { el.placeholder = window.i18n[window.currentLang][key]; } });
-            window.updateInputsForLanguage(); window.updateCalculations(); 
+            window.updateInputsForLanguage();
+            window.updateCalculations(); 
         }
         window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
 
+        // BINDING
         function bind(id, key, param) { 
             const el = document.getElementById(id); if(!el) return;
+            
+            if (!el.hasAttribute('data-base-min')) {
+                el.setAttribute('data-base-min', el.min);
+                el.setAttribute('data-base-max', el.max);
+                el.setAttribute('data-base-step', el.step || '1');
+            }
+
             el.addEventListener('input', (e) => { 
                 let val = parseFloat(e.target.value); 
                 const isEn = window.currentLang === 'en';
                 const isDist = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL'].includes(param);
+                
                 const valInMeters = (isEn && isDist) ? val / 3.28084 : val;
+
                 const pairId = id.includes('range') ? id.replace('range-', '') : 'range-' + id;
                 if(document.getElementById(pairId)) document.getElementById(pairId).value = val;
-                window.state[key][param] = valInMeters; window.updateCalculations(); 
+                
+                window.state[key][param] = valInMeters; 
+                window.updateCalculations(); 
             }); 
         }
+        // LUXSINTAX: Variáveis do Lúmens adicionadas ao array de BIND
         ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 
         window.AuthManager.init();
