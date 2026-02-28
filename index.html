@@ -1215,7 +1215,20 @@
 
                         ctx.beginPath();
                         ctx.arc(cxPx, cyPx, radiusPx, 0, Math.PI * 2);
-                        ctx.fillStyle = isDark ? "rgba(217, 119, 6, 0.15)" : "rgba(251, 191, 36, 0.15)";
+                        
+                        // LUXSINTAX - Radial Gradient para simular dispersão fotométrica (fade nas bordas)
+                        const spotGradient = ctx.createRadialGradient(cxPx, cyPx, 0, cxPx, cyPx, radiusPx);
+                        if (isDark) {
+                            spotGradient.addColorStop(0, "rgba(217, 119, 6, 0.4)");
+                            spotGradient.addColorStop(0.5, "rgba(217, 119, 6, 0.15)");
+                            spotGradient.addColorStop(1, "rgba(217, 119, 6, 0)");
+                        } else {
+                            spotGradient.addColorStop(0, "rgba(251, 191, 36, 0.4)");
+                            spotGradient.addColorStop(0.5, "rgba(251, 191, 36, 0.15)");
+                            spotGradient.addColorStop(1, "rgba(251, 191, 36, 0)");
+                        }
+                        
+                        ctx.fillStyle = spotGradient;
                         ctx.fill();
                         ctx.strokeStyle = "rgba(217, 119, 6, 0.3)";
                         ctx.lineWidth = 1;
