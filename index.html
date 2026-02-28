@@ -280,7 +280,7 @@
                                 </div>
                                 <div id="inputs-vertical" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0.5" max="10" step="0.1" value="1.6"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
                                     <div class="mode-standard-only">
                                         <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
@@ -742,17 +742,37 @@
         // --- AUTH MANAGER (LUXSINTAX V2 - RECOVERY ENABLED) ---
         window.AuthManager = {
             init: async function() {
-                const { data: { session } } = await supabase.auth.getSession();
-                this.handleSessionUpdate(session);
+                // 1. Recupera sessão inicial (se existir)
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) console.error("[LuxSintax_Auth] Erro ao recuperar sessão:", error.message);
                 
-                // LUXSINTAX: Event Listener Atualizado para capturar PASSWORD_RECOVERY
-                supabase.auth.onAuthStateChange((event, session) => {
+                this.handleSessionUpdate(session);
+
+                // 2. Listener de Mudança de Estado (Tratamento de Eventos Críticos)
+                supabase.auth.onAuthStateChange(async (event, session) => {
+                    console.log(`[LuxSintax_Auth] Evento: ${event}`); // Log para auditoria em dev
+                    
                     this.handleSessionUpdate(session);
+
                     if (event === 'PASSWORD_RECOVERY') {
+                        // Garantimos que o app está "destravado" para o fluxo de reset
+                        this.unlockApp(); 
+                        
+                        // Forçamos a abertura do modal de perfil/reset
                         setTimeout(() => {
-                            alert(window.currentLang === 'en' ? window.i18n.en.msg_recovery_prompt : window.i18n.pt.msg_recovery_prompt);
                             this.openProfile();
-                        }, 500);
+                            // Opcional: injetar mensagem de instrução clara no modal
+                            const msg = window.currentLang === 'en' ? window.i18n.en.msg_recovery_prompt : window.i18n.pt.msg_recovery_prompt;
+                            alert(msg);
+                        }, 800);
+                    }
+
+                    if (event === 'SIGNED_IN' && session) {
+                        this.unlockApp();
+                    }
+
+                    if (event === 'SIGNED_OUT') {
+                        this.lockApp();
                     }
                 });
             },
@@ -798,7 +818,6 @@
                 }
             },
             
-            // LUXSINTAX: Novos fluxos de recuperação
             showForgotPassword: function() {
                 document.getElementById('form-login').classList.add('hidden');
                 document.getElementById('form-register').classList.add('hidden');
@@ -811,10 +830,13 @@
             handlePasswordResetRequest: async function() {
                 const email = document.getElementById('forgot-email').value;
                 if (!email) {
-                    alert("Por favor, insira um e-mail.");
+                    alert(window.currentLang === 'en' ? "Email is required" : "Por favor, insira um e-mail.");
                     return;
                 }
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                
+                const sanitizedEmail = email.trim().toLowerCase();
+
+                const { error } = await supabase.auth.resetPasswordForEmail(sanitizedEmail, {
                     redirectTo: window.location.origin + window.location.pathname,
                 });
                 
