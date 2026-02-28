@@ -280,7 +280,7 @@
                                 </div>
                                 <div id="inputs-vertical" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0" max="10" step="0.1" value="1.6"></div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0.5" max="10" step="0.1" value="1.6"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
                                     <div class="mode-standard-only">
                                         <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
@@ -323,6 +323,23 @@
                                     <div class="mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_w">LARGURA DO AMB. (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_l">COMPRIMENTO DO AMB. (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomL" value="4.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
                                     
+                                    <div class="mb-4 group border-t border-slate-200 pt-4">
+                                        <label class="flex items-center justify-between cursor-pointer group">
+                                            <span class="text-[10px] text-luminous-gold font-black uppercase tracking-wider" data-i18n="lbl_lumen_mode">MÉTODO DOS LÚMENS</span>
+                                            <div class="relative">
+                                                <input type="checkbox" id="g-lumenMode" onchange="window.toggleLumenMode(this.checked)" class="sr-only">
+                                                <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="lumen-toggle-bg"></div>
+                                                <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="lumen-toggle-dot"></div>
+                                            </div>
+                                        </label>
+                                        <div id="lumen-inputs" class="hidden mt-4 space-y-4 bg-amber-50 dark:bg-slate-800/50 p-4 rounded-xl border border-amber-100 dark:border-slate-700">
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[8px] text-slate-500 font-bold">LX</span></div></div></div>
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100"><span class="text-[8px] text-slate-500 font-bold">LM</span></div></div></div>
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_util_factor">FATOR UTILIZAÇÃO (U)</label><div class="flex items-baseline gap-1"><input type="number" id="g-utilFactor" value="0.60" min="0.1" max="1.0" step="0.05"></div></div></div>
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_maint_factor">FATOR MANUTENÇÃO (FM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-maintFactor" value="0.80" min="0.1" max="1.0" step="0.05"></div></div></div>
+                                        </div>
+                                    </div>
+
                                     <div class="mb-6 group border-t border-slate-200 pt-4">
                                         <div class="flex flex-col mb-2">
                                             <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-1" data-i18n="lbl_grid_sug">MALHA SUGERIDA</label>
@@ -330,7 +347,7 @@
                                                 <div id="grid-suggestion-display" class="text-3xl font-black text-tech-cyan tracking-tighter">2 <span class="text-sm text-slate-400 font-normal mx-1">X</span> 2</div>
                                                 <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded font-bold uppercase tracking-wider dark:bg-slate-800" data-i18n="lbl_grid_unit">PEÇAS</span>
                                             </div>
-                                            <p class="text-[9px] text-slate-400 mt-2 italic font-semibold leading-relaxed" data-i18n="lbl_grid_desc">Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.</p>
+                                            <p id="grid-desc-display" class="text-[9px] text-slate-400 mt-2 italic font-semibold leading-relaxed" data-i18n="lbl_grid_desc">Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -607,7 +624,8 @@
                 footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade e Uso", terms_accept: "Li, Compreendi e Aceito os Riscos",
                 nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem.", profile_help: "<i class=\"fas fa-envelope\"></i> Ajuda e Suporte",
                 auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora.",
-                search_placeholder: "Buscar ambiente ou tarefa..."
+                search_placeholder: "Buscar ambiente ou tarefa...",
+                lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "FLOOR PLAN<br>GRID",
@@ -631,7 +649,8 @@
                 footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood and Accept the Risks",
                 nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support",
                 auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now.",
-                search_placeholder: "Search room or task..."
+                search_placeholder: "Search room or task...",
+                lbl_lumen_mode: "LUMEN METHOD (SMART)", lbl_target_lux: "TARGET ILLUMINANCE (EM)", lbl_fixture_flux: "FIXTURE FLUX (LM)", lbl_util_factor: "UTILIZATION FACTOR (U)", lbl_maint_factor: "MAINTENANCE FACTOR (FM)"
             }
         };
 
@@ -640,7 +659,7 @@
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null, iesFileName: null }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
-            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2 }
+            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 }
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
@@ -917,6 +936,24 @@
             document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
             window.updateCalculations();
         }
+        
+        // LUXSINTAX: Alternador do Modo Lúmens (Smart Grid)
+        window.toggleLumenMode = function(checked) {
+            window.state.grid.lumenMode = checked;
+            document.getElementById('lumen-inputs').classList.toggle('hidden', !checked);
+            const bg = document.getElementById('lumen-toggle-bg');
+            const dot = document.getElementById('lumen-toggle-dot');
+            if(checked) {
+                bg.classList.add('bg-luminous-gold');
+                bg.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+                dot.classList.add('translate-x-3');
+            } else {
+                bg.classList.remove('bg-luminous-gold');
+                bg.classList.add('bg-slate-200', 'dark:bg-slate-600');
+                dot.classList.remove('translate-x-3');
+            }
+            window.updateCalculations();
+        }
 
         // --- IES PARSER & LOGIC ---
         window.handleIESUpload = function(input) {
@@ -1151,14 +1188,49 @@
             ctx.clearRect(0, 0, cw, ch);
 
             if (window.currentTool === 'grid') {
-                // LUXSINTAX - AUTONOMOUS GRID CALCULATION
-                const brCalc = s.beam * Math.PI / 180;
-                const diaCalc = 2 * s.height * Math.tan(brCalc / 2);
-                const effectiveSpacing = diaCalc > 0.1 ? diaCalc * 0.75 : 1; // 25% overlap, fallback 1m
-                s.cols = Math.max(1, Math.ceil(s.roomW / effectiveSpacing));
-                s.rows = Math.max(1, Math.ceil(s.roomL / effectiveSpacing));
-
                 const gridDisplay = document.getElementById('grid-suggestion-display');
+                const gridDesc = document.getElementById('grid-desc-display');
+
+                // LUXSINTAX - AUTONOMOUS GRID CALCULATION OU LUMEN METHOD
+                if (s.lumenMode) {
+                    const area = s.roomW * s.roomL;
+                    const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
+                    const N = Math.max(1, Math.ceil(targetN));
+                    
+                    const ratio = s.roomW / s.roomL;
+                    let calcCols = Math.round(Math.sqrt(N * ratio));
+                    let calcRows = Math.round(Math.sqrt(N / ratio));
+                    
+                    calcCols = Math.max(1, calcCols);
+                    calcRows = Math.max(1, calcRows);
+                    
+                    while (calcCols * calcRows < N) {
+                        if ((calcCols / calcRows) < ratio) {
+                            calcCols++;
+                        } else {
+                            calcRows++;
+                        }
+                    }
+                    s.cols = calcCols;
+                    s.rows = calcRows;
+                    
+                    if (gridDesc) {
+                        gridDesc.innerHTML = window.currentLang === 'en' ? `Total required: ${N} fixtures to reach ${s.targetLux} lx.` : `Total calculado: ${N} luminárias para atingir ${s.targetLux} lx.`;
+                        gridDesc.classList.add('text-luminous-gold');
+                    }
+                } else {
+                    const brCalc = s.beam * Math.PI / 180;
+                    const diaCalc = 2 * s.height * Math.tan(brCalc / 2);
+                    const effectiveSpacing = diaCalc > 0.1 ? diaCalc * 0.75 : 1; 
+                    s.cols = Math.max(1, Math.ceil(s.roomW / effectiveSpacing));
+                    s.rows = Math.max(1, Math.ceil(s.roomL / effectiveSpacing));
+                    
+                    if (gridDesc) {
+                        gridDesc.innerHTML = window.currentLang === 'en' ? 'Autonomous distribution aiming for 25% beam overlap.' : 'Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.';
+                        gridDesc.classList.remove('text-luminous-gold');
+                    }
+                }
+
                 if (gridDisplay) {
                     gridDisplay.innerHTML = `${s.cols} <span class="text-sm text-slate-400 font-normal mx-1">X</span> ${s.rows}`;
                 }
@@ -1632,7 +1704,8 @@
                 window.updateCalculations(); 
             }); 
         }
-        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        // LUXSINTAX: Variáveis do Lúmens adicionadas ao array de BIND
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 
         window.AuthManager.init();
         window.switchTool('ponto');
