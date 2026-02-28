@@ -322,8 +322,17 @@
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
                                     <div class="mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_w">LARGURA DO AMB. (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_l">COMPRIMENTO DO AMB. (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomL" value="4.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
-                                    <div class="mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_grid_x">QTD. LUMINÁRIAS (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-cols" value="2" min="1" max="20" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div><input type="range" id="range-g-cols" min="1" max="20" step="1" value="2"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_grid_y">QTD. LUMINÁRIAS (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-rows" value="2" min="1" max="20" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div><input type="range" id="range-g-rows" min="1" max="20" step="1" value="2"></div>
+                                    
+                                    <div class="mb-6 group border-t border-slate-200 pt-4">
+                                        <div class="flex flex-col mb-2">
+                                            <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-1" data-i18n="lbl_grid_sug">MALHA SUGERIDA</label>
+                                            <div class="flex items-center gap-2">
+                                                <div id="grid-suggestion-display" class="text-3xl font-black text-tech-cyan tracking-tighter">2 <span class="text-sm text-slate-400 font-normal mx-1">X</span> 2</div>
+                                                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded font-bold uppercase tracking-wider dark:bg-slate-800" data-i18n="lbl_grid_unit">PEÇAS</span>
+                                            </div>
+                                            <p class="text-[9px] text-slate-400 mt-2 italic font-semibold leading-relaxed" data-i18n="lbl_grid_desc">Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -578,7 +587,7 @@
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "DISTRIBUIÇÃO<br>EM PLANTA",
                 calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
-                lbl_room_w: "LARGURA DO AMB. (X)", lbl_room_l: "COMPRIMENTO DO AMB. (Y)", lbl_grid_x: "QTD. LUMINÁRIAS (X)", lbl_grid_y: "QTD. LUMINÁRIAS (Y)",
+                lbl_room_w: "LARGURA DO AMB. (X)", lbl_room_l: "COMPRIMENTO DO AMB. (Y)", lbl_grid_sug: "MALHA SUGERIDA", lbl_grid_unit: "PEÇAS", lbl_grid_desc: "Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
                 tab_interiors: "Interiores (NBR 8995)", tab_roadway: "Viária (NBR 5101)", filter_all: "Todas as Categorias", col_cat: "Categoria", col_room: "Ambiente / Tarefa",
                 road_params: "Parâmetros da Via (Classe M)", lbl_speed: "Velocidade (km/h)", lbl_volume: "Volume de Tráfego", lbl_separation: "Separação de Tráfego", lbl_density: "Densidade de Interseções", lbl_complexity: "Complexidade / Guiagem", lbl_ambient: "Luminância do Entorno",
@@ -597,7 +606,7 @@
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "FLOOR PLAN<br>GRID",
                 calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES", lbl_ies_upload: "UPLOAD .IES FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
-                lbl_room_w: "ROOM WIDTH (X)", lbl_room_l: "ROOM LENGTH (Y)", lbl_grid_x: "FIXTURES QTY (X)", lbl_grid_y: "FIXTURES QTY (Y)",
+                lbl_room_w: "ROOM WIDTH (X)", lbl_room_l: "ROOM LENGTH (Y)", lbl_grid_sug: "SUGGESTED GRID", lbl_grid_unit: "FIXTURES", lbl_grid_desc: "Autonomous distribution aiming for 25% beam overlap on the projected light spot.",
                 hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
                 tab_interiors: "Interiors (ISO/IES)", tab_roadway: "Roadway (IES/NBR)", filter_all: "All Categories", col_cat: "Category", col_room: "Room / Task",
                 road_params: "Roadway Parameters (M Class)", lbl_speed: "Speed (km/h)", lbl_volume: "Traffic Volume", lbl_separation: "Traffic Separation", lbl_density: "Intersection Density", lbl_complexity: "Complexity / Guidance", lbl_ambient: "Ambient Luminance",
@@ -1134,6 +1143,18 @@
             ctx.clearRect(0, 0, cw, ch);
 
             if (window.currentTool === 'grid') {
+                // LUXSINTAX - AUTONOMOUS GRID CALCULATION
+                const brCalc = s.beam * Math.PI / 180;
+                const diaCalc = 2 * s.height * Math.tan(brCalc / 2);
+                const effectiveSpacing = diaCalc > 0.1 ? diaCalc * 0.75 : 1; // 25% overlap, fallback 1m
+                s.cols = Math.max(1, Math.ceil(s.roomW / effectiveSpacing));
+                s.rows = Math.max(1, Math.ceil(s.roomL / effectiveSpacing));
+
+                const gridDisplay = document.getElementById('grid-suggestion-display');
+                if (gridDisplay) {
+                    gridDisplay.innerHTML = `${s.cols} <span class="text-sm text-slate-400 font-normal mx-1">X</span> ${s.rows}`;
+                }
+
                 const padX = 80;
                 const padY = 80;
                 const availW = cw - padX * 2;
@@ -1557,7 +1578,7 @@
                 window.updateCalculations(); 
             }); 
         }
-        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'cols', 'rows'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 
         window.AuthManager.init();
         window.switchTool('ponto');
