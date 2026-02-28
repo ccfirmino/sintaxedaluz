@@ -1166,15 +1166,15 @@
                 const offsetX = (cw - roomPxW) / 2;
                 const offsetY = (ch - roomPxH) / 2;
 
-                // Desenha o fundo da sala
                 ctx.fillStyle = isDark ? "#0f172a" : "#f8fafc";
                 ctx.fillRect(offsetX, offsetY, roomPxW, roomPxH);
                 
-                // LUXSINTAX - CLIpping MASK (Conteção das manchas de luz no ambiente)
-                ctx.save();
-                ctx.beginPath();
-                ctx.rect(offsetX, offsetY, roomPxW, roomPxH);
-                ctx.clip();
+                ctx.strokeStyle = cFloorLine;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(offsetX, offsetY, roomPxW, roomPxH);
+
+                drawDimLine(ctx, offsetX, offsetY - 20, offsetX + roomPxW, offsetY - 20, window.formatDist(s.roomW));
+                drawDimLineVertical(ctx, offsetX - 20, offsetY, offsetY + roomPxH, window.formatDist(s.roomL));
 
                 const br = s.beam * Math.PI / 180;
                 const radiusM = s.height * Math.tan(br / 2);
@@ -1183,7 +1183,6 @@
                 const spacingX = s.roomW / s.cols;
                 const spacingY = s.roomL / s.rows;
 
-                // Loop para desenhar as manchas luminosas com clipping
                 for (let i = 0; i < s.cols; i++) {
                     for (let j = 0; j < s.rows; j++) {
                         const cxM = (i + 0.5) * spacingX;
@@ -1198,24 +1197,6 @@
                         ctx.strokeStyle = "rgba(217, 119, 6, 0.3)";
                         ctx.lineWidth = 1;
                         ctx.stroke();
-                    }
-                }
-                
-                // Restaura o contexto para desenhar fora do clip e manter arestas limpas
-                ctx.restore();
-
-                // Desenha a borda do ambiente (por cima do corte para acabamento perfeito)
-                ctx.strokeStyle = cFloorLine;
-                ctx.lineWidth = 3;
-                ctx.strokeRect(offsetX, offsetY, roomPxW, roomPxH);
-
-                // Desenha os pontos de luz (sources) e as linhas de cota
-                for (let i = 0; i < s.cols; i++) {
-                    for (let j = 0; j < s.rows; j++) {
-                        const cxM = (i + 0.5) * spacingX;
-                        const cyM = (j + 0.5) * spacingY;
-                        const cxPx = offsetX + cxM * scale;
-                        const cyPx = offsetY + cyM * scale;
 
                         ctx.beginPath();
                         ctx.arc(cxPx, cyPx, 4, 0, Math.PI * 2);
@@ -1223,9 +1204,6 @@
                         ctx.fill();
                     }
                 }
-
-                drawDimLine(ctx, offsetX, offsetY - 20, offsetX + roomPxW, offsetY - 20, window.formatDist(s.roomW));
-                drawDimLineVertical(ctx, offsetX - 20, offsetY, offsetY + roomPxH, window.formatDist(s.roomL));
 
                 if (s.cols > 1) {
                     const cx1 = offsetX + 0.5 * spacingX * scale;
