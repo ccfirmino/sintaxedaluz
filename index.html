@@ -360,10 +360,16 @@
                             </div>
 
                             <div id="search-container" class="flex flex-col md:flex-row gap-4 mb-6 w-full">
-                                <div class="w-full">
+                                <div class="w-full md:w-1/3">
                                     <select id="category-filter" onchange="window.filterNorms()" class="w-full bg-slate-50 border border-slate-200 rounded-full py-3 px-6 text-sm text-starlight font-bold focus:border-luminous-gold focus:ring-2 focus:ring-amber-100 outline-none transition-all custom-select uppercase cursor-pointer shadow-sm">
                                         <option value="all" data-i18n="filter_all">Todas as Categorias</option>
                                     </select>
+                                </div>
+                                <div class="w-full md:w-2/3 relative">
+                                    <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <input type="text" id="search-filter" onkeyup="window.filterNorms()" placeholder="Buscar ambiente ou tarefa..." data-i18n-placeholder="search_placeholder" class="w-full bg-slate-50 border border-slate-200 rounded-full py-3 pl-12 pr-6 text-sm text-starlight font-bold focus:border-luminous-gold focus:ring-2 focus:ring-amber-100 outline-none transition-all shadow-sm uppercase placeholder:normal-case placeholder:font-medium placeholder:text-slate-400">
                                 </div>
                             </div>
 
@@ -600,7 +606,8 @@
                 card_1_title: "INTENSIDADE ABSOLUTA", card_1_desc: "Converte dados fotométricos relativos para intensidade absoluta (Candelas).", card_2_title: "LEI DO COSSENO CÚBICO", card_2_desc: "Variação da Lei do Inverso do Quadrado para superfícies horizontais.", card_3_title: "GEOMETRIA DO FACHO", card_3_desc: "Cálculo trigonométrico do diâmetro da mancha luminosa projetada.", card_4_title: "CONSULTA NORMATIVA", card_4_desc: "Hub de inteligência integrando requisitos da NBR 8995-1, NBR 5101 e LEED/WELL.",
                 footer_terms: "Termo de Responsabilidade", terms_title: "Termo de Responsabilidade e Uso", terms_accept: "Li, Compreendi e Aceito os Riscos",
                 nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem.", profile_help: "<i class=\"fas fa-envelope\"></i> Ajuda e Suporte",
-                auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora."
+                auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora.",
+                search_placeholder: "Buscar ambiente ou tarefa..."
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "FLOOR PLAN<br>GRID",
@@ -623,7 +630,8 @@
                 card_4_title: "NORMATIVE QUERY", card_4_desc: "Intelligence hub integrating NBR 8995-1, NBR 5101, and LEED/WELL requirements.",
                 footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood and Accept the Risks",
                 nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support",
-                auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now."
+                auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now.",
+                search_placeholder: "Search room or task..."
             }
         };
 
@@ -1540,11 +1548,21 @@
             const uniqueCats = [...new Set(window.normsDatabase.map(n => n.cat))].sort();
             uniqueCats.forEach(c => { const o = document.createElement('option'); o.value=c; o.innerText=c; sel.appendChild(o); });
         }
+        
         window.filterNorms = function() {
             const cat = document.getElementById('category-filter').value;
-            const filtered = window.normsDatabase.filter(n => cat === 'all' || n.cat === cat);
+            const searchInput = document.getElementById('search-filter');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            
+            const filtered = window.normsDatabase.filter(n => {
+                const matchCat = cat === 'all' || n.cat === cat;
+                const matchSearch = n.room.toLowerCase().includes(searchTerm) || n.cat.toLowerCase().includes(searchTerm);
+                return matchCat && matchSearch;
+            });
+            
             document.getElementById('nbr8995-tbody').innerHTML = filtered.map(n => `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-slate-500 font-bold">${n.room}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`).join('');
         }
+        
         window.switchQueryTab = function(t) {
             ['nbr8995','nbr5101','leed'].forEach(k => {
                 document.getElementById('content-'+k).classList.toggle('hidden', k!==t);
@@ -1606,6 +1624,7 @@
             window.currentLang = window.currentLang === 'pt' ? 'en' : 'pt'; 
             document.querySelectorAll('.lang-display').forEach(e => e.innerText = window.currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
             document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { el.innerHTML = window.i18n[window.currentLang][key]; } });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.getAttribute('data-i18n-placeholder'); if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { el.placeholder = window.i18n[window.currentLang][key]; } });
             window.updateInputsForLanguage();
             window.updateCalculations(); 
         }
