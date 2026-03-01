@@ -945,7 +945,7 @@ driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 }
             document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
             
             const modeSelector = document.getElementById('calc-mode-selector');
-            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'grid');
+            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'grid' || toolId === 'driver');
 
             if (toolId !== 'query') {
                 ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
