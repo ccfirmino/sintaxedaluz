@@ -1524,41 +1524,39 @@
                     for(let i=0; i < s.qty; i++) {
                         const spotX = startX + (i * s.spacing * scale);
                         
-                        // Largura da elipse no ponto de impacto
-                        const beamWidthM = 2 * (s.dist / Math.cos(trRad)) * Math.tan(brRad / 2);
-                        const bW_px = beamWidthM * scale;
+                        // ==========================================
+                        // MATEMÁTICA CORRIGIDA: Projeção de Cone (Scallop)
+                        // ==========================================
+                        const safeTrRad = Math.max(0.05, trRad); // Proteção contra assíntota (raios paralelos)
                         
-                        // Altura da elipse (projeção vertical na parede)
-                        // Calculada pela diferença entre o topo e a base do facho atingindo o plano vertical
-                        let angleTop = trRad - (brRad / 2);
-                        let angleBottom = trRad + (brRad / 2);
+                        // Distância do percurso central da luz até a parede (Hipotenusa)
+                        const pathLength = s.dist / Math.sin(safeTrRad);
                         
-                        // Guardas para evitar divisões por zero ou ângulos paralelos à parede
-                        angleTop = Math.max(0.01, angleTop);
-                        angleBottom = Math.min(Math.PI/2 - 0.01, angleBottom);
-
-                        const hTop = s.dist / Math.tan(angleTop);
-                        const hBottom = s.dist / Math.tan(angleBottom);
-                        const bH_px = Math.abs(hTop - hBottom) * scale;
+                        // Largura métrica (bW) baseada na abertura do cone no ponto de impacto
+                        const bW_metric = 2 * (pathLength * Math.tan(brRad / 2));
+                        const bW_px = bW_metric * scale;
                         
-                        const hitY_metric_current = s.height - (s.dist / Math.tan(trRad));
+                        // Altura métrica (bH) projetada na vertical (elipse alongada pela inclinação)
+                        let bH_metric = bW_metric / Math.sin(safeTrRad);
+                        // CAP DE SEGURANÇA: Limita a altura para não formar o "pilar de luz"
+                        bH_metric = Math.min(bH_metric, s.height * 2.5); 
+                        const bH_px = bH_metric * scale;
+                        
+                        // Centro ótico do facho na parede
+                        const hitY_metric_current = s.height - (s.dist / Math.tan(safeTrRad));
                         const hitY_px_current = floorY - (hitY_metric_current * scale);
 
-                       // Renderização da Mancha com Gradiente Elíptico (CORRIGIDO: Coordenadas Locais)
+                        // Renderização do Gradiente
                         const maxRadius = Math.max(bW_px, bH_px) / 2;
-                        
-                        // O gradiente DEVE ser criado em (0,0) pois faremos um translate para o spotX e hitY
                         const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, maxRadius);
-                        const intensityAlpha = isDark ? 0.7 : 0.6; // Opacidade aumentada para melhor UX visual
+                        const intensityAlpha = isDark ? 0.7 : 0.6;
                         
                         sg.addColorStop(0, `rgba(217, 119, 6, ${intensityAlpha})`);
                         sg.addColorStop(0.4, `rgba(217, 119, 6, ${intensityAlpha * 0.4})`);
                         sg.addColorStop(1, "rgba(217, 119, 6, 0)");
 
                         ctx.save();
-                        // 1. Move a matriz para o centro de impacto na parede
                         ctx.translate(spotX, hitY_px_current);
-                        // 2. Achata o círculo transformando-o perfeitamente na elipse de projeção real
                         ctx.scale(bW_px / (maxRadius * 2), bH_px / (maxRadius * 2));
                         
                         ctx.fillStyle = sg;
