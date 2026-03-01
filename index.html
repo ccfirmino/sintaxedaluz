@@ -279,9 +279,24 @@
                                     </div>
                                 </div>
                                 <div id="inputs-vertical" class="hidden">
+                                    <div class="mb-6 flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                        <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all">Corte Técnico</button>
+                                        <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all">Elevação Frontal</button>
+                                    </div>
+
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0.5" max="10" step="0.1" value="1.6"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
+                                    
+                                    <div class="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4 mb-4">
+                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_frame_w">Largura Quadro</label><div class="flex items-baseline gap-1"><input type="number" id="v-frameW" value="1.2" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-frameW" min="0.1" max="10" step="0.1" value="1.2"></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_frame_h">Altura Quadro</label><div class="flex items-baseline gap-1"><input type="number" id="v-frameH" value="0.8" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-frameH" min="0.1" max="10" step="0.1" value="0.8"></div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4 mb-6">
+                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_qty">Qtd. Peças</label><div class="flex items-baseline gap-1"><input type="number" id="v-qty" value="1" min="1" max="20" step="1"></div></div><input type="range" id="range-v-qty" min="1" max="20" step="1" value="1"></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_spacing">Entre Peças</label><div class="flex items-baseline gap-1"><input type="number" id="v-spacing" value="1.0" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-spacing" min="0.1" max="10" step="0.1" value="1.0"></div>
+                                    </div>
+
                                     <div class="mode-standard-only">
                                         <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
                                     </div>
@@ -512,7 +527,7 @@
 
         <footer class="bg-white py-12 px-6 border-t border-slate-200 mt-auto text-[10px] tracking-widest text-slate-400 transition-colors duration-300">
             <div class="max-w-[1800px] mx-auto text-center uppercase font-black">
-                <a href="#" class="text-lg font-black tracking-[0.2em] text-starlight uppercase">Lux<span class="text-luminous-gold font-light">Sintax</span></a>
+                <a href="#" class="text-lg font-black tracking-[0.2em] text-starlight uppercase">Lux<span class="text-luminous-gold font-light">SINTAX</span></a>
                 <p class="mt-2">© 2026 LuxSintax. All rights reserved.</p>
                 <div class="mt-4"><button onclick="window.openTerms()" class="hover:text-luminous-gold transition-colors border-b border-transparent hover:border-luminous-gold font-bold" data-i18n="footer_terms">Termo de Responsabilidade</button></div>
             </div>
@@ -604,7 +619,7 @@
             }
         };
 
-        // 1. I18N DICTIONARY (LUXSINTAX UPDATE)
+        // 1. I18N DICTIONARY
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "DISTRIBUIÇÃO<br>EM PLANTA",
@@ -625,7 +640,8 @@
                 nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem.", profile_help: "<i class=\"fas fa-envelope\"></i> Ajuda e Suporte",
                 auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora.",
                 search_placeholder: "Buscar ambiente ou tarefa...",
-                lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)"
+                lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)",
+                lbl_frame_w: "Largura Quadro", lbl_frame_h: "Altura Quadro", lbl_qty: "Qtd. Peças"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "FLOOR PLAN<br>GRID",
@@ -650,21 +666,22 @@
                 nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support",
                 auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now.",
                 search_placeholder: "Search room or task...",
-                lbl_lumen_mode: "LUMEN METHOD (SMART)", lbl_target_lux: "TARGET ILLUMINANCE (EM)", lbl_fixture_flux: "FIXTURE FLUX (LM)", lbl_util_factor: "UTILIZATION FACTOR (U)", lbl_maint_factor: "MAINTENANCE FACTOR (FM)"
+                lbl_lumen_mode: "LUMEN METHOD (SMART)", lbl_target_lux: "TARGET ILLUMINANCE (EM)", lbl_fixture_flux: "FIXTURE FLUX (LM)", lbl_util_factor: "UTILIZATION FACTOR (U)", lbl_maint_factor: "MAINTENANCE FACTOR (FM)",
+                lbl_frame_w: "Frame Width", lbl_frame_h: "Frame Height", lbl_qty: "Qty."
             }
         };
 
         // 2. GLOBAL STATE
         window.state = {
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, iesData: null, iesFileName: null }, 
+            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, iesData: null, iesFileName: null, viewMode: 'section' }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
             grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 }
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
 
-        // 3. DATABASES (FULL RESTORATION)
+        // 3. DATABASES
         window.normsDatabase = [
             { cat: "Áreas de Tráfego", room: "Áreas de circulação e corredores", lux: 100, ugr: 28, ra: 40 },
             { cat: "Áreas de Tráfego", room: "Escadas, escadas rolantes, esteiras", lux: 150, ugr: 25, ra: 40 },
@@ -766,13 +783,12 @@
             return Math.round(lux) + ' Lux';
         };
 
-        // --- AUTH MANAGER (LUXSINTAX V2 - RECOVERY ENABLED) ---
+        // --- AUTH MANAGER ---
         window.AuthManager = {
             init: async function() {
                 const { data: { session } } = await supabase.auth.getSession();
                 this.handleSessionUpdate(session);
                 
-                // LUXSINTAX: Event Listener Atualizado para capturar PASSWORD_RECOVERY
                 supabase.auth.onAuthStateChange((event, session) => {
                     this.handleSessionUpdate(session);
                     if (event === 'PASSWORD_RECOVERY') {
@@ -824,8 +840,6 @@
                     btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
                 }
             },
-            
-            // LUXSINTAX: Novos fluxos de recuperação
             showForgotPassword: function() {
                 document.getElementById('form-login').classList.add('hidden');
                 document.getElementById('form-register').classList.add('hidden');
@@ -937,7 +951,24 @@
             window.updateCalculations();
         }
         
-        // LUXSINTAX: Alternador do Modo Lúmens (Smart Grid)
+        // LUXSINTAX: Botão Toggle (Corte vs Elevação)
+        window.toggleVerticalView = function(mode) {
+            window.state.vertical.viewMode = mode;
+            const btnS = document.getElementById('btn-v-section');
+            const btnE = document.getElementById('btn-v-elevation');
+            const activeClass = "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all";
+            const inactiveClass = "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all";
+            
+            if (mode === 'section') {
+                btnS.className = activeClass; 
+                btnE.className = inactiveClass;
+            } else {
+                btnE.className = activeClass; 
+                btnS.className = inactiveClass;
+            }
+            window.updateCalculations();
+        };
+
         window.toggleLumenMode = function(checked) {
             window.state.grid.lumenMode = checked;
             document.getElementById('lumen-inputs').classList.toggle('hidden', !checked);
@@ -1103,7 +1134,7 @@
             return s.beam;
         }
 
-        // --- CANVAS ENGINE (THEME-AWARE) ---
+        // --- CANVAS ENGINE ---
         const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
             const isDark = document.documentElement.classList.contains('dark');
             ctx.beginPath(); ctx.strokeStyle = isDark ? "#475569" : "#94a3b8"; ctx.lineWidth = 1; 
@@ -1191,7 +1222,6 @@
                 const gridDisplay = document.getElementById('grid-suggestion-display');
                 const gridDesc = document.getElementById('grid-desc-display');
 
-                // LUXSINTAX - AUTONOMOUS GRID CALCULATION OU LUMEN METHOD
                 if (s.lumenMode) {
                     const area = s.roomW * s.roomL;
                     const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
@@ -1246,11 +1276,9 @@
                 const offsetX = (cw - roomPxW) / 2;
                 const offsetY = (ch - roomPxH) / 2;
 
-                // Desenha o fundo da sala
                 ctx.fillStyle = isDark ? "#0f172a" : "#f8fafc";
                 ctx.fillRect(offsetX, offsetY, roomPxW, roomPxH);
                 
-                // LUXSINTAX - CLIpping MASK (Conteção das manchas de luz no ambiente)
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(offsetX, offsetY, roomPxW, roomPxH);
@@ -1263,7 +1291,6 @@
                 const spacingX = s.roomW / s.cols;
                 const spacingY = s.roomL / s.rows;
 
-                // Loop para desenhar as manchas luminosas com clipping
                 for (let i = 0; i < s.cols; i++) {
                     for (let j = 0; j < s.rows; j++) {
                         const cxM = (i + 0.5) * spacingX;
@@ -1274,7 +1301,6 @@
                         ctx.beginPath();
                         ctx.arc(cxPx, cyPx, radiusPx, 0, Math.PI * 2);
                         
-                        // LUXSINTAX - Radial Gradient para simular dispersão fotométrica (fade nas bordas)
                         const spotGradient = ctx.createRadialGradient(cxPx, cyPx, 0, cxPx, cyPx, radiusPx);
                         if (isDark) {
                             spotGradient.addColorStop(0, "rgba(217, 119, 6, 0.4)");
@@ -1294,15 +1320,12 @@
                     }
                 }
                 
-                // Restaura o contexto para desenhar fora do clip e manter arestas limpas
                 ctx.restore();
 
-                // Desenha a borda do ambiente (por cima do corte para acabamento perfeito)
                 ctx.strokeStyle = cFloorLine;
                 ctx.lineWidth = 3;
                 ctx.strokeRect(offsetX, offsetY, roomPxW, roomPxH);
 
-                // Desenha os pontos de luz (sources) e as linhas de cota
                 for (let i = 0; i < s.cols; i++) {
                     for (let j = 0; j < s.rows; j++) {
                         const cxM = (i + 0.5) * spacingX;
@@ -1338,20 +1361,14 @@
             let scale = Math.min(scaleH, scaleW); scale = Math.min(Math.max(scale, 12), 160);
 
             // DRAW FLOOR (For Standard Modes)
-            ctx.strokeStyle = cFloorLine; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
-            if (window.currentTool === 'ponto') {
-                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
-                ctx.fillText(window.currentLang === 'en' ? "FLOOR LINE (fl)" : "LINHA DE PISO (lp)", 10, floorY + 18); 
-                ctx.fillText(window.currentLang === 'en' ? "fl: 0' 0\"" : "lp: 0.00m", 10, floorY - 8); 
-                ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(5, floorY); ctx.stroke();
-            } else if (window.currentTool === 'vertical') {
-                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
-                ctx.fillText(window.currentLang === 'en' ? "FLOOR LINE (fl)" : "LINHA DE PISO (lp)", 10, floorY + 18); 
-                ctx.fillText(window.currentLang === 'en' ? "fl: 0' 0\"" : "lp: 0.00m", 10, floorY - 8);
-            } else if (window.currentTool === 'homog') {
-                 ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
-                 ctx.fillText(window.currentLang === 'en' ? "FLOOR LINE (fl)" : "LINHA DE PISO (lp)", 10, floorY + 18); 
-                 ctx.fillText(window.currentLang === 'en' ? "fl: 0' 0\"" : "lp: 0.00m", 10, floorY - 8);
+            if(window.currentTool !== 'vertical' || s.viewMode === 'section' || !s.viewMode) {
+                ctx.strokeStyle = cFloorLine; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
+                if (window.currentTool === 'ponto' || window.currentTool === 'vertical' || window.currentTool === 'homog') {
+                    ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
+                    ctx.fillText(window.currentLang === 'en' ? "FLOOR LINE (fl)" : "LINHA DE PISO (lp)", 10, floorY + 18); 
+                    ctx.fillText(window.currentLang === 'en' ? "fl: 0' 0\"" : "lp: 0.00m", 10, floorY - 8); 
+                    ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(5, floorY); ctx.stroke();
+                }
             }
 
              if (window.currentTool === 'ponto') {
@@ -1424,73 +1441,101 @@
                     drawDimLine(ctx, centerX + xL, floorY + 50, centerX + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
                 }
             }
-             else if (window.currentTool === 'vertical') {
-                const sy = floorY - (s.height * scale), wx = centerX + (s.dist * scale), tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
-                
-                let ev = 0; 
-                let I_v;
-                 if(window.calcMode === 'ies') {
-                    I_v = window.getIESIntensity(s, s.tilt);
-                 } else {
-                    I_v = getIntensity(s);
-                 }
-                 
-                 if (s.tilt > 0) {
-                    ev = (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist);
-                 }
+            else if (window.currentTool === 'vertical') {
+                const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
+                let I_v = (window.calcMode === 'ies') ? window.getIESIntensity(s, s.tilt) : getIntensity(s);
+                let ev = (s.tilt > 0) ? (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist) : 0;
+                let hitY_metric = s.height - (s.dist / Math.tan(tr));
+                let hitY_px = floorY - (hitY_metric * scale);
+                const sy = floorY - (s.height * scale);
 
-                let hitY_metric = s.height - (s.dist / Math.tan(tr)); let hitY_px = floorY - (hitY_metric * scale);
-                
-                ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = cFloorLine; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; 
-                ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
+                if (s.viewMode === 'section' || !s.viewMode) {
+                    // ==========================================
+                    // VISÃO: CORTE TÉCNICO (FULL WIDTH)
+                    // ==========================================
+                    const wx = centerX + (s.dist * scale); 
 
-                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
-                ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4);
+                    ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = cFloorLine; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2;
+                    
+                    ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
 
-                const hqY = floorY - (s.hq * scale);
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
-                ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, 10, hqY - 8);
-                
-                ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip(); 
-                ctx.save(); ctx.translate(centerX, sy);
-                const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
-                ctx.restore();
+                    // Cota de Altura
+                    ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]);
+                    ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4);
 
-                if (s.tilt > 0) {
-                    const axisX = centerX + (s.height * scale) * Math.tan(tr);
-                    ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
-                    drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
-                }
+                    const hqY = floorY - (s.hq * scale);
+                    ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, 10, hqY - 8);
 
-                if (window.calcMode !== 'ies' || s.iesData) {
-                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false);
-                }
+                    // Faixa de Luz
+                    ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip();
+                    ctx.save(); ctx.translate(centerX, sy);
+                    const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore();
 
-                 if (s.tilt > 0) {
-                    ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, hitY_px); ctx.strokeStyle = "#d97706"; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
-                     
-                     if (hitY_metric > -10 && hitY_metric < s.height * 3) {
-                        ctx.beginPath(); ctx.arc(wx, hitY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
-                        
-                        let valText = window.formatIllum(ev);
-                        if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
-                        drawTextVal(ctx, valText, wx - 45, hitY_px);
-                        
-                        if (hitY_px < floorY) {
-                            drawDimLineVertical(ctx, wx + 45, hitY_px, floorY, `${window.formatDist(hitY_metric)}`);
-                        }
-                     }
-                     
-                    if ((window.calcMode !== 'ies' || s.iesData) && s.tilt + currentBeam/2 < 89) {
-                        const hTopMetric = s.height - (s.dist / Math.tan((s.tilt + currentBeam/2) * Math.PI/180));
-                        const hTopPx = floorY - (hTopMetric * scale);
-                        if(hTopPx > -100 && hTopPx < floorY + 100) {
-                           drawDimLineVertical(ctx, wx + 20, hTopPx, floorY, `${window.formatDist(hTopMetric)}`);
+                    // Ângulos e Eixos
+                    if (s.tilt > 0) {
+                        const axisX = centerX + (s.height * scale) * Math.tan(tr);
+                        ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
+                        drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
+                    }
+                    if (window.calcMode !== 'ies' || s.iesData) drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false);
+
+                    // Ponto de Impacto na Parede
+                    if (s.tilt > 0) {
+                        ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, hitY_px); ctx.strokeStyle = "#d97706"; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+                        if (hitY_metric > -10 && hitY_metric < s.height * 3) {
+                            ctx.beginPath(); ctx.arc(wx, hitY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                            let valText = window.formatIllum(ev);
+                            if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
+                            drawTextVal(ctx, valText, wx - 45, hitY_px);
+                            if (hitY_px < floorY) drawDimLineVertical(ctx, wx + 45, hitY_px, floorY, `${window.formatDist(hitY_metric)}`);
                         }
                     }
+                    drawDimLine(ctx, centerX, sy - 35, wx, sy - 35, `d: ${window.formatDist(s.dist)}`);
+
+                } else {
+                    // ==========================================
+                    // VISÃO: ELEVAÇÃO FRONTAL (WALL WASH) FULL WIDTH
+                    // ==========================================
+                    const wallW = Math.max(cw * 0.8, s.frameW * scale * 1.5 + (s.qty * s.spacing * scale));
+                    const wallX = (cw - wallW) / 2;
+                    ctx.fillStyle = isDark ? "#1e293b" : "#f1f5f9"; ctx.fillRect(wallX, 40, wallW, floorY - 40);
+                    ctx.strokeStyle = cFloorLine; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
+
+                    // Quadro (Moldura)
+                    const fW_px = s.frameW * scale, fH_px = s.frameH * scale, fY_px = floorY - (s.hq * scale);
+                    ctx.strokeStyle = "#d97706"; ctx.setLineDash([5, 5]); ctx.strokeRect(centerX - fW_px/2, fY_px - fH_px/2, fW_px, fH_px); ctx.setLineDash([]);
+
+                    // Manchas de Luz
+                    const startX = centerX - ((s.qty - 1) * s.spacing * scale) / 2;
+                    for(let i=0; i < s.qty; i++) {
+                        const spotX = startX + (i * s.spacing * scale);
+                        const bW = 2 * (s.dist / Math.cos(tr)) * Math.tan(br / 2) * scale;
+                        
+                        let t1 = Math.tan(tr - br/2); if (t1 <= 0.01) t1 = 0.01; 
+                        let t2 = Math.tan(tr + br/2);
+                        const bH = s.dist * (1/t1 - 1/t2) * scale;
+
+                        const sg = ctx.createRadialGradient(spotX, hitY_px, 0, spotX, hitY_px, Math.max(bW, bH)/2);
+                        sg.addColorStop(0, isDark ? "rgba(217, 119, 6, 0.4)" : "rgba(251, 191, 36, 0.4)");
+                        sg.addColorStop(1, isDark ? "rgba(217, 119, 6, 0)" : "rgba(251, 191, 36, 0)");
+
+                        ctx.save(); ctx.translate(spotX, hitY_px); ctx.scale(bW/Math.max(bW,bH), bH/Math.max(bW,bH));
+                        ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(0, 0, Math.max(bW,bH)/2, 0, Math.PI*2); ctx.fill(); ctx.restore();
+
+                        // Marcador da fonte no teto
+                        ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(spotX, 40, 3, 0, Math.PI * 2); ctx.fill();
+                    }
+
+                    // Linhas de Cota
+                    drawDimLine(ctx, centerX - fW_px/2, fY_px + fH_px/2 + 20, centerX + fW_px/2, fY_px + fH_px/2 + 20, window.formatDist(s.frameW));
+                    drawDimLineVertical(ctx, centerX + fW_px/2 + 20, fY_px - fH_px/2, fY_px + fH_px/2, window.formatDist(s.frameH));
+                    
+                    // Linha do Eixo HQ
+                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(wallX, fY_px); ctx.lineTo(wallX + wallW, fY_px); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, wallX + 10, fY_px - 8);
                 }
-                drawDimLine(ctx, centerX, sy - 35, wx, sy - 35, `d: ${window.formatDist(s.dist)}`); 
             } else if (window.currentTool === 'homog') {
                 const I = getIntensity(window.state.homog); 
                 const sy = floorY - (s.height * scale); const py = floorY - (s.plane * scale); const hS = (s.spacing * scale) / 2;
@@ -1548,7 +1593,6 @@
                 }
             }
             
-            // Draw Photometric Curve
             if (window.calcMode === 'ies' && s.iesData) {
                 ctx.beginPath();
                 ctx.strokeStyle = "rgba(217, 119, 6, 0.4)";
@@ -1557,17 +1601,16 @@
                 const row = candelas[0];
                 const maxI = Math.max(...row);
                 
-                // Draw Right Side
+                const sy = floorY - (s.height * scale);
                 for(let i=0; i<vAngles.length; i++) {
-                    const ang = (vAngles[i] + s.tilt) * Math.PI / 180;
+                    const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
                     const r = (row[i] / maxI) * (s.height * scale * 0.9);
                     const x = centerX + r * Math.sin(ang);
                     const y = sy + r * Math.cos(ang);
                     if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
                 }
-                // Draw Left Side (Mirror)
                 for(let i=0; i<vAngles.length; i++) {
-                     const ang = (-vAngles[i] + s.tilt) * Math.PI / 180;
+                     const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
                      const r = (row[i] / maxI) * (s.height * scale * 0.9);
                      const x = centerX + r * Math.sin(ang);
                      const y = sy + r * Math.cos(ang);
@@ -1644,26 +1687,29 @@
             const isEn = window.currentLang === 'en';
             document.querySelectorAll('.unit-m-ft').forEach(el => el.innerText = isEn ? 'FT' : 'M');
             
-            const distParams = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL'];
+            // LUXSINTAX: Adicionada a conversão de unidades para o Quadro
+            const distParams = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL', 'frameW', 'frameH'];
             ['ponto', 'vertical', 'homog', 'grid'].forEach(key => {
                 distParams.forEach(param => {
                     const numInput = document.getElementById(`${key[0]}-${param}`);
                     const rangeInput = document.getElementById(`range-${key[0]}-${param}`);
                     if (numInput && rangeInput) {
                         const valMeters = window.state[key][param];
-                        if (isEn) {
-                            const valFt = valMeters * 3.28084;
-                            numInput.value = valFt.toFixed(2);
-                            rangeInput.min = (parseFloat(rangeInput.getAttribute('data-base-min')) * 3.28084).toFixed(2);
-                            rangeInput.max = (parseFloat(rangeInput.getAttribute('data-base-max')) * 3.28084).toFixed(2);
-                            rangeInput.step = '0.1';
-                            rangeInput.value = valFt.toFixed(2);
-                        } else {
-                            numInput.value = valMeters.toFixed(2);
-                            rangeInput.min = rangeInput.getAttribute('data-base-min');
-                            rangeInput.max = rangeInput.getAttribute('data-base-max');
-                            rangeInput.step = rangeInput.getAttribute('data-base-step');
-                            rangeInput.value = valMeters.toFixed(2);
+                        if (valMeters !== undefined) {
+                            if (isEn) {
+                                const valFt = valMeters * 3.28084;
+                                numInput.value = valFt.toFixed(2);
+                                rangeInput.min = (parseFloat(rangeInput.getAttribute('data-base-min')) * 3.28084).toFixed(2);
+                                rangeInput.max = (parseFloat(rangeInput.getAttribute('data-base-max')) * 3.28084).toFixed(2);
+                                rangeInput.step = '0.1';
+                                rangeInput.value = valFt.toFixed(2);
+                            } else {
+                                numInput.value = valMeters.toFixed(2);
+                                rangeInput.min = rangeInput.getAttribute('data-base-min');
+                                rangeInput.max = rangeInput.getAttribute('data-base-max');
+                                rangeInput.step = rangeInput.getAttribute('data-base-step');
+                                rangeInput.value = valMeters.toFixed(2);
+                            }
                         }
                     }
                 });
@@ -1693,7 +1739,7 @@
             el.addEventListener('input', (e) => { 
                 let val = parseFloat(e.target.value); 
                 const isEn = window.currentLang === 'en';
-                const isDist = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL'].includes(param);
+                const isDist = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL', 'frameW', 'frameH'].includes(param);
                 
                 const valInMeters = (isEn && isDist) ? val / 3.28084 : val;
 
@@ -1704,8 +1750,9 @@
                 window.updateCalculations(); 
             }); 
         }
-        // LUXSINTAX: Variáveis do Lúmens adicionadas ao array de BIND
-        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        
+        // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 
         window.AuthManager.init();
         window.switchTool('ponto');
