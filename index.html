@@ -1544,20 +1544,26 @@
                         const hitY_metric_current = s.height - (s.dist / Math.tan(trRad));
                         const hitY_px_current = floorY - (hitY_metric_current * scale);
 
-                        // Renderização da Mancha com Gradiente Elíptico
-                        const sg = ctx.createRadialGradient(spotX, hitY_px_current, 0, spotX, hitY_px_current, Math.max(bW_px, bH_px)/2);
-                        const intensityAlpha = isDark ? 0.5 : 0.4;
+                       // Renderização da Mancha com Gradiente Elíptico (CORRIGIDO: Coordenadas Locais)
+                        const maxRadius = Math.max(bW_px, bH_px) / 2;
+                        
+                        // O gradiente DEVE ser criado em (0,0) pois faremos um translate para o spotX e hitY
+                        const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, maxRadius);
+                        const intensityAlpha = isDark ? 0.7 : 0.6; // Opacidade aumentada para melhor UX visual
+                        
                         sg.addColorStop(0, `rgba(217, 119, 6, ${intensityAlpha})`);
                         sg.addColorStop(0.4, `rgba(217, 119, 6, ${intensityAlpha * 0.4})`);
                         sg.addColorStop(1, "rgba(217, 119, 6, 0)");
 
                         ctx.save();
+                        // 1. Move a matriz para o centro de impacto na parede
                         ctx.translate(spotX, hitY_px_current);
-                        // Escalonamento para transformar círculo em elipse de projeção
-                        ctx.scale(bW_px / Math.max(bW_px, bH_px), bH_px / Math.max(bW_px, bH_px));
+                        // 2. Achata o círculo transformando-o perfeitamente na elipse de projeção real
+                        ctx.scale(bW_px / (maxRadius * 2), bH_px / (maxRadius * 2));
+                        
                         ctx.fillStyle = sg;
                         ctx.beginPath();
-                        ctx.arc(0, 0, Math.max(bW_px, bH_px)/2, 0, Math.PI * 2);
+                        ctx.arc(0, 0, maxRadius, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
 
