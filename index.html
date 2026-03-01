@@ -243,6 +243,7 @@
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
                     <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-drafting-compass text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
                     <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">DISTRIBUIÇÃO<br>EM PLANTA</span></button>
+                    <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span>DIMENSIONAR<br>DRIVER</span></button>
                     <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                 </div>
 
@@ -332,6 +333,20 @@
                                         </div>
                                     </div>
                                 </div>
+                               <div id="inputs-driver" class="hidden">
+    <div class="mb-6 group border-b border-slate-200 pb-4">
+        <label class="text-[10px] text-luminous-gold font-black uppercase mb-3 block">Modo de Operação</label>
+        <select id="dr-mode" onchange="window.state.driver.mode = this.value; window.updateCalculations();" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight dark:bg-slate-800 dark:border-slate-700">
+            <option value="CV">Tensão Constante (CV - 12/24V)</option>
+            <option value="CC">Corrente Constante (CC - mA)</option>
+        </select>
+    </div>
+    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold uppercase whitespace-nowrap">Potência Unitária (W)</label><div class="flex items-baseline gap-1"><input type="number" id="dr-power" value="14.4" min="1" max="200" step="0.1"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-dr-power" min="1" max="200" step="0.1" value="14.4"></div>
+    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold uppercase whitespace-nowrap">Metragem / Quantidade</label><div class="flex items-baseline gap-1"><input type="number" id="dr-qty" value="5" min="1" max="100" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div><input type="range" id="range-dr-qty" min="1" max="100" step="1" value="5"></div>
+    <div id="cc-params" class="hidden bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-6 group">
+        <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-tech-cyan font-black uppercase whitespace-nowrap">Corrente (mA)</label><div class="flex items-baseline gap-1"><input type="number" id="dr-current" value="350" min="100" max="3000" step="50"><span class="text-[9px] text-tech-cyan font-bold">mA</span></div></div>
+    </div>
+</div>
                                 <div id="inputs-grid" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
@@ -676,7 +691,8 @@
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, iesData: null, iesFileName: null, viewMode: 'section' }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
-            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 }
+           grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 },
+driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 }
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
@@ -916,7 +932,7 @@
         // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
             window.currentTool = toolId;
-            ['ponto', 'vertical', 'homog', 'grid', 'query'].forEach(id => {
+            ['ponto', 'vertical', 'homog', 'grid', 'driver', 'query'].forEach(id => {
                 const btn = document.getElementById('tab-' + id);
                 if(btn) {
                     let cls = "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ";
@@ -932,7 +948,7 @@
             if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'grid');
 
             if (toolId !== 'query') {
-                ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
+                ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 window.updateCalcMode(window.calcMode);
@@ -1217,7 +1233,57 @@
             }
 
             ctx.clearRect(0, 0, cw, ch);
+            if (window.currentTool === 'driver') {
+                const d = window.state.driver;
+                const ccParams = document.getElementById('cc-params');
+                if(ccParams) ccParams.classList.toggle('hidden', d.mode !== 'CC');
 
+                const totalPower = d.power * d.qty;
+                const recPower = totalPower * 1.20; // Margem de segurança de 20%
+
+                // Fundo do Dashboard
+                ctx.fillStyle = isDark ? "#1e293b" : "#f8fafc";
+                ctx.strokeStyle = cFloorLine; ctx.lineWidth = 1;
+                if (ctx.roundRect) {
+                    ctx.beginPath(); ctx.roundRect(centerX - 220, ch/2 - 140, 440, 280, 16); ctx.fill(); ctx.stroke();
+                } else {
+                    ctx.fillRect(centerX - 220, ch/2 - 140, 440, 280); ctx.strokeRect(centerX - 220, ch/2 - 140, 440, 280);
+                }
+
+                ctx.textAlign = "center";
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.font = "900 11px Manrope";
+                ctx.fillText("POTÊNCIA TOTAL DA CARGA (W)", centerX, ch/2 - 70);
+                
+                ctx.fillStyle = "#d97706";
+                ctx.font = "900 52px Manrope";
+                ctx.fillText(`${totalPower.toFixed(1)} W`, centerX, ch/2 - 20);
+
+                ctx.fillStyle = isDark ? "#cbd5e1" : "#0f172a";
+                ctx.font = "900 11px Manrope";
+                ctx.fillText("DRIVER RECOMENDADO (MARGEM DE +20%)", centerX, ch/2 + 40);
+                
+                ctx.fillStyle = "#0284c7";
+                ctx.font = "900 38px Manrope";
+                ctx.fillText(`Mínimo: ${recPower.toFixed(1)} W`, centerX, ch/2 + 85);
+
+                // Rodapé de Voltagem
+                ctx.fillStyle = isDark ? "#111827" : "#e2e8f0";
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(centerX - 220, ch/2 + 100, 440, 40, {bl: 16, br: 16}); ctx.fill(); } 
+                else { ctx.fillRect(centerX - 220, ch/2 + 100, 440, 40); }
+
+                if (d.mode === 'CC') {
+                    const vForward = totalPower / (d.current / 1000);
+                    ctx.fillStyle = "#4d7c0f"; ctx.font = "bold 12px Manrope";
+                    ctx.fillText(`Saída Exigida: ${d.current}mA  |  Janela de Tensão > ${vForward.toFixed(1)}V DC`, centerX, ch/2 + 125);
+                } else {
+                    ctx.fillStyle = "#4d7c0f"; ctx.font = "bold 12px Manrope";
+                    ctx.fillText(`Saída Exigida: 12V ou 24V DC (Conforme especificação da fita)`, centerX, ch/2 + 125);
+                }
+                
+                ctx.textAlign = "start"; // Reset global
+                return;
+            }
             if (window.currentTool === 'grid') {
                 const gridDisplay = document.getElementById('grid-suggestion-display');
                 const gridDesc = document.getElementById('grid-desc-display');
@@ -1830,6 +1896,9 @@
         
         // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
         ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
+        bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
+        bind('dr-current', 'driver', 'current');
 
         window.AuthManager.init();
         window.switchTool('ponto');
