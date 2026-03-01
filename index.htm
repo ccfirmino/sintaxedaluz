@@ -1527,35 +1527,41 @@
                         // ==========================================
                         // MATEMÁTICA CORRIGIDA: Projeção de Cone (Scallop)
                         // ==========================================
-                        const safeTrRad = Math.max(0.05, trRad); // Proteção contra assíntota (raios paralelos)
-                        
-                        // Distância do percurso central da luz até a parede (Hipotenusa)
+                        const safeTrRad = Math.max(0.05, trRad);
                         const pathLength = s.dist / Math.sin(safeTrRad);
-                        
-                        // Largura métrica (bW) baseada na abertura do cone no ponto de impacto
                         const bW_metric = 2 * (pathLength * Math.tan(brRad / 2));
                         const bW_px = bW_metric * scale;
                         
-                        // Altura métrica (bH) projetada na vertical (elipse alongada pela inclinação)
                         let bH_metric = bW_metric / Math.sin(safeTrRad);
-                        // CAP DE SEGURANÇA: Limita a altura para não formar o "pilar de luz"
                         bH_metric = Math.min(bH_metric, s.height * 2.5); 
                         const bH_px = bH_metric * scale;
                         
-                        // Centro ótico do facho na parede
                         const hitY_metric_current = s.height - (s.dist / Math.tan(safeTrRad));
                         const hitY_px_current = floorY - (hitY_metric_current * scale);
 
-                        // Renderização do Gradiente
+                        // Renderização do Gradiente com Drop-off mais acentuado (redução de fade espalhado)
                         const maxRadius = Math.max(bW_px, bH_px) / 2;
                         const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, maxRadius);
-                        const intensityAlpha = isDark ? 0.7 : 0.6;
+                        const intensityAlpha = isDark ? 0.8 : 0.7; // Brilho central compensado
                         
+                        // Curva de degrêde mais definida nas bordas
                         sg.addColorStop(0, `rgba(217, 119, 6, ${intensityAlpha})`);
-                        sg.addColorStop(0.4, `rgba(217, 119, 6, ${intensityAlpha * 0.4})`);
+                        sg.addColorStop(0.6, `rgba(217, 119, 6, ${intensityAlpha * 0.5})`);
+                        sg.addColorStop(0.9, `rgba(217, 119, 6, ${intensityAlpha * 0.05})`);
                         sg.addColorStop(1, "rgba(217, 119, 6, 0)");
 
+                        // ==========================================
+                        // CLIPPING (MÁSCARA) E RENDERIZAÇÃO
+                        // ==========================================
                         ctx.save();
+                        
+                        // 1. Cria a barreira física (Teto = 40px, Chão = floorY)
+                        // A luz desenhada a partir daqui NÃO VAZARÁ além destas linhas
+                        ctx.beginPath();
+                        ctx.rect(0, 40, cw, floorY - 40);
+                        ctx.clip();
+
+                        // 2. Transforma e desenha a elipse (Spot de Luz)
                         ctx.translate(spotX, hitY_px_current);
                         ctx.scale(bW_px / (maxRadius * 2), bH_px / (maxRadius * 2));
                         
@@ -1563,20 +1569,24 @@
                         ctx.beginPath();
                         ctx.arc(0, 0, maxRadius, 0, Math.PI * 2);
                         ctx.fill();
+                        
+                        // 3. Libera a restrição de barreira para podermos desenhar os objetos por cima
                         ctx.restore();
 
-                        // Fonte Luminosa (Luminária) no "Teto"
+                        // ==========================================
+                        // ELEMENTOS FÍSICOS (Luminária e Textos)
+                        // ==========================================
+                        // Fonte Luminosa no Teto (Desenhada APÓS o restore para não ser cortada pela máscara)
                         ctx.fillStyle = '#FBBF24';
                         ctx.beginPath(); ctx.arc(spotX, 40, 4, 0, Math.PI * 2); ctx.fill();
                         ctx.strokeStyle = "#d97706"; ctx.lineWidth = 1; ctx.stroke();
                         
-                        // Valor de Lux no centro da primeira peça
+                        // Etiqueta com o valor do Lux no centro do quadro
                         if (i === 0 && tr > 0) {
                             let valText = window.formatIllum(ev);
                             if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
                             drawTextVal(ctx, valText, spotX, hitY_px_current - 10);
                         }
-                    }
 
                     // COTAS E DIMENSÕES (Annotations)
                     // Cota de Altura Total (H)
