@@ -1496,45 +1496,107 @@
 
                 } else {
                     // ==========================================
-                    // VISÃO: ELEVAÇÃO FRONTAL (WALL WASH) FULL WIDTH
+                    // VISÃO: ELEVAÇÃO FRONTAL (WALL WASH) - REFAZENDO PARA PRECISÃO
                     // ==========================================
                     const wallW = Math.max(cw * 0.8, s.frameW * scale * 1.5 + (s.qty * s.spacing * scale));
                     const wallX = (cw - wallW) / 2;
-                    ctx.fillStyle = isDark ? "#1e293b" : "#f1f5f9"; ctx.fillRect(wallX, 40, wallW, floorY - 40);
-                    ctx.strokeStyle = cFloorLine; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
+                    
+                    // Desenho da Parede (Background)
+                    ctx.fillStyle = isDark ? "#1e293b" : "#f1f5f9"; 
+                    ctx.fillRect(wallX, 60, wallW, floorY - 60);
+                    ctx.strokeStyle = cFloorLine; 
+                    ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
+
+                    // Representação do Teto/Trilho (Linha de Profundidade)
+                    ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
+                    ctx.beginPath(); ctx.moveTo(0, 40); ctx.lineTo(cw, 40); ctx.stroke();
 
                     // Quadro (Moldura)
                     const fW_px = s.frameW * scale, fH_px = s.frameH * scale, fY_px = floorY - (s.hq * scale);
-                    ctx.strokeStyle = "#d97706"; ctx.setLineDash([5, 5]); ctx.strokeRect(centerX - fW_px/2, fY_px - fH_px/2, fW_px, fH_px); ctx.setLineDash([]);
+                    ctx.strokeStyle = "#d97706"; ctx.lineWidth = 2; ctx.setLineDash([5, 5]); 
+                    ctx.strokeRect(centerX - fW_px/2, fY_px - fH_px/2, fW_px, fH_px); ctx.setLineDash([]);
 
-                    // Manchas de Luz
+                    // Lógica de Mancha de Luz (Light Distribution)
                     const startX = centerX - ((s.qty - 1) * s.spacing * scale) / 2;
+                    const trRad = tr; // Tilt em radianos já calculado
+                    const brRad = br; // Beam em radianos já calculado
+
                     for(let i=0; i < s.qty; i++) {
                         const spotX = startX + (i * s.spacing * scale);
-                        const bW = 2 * (s.dist / Math.cos(tr)) * Math.tan(br / 2) * scale;
                         
-                        let t1 = Math.tan(tr - br/2); if (t1 <= 0.01) t1 = 0.01; 
-                        let t2 = Math.tan(tr + br/2);
-                        const bH = s.dist * (1/t1 - 1/t2) * scale;
+                        // Largura da elipse no ponto de impacto
+                        const beamWidthM = 2 * (s.dist / Math.cos(trRad)) * Math.tan(brRad / 2);
+                        const bW_px = beamWidthM * scale;
+                        
+                        // Altura da elipse (projeção vertical na parede)
+                        // Calculada pela diferença entre o topo e a base do facho atingindo o plano vertical
+                        let angleTop = trRad - (brRad / 2);
+                        let angleBottom = trRad + (brRad / 2);
+                        
+                        // Guardas para evitar divisões por zero ou ângulos paralelos à parede
+                        angleTop = Math.max(0.01, angleTop);
+                        angleBottom = Math.min(Math.PI/2 - 0.01, angleBottom);
 
-                        const sg = ctx.createRadialGradient(spotX, hitY_px, 0, spotX, hitY_px, Math.max(bW, bH)/2);
-                        sg.addColorStop(0, isDark ? "rgba(217, 119, 6, 0.4)" : "rgba(251, 191, 36, 0.4)");
-                        sg.addColorStop(1, isDark ? "rgba(217, 119, 6, 0)" : "rgba(251, 191, 36, 0)");
+                        const hTop = s.dist / Math.tan(angleTop);
+                        const hBottom = s.dist / Math.tan(angleBottom);
+                        const bH_px = Math.abs(hTop - hBottom) * scale;
+                        
+                        const hitY_metric_current = s.height - (s.dist / Math.tan(trRad));
+                        const hitY_px_current = floorY - (hitY_metric_current * scale);
 
-                        ctx.save(); ctx.translate(spotX, hitY_px); ctx.scale(bW/Math.max(bW,bH), bH/Math.max(bW,bH));
-                        ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(0, 0, Math.max(bW,bH)/2, 0, Math.PI*2); ctx.fill(); ctx.restore();
+                        // Renderização da Mancha com Gradiente Elíptico
+                        const sg = ctx.createRadialGradient(spotX, hitY_px_current, 0, spotX, hitY_px_current, Math.max(bW_px, bH_px)/2);
+                        const intensityAlpha = isDark ? 0.5 : 0.4;
+                        sg.addColorStop(0, `rgba(217, 119, 6, ${intensityAlpha})`);
+                        sg.addColorStop(0.4, `rgba(217, 119, 6, ${intensityAlpha * 0.4})`);
+                        sg.addColorStop(1, "rgba(217, 119, 6, 0)");
 
-                        // Marcador da fonte no teto
-                        ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(spotX, 40, 3, 0, Math.PI * 2); ctx.fill();
+                        ctx.save();
+                        ctx.translate(spotX, hitY_px_current);
+                        // Escalonamento para transformar círculo em elipse de projeção
+                        ctx.scale(bW_px / Math.max(bW_px, bH_px), bH_px / Math.max(bW_px, bH_px));
+                        ctx.fillStyle = sg;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, Math.max(bW_px, bH_px)/2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+
+                        // Fonte Luminosa (Luminária) no "Teto"
+                        ctx.fillStyle = '#FBBF24';
+                        ctx.beginPath(); ctx.arc(spotX, 40, 4, 0, Math.PI * 2); ctx.fill();
+                        ctx.strokeStyle = "#d97706"; ctx.lineWidth = 1; ctx.stroke();
+                        
+                        // Valor de Lux no centro da primeira peça
+                        if (i === 0 && tr > 0) {
+                            let valText = window.formatIllum(ev);
+                            if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
+                            drawTextVal(ctx, valText, spotX, hitY_px_current - 10);
+                        }
                     }
 
-                    // Linhas de Cota
-                    drawDimLine(ctx, centerX - fW_px/2, fY_px + fH_px/2 + 20, centerX + fW_px/2, fY_px + fH_px/2 + 20, window.formatDist(s.frameW));
-                    drawDimLineVertical(ctx, centerX + fW_px/2 + 20, fY_px - fH_px/2, fY_px + fH_px/2, window.formatDist(s.frameH));
+                    // COTAS E DIMENSÕES (Annotations)
+                    // Cota de Altura Total (H)
+                    drawDimLineVertical(ctx, wallX - 40, 40, floorY, `H: ${window.formatDist(s.height)}`);
                     
-                    // Linha do Eixo HQ
-                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(wallX, fY_px); ctx.lineTo(wallX + wallW, fY_px); ctx.stroke(); ctx.setLineDash([]);
-                    ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, wallX + 10, fY_px - 8);
+                    // Cota de Distância da Parede (D) - Representada como um offset no topo
+                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = "#94a3b8";
+                    ctx.moveTo(startX, 40); ctx.lineTo(startX, 20); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.font = "bold 11px Manrope"; ctx.fillStyle = "#d97706";
+                    ctx.fillText(`D: ${window.formatDist(s.dist)} (OFFSET)`, startX + 10, 30);
+
+                    // Cotas do Quadro
+                    drawDimLine(ctx, centerX - fW_px/2, fY_px + fH_px/2 + 25, centerX + fW_px/2, fY_px + fH_px/2 + 25, `w: ${window.formatDist(s.frameW)}`);
+                    drawDimLineVertical(ctx, centerX + fW_px/2 + 30, fY_px - fH_px/2, fY_px + fH_px/2, `h: ${window.formatDist(s.frameH)}`);
+                    
+                    // Cota de Eixo (hq)
+                    ctx.beginPath(); ctx.setLineDash([4, 2]); ctx.strokeStyle = "rgba(148, 163, 184, 0.5)";
+                    ctx.moveTo(wallX, fY_px); ctx.lineTo(wallX + wallW, fY_px); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.fillStyle = cBaseText; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, wallX + 10, fY_px - 8);
+
+                    // Cota de Espaçamento entre Fontes
+                    if (s.qty > 1) {
+                        drawDimLine(ctx, startX, 55, startX + (s.spacing * scale), 55, `s: ${window.formatDist(s.spacing)}`);
+                    }
                 }
             } else if (window.currentTool === 'homog') {
                 const I = getIntensity(window.state.homog); 
