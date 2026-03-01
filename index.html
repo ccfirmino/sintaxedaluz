@@ -1544,11 +1544,11 @@
                         const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, maxRadius);
                         const intensityAlpha = isDark ? 0.8 : 0.7; // Brilho central compensado
                         
-                        // Curva de degrêde mais definida nas bordas
-                        sg.addColorStop(0, `rgba(217, 119, 6, ${intensityAlpha})`);
-                        sg.addColorStop(0.6, `rgba(217, 119, 6, ${intensityAlpha * 0.5})`);
-                        sg.addColorStop(0.9, `rgba(217, 119, 6, ${intensityAlpha * 0.05})`);
-                        sg.addColorStop(1, "rgba(217, 119, 6, 0)");
+                        // Curva de degrêde com a cor exata do Corte Técnico (Amber 400)
+                        sg.addColorStop(0, `rgba(251, 191, 36, ${intensityAlpha})`);
+                        sg.addColorStop(0.6, `rgba(251, 191, 36, ${intensityAlpha * 0.5})`);
+                        sg.addColorStop(0.9, `rgba(251, 191, 36, ${intensityAlpha * 0.05})`);
+                        sg.addColorStop(1, "rgba(251, 191, 36, 0)");
 
                         // ==========================================
                         // CLIPPING (MÁSCARA) E RENDERIZAÇÃO
