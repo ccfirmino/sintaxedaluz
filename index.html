@@ -362,15 +362,15 @@
     </div>
 </div>
                                     <div class="mb-4 group border-t border-slate-200 pt-4">
-    <label class="flex items-center justify-between cursor-pointer">
-        <span class="text-[10px] text-tech-cyan font-black uppercase tracking-wider">Modo Falsa Cor (Análise)</span>
-        <div class="relative">
-            <input type="checkbox" id="g-falseColor" onchange="window.state.grid.falseColor = this.checked; window.updateCalculations();" class="sr-only">
-            <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
-            <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
-        </div>
-    </label>
-</div>
+                                        <h4 class="text-[10px] text-luminous-gold font-black uppercase tracking-wider mb-4" data-i18n="lbl_lumen_mode">MÉTODO DOS LÚMENS (OBRIGATÓRIO)</h4>
+                                        <div id="lumen-inputs" class="space-y-4 bg-amber-50 dark:bg-slate-800/50 p-4 rounded-xl border border-amber-100 dark:border-slate-700">
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[8px] text-slate-500 font-bold">LX</span></div></div></div>
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[8px] text-slate-500 font-bold">W</span></div></div></div>
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100" class="transition-opacity"><span class="text-[8px] text-slate-500 font-bold">LM</span></div></div></div>
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_util_factor">FATOR UTILIZAÇÃO (U)</label><div class="flex items-baseline gap-1"><input type="number" id="g-utilFactor" value="0.60" min="0.1" max="1.0" step="0.05"></div></div></div>
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_maint_factor">FATOR MANUTENÇÃO (FM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-maintFactor" value="0.80" min="0.1" max="1.0" step="0.05"></div></div></div>
+                                        </div>
+                                    </div>
                                     <div class="mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_w">LARGURA DO AMB. (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_l">COMPRIMENTO DO AMB. (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomL" value="4.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
                                     
@@ -1157,6 +1157,22 @@ window.handleGenerateReport = async () => {
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
             document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
             document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
+            
+            // Lógica de Bloqueio (Data Integrity Lock)
+            const fluxInput = document.getElementById('g-flux');
+            const wattsInput = document.getElementById('g-watts');
+            if (fluxInput && wattsInput) {
+                const isIES = (mode === 'ies' && window.state.grid.iesData);
+                fluxInput.disabled = isIES;
+                wattsInput.disabled = isIES;
+                if (isIES) {
+                    fluxInput.classList.add('opacity-50', 'cursor-not-allowed');
+                    wattsInput.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    fluxInput.classList.remove('opacity-50', 'cursor-not-allowed');
+                    wattsInput.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
             window.updateCalculations();
         }
         
@@ -1629,7 +1645,44 @@ window.handleGenerateReport = async () => {
                         }
                     }
                 }
-
+// LEGENDA DE FALSA COR (HEATMAP)
+                if (s.falseColor) {
+                    const legW = 140;
+                    const legH = 12;
+                    const legX = offsetX + roomPxW - legW - 20;
+                    const legY = offsetY + roomPxH - legH - 25;
+                    
+                    // Fundo da legenda
+                    ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.9)";
+                    ctx.fillRect(legX - 15, legY - 20, legW + 30, legH + 40);
+                    ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
+                    ctx.strokeRect(legX - 15, legY - 20, legW + 30, legH + 40);
+                    
+                    // Gradiente
+                    const legGrad = ctx.createLinearGradient(legX, 0, legX + legW, 0);
+                    const scaleColors = window.FalseColorEngine.colorScale;
+                    const maxScaleLux = scaleColors[scaleColors.length - 1].lux;
+                    
+                    scaleColors.forEach(c => {
+                        legGrad.addColorStop(c.lux / maxScaleLux, `rgb(${c.r},${c.g},${c.b})`);
+                    });
+                    
+                    ctx.fillStyle = legGrad;
+                    ctx.fillRect(legX, legY, legW, legH);
+                    
+                    // Textos da legenda
+                    ctx.fillStyle = isDark ? "#cbd5e1" : "#334155";
+                    ctx.font = "bold 9px Manrope";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "top";
+                    scaleColors.forEach(c => {
+                        const px = legX + (c.lux / maxScaleLux) * legW;
+                        ctx.fillText(c.lux, px, legY + legH + 5);
+                    });
+                    ctx.textAlign = "left";
+                    ctx.fillStyle = "#d97706";
+                    ctx.fillText("Lux", legX, legY - 14);
+                }
                 // 3. ANIMAÇÃO DO BOTÃO FOGGLE
                 const bgToggle = document.getElementById('fc-toggle-bg');
                 const dotToggle = document.getElementById('fc-toggle-dot');
@@ -2176,7 +2229,7 @@ window.handleGenerateReport = async () => {
         }
         
         // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
-        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
