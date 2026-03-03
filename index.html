@@ -175,7 +175,9 @@
                         <button type="button" onclick="window.togglePassword('reg-password')" tabindex="-1" class="absolute right-0 bottom-2 text-slate-400 hover:text-luminous-gold transition-colors outline-none"><i id="icon-reg-password" class="fas fa-eye"></i></button>
                     </div>
                 </div>
-               	
+                <div class="flex items-start gap-2 mt-2"><input type="checkbox" id="reg-terms" class="mt-1 w-3 h-3 accent-luminous-gold"><label for="reg-terms" class="text-[10px] leading-tight text-dim-gray font-bold cursor-pointer">Concordo com os termos de uso.</label></div>
+                <button onclick="window.AuthManager.handleRegister()" class="w-full py-4 bg-transparent border-2 border-luminous-gold text-luminous-gold font-black rounded-lg uppercase tracking-widest text-xs hover:bg-luminous-gold hover:text-white transition-colors">Criar Conta Gratuita</button>
+            </div>
             
             <div id="form-forgot-password" class="space-y-5 hidden">
                 <div class="text-center mb-4">
@@ -248,7 +250,7 @@
 
                 <div id="calculator-interface" class="w-full relative">
                     <div id="visual-tools" class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full transition-opacity duration-300 hidden">
-                        <div class="md:col-span-4 lg:col-span-3 flex flex-col gap-6">
+                        <div class="lg:col-span-3 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
                                     <h3 class="text-md text-starlight mb-2 font-black whitespace-nowrap text-center border-b border-slate-200 pb-3" data-i18n="calc_params">Parâmetros da Fonte</h3>
@@ -348,17 +350,7 @@
 </div>
                                 <div id="inputs-grid" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mode-standard-only">
-    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
-</div>
-
-<div class="mode-ies-group hidden space-y-6 mb-6 border-t border-slate-200 pt-4">
-    <div class="group">
-        <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
-        <input type="file" id="g-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-        <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-    </div>
-</div>
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
                                     <div class="mb-4 group border-t border-slate-200 pt-4">
     <label class="flex items-center justify-between cursor-pointer">
         <span class="text-[10px] text-tech-cyan font-black uppercase tracking-wider">Modo Falsa Cor (Análise)</span>
@@ -383,22 +375,6 @@
                                         </label>
                                         <div id="lumen-inputs" class="hidden mt-4 space-y-4 bg-amber-50 dark:bg-slate-800/50 p-4 rounded-xl border border-amber-100 dark:border-slate-700">
                                             <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[8px] text-slate-500 font-bold">LX</span></div></div></div>
-<div class="mb-4 group border-t border-slate-200 pt-4">
-                                    <h4 class="text-[10px] text-luminous-gold font-black uppercase mb-3"><i class="fas fa-eye"></i> Parâmetros (UGR)</h4>
-                                    <div class="space-y-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Área Emissiva (m²)</label><div class="flex items-baseline gap-1"><input type="number" id="g-lumArea" value="0.36" min="0.005" max="2.0" step="0.01"></div></div><p class="text-[8px] text-slate-400 italic">Ex: Painel 60x60 = 0.36 / Spot = 0.01</p></div>
-                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_maint_factor">FATOR MANUTENÇÃO (FM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-maintFactor" value="0.80" min="0.1" max="1.0" step="0.05"></div></div></div>
-                                        </div> </div> <div class="mb-4 group border-t border-slate-200 pt-4">
-                                        <h4 class="text-[10px] text-luminous-gold font-black uppercase mb-3"><i class="fas fa-eye"></i> Parâmetros (UGR)</h4>
-                                        <div class="space-y-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Área Emissiva (m²)</label><div class="flex items-baseline gap-1"><input type="number" id="g-lumArea" value="0.36" min="0.005" max="2.0" step="0.01"></div></div><p class="text-[8px] text-slate-400 italic">Ex: Painel 60x60 = 0.36 / Spot = 0.01</p></div>
-                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Altura Observador</label><div class="flex items-baseline gap-1"><input type="number" id="g-obsHeight" value="1.2" min="0.8" max="2.0" step="0.1"><span class="text-[8px] text-slate-500 font-bold">M</span></div></div></div>
-                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Lum. Fundo (Lb)</label><div class="flex items-baseline gap-1"><input type="number" id="g-bgLuminance" value="12" min="1" max="100" step="1"><span class="text-[8px] text-slate-500 font-bold">CD/M²</span></div></div></div>
-                                        </div>
-                                    </div>
-                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Lum. Fundo (Lb)</label><div class="flex items-baseline gap-1"><input type="number" id="g-bgLuminance" value="12" min="1" max="100" step="1"><span class="text-[8px] text-slate-500 font-bold">CD/M²</span></div></div></div>
-                                    </div>
-                                </div>
                                             <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100"><span class="text-[8px] text-slate-500 font-bold">LM</span></div></div></div>
                                             <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_util_factor">FATOR UTILIZAÇÃO (U)</label><div class="flex items-baseline gap-1"><input type="number" id="g-utilFactor" value="0.60" min="0.1" max="1.0" step="0.05"></div></div></div>
                                             <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_maint_factor">FATOR MANUTENÇÃO (FM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-maintFactor" value="0.80" min="0.1" max="1.0" step="0.05"></div></div></div>
@@ -419,7 +395,7 @@
                             </div>
                         </div>
 
-                        <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
+                        <div class="lg:col-span-9 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full min-h-[600px]">
                                 <h3 class="text-sm text-starlight mb-6 border-b border-slate-200 pb-4 uppercase tracking-widest font-black" data-i18n="hdr_results">Resultados em Tempo Real</h3>
                                 <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
@@ -491,7 +467,7 @@
                             </div>
 
                             <div id="content-nbr5101" class="query-content hidden">
-                                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-full">
+                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
                                     <div class="lg:col-span-5 flex flex-col gap-4">
                                         <div class="glass-panel p-5 rounded-xl border border-slate-200 bg-white">
                                             <h4 class="text-sm font-black text-luminous-gold mb-4 flex items-center gap-2 uppercase tracking-wider"><i class="fas fa-sliders-h"></i> <span data-i18n="road_params">Parâmetros da Via (Classe M)</span></h4>
@@ -746,14 +722,13 @@
         // 2. GLOBAL STATE
         window.state = {
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-        vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, iesData: null, iesFileName: null, viewMode: 'section' }, 
-        homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
-        grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, falseColor: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80, lumArea: 0.36, obsHeight: 1.2, bgLuminance: 12 },
-        driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 }
-    };
-    
-    window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
-    window.currentLeedTarget = 'gold';
+            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, iesData: null, iesFileName: null, viewMode: 'section' }, 
+            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
+           grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, falseColor: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 },
+driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 }
+        };
+        window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
+        window.currentLeedTarget = 'gold';
 
         // 3. DATABASES
         window.normsDatabase = [
@@ -1067,12 +1042,7 @@ window.handleGenerateReport = async () => {
     if (!window.PDFLib) return alert('Carregando gerador de PDF...');
     const grid = window.state.grid;
     const lpd = (grid.cols * grid.rows * (grid.flux / 100)) / (grid.roomW * grid.roomL);
-    
-    const ugr = window.GlareEngine.calculateUGR(grid, { 
-        observerHeight: grid.obsHeight, 
-        luminaireArea: grid.lumArea, 
-        backgroundLuminance: grid.bgLuminance 
-    });
+    const ugr = window.GlareEngine.calculateUGR(grid, { observerHeight: 1.2, luminaireArea: 0.36, backgroundLuminance: 12 });
     
     const pdfDoc = await window.PDFLib.PDFDocument.create();
     const page = pdfDoc.addPage([595.28, 841.89]);
@@ -1080,7 +1050,7 @@ window.handleGenerateReport = async () => {
     
     page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
     page.drawText('LUXSINTAX', { x: 50, y: height - 45, size: 24, color: window.PDFLib.rgb(0.85, 0.47, 0.02) });
-    page.drawText('RELATÓRIO TÉCNICO DE CONFORMIDADE', { x: 50, y: height - 65, size: 8, color: window.PDFLib.rgb(1, 1, 1) });
+    page.drawText('RELATÓRIO TÉCNICO DE CONFORMIDADE LUMINOTÉCNICA', { x: 50, y: height - 65, size: 8, color: window.PDFLib.rgb(1, 1, 1) });
     
     let cy = height - 120;
     const drawRow = (l, v) => { page.drawText(l+':', { x: 50, y: cy, size: 9 }); page.drawText(v, { x: 200, y: cy, size: 9 }); cy -= 15; };
@@ -1117,7 +1087,7 @@ window.handleGenerateReport = async () => {
             document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
             
             const modeSelector = document.getElementById('calc-mode-selector');
-            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver');
+            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'grid' || toolId === 'driver');
 
             if (toolId !== 'query') {
                 ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
@@ -1185,15 +1155,14 @@ const advResults = document.getElementById('grid-advanced-results');
                     const content = e.target.result;
                     const parsed = window.parseIES(content);
                     
-                   if (parsed) {
-                        const targetKey = window.currentTool; // Agora funciona para qualquer aba automaticamente
+                    if (parsed) {
+                        const targetKey = window.currentTool === 'homog' ? 'homog' : (window.currentTool === 'ponto' ? 'ponto' : 'vertical');
                         window.state[targetKey].iesData = parsed;
                         window.state[targetKey].iesFileName = file.name;
                         
                         let statusId = 'p-ies-status';
                         if(window.currentTool === 'vertical') statusId = 'v-ies-status';
                         if(window.currentTool === 'homog') statusId = 'h-ies-status';
-                        if(window.currentTool === 'grid') statusId = 'g-ies-status'; // Adicionado o Grid
 
                         const statusEl = document.getElementById(statusId);
                         if(statusEl) {
@@ -1385,8 +1354,10 @@ const advResults = document.getElementById('grid-advanced-results');
             let boundsW = 3.0; 
             const s = window.state[window.currentTool];
 
-            // Agora todas as ferramentas (incluindo a Malha) extraem o facho real se houver um arquivo IES carregado.
-            let currentBeam = window.getEffectiveBeam(s);
+            let currentBeam = 30;
+            if(window.currentTool !== 'grid') {
+                currentBeam = window.getEffectiveBeam(s);
+            }
 
             if (window.currentTool === 'ponto') {
                 boundsH = s.height;
@@ -1456,11 +1427,7 @@ const advResults = document.getElementById('grid-advanced-results');
                 
                 ctx.textAlign = "start"; // Reset global
 // Atualizar Calculo de UGR
-                const ugrVal = window.GlareEngine.calculateUGR(s, {
-                    observerHeight: s.obsHeight,
-                    luminaireArea: s.lumArea,
-                    backgroundLuminance: s.bgLuminance
-                });
+                const ugrVal = window.GlareEngine.calculateUGR(s, { observerHeight: 1.2, luminaireArea: 0.36, backgroundLuminance: 12 });
                 const ugrEl = document.getElementById('ugr-value');
                 const ugrStatus = document.getElementById('ugr-status');
                 const ugrBar = document.getElementById('ugr-bar');
@@ -1508,7 +1475,7 @@ const advResults = document.getElementById('grid-advanced-results');
                         gridDesc.classList.add('text-luminous-gold');
                     }
                 } else {
-                    const brCalc = currentBeam * Math.PI / 180;
+                    const brCalc = s.beam * Math.PI / 180;
                     const diaCalc = 2 * s.height * Math.tan(brCalc / 2);
                     const effectiveSpacing = diaCalc > 0.1 ? diaCalc * 0.75 : 1; 
                     s.cols = Math.max(1, Math.ceil(s.roomW / effectiveSpacing));
@@ -2101,11 +2068,6 @@ const advResults = document.getElementById('grid-advanced-results');
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
-
-        // BINDINGS DO UGR
-        bind('g-lumArea', 'grid', 'lumArea');
-        bind('g-obsHeight', 'grid', 'obsHeight');
-        bind('g-bgLuminance', 'grid', 'bgLuminance');
 
         window.AuthManager.init();
         window.switchTool('ponto');
