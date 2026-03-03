@@ -1050,96 +1050,99 @@ window.handleBimExport = () => {
 
 window.handleGenerateReport = async () => {
     if (!window.PDFLib) return alert('Carregando gerador de PDF...');
+    const grid = window.state.grid;
+
+    // 1. Cálculos Matemáticos Avançados
+    const area = grid.roomW * grid.roomL;
+    const totalFixtures = grid.cols * grid.rows;
     
-    try {
-        const grid = window.state.grid;
+    // Iluminância Resultante (Equação do Método dos Lúmens)
+    const resultingLux = (totalFixtures * grid.flux * grid.utilFactor * grid.maintFactor) / area;
+    
+    // Densidade de Potência (LPD) - Assumindo 100lm/W como média de mercado
+    const lpd = (totalFixtures * (grid.flux / 100)) / area; 
 
-        // 1. Cálculos de Engenharia
-        const area = grid.roomW * grid.roomL;
-        const totalFixtures = grid.cols * grid.rows;
-        
-        // Puxa os Watts do IES. Se não existir IES, estima 100lm/W.
-        const fixtureWatts = grid.watts ? grid.watts : (grid.flux / 100);
-        
-        const resultingLux = (totalFixtures * grid.flux * grid.utilFactor * grid.maintFactor) / area;
-        const lpd = (totalFixtures * fixtureWatts) / area; 
+    // Extração de Dados da Luminária (IES ou Genérica)
+    const effectiveBeam = window.getEffectiveBeam(grid);
+    const luminaireName = grid.iesFileName ? grid.iesFileName : "Fonte Genérica (Distribuição Lambertiana)";
 
-        const effectiveBeam = window.getEffectiveBeam(grid);
-        const luminaireName = grid.iesFileName ? grid.iesFileName : "Luminária Padrão (Distribuição Lambertiana)";
+    // Parâmetros de Ofuscamento (UGR) com Fallback seguro
+    const uArea = grid.lumArea || 0.36;
+    const obsH = grid.obsHeight || 1.2;
+    const bgLum = grid.bgLuminance || 12;
+    const ugr = window.GlareEngine.calculateUGR(grid, { observerHeight: obsH, luminaireArea: uArea, backgroundLuminance: bgLum });
 
-        const uArea = grid.lumArea || 0.36;
-        const obsH = grid.obsHeight || 1.2;
-        const bgLum = grid.bgLuminance || 12;
-        const ugr = window.GlareEngine.calculateUGR(grid, { observerHeight: obsH, luminaireArea: uArea, backgroundLuminance: bgLum });
+    // 2. Renderização do Layout do PDF
+    const pdfDoc = await window.PDFLib.PDFDocument.create();
+    const page = pdfDoc.addPage([595.28, 841.89]); // Formato A4
+    const { width, height } = page.getSize();
 
-        // 2. Criação do Documento
-        const pdfDoc = await window.PDFLib.PDFDocument.create();
-        const page = pdfDoc.addPage([595.28, 841.89]);
-        const { width, height } = page.getSize();
+    // Cabeçalho Corporativo
+    page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
+    page.drawText('LUXSINTAX', { x: 50, y: height - 45, size: 24, color: window.PDFLib.rgb(0.85, 0.47, 0.02) });
+    page.drawText('RELATÓRIO TÉCNICO DE CONFORMIDADE LUMINOTÉCNICA', { x: 50, y: height - 65, size: 8, color: window.PDFLib.rgb(1, 1, 1) });
 
-        // Cabeçalho
-        page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
-        page.drawText('LUXSINTAX', { x: 50, y: height - 45, size: 24, color: window.PDFLib.rgb(0.85, 0.47, 0.02) });
-        page.drawText('RELATÓRIO TÉCNICO DE CONFORMIDADE LUMINOTÉCNICA', { x: 50, y: height - 65, size: 8, color: window.PDFLib.rgb(1, 1, 1) });
+    let cy = height - 120;
+    
+    // Funções auxiliares de tipografia
+    const drawSect = (title) => { page.drawText(title, { x: 50, y: cy, size: 12, color: window.PDFLib.rgb(0.85, 0.47, 0.02) }); cy -= 20; };
+    const drawRow = (l, v) => { page.drawText(l+':', { x: 50, y: cy, size: 9, color: window.PDFLib.rgb(0.3, 0.3, 0.3) }); page.drawText(v, { x: 200, y: cy, size: 9, color: window.PDFLib.rgb(0, 0, 0) }); cy -= 15; };
 
-        let cy = height - 120;
-        const drawSect = (title) => { page.drawText(title, { x: 50, y: cy, size: 12, color: window.PDFLib.rgb(0.85, 0.47, 0.02) }); cy -= 20; };
-        const drawRow = (l, v) => { page.drawText(l+':', { x: 50, y: cy, size: 9, color: window.PDFLib.rgb(0.3, 0.3, 0.3) }); page.drawText(String(v), { x: 200, y: cy, size: 9, color: window.PDFLib.rgb(0, 0, 0) }); cy -= 15; };
+    // Seção 1: Dados do Ambiente
+    drawSect('1. DADOS DO AMBIENTE');
+    drawRow('Data do Estudo', new Date().toLocaleDateString('pt-BR'));
+    drawRow('Dimensões (X x Y)', `${grid.roomW.toFixed(2)}m x ${grid.roomL.toFixed(2)}m`);
+    drawRow('Pé-direito (H)', `${grid.height.toFixed(2)}m`);
+    drawRow('Área Total', `${area.toFixed(2)} m²`);
+    cy -= 10;
 
-        drawSect('1. DADOS DO AMBIENTE');
-        drawRow('Data do Estudo', new Date().toLocaleDateString('pt-BR'));
-        drawRow('Dimensões (X x Y)', `${grid.roomW.toFixed(2)}m x ${grid.roomL.toFixed(2)}m`);
-        drawRow('Pé-direito (H)', `${grid.height.toFixed(2)}m`);
-        drawRow('Área Total', `${area.toFixed(2)} m²`);
-        cy -= 10;
+    // Seção 2: Especificação da Luminária
+    drawSect('2. ESPECIFICAÇÃO DA LUMINÁRIA');
+    drawRow('Modelo / Arquivo IES', luminaireName);
+    drawRow('Fluxo Luminoso', `${grid.flux} lúmens`);
+    drawRow('Abertura de Facho (FWHM)', `${Math.round(effectiveBeam)}°`);
+    drawRow('Fator de Utilização (U)', `${grid.utilFactor.toFixed(2)}`);
+    drawRow('Fator de Manutenção (FM)', `${grid.maintFactor.toFixed(2)}`);
+    cy -= 10;
 
-        drawSect('2. ESPECIFICAÇÃO DA LUMINÁRIA');
-        drawRow('Modelo / Arquivo IES', luminaireName);
-        drawRow('Potência Unitária', `${fixtureWatts.toFixed(1)} W`);
-        drawRow('Fluxo Luminoso (Φ)', `${Math.round(grid.flux)} lúmens`);
-        drawRow('Abertura de Facho (FWHM)', `${Math.round(effectiveBeam)}°`);
-        drawRow('Fator de Utilização (U)', `${grid.utilFactor.toFixed(2)}`);
-        drawRow('Fator de Manutenção (FM)', `${grid.maintFactor.toFixed(2)}`);
-        cy -= 10;
+    // Seção 3: Geometria da Malha
+    drawSect('3. DISTRIBUIÇÃO ESPACIAL');
+    drawRow('Malha Sugerida', `${grid.cols} colunas x ${grid.rows} linhas`);
+    drawRow('Total de Peças (N)', `${totalFixtures} unidades`);
+    cy -= 15;
 
-        drawSect('3. DISTRIBUIÇÃO ESPACIAL');
-        drawRow('Malha Sugerida', `${grid.cols} colunas x ${grid.rows} linhas`);
-        drawRow('Total de Peças (N)', `${totalFixtures} unidades`);
-        cy -= 15;
+    // Blocos de Indicadores (KPIs)
+    const drawKPI = (x, y, l, v, s) => {
+        page.drawRectangle({ x, y, width: 155, height: 60, borderColor: window.PDFLib.rgb(0.88, 0.91, 0.94), borderWidth: 1 });
+        page.drawText(l, { x: x + 10, y: y + 45, size: 7, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(v, { x: x + 10, y: y + 20, size: 16, color: window.PDFLib.rgb(0, 0, 0) });
+        page.drawText(s, { x: x + 10, y: y + 8, size: 7, color: window.PDFLib.rgb(0.5, 0.5, 0.5) });
+    };
 
-        // Blocos Gráficos
-        const drawKPI = (x, y, l, v, s) => {
-            page.drawRectangle({ x, y, width: 155, height: 60, borderColor: window.PDFLib.rgb(0.88, 0.91, 0.94), borderWidth: 1 });
-            page.drawText(l, { x: x + 10, y: y + 45, size: 7, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
-            page.drawText(String(v), { x: x + 10, y: y + 20, size: 16, color: window.PDFLib.rgb(0, 0, 0) });
-            page.drawText(s, { x: x + 10, y: y + 8, size: 7, color: window.PDFLib.rgb(0.5, 0.5, 0.5) });
-        };
+    drawKPI(50, cy - 60, 'ILUMINÂNCIA ALVO', `${grid.targetLux} lx`, 'Referência Normativa');
+    drawKPI(215, cy - 60, 'ILUMINÂNCIA RESULTANTE', `${Math.round(resultingLux)} lx`, 'Média Estimada (Projeto)');
+    drawKPI(380, cy - 60, 'OFUSCAMENTO (UGR)', `${ugr}`, 'Índice Max. Calculado');
+    cy -= 80;
+    
+    drawKPI(50, cy - 60, 'EFICIÊNCIA (LPD)', `${lpd.toFixed(2)} W/m²`, 'Densidade de Potência');
+    cy -= 80;
 
-        drawKPI(50, cy - 60, 'ILUMINÂNCIA ALVO', `${grid.targetLux} lx`, 'Referência Normativa');
-        drawKPI(215, cy - 60, 'ILUMINÂNCIA RESULTANTE', `${Math.round(resultingLux)} lx`, 'Média Estimada (Projeto)');
-        drawKPI(380, cy - 60, 'OFUSCAMENTO (UGR)', `${ugr}`, 'Índice Max. Calculado');
-        cy -= 80;
-        
-        drawKPI(50, cy - 60, 'EFICIÊNCIA (LPD)', `${lpd.toFixed(2)} W/m²`, 'Densidade de Potência');
-        cy -= 80;
+    // Seção 4: Notas Técnicas e Embasamento
+    cy -= 10;
+    page.drawText('NOTAS TÉCNICAS E PARÂMETROS DE CÁLCULO:', { x: 50, y: cy, size: 9, color: window.PDFLib.rgb(0.85, 0.47, 0.02) });
+    cy -= 15;
+    const note1 = '- Iluminância Resultante: Equação dos Lúmens (N * Fluxo * U * FM) / Área.';
+    const note2 = `- Ofuscamento (UGR): Estudo pontual c/ Área Emissiva=${uArea}m², Altura Obs=${obsH}m, Fundo=${bgLum}cd/m².`;
+    const note3 = '- LPD: Estimativa assumindo eficácia média de mercado de 100 lm/W para a luminária especificada.';
+    
+    page.drawText(note1, { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 12;
+    page.drawText(note2, { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 12;
+    page.drawText(note3, { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
 
-        // Notas Técnicas
-        cy -= 10;
-        page.drawText('NOTAS TÉCNICAS E PARÂMETROS DE CÁLCULO:', { x: 50, y: cy, size: 9, color: window.PDFLib.rgb(0.85, 0.47, 0.02) });
-        cy -= 15;
-        page.drawText('- Iluminância Resultante: Equação dos Lúmens (N * Fluxo * U * FM) / Área.', { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 12;
-        page.drawText(`- Ofuscamento (UGR): Área Emissiva=${uArea}m², Altura Obs=${obsH}m, Fundo=${bgLum}cd/m².`, { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 12;
-        page.drawText('- LPD: Calculado utilizando a potência em Watts extraída fisicamente do arquivo IES.', { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
-
-        // 3. Download
-        const bytes = await pdfDoc.save();
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Relatorio_LuxSintax.pdf'; link.click();
-
-    } catch (err) {
-        console.error("Erro no PDF:", err);
-        alert("Ops! Ocorreu um erro ao gerar o PDF. Feche e abra a aba novamente.");
-    }
+    // 3. Processamento e Download
+    const bytes = await pdfDoc.save();
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Relatorio_LuxSintax_Grid.pdf'; link.click();
 };
         // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
@@ -1229,18 +1232,6 @@ const advResults = document.getElementById('grid-advanced-results');
                         const targetKey = window.currentTool;
                         window.state[targetKey].iesData = parsed;
                         window.state[targetKey].iesFileName = file.name;
-// Injeta Fluxo e Potência Reais
-                        window.state[targetKey].flux = Math.round(parsed.calculatedFlux);
-                        window.state[targetKey].watts = parsed.watts || 0;
-
-                        // Trava a caixa de Fluxo no HTML para garantir integridade
-                        const fluxInput = document.getElementById('g-flux');
-                        if (fluxInput && targetKey === 'grid') {
-                            fluxInput.value = Math.round(parsed.calculatedFlux);
-                            fluxInput.disabled = true;
-                            fluxInput.classList.add('opacity-50', 'cursor-not-allowed');
-                            fluxInput.title = "Valor bloqueado: Extraído diretamente do arquivo IES";
-                        }
                         
                         let statusId = 'p-ies-status';
                         if(window.currentTool === 'vertical') statusId = 'v-ies-status';
@@ -1273,6 +1264,7 @@ const advResults = document.getElementById('grid-advanced-results');
                         break;
                     }
                 }
+                
                 if (!tiltFound) return null;
 
                 function nextNum() {
@@ -1284,15 +1276,12 @@ const advResults = document.getElementById('grid-advanced-results');
                     return null;
                 }
 
-                const numLamps = nextNum(); 
-                const lumensPerLamp = nextNum(); 
+                nextNum(); nextNum(); 
                 const multiplier = nextNum();
                 const vCount = nextNum();
                 const hCount = nextNum();
                 nextNum(); nextNum(); nextNum(); nextNum(); nextNum();
-                const bf = nextNum(); 
-                nextNum(); 
-                const watts = nextNum(); // Extrai a Potência exata em Watts
+                nextNum(); nextNum(); nextNum();
 
                 const vAngles = [];
                 for(let i=0; i<vCount; i++) vAngles.push(nextNum());
@@ -1309,72 +1298,7 @@ const advResults = document.getElementById('grid-advanced-results');
                     candelas.push(row);
                 }
 
-                // CÁLCULO DE FLUXO BLINDADO (Identifica se é Relativo ou Absoluto)
-                let calculatedFlux = 0;
-                if (lumensPerLamp !== -1 && lumensPerLamp > 0) {
-                    // Fotometria Relativa (Ex: Lâmpadas Fluorescentes/Metálicas)
-                    calculatedFlux = (numLamps > 0 ? numLamps : 1) * lumensPerLamp * (bf > 0 ? bf : 1) * multiplier;
-                } else {
-                    // Fotometria Absoluta (LEDs) - Integração Zonal
-                    for(let i = 0; i < vCount - 1; i++) {
-                        let a1 = vAngles[i] * Math.PI / 180;
-                        let a2 = vAngles[i + 1] * Math.PI / 180;
-                        let avgI = (candelas[0][i] + candelas[0][i + 1]) / 2;
-                        let solidAngle = 2 * Math.PI * Math.abs(Math.cos(a1) - Math.cos(a2));
-                        calculatedFlux += avgI * solidAngle * multiplier;
-                    }
-                }
-
-                return { vAngles, hAngles, candelas, multiplier, watts, calculatedFlux };
-
-            } catch (e) {
-                console.error("Erro Crítico no Parser IES:", e);
-                return null;
-            }
-        }
-                }
-
-                const numLamps = nextNum(); 
-                const lumensPerLamp = nextNum(); 
-                const multiplier = nextNum();
-                const vCount = nextNum();
-                const hCount = nextNum();
-                nextNum(); nextNum(); nextNum(); nextNum(); nextNum();
-                const bf = nextNum(); 
-                nextNum(); 
-                const watts = nextNum(); // Extrai a Potência Real em Watts do Arquivo
-
-                const vAngles = [];
-                for(let i=0; i<vCount; i++) vAngles.push(nextNum());
-
-                const hAngles = [];
-                for(let i=0; i<hCount; i++) hAngles.push(nextNum());
-
-                const candelas = [];
-                for(let h=0; h<hCount; h++) {
-                    const row = [];
-                    for(let v=0; v<vCount; v++) {
-                        row.push(nextNum());
-                    }
-                    candelas.push(row);
-                }
-
-                // Motor de Integração Esférica para descobrir o Fluxo Total
-                let calculatedFlux = 0;
-                if (lumensPerLamp !== -1) {
-                    calculatedFlux = numLamps * lumensPerLamp * bf * multiplier;
-                } else {
-                    // Integração para Fotometria Absoluta (LEDs)
-                    for(let i = 0; i < vCount - 1; i++) {
-                        let a1 = vAngles[i] * Math.PI / 180;
-                        let a2 = vAngles[i + 1] * Math.PI / 180;
-                        let avgI = (candelas[0][i] + candelas[0][i + 1]) / 2;
-                        let solidAngle = 2 * Math.PI * Math.abs(Math.cos(a1) - Math.cos(a2));
-                        calculatedFlux += avgI * solidAngle * multiplier;
-                    }
-                }
-
-                return { vAngles, hAngles, candelas, multiplier, watts, calculatedFlux };
+                return { vAngles, hAngles, candelas, multiplier };
 
             } catch (e) {
                 console.error("IES Parse Error", e);
