@@ -350,30 +350,35 @@
 </div>
                                 <div id="inputs-grid" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                    
                                     <div class="mode-standard-only">
-    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
-</div>
+                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
+                                    </div>
 
-<div class="mode-ies-group hidden space-y-6 mb-6 border-t border-slate-200 pt-4">
-    <div class="group">
-        <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
-        <input type="file" id="g-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-        <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-    </div>
-</div>
-                                    <div class="mb-4 group border-t border-slate-200 pt-4">
-                                        <h4 class="text-[10px] text-luminous-gold font-black uppercase tracking-wider mb-4" data-i18n="lbl_lumen_mode">MÉTODO DOS LÚMENS (OBRIGATÓRIO)</h4>
-                                        <div id="lumen-inputs" class="space-y-4 bg-amber-50 dark:bg-slate-800/50 p-4 rounded-xl border border-amber-100 dark:border-slate-700">
-                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[8px] text-slate-500 font-bold">LX</span></div></div></div>
-                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[8px] text-slate-500 font-bold">W</span></div></div></div>
-                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100" class="transition-opacity"><span class="text-[8px] text-slate-500 font-bold">LM</span></div></div></div>
-                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_util_factor">FATOR UTILIZAÇÃO (U)</label><div class="flex items-baseline gap-1"><input type="number" id="g-utilFactor" value="0.60" min="0.1" max="1.0" step="0.05"></div></div></div>
-                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_maint_factor">FATOR MANUTENÇÃO (FM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-maintFactor" value="0.80" min="0.1" max="1.0" step="0.05"></div></div></div>
+                                    <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-slate-200 pt-4">
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <input type="file" id="g-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                                            <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
+                                    
+                                    <div class="mode-direct-group mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="g-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-g-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                    
+                                    <div class="mode-photo-group hidden mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="g-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-g-cdklm" min="0" max="10000" step="10" value="2000"></div>
+
+                                    <div class="space-y-6 mb-6 border-t border-slate-200 pt-4">
+                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[8px] text-slate-500 font-bold">LX</span></div></div></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100" class="transition-opacity"><span class="text-[8px] text-slate-500 font-bold">LM</span></div></div></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[8px] text-slate-500 font-bold">W</span></div></div></div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_util_factor">FATOR UTILIZAÇÃO</label><div class="flex items-baseline gap-1"><input type="number" id="g-utilFactor" value="0.60" min="0.1" max="1.0" step="0.05"></div></div></div>
+                                            <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_maint_factor">FATOR MANUTENÇÃO</label><div class="flex items-baseline gap-1"><input type="number" id="g-maintFactor" value="0.80" min="0.1" max="1.0" step="0.05"></div></div></div>
+                                        </div>
+                                    </div>
+
                                     <div class="mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_w">LARGURA DO AMB. (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_l">COMPRIMENTO DO AMB. (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomL" value="4.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
-                                    
                                     
                                     <div class="mb-6 group border-t border-slate-200 pt-4">
                                         <div class="flex flex-col mb-2">
@@ -382,12 +387,10 @@
                                                 <div id="grid-suggestion-display" class="text-3xl font-black text-tech-cyan tracking-tighter">2 <span class="text-sm text-slate-400 font-normal mx-1">X</span> 2</div>
                                                 <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded font-bold uppercase tracking-wider dark:bg-slate-800" data-i18n="lbl_grid_unit">PEÇAS</span>
                                             </div>
-                                            <p id="grid-desc-display" class="text-[9px] text-slate-400 mt-2 italic font-semibold leading-relaxed" data-i18n="lbl_grid_desc">Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.</p>
+                                            <p id="grid-desc-display" class="text-[9px] text-slate-400 mt-2 italic font-semibold leading-relaxed text-luminous-gold">Cálculo de malha para atingir o alvo desejado.</p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
                         <div class="lg:col-span-9 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col relative h-full min-h-[600px]">
@@ -1479,43 +1482,31 @@ window.handleGenerateReport = async () => {
                 const gridDisplay = document.getElementById('grid-suggestion-display');
                 const gridDesc = document.getElementById('grid-desc-display');
 
-                if (s.lumenMode) {
-                    const area = s.roomW * s.roomL;
-                    const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
-                    const N = Math.max(1, Math.ceil(targetN));
-                    
-                    const ratio = s.roomW / s.roomL;
-                    let calcCols = Math.round(Math.sqrt(N * ratio));
-                    let calcRows = Math.round(Math.sqrt(N / ratio));
-                    
-                    calcCols = Math.max(1, calcCols);
-                    calcRows = Math.max(1, calcRows);
-                    
-                    while (calcCols * calcRows < N) {
-                        if ((calcCols / calcRows) < ratio) {
-                            calcCols++;
-                        } else {
-                            calcRows++;
-                        }
+                // 1. CÁLCULO OBRIGATÓRIO (MÉTODO DOS LÚMENS)
+                const area = s.roomW * s.roomL;
+                const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
+                const N = Math.max(1, Math.ceil(targetN));
+                
+                const ratio = s.roomW / s.roomL;
+                let calcCols = Math.round(Math.sqrt(N * ratio));
+                let calcRows = Math.round(Math.sqrt(N / ratio));
+                
+                calcCols = Math.max(1, calcCols);
+                calcRows = Math.max(1, calcRows);
+                
+                while (calcCols * calcRows < N) {
+                    if ((calcCols / calcRows) < ratio) {
+                        calcCols++;
+                    } else {
+                        calcRows++;
                     }
-                    s.cols = calcCols;
-                    s.rows = calcRows;
-                    
-                    if (gridDesc) {
-                        gridDesc.innerHTML = window.currentLang === 'en' ? `Total required: ${N} fixtures to reach ${s.targetLux} lx.` : `Total calculado: ${N} luminárias para atingir ${s.targetLux} lx.`;
-                        gridDesc.classList.add('text-luminous-gold');
-                    }
-                } else {
-                    const brCalc = currentBeam * Math.PI / 180;
-                    const diaCalc = 2 * s.height * Math.tan(brCalc / 2);
-                    const effectiveSpacing = diaCalc > 0.1 ? diaCalc * 0.75 : 1; 
-                    s.cols = Math.max(1, Math.ceil(s.roomW / effectiveSpacing));
-                    s.rows = Math.max(1, Math.ceil(s.roomL / effectiveSpacing));
-                    
-                    if (gridDesc) {
-                        gridDesc.innerHTML = window.currentLang === 'en' ? 'Autonomous distribution aiming for 25% beam overlap.' : 'Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.';
-                        gridDesc.classList.remove('text-luminous-gold');
-                    }
+                }
+                s.cols = calcCols;
+                s.rows = calcRows;
+                
+                if (gridDesc) {
+                    gridDesc.innerHTML = window.currentLang === 'en' ? `Total required: ${N} fixtures to reach ${s.targetLux} lx.` : `Total calculado: ${N} luminárias para atingir ${s.targetLux} lx.`;
+                    gridDesc.classList.add('text-luminous-gold');
                 }
 
                 if (gridDisplay) {
