@@ -1051,35 +1051,98 @@ window.handleBimExport = () => {
 window.handleGenerateReport = async () => {
     if (!window.PDFLib) return alert('Carregando gerador de PDF...');
     const grid = window.state.grid;
-    const lpd = (grid.cols * grid.rows * (grid.flux / 100)) / (grid.roomW * grid.roomL);
-    const ugr = window.GlareEngine.calculateUGR(grid, { observerHeight: 1.2, luminaireArea: 0.36, backgroundLuminance: 12 });
+
+    // 1. Cálculos Matemáticos Avançados
+    const area = grid.roomW * grid.roomL;
+    const totalFixtures = grid.cols * grid.rows;
     
+    // Iluminância Resultante (Equação do Método dos Lúmens)
+    const resultingLux = (totalFixtures * grid.flux * grid.utilFactor * grid.maintFactor) / area;
+    
+    // Densidade de Potência (LPD) - Assumindo 100lm/W como média de mercado
+    const lpd = (totalFixtures * (grid.flux / 100)) / area; 
+
+    // Extração de Dados da Luminária (IES ou Genérica)
+    const effectiveBeam = window.getEffectiveBeam(grid);
+    const luminaireName = grid.iesFileName ? grid.iesFileName : "Fonte Genérica (Distribuição Lambertiana)";
+
+    // Parâmetros de Ofuscamento (UGR) com Fallback seguro
+    const uArea = grid.lumArea || 0.36;
+    const obsH = grid.obsHeight || 1.2;
+    const bgLum = grid.bgLuminance || 12;
+    const ugr = window.GlareEngine.calculateUGR(grid, { observerHeight: obsH, luminaireArea: uArea, backgroundLuminance: bgLum });
+
+    // 2. Renderização do Layout do PDF
     const pdfDoc = await window.PDFLib.PDFDocument.create();
-    const page = pdfDoc.addPage([595.28, 841.89]);
+    const page = pdfDoc.addPage([595.28, 841.89]); // Formato A4
     const { width, height } = page.getSize();
-    
+
+    // Cabeçalho Corporativo
     page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
     page.drawText('LUXSINTAX', { x: 50, y: height - 45, size: 24, color: window.PDFLib.rgb(0.85, 0.47, 0.02) });
     page.drawText('RELATÓRIO TÉCNICO DE CONFORMIDADE LUMINOTÉCNICA', { x: 50, y: height - 65, size: 8, color: window.PDFLib.rgb(1, 1, 1) });
-    
+
     let cy = height - 120;
-    const drawRow = (l, v) => { page.drawText(l+':', { x: 50, y: cy, size: 9 }); page.drawText(v, { x: 200, y: cy, size: 9 }); cy -= 15; };
-    drawRow('Data', new Date().toLocaleDateString('pt-BR'));
-    drawRow('Ambiente', `${grid.roomW}m x ${grid.roomL}m (H: ${grid.height}m)`);
-    drawRow('Total Peças', `${grid.cols * grid.rows} unidades`);
     
-    cy -= 30; page.drawText('INDICADORES DE PERFORMANCE', { x: 50, y: cy, size: 12 }); cy -= 20;
+    // Funções auxiliares de tipografia
+    const drawSect = (title) => { page.drawText(title, { x: 50, y: cy, size: 12, color: window.PDFLib.rgb(0.85, 0.47, 0.02) }); cy -= 20; };
+    const drawRow = (l, v) => { page.drawText(l+':', { x: 50, y: cy, size: 9, color: window.PDFLib.rgb(0.3, 0.3, 0.3) }); page.drawText(v, { x: 200, y: cy, size: 9, color: window.PDFLib.rgb(0, 0, 0) }); cy -= 15; };
+
+    // Seção 1: Dados do Ambiente
+    drawSect('1. DADOS DO AMBIENTE');
+    drawRow('Data do Estudo', new Date().toLocaleDateString('pt-BR'));
+    drawRow('Dimensões (X x Y)', `${grid.roomW.toFixed(2)}m x ${grid.roomL.toFixed(2)}m`);
+    drawRow('Pé-direito (H)', `${grid.height.toFixed(2)}m`);
+    drawRow('Área Total', `${area.toFixed(2)} m²`);
+    cy -= 10;
+
+    // Seção 2: Especificação da Luminária
+    drawSect('2. ESPECIFICAÇÃO DA LUMINÁRIA');
+    drawRow('Modelo / Arquivo IES', luminaireName);
+    drawRow('Fluxo Luminoso', `${grid.flux} lúmens`);
+    drawRow('Abertura de Facho (FWHM)', `${Math.round(effectiveBeam)}°`);
+    drawRow('Fator de Utilização (U)', `${grid.utilFactor.toFixed(2)}`);
+    drawRow('Fator de Manutenção (FM)', `${grid.maintFactor.toFixed(2)}`);
+    cy -= 10;
+
+    // Seção 3: Geometria da Malha
+    drawSect('3. DISTRIBUIÇÃO ESPACIAL');
+    drawRow('Malha Sugerida', `${grid.cols} colunas x ${grid.rows} linhas`);
+    drawRow('Total de Peças (N)', `${totalFixtures} unidades`);
+    cy -= 15;
+
+    // Blocos de Indicadores (KPIs)
     const drawKPI = (x, y, l, v, s) => {
-        page.drawRectangle({ x, y, width: 160, height: 60, borderColor: window.PDFLib.rgb(0.88, 0.91, 0.94), borderWidth: 1 });
-        page.drawText(l, { x: x + 10, y: y + 45, size: 7 }); page.drawText(v, { x: x + 10, y: y + 20, size: 18 }); page.drawText(s, { x: x + 10, y: y + 8, size: 7 });
+        page.drawRectangle({ x, y, width: 155, height: 60, borderColor: window.PDFLib.rgb(0.88, 0.91, 0.94), borderWidth: 1 });
+        page.drawText(l, { x: x + 10, y: y + 45, size: 7, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(v, { x: x + 10, y: y + 20, size: 16, color: window.PDFLib.rgb(0, 0, 0) });
+        page.drawText(s, { x: x + 10, y: y + 8, size: 7, color: window.PDFLib.rgb(0.5, 0.5, 0.5) });
     };
-    drawKPI(50, cy - 60, 'ILUMINÂNCIA (ALVO)', `${grid.targetLux} lx`, 'Ref: NBR 8995-1');
-    drawKPI(220, cy - 60, 'OFUSCAMENTO (UGR)', `${ugr}`, 'Limite: 19');
-    drawKPI(390, cy - 60, 'EFICIÊNCIA (LPD)', `${lpd.toFixed(2)} W/m²`, 'Meta LEED');
+
+    drawKPI(50, cy - 60, 'ILUMINÂNCIA ALVO', `${grid.targetLux} lx`, 'Referência Normativa');
+    drawKPI(215, cy - 60, 'ILUMINÂNCIA RESULTANTE', `${Math.round(resultingLux)} lx`, 'Média Estimada (Projeto)');
+    drawKPI(380, cy - 60, 'OFUSCAMENTO (UGR)', `${ugr}`, 'Índice Max. Calculado');
+    cy -= 80;
     
+    drawKPI(50, cy - 60, 'EFICIÊNCIA (LPD)', `${lpd.toFixed(2)} W/m²`, 'Densidade de Potência');
+    cy -= 80;
+
+    // Seção 4: Notas Técnicas e Embasamento
+    cy -= 10;
+    page.drawText('NOTAS TÉCNICAS E PARÂMETROS DE CÁLCULO:', { x: 50, y: cy, size: 9, color: window.PDFLib.rgb(0.85, 0.47, 0.02) });
+    cy -= 15;
+    const note1 = '- Iluminância Resultante: Equação dos Lúmens (N * Fluxo * U * FM) / Área.';
+    const note2 = `- Ofuscamento (UGR): Estudo pontual c/ Área Emissiva=${uArea}m², Altura Obs=${obsH}m, Fundo=${bgLum}cd/m².`;
+    const note3 = '- LPD: Estimativa assumindo eficácia média de mercado de 100 lm/W para a luminária especificada.';
+    
+    page.drawText(note1, { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 12;
+    page.drawText(note2, { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 12;
+    page.drawText(note3, { x: 50, y: cy, size: 8, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
+
+    // 3. Processamento e Download
     const bytes = await pdfDoc.save();
     const blob = new Blob([bytes], { type: 'application/pdf' });
-    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Report_LuxSintax.pdf`; link.click();
+    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Relatorio_LuxSintax_Grid.pdf'; link.click();
 };
         // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
