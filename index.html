@@ -1059,8 +1059,9 @@ window.handleGenerateReport = async () => {
     // Iluminância Resultante (Equação do Método dos Lúmens)
     const resultingLux = (totalFixtures * grid.flux * grid.utilFactor * grid.maintFactor) / area;
     
-    // Densidade de Potência (LPD) - Assumindo 100lm/W como média de mercado
-    const lpd = (totalFixtures * (grid.flux / 100)) / area; 
+    // Densidade de Potência (LPD) - Usa Watts do IES ou assume 100lm/W
+    const fixtureWatts = grid.watts ? grid.watts : (grid.flux / 100);
+    const lpd = (totalFixtures * fixtureWatts) / area; 
 
     // Extração de Dados da Luminária (IES ou Genérica)
     const effectiveBeam = window.getEffectiveBeam(grid);
@@ -1099,7 +1100,8 @@ window.handleGenerateReport = async () => {
     // Seção 2: Especificação da Luminária
     drawSect('2. ESPECIFICAÇÃO DA LUMINÁRIA');
     drawRow('Modelo / Arquivo IES', luminaireName);
-    drawRow('Fluxo Luminoso', `${grid.flux} lúmens`);
+    drawRow('Potência Unitária (W)', `${fixtureWatts.toFixed(1)} W`);
+    drawRow('Fluxo Luminoso (Φ)', `${Math.round(grid.flux)} lúmens`);
     drawRow('Abertura de Facho (FWHM)', `${Math.round(effectiveBeam)}°`);
     drawRow('Fator de Utilização (U)', `${grid.utilFactor.toFixed(2)}`);
     drawRow('Fator de Manutenção (FM)', `${grid.maintFactor.toFixed(2)}`);
@@ -1232,6 +1234,18 @@ const advResults = document.getElementById('grid-advanced-results');
                         const targetKey = window.currentTool;
                         window.state[targetKey].iesData = parsed;
                         window.state[targetKey].iesFileName = file.name;
+// Injeta Fluxo e Potência Reais
+                        window.state[targetKey].flux = Math.round(parsed.calculatedFlux);
+                        window.state[targetKey].watts = parsed.watts || 0;
+
+                        // Trava a caixa de Fluxo no HTML para garantir integridade
+                        const fluxInput = document.getElementById('g-flux');
+                        if (fluxInput && targetKey === 'grid') {
+                            fluxInput.value = Math.round(parsed.calculatedFlux);
+                            fluxInput.disabled = true;
+                            fluxInput.classList.add('opacity-50', 'cursor-not-allowed');
+                            fluxInput.title = "Valor bloqueado: Extraído diretamente do arquivo IES";
+                        }
                         
                         let statusId = 'p-ies-status';
                         if(window.currentTool === 'vertical') statusId = 'v-ies-status';
@@ -1276,12 +1290,15 @@ const advResults = document.getElementById('grid-advanced-results');
                     return null;
                 }
 
-                nextNum(); nextNum(); 
+                const numLamps = nextNum(); 
+                const lumensPerLamp = nextNum(); 
                 const multiplier = nextNum();
                 const vCount = nextNum();
                 const hCount = nextNum();
                 nextNum(); nextNum(); nextNum(); nextNum(); nextNum();
-                nextNum(); nextNum(); nextNum();
+                const bf = nextNum(); 
+                nextNum(); 
+                const watts = nextNum(); // Extrai a Potência Real em Watts do Arquivo
 
                 const vAngles = [];
                 for(let i=0; i<vCount; i++) vAngles.push(nextNum());
@@ -1298,7 +1315,22 @@ const advResults = document.getElementById('grid-advanced-results');
                     candelas.push(row);
                 }
 
-                return { vAngles, hAngles, candelas, multiplier };
+                // Motor de Integração Esférica para descobrir o Fluxo Total
+                let calculatedFlux = 0;
+                if (lumensPerLamp !== -1) {
+                    calculatedFlux = numLamps * lumensPerLamp * bf * multiplier;
+                } else {
+                    // Integração para Fotometria Absoluta (LEDs)
+                    for(let i = 0; i < vCount - 1; i++) {
+                        let a1 = vAngles[i] * Math.PI / 180;
+                        let a2 = vAngles[i + 1] * Math.PI / 180;
+                        let avgI = (candelas[0][i] + candelas[0][i + 1]) / 2;
+                        let solidAngle = 2 * Math.PI * Math.abs(Math.cos(a1) - Math.cos(a2));
+                        calculatedFlux += avgI * solidAngle * multiplier;
+                    }
+                }
+
+                return { vAngles, hAngles, candelas, multiplier, watts, calculatedFlux };
 
             } catch (e) {
                 console.error("IES Parse Error", e);
