@@ -349,11 +349,6 @@
     </div>
 </div>
                                 <div id="inputs-grid" class="hidden">
-                                    <div class="flex flex-row items-center justify-center gap-6 p-1 mb-6 border-b border-slate-200 pb-4">
-                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="direct" checked onchange="window.updateCalcMode('direct')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Luminária Manual</span></label>
-                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="ies" onchange="window.updateCalcMode('ies')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Arquivo IES</span></label>
-                                    </div>
-
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     
                                     <div class="mode-standard-only">
@@ -367,6 +362,10 @@
                                             <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
+                                    
+                                    <div class="mode-direct-group mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="g-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-g-intensity" min="0" max="20000" step="10" value="3000"></div>
+                                    
+                                    <div class="mode-photo-group hidden mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="g-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-g-cdklm" min="0" max="10000" step="10" value="2000"></div>
 
                                     <div class="space-y-6 mb-6 border-t border-slate-200 pt-4">
                                         
@@ -1168,26 +1167,18 @@ window.handleGenerateReport = async () => {
             document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
             
             const modeSelector = document.getElementById('calc-mode-selector');
-            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid');
+            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver');
 
             if (toolId !== 'query') {
                 ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
-                
-                // Inteligência para separar os menus
-                if (toolId === 'grid') {
-                    const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
-                    if (gridSel) window.updateCalcMode(gridSel.value);
-                } else if (toolId !== 'driver') {
-                    const globalSel = document.querySelector('input[name="calc_mode"]:checked');
-                    if (globalSel) window.updateCalcMode(globalSel.value);
-                } else {
-                    window.updateCalcMode(window.calcMode);
-                }
-                
+                window.updateCalcMode(window.calcMode);
                 window.updateCalculations();
             } else {
+                 window.switchQueryTab('nbr8995');
+            }
+        }
 
         window.updateCalcMode = function(mode) {
             window.calcMode = mode;
