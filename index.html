@@ -373,10 +373,10 @@
                                         
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30" class="transition-opacity"></div>
                                         
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <div class="flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                                             <div class="group">
                                                 <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block" data-i18n="lbl_util_factor">Fator Utilização (U)</label>
-                                                <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-2 text-xs font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
+                                                <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
                                                     <option value="0.70">Cores Claras / Aberto (0.70)</option>
                                                     <option value="0.60" selected>Padrão / Médio (0.60)</option>
                                                     <option value="0.40">Cores Escuras / Fechado (0.40)</option>
@@ -385,7 +385,7 @@
                                             
                                             <div class="group">
                                                 <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block" data-i18n="lbl_maint_factor">Fator Manutenção (FM)</label>
-                                                <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-2 text-xs font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
+                                                <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
                                                     <option value="0.80" selected>Limpo / Novo (0.80)</option>
                                                     <option value="0.70">Normal / Escritório (0.70)</option>
                                                     <option value="0.60">Sujo / Industrial (0.60)</option>
