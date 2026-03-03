@@ -163,7 +163,8 @@
                         <button type="button" onclick="window.AuthManager.showForgotPassword()" class="text-[9px] text-slate-400 hover:text-luminous-gold transition-colors font-bold uppercase tracking-widest outline-none" data-i18n="auth_forgot">Esqueceu a senha?</button>
                     </div>
                 </div>
-                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-white font-black rounded-lg uppercase tracking-widest text-xs hover:bg-amber-700 transition-colors shadow-lg">Acessar Plataforma</button>
+                <button onclick="window.AuthManager.handleLogin()" class="w-full py-4 bg-luminous-gold text-white font-black rounded-lg uppercase tracking-widest text-xs hover:bg-amber-700 transition-colors shadow-lg mb-3">Acessar Plataforma</button>
+<button type="button" onclick="window.AuthManager.unlockApp(); document.getElementById('user-name-display').innerText = 'VISITANTE';" class="w-full py-3 bg-slate-100 text-slate-500 font-black rounded-lg uppercase tracking-widest text-[10px] hover:bg-slate-200 transition-colors shadow-sm border border-slate-200">Entrar sem Login (Modo Apresentação)</button>
             </div>
             <div id="form-register" class="space-y-5 hidden">
                 <div class="grid grid-cols-2 gap-4"><div class="auth-input-group"><label>Nome</label><input type="text" id="reg-name" placeholder="Nome"></div><div class="auth-input-group"><label>Sobrenome</label><input type="text" id="reg-surname" placeholder="Sobrenome"></div></div>
