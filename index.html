@@ -1548,12 +1548,12 @@ window.handleGenerateReport = async () => {
 
                 // 1. MOTOR DE CÁLCULO PONTO A PONTO (Malha de 0.5m x 0.5m)
                 const cellSizeM = 0.5; 
-                const calcCols = Math.ceil(s.roomW / cellSizeM);
-                const calcRows = Math.ceil(s.roomL / cellSizeM);
-                const cellPxW = roomPxW / calcCols;
-                const cellPxH = roomPxH / calcRows;
-                const cellMW = s.roomW / calcCols;
-                const cellMH = s.roomL / calcRows;
+                const cellCols = Math.ceil(s.roomW / cellSizeM);
+                const cellRows = Math.ceil(s.roomL / cellSizeM);
+                const cellPxW = roomPxW / cellCols;
+                const cellPxH = roomPxH / cellRows;
+                const cellMW = s.roomW / cellCols;
+                const cellMH = s.roomL / cellRows;
 
                 // Mapeia coordenadas das Luminárias
                 const fixtures = [];
@@ -1581,8 +1581,8 @@ window.handleGenerateReport = async () => {
                 ctx.font = "bold 9px Manrope";
 
                 // 2. RENDERIZAÇÃO DA MATRIZ (GRID)
-                for (let i = 0; i < calcCols; i++) {
-                    for (let j = 0; j < calcRows; j++) {
+                for (let i = 0; i < cellCols; i++) {
+                    for (let j = 0; j < cellRows; j++) {
                         const ptX = (i + 0.5) * cellMW;
                         const ptY = (j + 0.5) * cellMH;
                         
