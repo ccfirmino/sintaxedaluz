@@ -1977,29 +1977,40 @@ const advResults = document.getElementById('grid-advanced-results');
             }
             
             if (window.calcMode === 'ies' && s.iesData) {
-                ctx.beginPath();
-                ctx.strokeStyle = "rgba(217, 119, 6, 0.4)";
-                ctx.setLineDash([]);
                 const { vAngles, candelas } = s.iesData;
                 const row = candelas[0];
                 const maxI = Math.max(...row);
-                
                 const sy = floorY - (s.height * scale);
-                for(let i=0; i<vAngles.length; i++) {
-                    const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                    const r = (row[i] / maxI) * (s.height * scale * 0.9);
-                    const x = centerX + r * Math.sin(ang);
-                    const y = sy + r * Math.cos(ang);
-                    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+
+                // Define as origens: 1 no centro, ou 2 se for Estudo de Facho
+                let origins = [centerX];
+                if (window.currentTool === 'homog') {
+                    const hS = (s.spacing * scale) / 2;
+                    origins = [centerX - hS, centerX + hS];
                 }
-                for(let i=0; i<vAngles.length; i++) {
-                     const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                     const r = (row[i] / maxI) * (s.height * scale * 0.9);
-                     const x = centerX + r * Math.sin(ang);
-                     const y = sy + r * Math.cos(ang);
-                     ctx.lineTo(x,y);
-                }
-                ctx.stroke();
+
+                ctx.strokeStyle = "rgba(217, 119, 6, 0.4)";
+                ctx.setLineDash([]);
+
+                // Desenha a curva IES para cada origem
+                origins.forEach(originX => {
+                    ctx.beginPath();
+                    for(let i=0; i<vAngles.length; i++) {
+                        const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                        const r = (row[i] / maxI) * (s.height * scale * 0.9);
+                        const x = originX + r * Math.sin(ang);
+                        const y = sy + r * Math.cos(ang);
+                        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                    }
+                    for(let i=0; i<vAngles.length; i++) {
+                        const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                        const r = (row[i] / maxI) * (s.height * scale * 0.9);
+                        const x = originX + r * Math.sin(ang);
+                        const y = sy + r * Math.cos(ang);
+                        ctx.lineTo(x,y);
+                    }
+                    ctx.stroke();
+                });
             }
         }
 
