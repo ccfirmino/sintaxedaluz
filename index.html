@@ -747,10 +747,12 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            window.state = {
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, iesData: null, iesFileName: null, viewMode: 'section' }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
+            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, falseColor: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80, lumArea: 0.36, obsHeight: 1.2, bgLuminance: 12 },
+            driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 }
+        };
            
            // ESTA É A LINHA QUE MUDOU (Adicionamos lumArea, obsHeight e bgLuminance no final):
            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, falseColor: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80, lumArea: 0.36, obsHeight: 1.2, bgLuminance: 12 },
@@ -1072,6 +1074,7 @@ window.handleGenerateReport = async () => {
     if (!window.PDFLib) return alert('Carregando gerador de PDF...');
     const grid = window.state.grid;
     const lpd = (grid.cols * grid.rows * (grid.flux / 100)) / (grid.roomW * grid.roomL);
+    
     const ugr = window.GlareEngine.calculateUGR(grid, { 
         observerHeight: grid.obsHeight, 
         luminaireArea: grid.lumArea, 
@@ -1084,7 +1087,7 @@ window.handleGenerateReport = async () => {
     
     page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
     page.drawText('LUXSINTAX', { x: 50, y: height - 45, size: 24, color: window.PDFLib.rgb(0.85, 0.47, 0.02) });
-    page.drawText('RELATÓRIO TÉCNICO DE CONFORMIDADE LUMINOTÉCNICA', { x: 50, y: height - 65, size: 8, color: window.PDFLib.rgb(1, 1, 1) });
+    page.drawText('RELATÓRIO TÉCNICO DE CONFORMIDADE', { x: 50, y: height - 65, size: 8, color: window.PDFLib.rgb(1, 1, 1) });
     
     let cy = height - 120;
     const drawRow = (l, v) => { page.drawText(l+':', { x: 50, y: cy, size: 9 }); page.drawText(v, { x: 200, y: cy, size: 9 }); cy -= 15; };
@@ -1460,11 +1463,10 @@ const advResults = document.getElementById('grid-advanced-results');
                 
                 ctx.textAlign = "start"; // Reset global
 // Atualizar Calculo de UGR
-                // Atualizar Calculo de UGR com variáveis dinâmicas
-                const ugrVal = window.GlareEngine.calculateUGR(s, { 
-                    observerHeight: s.obsHeight, 
-                    luminaireArea: s.lumArea, 
-                    backgroundLuminance: s.bgLuminance 
+                const ugrVal = window.GlareEngine.calculateUGR(s, {
+                    observerHeight: s.obsHeight,
+                    luminaireArea: s.lumArea,
+                    backgroundLuminance: s.bgLuminance
                 });
                 const ugrEl = document.getElementById('ugr-value');
                 const ugrStatus = document.getElementById('ugr-status');
