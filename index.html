@@ -893,8 +893,19 @@ driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 }
 handleLogin: async function() {
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) alert(error.message);
+                
+                if (!email || !password) {
+                    return alert("Por favor, preencha seu e-mail e senha.");
+                }
+
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                
+                if (error) {
+                    alert("Erro de acesso: " + error.message);
+                } else if (data.session) {
+                    // Força a atualização da interface e destranca a tela na mesma hora
+                    this.handleSessionUpdate(data.session);
+                }
             },
             handleRegister: async function() {
                 const email = document.getElementById('reg-email').value;
