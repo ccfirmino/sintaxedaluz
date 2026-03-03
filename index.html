@@ -1570,13 +1570,20 @@ window.handleGenerateReport = async () => {
                     }
                 }
 
-                // Extrai Intensidade Máxima
+                // Extrai Intensidade Máxima e Cria Curva Fotométrica Perfeita
                 let maxI = 0;
+                let n_power = 1;
+                
                 if (window.calcMode === 'ies' && s.iesData) {
                     maxI = s.iesData.candelas[0][0] * s.iesData.multiplier;
                 } else {
-                    const solidAngle = 2 * Math.PI * (1 - Math.cos(br / 2));
-                    maxI = s.flux / (solidAngle || 1);
+                    const halfBeamRad = (currentBeam / 2) * Math.PI / 180;
+                    // Equação FWHM: Calcula o expoente para que a intensidade caia pela metade na exata borda do facho
+                    if (halfBeamRad > 0 && halfBeamRad < Math.PI / 2) {
+                        n_power = Math.log(0.5) / Math.log(Math.cos(halfBeamRad));
+                    }
+                    // Fluxo = Integral da curva. Isolando Imax:
+                    maxI = (s.flux * (n_power + 1)) / (2 * Math.PI);
                 }
 
                 // Adiciona Reflexão de Parede (Luz Indireta / Método da Cavidade)
@@ -1607,8 +1614,9 @@ window.handleGenerateReport = async () => {
                             if (window.calcMode === 'ies' && s.iesData) {
                                 I = window.getIESIntensity(s, angleDeg);
                             } else {
-                                if (angleDeg <= currentBeam / 2) {
-                                    I = maxI * Math.pow(Math.cos(angleRad), 1.5); // Falloff fotométrico
+                                // Falloff Gaussiano Suave (Sem corte seco - Simula curva real de luminária)
+                                if (angleRad < Math.PI / 2) {
+                                    I = maxI * Math.pow(Math.cos(angleRad), n_power);
                                 }
                             }
                             if (I > 0) {
