@@ -412,28 +412,6 @@
                                     <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                     <canvas id="beamCanvas" class="w-full h-full relative z-10"></canvas>
                                 </div>
-<div id="grid-advanced-results" class="hidden mt-2 space-y-4 animate-fade-in-up">
-    <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-        <div class="flex justify-between items-center">
-            <div>
-                <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Ofuscamento (UGR)</span>
-                <div id="ugr-value" class="text-3xl font-black text-starlight dark:text-white">--</div>
-            </div>
-            <div id="ugr-status" class="text-[9px] font-bold px-2 py-1 rounded uppercase">Calculando...</div>
-        </div>
-        <div class="bar-container bg-slate-200 dark:bg-slate-700 h-1.5 mt-2">
-            <div id="ugr-bar" class="bar-fill bg-tech-cyan" style="width: 0%"></div>
-        </div>
-    </div>
-    <div class="flex gap-3">
-        <button onclick="window.handleGenerateReport()" class="flex-1 py-3 bg-starlight text-white font-black rounded-lg uppercase tracking-widest text-[10px] hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg">
-            <i class="fas fa-file-pdf"></i> PDF
-        </button>
-        <button onclick="window.handleBimExport()" class="flex-1 py-3 bg-tech-cyan text-white font-black rounded-lg uppercase tracking-widest text-[10px] hover:bg-sky-700 transition-all flex items-center justify-center gap-2 shadow-lg">
-            <i class="fas fa-cube"></i> BIM (JSON)
-        </button>
-    </div>
-</div>
                             </div>
                         </div>
                     </div>
@@ -1168,8 +1146,6 @@ window.handleGenerateReport = async () => {
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 window.updateCalcMode(window.calcMode);
                 window.updateCalculations();
-const advResults = document.getElementById('grid-advanced-results');
-            if(advResults) advResults.classList.toggle('hidden', toolId !== 'grid');
             } else {
                  window.switchQueryTab('nbr8995');
             }
@@ -1497,22 +1473,6 @@ const advResults = document.getElementById('grid-advanced-results');
                 }
                 
                 ctx.textAlign = "start"; // Reset global
-// Atualizar Calculo de UGR
-                const ugrVal = window.GlareEngine.calculateUGR(s, { observerHeight: 1.2, luminaireArea: 0.36, backgroundLuminance: 12 });
-                const ugrEl = document.getElementById('ugr-value');
-                const ugrStatus = document.getElementById('ugr-status');
-                const ugrBar = document.getElementById('ugr-bar');
-                if (ugrEl) {
-                    ugrEl.innerText = ugrVal;
-                    ugrBar.style.width = `${Math.min((ugrVal / 30) * 100, 100)}%`;
-                    if (ugrVal <= 19) {
-                        ugrStatus.innerText = "Confortável"; ugrStatus.className = "text-[9px] font-bold px-2 py-1 rounded uppercase bg-lime-100 text-leed-green"; ugrBar.className = "bar-fill bg-leed-green";
-                    } else if (ugrVal <= 25) {
-                        ugrStatus.innerText = "Aceitável"; ugrStatus.className = "text-[9px] font-bold px-2 py-1 rounded uppercase bg-amber-100 text-luminous-gold"; ugrBar.className = "bar-fill bg-luminous-gold";
-                    } else {
-                        ugrStatus.innerText = "Ofuscamento"; ugrStatus.className = "text-[9px] font-bold px-2 py-1 rounded uppercase bg-red-100 text-red-600"; ugrBar.className = "bar-fill bg-red-600";
-                    }
-                }
                 return;
             }
             if (window.currentTool === 'grid') {
