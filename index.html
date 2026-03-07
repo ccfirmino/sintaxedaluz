@@ -243,7 +243,7 @@
                     <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines text-lg mb-1"></i><span data-i18n="tab_horiz">SUPERFÍCIE<br>HORIZONTAL</span></button>
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
                     <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-drafting-compass text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
-                    <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">DISTRIBUIÇÃO<br>EM PLANTA</span></button>
+                    <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span>DIMENSIONAR<br>DRIVER</span></button>
                     <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                 </div>
@@ -412,16 +412,7 @@
                                         </label>
                                     </div>
                                     
-                                    <div class="mb-6 group border-t border-slate-200 pt-4">
-                                        <div class="flex flex-col mb-2">
-                                            <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-1" data-i18n="lbl_grid_sug">MALHA SUGERIDA</label>
-                                            <div class="flex items-center gap-2">
-                                                <div id="grid-suggestion-display" class="text-3xl font-black text-tech-cyan tracking-tighter">2 <span class="text-sm text-slate-400 font-normal mx-1">X</span> 2</div>
-                                                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded font-bold uppercase tracking-wider dark:bg-slate-800" data-i18n="lbl_grid_unit">PEÇAS</span>
-                                            </div>
-                                            <p id="grid-desc-display" class="text-[9px] text-slate-400 mt-2 italic font-semibold leading-relaxed text-luminous-gold">Cálculo de malha para atingir o alvo desejado.</p>
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -1559,19 +1550,7 @@ window.handleGenerateReport = async () => {
                 s.cols = calcCols;
                 s.rows = calcRows;
                 
-                if (gridDesc) {
-                    const actualPieces = s.cols * s.rows;
-                    const realAvgLux = Math.round((actualPieces * s.flux * s.utilFactor * s.maintFactor) / area);
-                    
-                    gridDesc.innerHTML = window.currentLang === 'en' 
-                        ? `Total in grid: <strong class="text-starlight dark:text-white">${actualPieces}</strong> fixtures.<br>Achieved Average: <strong class="text-starlight dark:text-white">${realAvgLux} lx</strong> (Target: ${s.targetLux} lx).` 
-                        : `Total na malha: <strong class="text-starlight dark:text-white">${actualPieces}</strong> luminárias.<br>Média atingida: <strong class="text-starlight dark:text-white">${realAvgLux} lx</strong> (Alvo: ${s.targetLux} lx).`;
-                    gridDesc.classList.add('text-luminous-gold');
-                }
-
-                if (gridDisplay) {
-                    gridDisplay.innerHTML = `${s.cols} <span class="text-sm text-slate-400 font-normal mx-1">X</span> ${s.rows}`;
-                }
+                
 
                 const padX = 80;
                 const padY = 80;
@@ -1637,27 +1616,27 @@ window.handleGenerateReport = async () => {
                 ctx.textBaseline = "middle";
                 ctx.font = "bold 9px Manrope";
 
-                // 2. RENDERIZAÇÃO DA MATRIZ (GRID)
+                // 2. RENDERIZAÇÃO DA MATRIZ (GRID) E CÁLCULO DE UNIFORMIDADE
+                let minLux = Infinity;
+                let sumLux = 0;
+                let cellCount = 0;
+
                 for (let i = 0; i < cellCols; i++) {
                     for (let j = 0; j < cellRows; j++) {
                         const ptX = (i + 0.5) * cellMW;
                         const ptY = (j + 0.5) * cellMH;
                         
-                        // Lei do Cosseno Cúbico Somada
                         let directLux = 0;
                         for (const fix of fixtures) {
                             const dx = ptX - fix.x;
                             const dy = ptY - fix.y;
-                            const dSq = dx*dx + dy*dy;
-                            const dist = Math.sqrt(dSq);
+                            const dist = Math.sqrt(dx*dx + dy*dy);
                             const angleRad = Math.atan2(dist, s.height);
-                            const angleDeg = angleRad * 180 / Math.PI;
-
+                            
                             let I = 0;
                             if (window.calcMode === 'ies' && s.iesData) {
-                                I = window.getIESIntensity(s, angleDeg);
+                                I = window.getIESIntensity(s, angleRad * 180 / Math.PI);
                             } else {
-                                // Falloff Gaussiano Suave (Sem corte seco - Simula curva real de luminária)
                                 if (angleRad < Math.PI / 2) {
                                     I = maxI * Math.pow(Math.cos(angleRad), n_power);
                                 }
@@ -1668,10 +1647,15 @@ window.handleGenerateReport = async () => {
                         }
 
                         const totalLux = Math.round(directLux * s.maintFactor + ambientLux);
+                        
+                        // Captura dados para o HUD
+                        if (totalLux < minLux) minLux = totalLux;
+                        sumLux += totalLux;
+                        cellCount++;
+
                         const pxX = offsetX + i * cellPxW;
                         const pxY = offsetY + j * cellPxH;
 
-                        // Pinta Célula e Escreve Valor de Lux
                         if (s.falseColor) {
                             ctx.fillStyle = window.FalseColorEngine.getLuxColor(totalLux, 0.85);
                             ctx.fillRect(pxX, pxY, cellPxW, cellPxH);
@@ -1681,14 +1665,71 @@ window.handleGenerateReport = async () => {
                             ctx.strokeRect(pxX, pxY, cellPxW, cellPxH);
                         }
 
-                        // Só escreve o número se a célula tiver tamanho suficiente para não poluir
                         if (cellPxW > 24 && cellPxH > 16) {
                             ctx.fillStyle = s.falseColor ? "rgba(0,0,0,0.6)" : (isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)");
                             ctx.fillText(totalLux, pxX + cellPxW/2, pxY + cellPxH/2);
                         }
                     }
                 }
-// LEGENDA DE FALSA COR (HEATMAP)
+
+                // --- DESENHAR HUD DE RESULTADOS NO CANVAS ---
+                const trueAvgLux = Math.round(sumLux / cellCount);
+                const uniformity = trueAvgLux > 0 ? (minLux / trueAvgLux).toFixed(2) : "0.00";
+                const actualPieces = s.cols * s.rows;
+
+                const hudX = 20;
+                const hudY = 20;
+                const hudW = 180;
+                const hudH = 95;
+                
+                ctx.save();
+                
+                // Fundo Translúcido
+                ctx.fillStyle = isDark ? "rgba(30, 41, 59, 0.9)" : "rgba(255, 255, 255, 0.95)";
+                ctx.shadowColor = "rgba(0,0,0,0.1)";
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetY = 4;
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hudX, hudY, hudW, hudH, 12); ctx.fill(); } 
+                else { ctx.fillRect(hudX, hudY, hudW, hudH); }
+                ctx.shadowColor = "transparent";
+                
+                // Borda
+                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+                ctx.lineWidth = 1;
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hudX, hudY, hudW, hudH, 12); ctx.stroke(); } 
+                else { ctx.strokeRect(hudX, hudY, hudW, hudH); }
+
+                // Textos
+                ctx.textAlign = "left";
+                ctx.textBaseline = "top";
+                
+                ctx.fillStyle = "#d97706";
+                ctx.font = "900 10px Manrope";
+                ctx.fillText("SÍNTESE DA MALHA", hudX + 15, hudY + 15);
+                
+                ctx.beginPath();
+                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+                ctx.moveTo(hudX + 15, hudY + 32);
+                ctx.lineTo(hudX + hudW - 15, hudY + 32);
+                ctx.stroke();
+
+                // Rótulos
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.font = "bold 10px Manrope";
+                ctx.fillText("Arranjo:", hudX + 15, hudY + 42);
+                ctx.fillText("Em Atingida:", hudX + 15, hudY + 58);
+                ctx.fillText("Uniformidade:", hudX + 15, hudY + 74);
+
+                // Valores
+                ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
+                ctx.font = "900 11px Manrope";
+                ctx.fillText(`${s.cols} x ${s.rows} (${actualPieces} un)`, hudX + 90, hudY + 41);
+                ctx.fillText(`${trueAvgLux} lx`, hudX + 90, hudY + 57);
+                ctx.fillText(`${uniformity}`, hudX + 90, hudY + 73);
+                
+                ctx.restore();
+
+                // LEGENDA DE FALSA COR (HEATMAP)
                 if (s.falseColor) {
                     const legW = 140;
                     const legH = 12;
