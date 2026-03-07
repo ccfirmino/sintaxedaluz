@@ -803,15 +803,22 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, iesData: null, iesFileName: null, viewMode: 'section' }, 
-            homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
-            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, falseColor: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 },
-            driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
-            leedProject: { rooms: [] } // Memória para os ambientes do projeto
+            // ... (mantenha os outros estados: ponto, vertical, homog, grid, driver intactos)
+            leedProject: { 
+                name: "Novo Projeto LEED",
+                target: "baseline",
+                rooms: [] 
+            }
         };
-        window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
-        window.currentLeedTarget = 'gold';
+
+        // Adicione este dicionário de metas (ASHRAE 90.1)
+        window.leedTargets = {
+            baseline: { label: "ASHRAE Base (0%)", factor: 1.0 },
+            certified: { label: "Certified (-5%)", factor: 0.95 },
+            silver: { label: "Silver (-10%)", factor: 0.90 },
+            gold: { label: "Gold (-20%)", factor: 0.80 },
+            platinum: { label: "Platinum (-30%)", factor: 0.70 }
+        };
 
         // 3. DATABASES
         window.normsDatabase = [
@@ -2420,109 +2427,240 @@ bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
 // --- GERENCIADOR DE PROJETO LEED (LÓGICA DINÂMICA) ---
-        window.addLeedRoom = function() {
-            const roomId = Date.now();
-            const room = { id: roomId, name: "Novo Ambiente", area: 50, fixtures: [] };
-            window.state.leedProject.rooms.push(room);
+window.addLeedRoom = function() {
+    const room = { id: Date.now(), name: "Novo Ambiente", area: 50, baseLpd: 0, fixtures: [] };
+    window.state.leedProject.rooms.push(room);
+    window.renderLeedProject();
+};
+
+window.removeLeedRoom = function(roomId) {
+    window.state.leedProject.rooms = window.state.leedProject.rooms.filter(r => r.id !== roomId);
+    window.renderLeedProject();
+};
+
+window.updateLeedRoomData = function(roomId, field, value) {
+    const room = window.state.leedProject.rooms.find(r => r.id === roomId);
+    if (room) {
+        room[field] = field === 'name' ? value : parseFloat(value) || 0;
+        window.renderLeedProject();
+    }
+};
+
+window.addLeedFixture = function(roomId) {
+    const room = window.state.leedProject.rooms.find(r => r.id === roomId);
+    if (room) {
+        room.fixtures.push({ id: Date.now(), label: "Luminária", power: 15, qty: 1 });
+        window.renderLeedProject();
+    }
+};
+
+window.removeLeedFixture = function(roomId, fixtureId) {
+    const room = window.state.leedProject.rooms.find(r => r.id === roomId);
+    if (room) {
+        room.fixtures = room.fixtures.filter(f => f.id !== fixtureId);
+        window.renderLeedProject();
+    }
+};
+
+window.updateLeedFixtureData = function(roomId, fixtureId, field, value) {
+    const room = window.state.leedProject.rooms.find(r => r.id === roomId);
+    if (room) {
+        const fixture = room.fixtures.find(f => f.id === fixtureId);
+        if (fixture) {
+            fixture[field] = field === 'label' ? value : parseFloat(value) || 0;
             window.renderLeedProject();
-        };
+        }
+    }
+};
 
-        window.addLeedFixture = function(roomId) {
-            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
-            if (room) {
-                room.fixtures.push({ id: Date.now(), label: "Luminária A", power: 30, qty: 10 });
-                window.renderLeedProject();
-            }
-        };
+window.renderLeedProject = function() {
+    const container = document.getElementById('leed-project-container');
+    const s = window.state.leedProject;
 
-        window.renderLeedProject = function() {
-            const container = document.getElementById('leed-project-container');
-            const isEn = window.currentLang === 'en';
-            
-            container.innerHTML = window.state.leedProject.rooms.map(room => `
-                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 animate-fade-in-up">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                        <div class="flex-grow">
-                            <input type="text" value="${room.name}" onchange="window.updateLeedRoomData(${room.id}, 'name', this.value)" 
-                                class="text-lg font-black text-starlight dark:text-white bg-transparent border-b border-transparent hover:border-luminous-gold transition-colors !w-full md:!w-1/2">
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase">Área (m²):</label>
-                                <input type="number" value="${room.area}" onchange="window.updateLeedRoomData(${room.id}, 'area', this.value)"
-                                    class="!w-20 text-right bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600">
-                            </div>
-                            <button onclick="window.removeLeedRoom(${room.id})" class="text-red-400 hover:text-red-600 transition-colors"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    
-                    <table class="w-full text-xs mb-4">
-                        <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700">
-                            <tr>
-                                <th class="text-left pb-2">Luminária</th>
-                                <th class="text-center pb-2">Watts</th>
-                                <th class="text-center pb-2">Qtd</th>
-                                <th class="text-right pb-2">Subtotal</th>
-                                <th class="pb-2"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            ${room.fixtures.map(f => `
-                                <tr>
-                                    <td class="py-3"><input type="text" value="${f.label}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold !w-full"></td>
-                                    <td class="py-3 text-center"><input type="number" value="${f.power}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="!w-16 text-center"></td>
-                                    <td class="py-3 text-center"><input type="number" value="${f.qty}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="!w-16 text-center"></td>
-                                    <td class="py-3 text-right font-black text-starlight dark:text-white">${(f.power * f.qty).toFixed(1)} W</td>
-                                    <td class="py-3 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-400"><i class="fas fa-times"></i></button></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    
-                    <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest">
-                        <i class="fas fa-plus-circle mr-1"></i> Adicionar Luminária
-                    </button>
+    let html = `
+        <div class="bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
+            <div class="flex-grow w-full md:w-auto">
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
+                <input type="text" value="${s.name}" onchange="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-700 text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1">
+            </div>
+            <div class="w-full md:w-auto">
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Meta ASHRAE 90.1</label>
+                <select onchange="window.state.leedProject.target = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-slate-800 text-luminous-gold border border-slate-700 rounded-lg px-4 py-2 font-bold text-xs uppercase outline-none w-full cursor-pointer">
+                    ${Object.entries(window.leedTargets).map(([key, data]) => `<option value="${key}" ${s.target === key ? 'selected' : ''}>${data.label}</option>`).join('')}
+                </select>
+            </div>
+            <div class="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
+                <button onclick="window.saveLeedProject()" class="flex-1 md:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-700"><i class="fas fa-save mr-2"></i> Salvar</button>
+                <button onclick="window.generateLeedReport()" class="flex-1 md:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
+            </div>
+        </div>
+    `;
+
+    html += s.rooms.map(room => `
+        <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 animate-fade-in-up mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div class="flex-grow w-full md:w-1/3">
+                    <input type="text" value="${room.name}" onchange="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-sm font-black text-starlight dark:text-white bg-transparent border-b border-slate-300 dark:border-slate-600 focus:border-luminous-gold transition-colors w-full pb-1 uppercase">
                 </div>
-            `).join('');
+                <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                    <div class="flex items-center gap-2">
+                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tipologia:</label>
+                        <select onchange="window.updateLeedRoomData(${room.id}, 'baseLpd', this.value)" class="text-xs bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600">
+                            <option value="0" disabled ${!room.baseLpd ? 'selected' : ''}>Selecione...</option>
+                            ${window.lpdBaselines.map(b => `<option value="${b.base}" ${room.baseLpd == b.base ? 'selected' : ''}>${b.type}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Área (m²):</label>
+                        <input type="number" value="${room.area}" onchange="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="w-20 text-right bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600">
+                    </div>
+                    <button onclick="window.removeLeedRoom(${room.id})" class="text-slate-400 hover:text-red-500 transition-colors ml-auto"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
             
-            window.updateGlobalLeedSummary();
-        };
-
-        window.updateLeedRoomData = (roomId, field, val) => {
-            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
-            if (room) { room[field] = field === 'area' ? parseFloat(val) : val; window.renderLeedProject(); }
-        };
-
-        window.updateLeedFixtureData = (roomId, fixtureId, field, val) => {
-            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
-            const fixture = room?.fixtures.find(f => f.id === fixtureId);
-            if (fixture) { fixture[field] = field === 'label' ? val : parseFloat(val); window.renderLeedProject(); }
-        };
-
-        window.removeLeedRoom = (id) => { window.state.leedProject.rooms = window.state.leedProject.rooms.filter(r => r.id !== id); window.renderLeedProject(); };
-        window.removeLeedFixture = (roomId, fId) => {
-            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
-            if (room) { room.fixtures = room.fixtures.filter(f => f.id !== fId); window.renderLeedProject(); }
-        };
-
-        window.updateGlobalLeedSummary = () => {
-            let totalW = 0, totalArea = 0;
-            window.state.leedProject.rooms.forEach(r => {
-                totalArea += r.area;
-                r.fixtures.forEach(f => totalW += (f.power * f.qty));
-            });
-            const lpd = totalArea > 0 ? (totalW / totalArea) : 0;
+            <table class="w-full text-xs mb-4">
+                <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700 text-[9px] tracking-widest">
+                    <tr><th class="text-left pb-2">Luminária</th><th class="text-center pb-2">Watts (W)</th><th class="text-center pb-2">Qtd</th><th class="text-right pb-2">Subtotal</th><th class="pb-2"></th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                    ${room.fixtures.map(f => `
+                        <tr>
+                            <td class="py-2"><input type="text" value="${f.label}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold w-full text-slate-600 dark:text-slate-300"></td>
+                            <td class="py-2 text-center"><input type="number" value="${f.power}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300"></td>
+                            <td class="py-2 text-center"><input type="number" value="${f.qty}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300"></td>
+                            <td class="py-2 text-right font-black text-starlight dark:text-white">${(f.power * f.qty).toFixed(1)} W</td>
+                            <td class="py-2 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-400"><i class="fas fa-times"></i></button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
             
-            document.getElementById('global-leed-watts').innerHTML = `${totalW.toFixed(1)} <span class="text-lg font-light text-slate-400">Watts</span>`;
-            document.getElementById('global-leed-lpd').innerHTML = `${lpd.toFixed(2)} <span class="text-lg font-light text-slate-400">W/m²</span>`;
-            
-            const statusBox = document.getElementById('global-leed-status');
-            if (lpd > 0) {
-                statusBox.classList.remove('animate-pulse');
-                statusBox.innerText = lpd < 8 ? "PROJETO EFICIENTE (DENTRO DO LEED)" : "ALERTA: CARGA ELEVADA";
-                statusBox.className = lpd < 8 ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest" : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest";
-            }
+            <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest transition-colors"><i class="fas fa-plus-circle mr-1"></i> Adicionar Luminária</button>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+    window.updateGlobalLeedSummary();
+};
+
+window.updateGlobalLeedSummary = () => {
+    let totalW = 0, totalArea = 0, allowedW = 0;
+    const s = window.state.leedProject;
+    const targetFactor = window.leedTargets[s.target].factor;
+
+    s.rooms.forEach(r => {
+        totalArea += r.area;
+        const roomAllowedLpd = (r.baseLpd || 0) * targetFactor;
+        allowedW += (roomAllowedLpd * r.area);
+        r.fixtures.forEach(f => totalW += (f.power * f.qty));
+    });
+
+    const currentLpd = totalArea > 0 ? (totalW / totalArea) : 0;
+    
+    document.getElementById('global-leed-watts').innerHTML = `${totalW.toFixed(1)} <span class="text-lg font-light text-slate-400">/ ${allowedW.toFixed(1)} W Permitidos</span>`;
+    document.getElementById('global-leed-lpd').innerHTML = `${currentLpd.toFixed(2)} <span class="text-lg font-light text-slate-400">W/m²</span>`;
+    
+    const statusBox = document.getElementById('global-leed-status');
+    if (totalArea > 0) {
+        statusBox.classList.remove('animate-pulse');
+        const isCompliant = totalW <= allowedW;
+        
+        statusBox.innerText = isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "ALERTA: CARGA EXCEDE LIMITE ASHRAE";
+        statusBox.className = isCompliant 
+            ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" 
+            : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
+    }
+};
+
+window.saveLeedProject = async () => {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return alert("Você precisa estar logado para salvar o projeto.");
+
+        const btn = document.querySelector('button[onclick="window.saveLeedProject()"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Salvando...';
+
+        const payload = {
+            user_id: session.user.id,
+            project_name: window.state.leedProject.name,
+            project_data: window.state.leedProject,
+            updated_at: new Date()
         };
+
+        const { error } = await supabase.from('leed_projects').upsert(payload, { onConflict: 'id' }); 
+        
+        if (error) throw error;
+        
+        btn.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!';
+        setTimeout(() => btn.innerHTML = originalText, 2000);
+
+    } catch (err) {
+        console.error("[LuxSintax] Erro de persistência:", err);
+        alert("Falha ao salvar o projeto. Verifique sua conexão.");
+    }
+};
+
+window.generateLeedReport = async () => {
+    if (!window.PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
+    
+    const s = window.state.leedProject;
+    if (s.rooms.length === 0) return alert('Adicione ao menos um ambiente ao projeto.');
+
+    const pdfDoc = await window.PDFLib.PDFDocument.create();
+    const page = pdfDoc.addPage([595.28, 841.89]);
+    const { width, height } = page.getSize();
+
+    page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
+    page.drawText('LUXSINTAX', { x: 50, y: height - 45, size: 24, color: window.PDFLib.rgb(0.3, 0.48, 0.06) });
+    page.drawText('RELATÓRIO DE COMPLIANCE DE CARGA (ASHRAE 90.1)', { x: 50, y: height - 65, size: 8, color: window.PDFLib.rgb(1, 1, 1) });
+
+    let cy = height - 120;
+    
+    page.drawText(`PROJETO: ${s.name.toUpperCase()}`, { x: 50, y: cy, size: 14, color: window.PDFLib.rgb(0, 0, 0) });
+    cy -= 20;
+    page.drawText(`META APLICADA: ${window.leedTargets[s.target].label.toUpperCase()}`, { x: 50, y: cy, size: 10, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
+    cy -= 40;
+
+    let totalArea = 0, totalWatts = 0, allowedWatts = 0;
+
+    s.rooms.forEach((r, idx) => {
+        let roomWatts = r.fixtures.reduce((acc, f) => acc + (f.power * f.qty), 0);
+        let roomAllowed = r.area * (r.baseLpd || 0) * window.leedTargets[s.target].factor;
+        
+        totalArea += r.area;
+        totalWatts += roomWatts;
+        allowedWatts += roomAllowed;
+
+        page.drawText(`${idx + 1}. ${r.name.toUpperCase()} (${r.area} m²)`, { x: 50, y: cy, size: 11, color: window.PDFLib.rgb(0.3, 0.48, 0.06) });
+        cy -= 15;
+        page.drawText(`Carga Instalada: ${roomWatts.toFixed(1)}W | Limite: ${roomAllowed.toFixed(1)}W`, { x: 60, y: cy, size: 9, color: window.PDFLib.rgb(0.2, 0.2, 0.2) });
+        cy -= 25;
+    });
+
+    cy -= 20;
+    page.drawLine({ start: { x: 50, y: cy }, end: { x: width - 50, y: cy }, thickness: 1, color: window.PDFLib.rgb(0.8, 0.8, 0.8) });
+    cy -= 30;
+
+    const isCompliant = totalWatts <= allowedWatts;
+    const finalStatus = isCompliant ? "APROVADO (COMPLIANT)" : "REPROVADO (EXCEDE LIMITES)";
+    const colorStatus = isCompliant ? window.PDFLib.rgb(0.3, 0.48, 0.06) : window.PDFLib.rgb(0.8, 0.2, 0.2);
+
+    page.drawText('DIAGNÓSTICO TÉCNICO GLOBAL', { x: 50, y: cy, size: 12, color: window.PDFLib.rgb(0, 0, 0) });
+    cy -= 20;
+    page.drawText(`Potência Total Projetada: ${totalWatts.toFixed(1)} W`, { x: 50, y: cy, size: 10 }); cy -= 15;
+    page.drawText(`Potência Máx. Permitida: ${allowedWatts.toFixed(1)} W`, { x: 50, y: cy, size: 10 }); cy -= 15;
+    page.drawText(`LPD Médio Projetado: ${(totalWatts/totalArea).toFixed(2)} W/m²`, { x: 50, y: cy, size: 10 }); cy -= 25;
+    
+    page.drawText(`STATUS DA CERTIFICAÇÃO: ${finalStatus}`, { x: 50, y: cy, size: 14, color: colorStatus });
+
+    const bytes = await pdfDoc.save();
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const link = document.createElement('a'); 
+    link.href = URL.createObjectURL(blob); 
+    link.download = `LuxSintax_LEED_${s.name.replace(/\s+/g, '_')}.pdf`; 
+    link.click();
+};
         window.AuthManager.init();
         window.switchTool('ponto');
     </script>
