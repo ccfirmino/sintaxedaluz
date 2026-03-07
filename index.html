@@ -205,9 +205,9 @@ card_3_title: "BEAM GEOMETRY"<!DOCTYPE html>
                 <div class="hidden md:flex gap-8 items-center">
                     <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
                     <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
-                    <button onclick="window.toggleLanguage()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase"><span class="lang-display">PT / EN</span></button>
                     <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase" title="Alternar Tema">
-                        <i class="fas fa-moon dark:hidden"></i><i class="far fa-sun hidden dark:inline"></i>
+                        <span class="dark:hidden"><i class="fas fa-moon text-[14px]"></i></span>
+                        <span class="hidden dark:inline"><i class="fas fa-sun text-[14px]"></i></span>
                     </button>
                     <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-slate-300">
                         <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-starlight font-bold text-xs border border-slate-200"><i class="fas fa-user"></i></div>
@@ -231,7 +231,7 @@ card_3_title: "BEAM GEOMETRY"<!DOCTYPE html>
                  <div class="h-[1px] bg-slate-200 w-full"></div>
                  <button onclick="window.toggleLanguage(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left lang-display">PT / EN</button>
                  <button onclick="window.toggleTheme(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase">
-                    <i class="fas fa-moon dark:hidden"></i><i class="far fa-sun hidden dark:inline"></i> TEMA
+                    <span class="inline-block w-5"><span class="dark:hidden"><i class="fas fa-moon"></i></span><span class="hidden dark:inline"><i class="fas fa-sun"></i></span></span> TEMA
                  </button>
             </div>
         </nav>
