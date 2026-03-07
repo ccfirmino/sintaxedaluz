@@ -429,15 +429,28 @@
                         </div>
                     </div>
 
-                <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
-                        <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
-                            <div class="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
-                                <div>
-                                    <h3 class="text-xl text-leed-green font-black tracking-widest flex items-center gap-2 uppercase">
-                                        <i class="fas fa-leaf"></i> <span>GERENCIADOR DE CARGA LEED</span>
-                                    </h3>
-                                    <p class="text-xs text-slate-500 mt-1 font-bold">Consolidação de LPD (Lighting Power Density) para o edifício completo.</p>
-                                </div>
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 border-b border-slate-200 pb-6">
+    <div>
+        <h3 class="text-xl text-leed-green font-black tracking-widest flex items-center gap-2 uppercase">
+            <i class="fas fa-leaf"></i> <span>GERENCIADOR DE CARGA LEED</span>
+        </h3>
+        <div class="flex flex-wrap gap-2 mt-3">
+            <button onclick="window.setProjectTarget('certified', 5)" id="proj-certified" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Certified</button>
+            <button onclick="window.setProjectTarget('silver', 10)" id="proj-silver" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Silver</button>
+            <button onclick="window.setProjectTarget('gold', 20)" id="proj-gold" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase active">Gold</button>
+            <button onclick="window.setProjectTarget('platinum', 30)" id="proj-platinum" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Platinum</button>
+        </div>
+    </div>
+    <div class="flex items-center gap-4">
+        <div class="text-right">
+            <span class="text-[9px] text-slate-400 font-black uppercase block">Meta de Redução</span>
+            <span id="proj-reduction-display" class="text-lg font-black text-leed-green">20%</span>
+        </div>
+        <button onclick="window.addLeedRoom()" class="bg-leed-green text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-800 transition-all shadow-lg">
+            <i class="fas fa-plus mr-2"></i> Adicionar Ambiente
+        </button>
+    </div>
+</div>
                                 <button onclick="window.addLeedRoom()" class="bg-leed-green text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-800 transition-all shadow-lg">
                                     <i class="fas fa-plus mr-2"></i> <span data-i18n="lbl_add_room">Adicionar Ambiente</span>
                                 </button>
@@ -808,7 +821,11 @@
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
             grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, falseColor: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
-            leedProject: { rooms: [] } // Memória para os ambientes do projeto
+            leedProject: { 
+                rooms: [], 
+                target: 'gold', 
+                reductionGoal: 20 
+            }
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
@@ -2419,12 +2436,88 @@ function bind(id, key, param) {
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
-// --- GERENCIADOR DE PROJETO LEED (LÓGICA DINÂMICA) ---
+// --- LÓGICA LEED AVANÇADA (ASHRAE 90.1 + METAS) ---
+        window.setProjectTarget = function(target, reduction) {
+            window.state.leedProject.target = target;
+            window.state.leedProject.reductionGoal = reduction;
+            document.querySelectorAll('.leed-level-box').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById('proj-' + target);
+            if(btn) btn.classList.add('active');
+            
+            const display = document.getElementById('proj-reduction-display');
+            if(display) display.innerText = reduction + '%';
+            
+            window.renderLeedProject();
+        };
+
         window.addLeedRoom = function() {
             const roomId = Date.now();
-            const room = { id: roomId, name: "Novo Ambiente", area: 50, fixtures: [] };
+            // Cada ambiente nasce com a tipologia 'Escritório' por padrão
+            const room = { id: roomId, name: "Novo Ambiente", area: 50, typology: "Escritório (Office)", fixtures: [] };
             window.state.leedProject.rooms.push(room);
             window.renderLeedProject();
+        };
+
+        window.renderLeedProject = function() {
+            const container = document.getElementById('leed-project-container');
+            const reductionFactor = 1 - (window.state.leedProject.reductionGoal / 100);
+            
+            container.innerHTML = window.state.leedProject.rooms.map(room => {
+                // Busca o limite ASHRAE no banco de dados lpdBaselines
+                const ashraeBase = window.lpdBaselines.find(b => b.type === room.typology)?.base || 10;
+                const allowedLPD = ashraeBase * reductionFactor;
+                const totalWatts = room.fixtures.reduce((acc, f) => acc + (f.power * f.qty), 0);
+                const currentLPD = room.area > 0 ? (totalWatts / room.area) : 0;
+                const isCompliant = currentLPD <= allowedLPD;
+
+                return `
+                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border ${isCompliant ? 'border-slate-200' : 'border-red-500/50'} transition-all animate-fade-in-up">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="md:col-span-1">
+                            <label class="text-[9px] font-black text-slate-400 uppercase block mb-1">Nome e Tipologia ASHRAE</label>
+                            <input type="text" value="${room.name}" onchange="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="font-black text-starlight dark:text-white !w-full mb-2 bg-transparent border-b border-slate-200">
+                            <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="text-[10px] font-bold !w-full bg-white dark:bg-slate-700 rounded border-slate-200 dark:border-slate-600 p-1">
+                                ${window.lpdBaselines.map(b => `<option value="${b.type}" ${b.type === room.typology ? 'selected' : ''}>${b.type}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="text-center">
+                            <label class="text-[9px] font-black text-slate-400 uppercase block mb-1">Área e Limite LPD</label>
+                            <div class="flex justify-center items-center gap-2">
+                                <input type="number" value="${room.area}" onchange="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="!w-16 text-center font-bold bg-transparent border-b border-slate-200">
+                                <span class="text-[10px] font-bold text-slate-400">m²</span>
+                            </div>
+                            <div class="text-[10px] mt-2 font-bold ${isCompliant ? 'text-leed-green' : 'text-red-500'}">
+                                Limite Meta: ${allowedLPD.toFixed(2)} W/m²
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <label class="text-[9px] font-black text-slate-400 uppercase block mb-1">Performance Atual</label>
+                            <div class="text-2xl font-black ${isCompliant ? 'text-starlight dark:text-white' : 'text-red-500'}">${currentLPD.toFixed(2)} <span class="text-xs">W/m²</span></div>
+                            <div class="text-[9px] font-black uppercase tracking-tighter">${isCompliant ? '✅ Conformidade OK' : '❌ Excede o Limite'}</div>
+                        </div>
+                    </div>
+                    
+                    <table class="w-full text-[10px] mb-4">
+                        <thead class="text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700">
+                            <tr><th class="text-left pb-2">Luminária</th><th class="text-center pb-2">Watts</th><th class="text-center pb-2">Qtd</th><th class="text-right pb-2">Subtotal</th><th class="pb-2"></th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                            ${room.fixtures.map(f => `
+                                <tr>
+                                    <td class="py-2"><input type="text" value="${f.label}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent !w-full font-medium"></td>
+                                    <td class="py-2 text-center"><input type="number" value="${f.power}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="!w-12 text-center bg-transparent"></td>
+                                    <td class="py-2 text-center"><input type="number" value="${f.qty}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="!w-12 text-center bg-transparent"></td>
+                                    <td class="py-2 text-right font-bold text-starlight dark:text-white">${(f.power * f.qty).toFixed(1)} W</td>
+                                    <td class="py-2 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase"><i class="fas fa-plus-circle mr-1"></i> Adicionar Luminária</button>
+                </div>`;
+            }).join('');
+            
+            window.updateGlobalLeedSummary();
         };
 
         window.addLeedFixture = function(roomId) {
@@ -2433,59 +2526,6 @@ bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
                 room.fixtures.push({ id: Date.now(), label: "Luminária A", power: 30, qty: 10 });
                 window.renderLeedProject();
             }
-        };
-
-        window.renderLeedProject = function() {
-            const container = document.getElementById('leed-project-container');
-            const isEn = window.currentLang === 'en';
-            
-            container.innerHTML = window.state.leedProject.rooms.map(room => `
-                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 animate-fade-in-up">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                        <div class="flex-grow">
-                            <input type="text" value="${room.name}" onchange="window.updateLeedRoomData(${room.id}, 'name', this.value)" 
-                                class="text-lg font-black text-starlight dark:text-white bg-transparent border-b border-transparent hover:border-luminous-gold transition-colors !w-full md:!w-1/2">
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase">Área (m²):</label>
-                                <input type="number" value="${room.area}" onchange="window.updateLeedRoomData(${room.id}, 'area', this.value)"
-                                    class="!w-20 text-right bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600">
-                            </div>
-                            <button onclick="window.removeLeedRoom(${room.id})" class="text-red-400 hover:text-red-600 transition-colors"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    
-                    <table class="w-full text-xs mb-4">
-                        <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700">
-                            <tr>
-                                <th class="text-left pb-2">Luminária</th>
-                                <th class="text-center pb-2">Watts</th>
-                                <th class="text-center pb-2">Qtd</th>
-                                <th class="text-right pb-2">Subtotal</th>
-                                <th class="pb-2"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            ${room.fixtures.map(f => `
-                                <tr>
-                                    <td class="py-3"><input type="text" value="${f.label}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold !w-full"></td>
-                                    <td class="py-3 text-center"><input type="number" value="${f.power}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="!w-16 text-center"></td>
-                                    <td class="py-3 text-center"><input type="number" value="${f.qty}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="!w-16 text-center"></td>
-                                    <td class="py-3 text-right font-black text-starlight dark:text-white">${(f.power * f.qty).toFixed(1)} W</td>
-                                    <td class="py-3 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-400"><i class="fas fa-times"></i></button></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    
-                    <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest">
-                        <i class="fas fa-plus-circle mr-1"></i> Adicionar Luminária
-                    </button>
-                </div>
-            `).join('');
-            
-            window.updateGlobalLeedSummary();
         };
 
         window.updateLeedRoomData = (roomId, field, val) => {
@@ -2512,12 +2552,14 @@ bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
                 r.fixtures.forEach(f => totalW += (f.power * f.qty));
             });
             const lpd = totalArea > 0 ? (totalW / totalArea) : 0;
-            
-            document.getElementById('global-leed-watts').innerHTML = `${totalW.toFixed(1)} <span class="text-lg font-light text-slate-400">Watts</span>`;
-            document.getElementById('global-leed-lpd').innerHTML = `${lpd.toFixed(2)} <span class="text-lg font-light text-slate-400">W/m²</span>`;
-            
+            const wDisplay = document.getElementById('global-leed-watts');
+            const lpdDisplay = document.getElementById('global-leed-lpd');
             const statusBox = document.getElementById('global-leed-status');
-            if (lpd > 0) {
+            
+            if(wDisplay) wDisplay.innerHTML = `${totalW.toFixed(1)} <span class="text-lg font-light text-slate-400">Watts</span>`;
+            if(lpdDisplay) lpdDisplay.innerHTML = `${lpd.toFixed(2)} <span class="text-lg font-light text-slate-400">W/m²</span>`;
+            
+            if (statusBox && lpd > 0) {
                 statusBox.classList.remove('animate-pulse');
                 statusBox.innerText = lpd < 8 ? "PROJETO EFICIENTE (DENTRO DO LEED)" : "ALERTA: CARGA ELEVADA";
                 statusBox.className = lpd < 8 ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest" : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest";
