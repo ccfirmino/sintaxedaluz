@@ -401,7 +401,7 @@
                                     <div class="mb-6 group border-t border-slate-200 pt-4"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_w">LARGURA DO AMB. (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_l">COMPRIMENTO DO AMB. (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomL" value="4.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
                                     
-                                    <<div class="mb-6 group border-t border-slate-200 pt-4">
+                                    <div class="mb-6 group border-t border-slate-200 pt-4">
                                         <label class="flex items-center justify-between cursor-pointer group">
                                             <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider">CORES FALSAS (HEATMAP)</span>
                                             <div class="relative">
@@ -1560,7 +1560,12 @@ window.handleGenerateReport = async () => {
                 s.rows = calcRows;
                 
                 if (gridDesc) {
-                    gridDesc.innerHTML = window.currentLang === 'en' ? `Total required: ${N} fixtures to reach ${s.targetLux} lx.` : `Total calculado: ${N} luminárias para atingir ${s.targetLux} lx.`;
+                    const actualPieces = s.cols * s.rows;
+                    const realAvgLux = Math.round((actualPieces * s.flux * s.utilFactor * s.maintFactor) / area);
+                    
+                    gridDesc.innerHTML = window.currentLang === 'en' 
+                        ? `Total in grid: <strong class="text-starlight dark:text-white">${actualPieces}</strong> fixtures.<br>Achieved Average: <strong class="text-starlight dark:text-white">${realAvgLux} lx</strong> (Target: ${s.targetLux} lx).` 
+                        : `Total na malha: <strong class="text-starlight dark:text-white">${actualPieces}</strong> luminárias.<br>Média atingida: <strong class="text-starlight dark:text-white">${realAvgLux} lx</strong> (Alvo: ${s.targetLux} lx).`;
                     gridDesc.classList.add('text-luminous-gold');
                 }
 
