@@ -1672,62 +1672,7 @@ window.handleGenerateReport = async () => {
                     }
                 }
 
-                // --- DESENHAR HUD DE RESULTADOS NO CANVAS ---
-                const trueAvgLux = Math.round(sumLux / cellCount);
-                const uniformity = trueAvgLux > 0 ? (minLux / trueAvgLux).toFixed(2) : "0.00";
-                const actualPieces = s.cols * s.rows;
-
-                const hudX = 20;
-                const hudY = 20;
-                const hudW = 180;
-                const hudH = 95;
                 
-                ctx.save();
-                
-                // Fundo Translúcido
-                ctx.fillStyle = isDark ? "rgba(30, 41, 59, 0.9)" : "rgba(255, 255, 255, 0.95)";
-                ctx.shadowColor = "rgba(0,0,0,0.1)";
-                ctx.shadowBlur = 10;
-                ctx.shadowOffsetY = 4;
-                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hudX, hudY, hudW, hudH, 12); ctx.fill(); } 
-                else { ctx.fillRect(hudX, hudY, hudW, hudH); }
-                ctx.shadowColor = "transparent";
-                
-                // Borda
-                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
-                ctx.lineWidth = 1;
-                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hudX, hudY, hudW, hudH, 12); ctx.stroke(); } 
-                else { ctx.strokeRect(hudX, hudY, hudW, hudH); }
-
-                // Textos
-                ctx.textAlign = "left";
-                ctx.textBaseline = "top";
-                
-                ctx.fillStyle = "#d97706";
-                ctx.font = "900 10px Manrope";
-                ctx.fillText("SÍNTESE DA MALHA", hudX + 15, hudY + 15);
-                
-                ctx.beginPath();
-                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
-                ctx.moveTo(hudX + 15, hudY + 32);
-                ctx.lineTo(hudX + hudW - 15, hudY + 32);
-                ctx.stroke();
-
-                // Rótulos
-                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-                ctx.font = "bold 10px Manrope";
-                ctx.fillText("Arranjo:", hudX + 15, hudY + 42);
-                ctx.fillText("Em Atingida:", hudX + 15, hudY + 58);
-                ctx.fillText("Uniformidade:", hudX + 15, hudY + 74);
-
-                // Valores
-                ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
-                ctx.font = "900 11px Manrope";
-                ctx.fillText(`${s.cols} x ${s.rows} (${actualPieces} un)`, hudX + 90, hudY + 41);
-                ctx.fillText(`${trueAvgLux} lx`, hudX + 90, hudY + 57);
-                ctx.fillText(`${uniformity}`, hudX + 90, hudY + 73);
-                
-                ctx.restore();
 
                 // LEGENDA DE FALSA COR (HEATMAP)
                 if (s.falseColor) {
@@ -1826,6 +1771,71 @@ window.handleGenerateReport = async () => {
                     const cy2 = offsetY + 1.5 * spacingY * scale;
                     drawDimLineVertical(ctx, offsetX + roomPxW + 25, cy1, cy2, window.formatDist(spacingY));
                 }
+                return; 
+            }
+if (s.rows > 1) {
+                    const cy1 = offsetY + 0.5 * spacingY * scale;
+                    const cy2 = offsetY + 1.5 * spacingY * scale;
+                    drawDimLineVertical(ctx, offsetX + roomPxW + 25, cy1, cy2, window.formatDist(spacingY));
+                }
+
+                // --- DESENHAR HUD DE RESULTADOS NO CANVAS (FORA DA MÁSCARA) ---
+                const trueAvgLux = Math.round(sumLux / cellCount);
+                const uniformity = trueAvgLux > 0 ? (minLux / trueAvgLux).toFixed(2) : "0.00";
+                const actualPieces = s.cols * s.rows;
+
+                const hudX = 20;
+                const hudY = 20;
+                const hudW = 180;
+                const hudH = 95;
+                
+                ctx.save();
+                
+                // Fundo Translúcido
+                ctx.fillStyle = isDark ? "rgba(30, 41, 59, 0.9)" : "rgba(255, 255, 255, 0.95)";
+                ctx.shadowColor = "rgba(0,0,0,0.1)";
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetY = 4;
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hudX, hudY, hudW, hudH, 12); ctx.fill(); } 
+                else { ctx.fillRect(hudX, hudY, hudW, hudH); }
+                ctx.shadowColor = "transparent";
+                
+                // Borda
+                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+                ctx.lineWidth = 1;
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hudX, hudY, hudW, hudH, 12); ctx.stroke(); } 
+                else { ctx.strokeRect(hudX, hudY, hudW, hudH); }
+
+                // Textos
+                ctx.textAlign = "left";
+                ctx.textBaseline = "top";
+                
+                ctx.fillStyle = "#d97706";
+                ctx.font = "900 10px Manrope";
+                ctx.fillText("SÍNTESE DA MALHA", hudX + 15, hudY + 15);
+                
+                ctx.beginPath();
+                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+                ctx.moveTo(hudX + 15, hudY + 32);
+                ctx.lineTo(hudX + hudW - 15, hudY + 32);
+                ctx.stroke();
+
+                // Rótulos
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.font = "bold 10px Manrope";
+                ctx.fillText("Arranjo:", hudX + 15, hudY + 42);
+                ctx.fillText("Em Atingida:", hudX + 15, hudY + 58);
+                ctx.fillText("Uniformidade:", hudX + 15, hudY + 74);
+
+                // Valores
+                ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
+                ctx.font = "900 11px Manrope";
+                ctx.fillText(`${s.cols} x ${s.rows} (${actualPieces} un)`, hudX + 90, hudY + 41);
+                ctx.fillText(`${trueAvgLux} lx`, hudX + 90, hudY + 57);
+                ctx.fillText(`${uniformity}`, hudX + 90, hudY + 73);
+                
+                ctx.restore();
+
                 return; 
             }
 
