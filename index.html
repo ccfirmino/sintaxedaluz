@@ -428,32 +428,33 @@
                             </div>
                         </div>
                     </div>
-
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 border-b border-slate-200 pb-6">
-    <div>
-        <h3 class="text-xl text-leed-green font-black tracking-widest flex items-center gap-2 uppercase">
-            <i class="fas fa-leaf"></i> <span>GERENCIADOR DE CARGA LEED</span>
-        </h3>
-        <div class="flex flex-wrap gap-2 mt-3">
-            <button onclick="window.setProjectTarget('certified', 5)" id="proj-certified" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Certified</button>
-            <button onclick="window.setProjectTarget('silver', 10)" id="proj-silver" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Silver</button>
-            <button onclick="window.setProjectTarget('gold', 20)" id="proj-gold" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase active">Gold</button>
-            <button onclick="window.setProjectTarget('platinum', 30)" id="proj-platinum" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Platinum</button>
-        </div>
-    </div>
-    <div class="flex items-center gap-4">
-        <div class="text-right">
-            <span class="text-[9px] text-slate-400 font-black uppercase block">Meta de Redução</span>
-            <span id="proj-reduction-display" class="text-lg font-black text-leed-green">20%</span>
-        </div>
-        <button onclick="window.addLeedRoom()" class="bg-leed-green text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-800 transition-all shadow-lg">
-            <i class="fas fa-plus mr-2"></i> Adicionar Ambiente
-        </button>
-    </div>
-</div>
-                                <button onclick="window.addLeedRoom()" class="bg-leed-green text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-800 transition-all shadow-lg">
-                                    <i class="fas fa-plus mr-2"></i> <span data-i18n="lbl_add_room">Adicionar Ambiente</span>
-                                </button>
+                    <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
+                        <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
+                            
+                            <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
+                        <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
+                            
+                            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 border-b border-slate-200 pb-6">
+                                <div>
+                                    <h3 class="text-xl text-leed-green font-black tracking-widest flex items-center gap-2 uppercase">
+                                        <i class="fas fa-leaf"></i> <span>GERENCIADOR DE CARGA LEED</span>
+                                    </h3>
+                                    <div class="flex flex-wrap gap-2 mt-3">
+                                        <button onclick="window.setProjectTarget('certified', 5)" id="proj-certified" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Certified</button>
+                                        <button onclick="window.setProjectTarget('silver', 10)" id="proj-silver" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Silver</button>
+                                        <button onclick="window.setProjectTarget('gold', 20)" id="proj-gold" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase active">Gold</button>
+                                        <button onclick="window.setProjectTarget('platinum', 30)" id="proj-platinum" class="leed-level-box px-3 py-1 rounded-full text-[9px] font-black uppercase">Platinum</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="text-right">
+                                        <span class="text-[9px] text-slate-400 font-black uppercase block">Meta de Redução</span>
+                                        <span id="proj-reduction-display" class="text-lg font-black text-leed-green">20%</span>
+                                    </div>
+                                    <button onclick="window.addLeedRoom()" class="bg-leed-green text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-800 transition-all shadow-lg">
+                                        <i class="fas fa-plus mr-2"></i> Adicionar Ambiente
+                                    </button>
+                                </div>
                             </div>
 
                             <div id="leed-project-container" class="space-y-8">
@@ -473,6 +474,7 @@
                                     AGUARDANDO DADOS
                                 </div>
                             </div>
+                            
                         </div>
                     </div>    
 		<div id="query-tool" class="w-full animate-fade-in-up col-span-12">
