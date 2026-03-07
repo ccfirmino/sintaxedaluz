@@ -1771,13 +1771,6 @@ window.handleGenerateReport = async () => {
                     const cy2 = offsetY + 1.5 * spacingY * scale;
                     drawDimLineVertical(ctx, offsetX + roomPxW + 25, cy1, cy2, window.formatDist(spacingY));
                 }
-                return; 
-            }
-if (s.rows > 1) {
-                    const cy1 = offsetY + 0.5 * spacingY * scale;
-                    const cy2 = offsetY + 1.5 * spacingY * scale;
-                    drawDimLineVertical(ctx, offsetX + roomPxW + 25, cy1, cy2, window.formatDist(spacingY));
-                }
 
                 // --- DESENHAR HUD DE RESULTADOS NO CANVAS (FORA DA MÁSCARA) ---
                 const trueAvgLux = Math.round(sumLux / cellCount);
