@@ -394,47 +394,6 @@
                                             </div>
                                         </div>
 
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    
-                                    <div class="mode-standard-only">
-                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
-                                    </div>
-
-                                    <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-slate-200 pt-4">
-                                        <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
-                                            <input type="file" id="g-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-                                            <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-                                        </div>
-                                    </div>
-                                    
-                                    
-                                    <div class="space-y-6 mb-6 border-t border-slate-200 pt-4">
-                                        
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="100000" step="100" value="3000" class="transition-opacity"></div>
-                                        
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30" class="transition-opacity"></div>
-                                        
-                                        <div class="flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                                            <div class="group">
-                                                <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block" data-i18n="lbl_util_factor">Fator Utilização (U)</label>
-                                                <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
-                                                    <option value="0.70">Cores Claras / Aberto (0.70)</option>
-                                                    <option value="0.60" selected>Padrão / Médio (0.60)</option>
-                                                    <option value="0.40">Cores Escuras / Fechado (0.40)</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div class="group">
-                                                <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block" data-i18n="lbl_maint_factor">Fator Manutenção (FM)</label>
-                                                <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
-                                                    <option value="0.80" selected>Limpo / Novo (0.80)</option>
-                                                    <option value="0.70">Normal / Escritório (0.70)</option>
-                                                    <option value="0.60">Sujo / Industrial (0.60)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
                                         <div class="group pt-2"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500"></div>
                                     </div>
 
@@ -443,7 +402,7 @@
                                     
                                     <div class="mb-6 group border-t border-slate-200 pt-4">
                                         <label class="flex items-center justify-between cursor-pointer group">
-                                            <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider">CORES FALSAS (HEATMAP)</span>
+                                            <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">CORES FALSAS (HEATMAP)</span>
                                             <div class="relative">
                                                 <input type="checkbox" id="g-falseColor" onchange="window.state.grid.falseColor = this.checked; window.updateCalculations()" class="sr-only">
                                                 <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
@@ -451,10 +410,8 @@
                                             </div>
                                         </label>
                                     </div>
-                                    
-                                    
                                 </div>
-                            </div>
+                             </div>
                         </div>
 
                         <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
