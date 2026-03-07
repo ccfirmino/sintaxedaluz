@@ -803,7 +803,11 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            // ... (mantenha os outros estados: ponto, vertical, homog, grid, driver intactos)
+            ponto: { height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
+            vertical: { height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, viewMode: 'section', iesData: null, iesFileName: null },
+            homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
+            grid: { height: 3.0, beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
+            driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
             leedProject: { 
                 name: "Novo Projeto LEED",
                 target: "baseline",
