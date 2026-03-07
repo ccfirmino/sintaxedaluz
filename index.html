@@ -245,7 +245,11 @@
                     <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-drafting-compass text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
                     <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span data-i18n="tab_driver">DIMENSIONAR<br>DRIVER</span></button>
-                    <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
+                <button onclick="window.switchTool('leedProj')" id="tab-leedProj" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
+                        <i class="fas fa-building text-lg mb-1"></i>
+                        <span data-i18n="tab_leed_proj">PROJETO<br>LEED (LPD)</span>
+                    </button>    
+		<button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                 </div>
 
                 <div id="calculator-interface" class="w-full relative">
@@ -425,7 +429,40 @@
                         </div>
                     </div>
 
-                    <div id="query-tool" class="w-full animate-fade-in-up col-span-12">
+                <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
+                        <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
+                            <div class="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
+                                <div>
+                                    <h3 class="text-xl text-leed-green font-black tracking-widest flex items-center gap-2 uppercase">
+                                        <i class="fas fa-leaf"></i> <span>GERENCIADOR DE CARGA LEED</span>
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mt-1 font-bold">Consolidação de LPD (Lighting Power Density) para o edifício completo.</p>
+                                </div>
+                                <button onclick="window.addLeedRoom()" class="bg-leed-green text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-800 transition-all shadow-lg">
+                                    <i class="fas fa-plus mr-2"></i> <span data-i18n="lbl_add_room">Adicionar Ambiente</span>
+                                </button>
+                            </div>
+
+                            <div id="leed-project-container" class="space-y-8">
+                                </div>
+
+                            <div class="mt-12 p-8 bg-slate-900 rounded-3xl text-white flex flex-col md:flex-row justify-between items-center gap-8 shadow-2xl">
+                                <div class="text-center md:text-left">
+                                    <div class="text-[10px] text-slate-400 font-black tracking-[0.2em] mb-2 uppercase">Carga Total do Projeto</div>
+                                    <div id="global-leed-watts" class="text-4xl font-black">0 <span class="text-lg font-light text-slate-400">Watts</span></div>
+                                </div>
+                                <div class="h-12 w-[1px] bg-slate-700 hidden md:block"></div>
+                                <div class="text-center md:text-left">
+                                    <div class="text-[10px] text-slate-400 font-black tracking-[0.2em] mb-2 uppercase">LPD Médio</div>
+                                    <div id="global-leed-lpd" class="text-4xl font-black text-leed-green">0.00 <span class="text-lg font-light text-slate-400">W/m²</span></div>
+                                </div>
+                                <div id="global-leed-status" class="bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest animate-pulse">
+                                    AGUARDANDO DADOS
+                                </div>
+                            </div>
+                        </div>
+                    </div>    
+		<div id="query-tool" class="w-full animate-fade-in-up col-span-12">
                         <div class="glass-panel p-8 rounded-2xl">
                             <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-slate-200 pb-4 gap-4">
                                 <div><h3 class="text-lg text-luminous-gold font-black tracking-widest flex items-center gap-2 uppercase"><i class="fas fa-search"></i> <span data-i18n="hdr_query">Centro de Consultas</span></h3><p class="text-xs text-slate-500 mt-1 font-bold" data-i18n="query_subtitle">Acesso rápido a normas e referências técnicas.</p></div>
@@ -711,8 +748,6 @@
                 search_placeholder: "Buscar ambiente ou tarefa...",
                 lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)",
                 lbl_frame_w: "Largura Quadro", lbl_frame_h: "Altura Quadro", lbl_qty: "Qtd. Peças",
-                
-                // NOVAS CHAVES INSERIDAS:
                 auth_signup_free: "CADASTRE-SE GRATUITAMENTE", auth_tab_login: "Login", auth_tab_register: "Cadastro",
                 auth_email: "E-mail", auth_pass: "Senha", auth_name: "Nome", auth_surname: "Sobrenome", auth_corp_email: "E-mail Corporativo",
                 auth_terms: "Concordo com os termos de uso.", auth_btn_login: "Acessar Plataforma", auth_btn_register: "Criar Conta Gratuita",
@@ -721,7 +756,12 @@
                 driver_mode: "Modo de Operação", driver_power: "Potência Unitária (W)", driver_qty: "Metragem / Quantidade", driver_current: "Corrente (mA)",
                 opt_cv: "Tensão Constante (CV - 12/24V)", opt_cc: "Corrente Constante (CC - mA)",
                 opt_util_70: "Cores Claras / Aberto (0.70)", opt_util_60: "Padrão / Médio (0.60)", opt_util_40: "Cores Escuras / Fechado (0.40)",
-                opt_maint_80: "Limpo / Novo (0.80)", opt_maint_70: "Normal / Escritório (0.70)", opt_maint_60: "Sujo / Industrial (0.60)"
+                opt_maint_80: "Limpo / Novo (0.80)", opt_maint_70: "Normal / Escritório (0.70)", opt_maint_60: "Sujo / Industrial (0.60)",
+                tab_leed_proj: "PROJETO<br>LEED (LPD)",
+                lbl_add_room: "Adicionar Ambiente",
+                lbl_add_fixture: "Nova Luminária",
+                lbl_room_name: "Nome do Ambiente",
+                lbl_compliance: "Status de Conformidade"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
@@ -736,19 +776,14 @@
                 leed_eq_1: "<strong class=\"text-starlight font-black\">Control:</strong> Individual for 90% of occupants.", leed_eq_2: "<strong class=\"text-starlight font-black\">Quality:</strong> CRI > 80, Life > 24kh, High reflectance.", leed_ss_1: "Mandatory <strong class=\"text-starlight font-black\">BUG Rating</strong> (Backlight-Uplight-Glare) requirement according to Zone (LZ0 to LZ4).",
                 well_sim_title: "Lighting Credits Simulator", well_concept: "Concept: LIGHT (WELL v2)", well_est_pts: "Estimated Points", well_contrib: "Certification Contribution",
                 well_l01: "Access to daylight and views.", well_req: "Mandatory", well_l02: "Adequate illuminance levels.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Solar glare management.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Zoning and intensity control.",
-                about_title: "ABOUT", 
-                about_text: "LuxSintax was born with a clear commitment: to transform agility into the Lighting Designer's greatest ally. In a market where time is scarce, we designed an ecosystem that eliminates friction between creative conception and technical validation.<br><br>More than a point-by-point calculator, we are a productivity hub. We integrate agile calculation tools with an intelligent standards search engine (NBR ISO/CIE 8995-1 / IESNA / NBR 5101), allowing you to validate illuminance levels and normative compliance in seconds.<br><br><strong>Technical Note:</strong> Based on the principles of trigonometry and classical photometry (Cosine Cubed Law), this tool offers mathematical precision for preliminary studies. We emphasize that the results are theoretical decision-support simulations and do not replace the complex global calculation (radiosity) of a final executive project signed by a qualified professional.",
-                card_1_title: "ABSOLUTE INTENSITY", card_1_desc: "Converts relative photometric data to absolute intensity (Candelas).", 
-                card_2_title: "COSINE CUBED LAW", card_2_desc: "Variation of the Inverse Square Law for horizontal surfaces.", 
-                card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", card_4_title: "LUMEN METHOD", card_4_desc: "Mathematical calculation to determine fixture quantity and average illuminance.",
+                about_title: "ABOUT", about_text: "LuxSintax was born with a clear commitment: to transform agility into the Lighting Designer's greatest ally. In a market where time is scarce, we designed an ecosystem that eliminates friction between creative conception and technical validation.<br><br>More than a point-by-point calculator, we are a productivity hub. We integrate agile calculation tools with an intelligent standards search engine (NBR ISO/CIE 8995-1 / IESNA / NBR 5101), allowing you to validate illuminance levels and normative compliance in seconds.<br><br><strong>Technical Note:</strong> Based on the principles of trigonometry and classical photometry (Cosine Cubed Law), this tool offers mathematical precision for preliminary studies. We emphasize that the results are theoretical decision-support simulations and do not replace the complex global calculation (radiosity) of a final executive project signed by a qualified professional.",
+                card_1_title: "ABSOLUTE INTENSITY", card_1_desc: "Converts relative photometric data to absolute intensity (Candelas).", card_2_title: "COSINE CUBED LAW", card_2_desc: "Variation of the Inverse Square Law for horizontal surfaces.", card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", card_4_title: "LUMEN METHOD", card_4_desc: "Mathematical calculation to determine fixture quantity and average illuminance.",
                 footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood and Accept the Risks",
                 nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support",
                 auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now.",
                 search_placeholder: "Search room or task...",
                 lbl_lumen_mode: "LUMEN METHOD (SMART)", lbl_target_lux: "TARGET ILLUMINANCE (EM)", lbl_fixture_flux: "FIXTURE FLUX (LM)", lbl_util_factor: "UTILIZATION FACTOR (U)", lbl_maint_factor: "MAINTENANCE FACTOR (FM)",
                 lbl_frame_w: "Frame Width", lbl_frame_h: "Frame Height", lbl_qty: "Qty.",
-                
-                // NOVAS CHAVES INSERIDAS:
                 auth_signup_free: "SIGN UP FOR FREE", auth_tab_login: "Login", auth_tab_register: "Register",
                 auth_email: "E-mail", auth_pass: "Password", auth_name: "First Name", auth_surname: "Last Name", auth_corp_email: "Corporate E-mail",
                 auth_terms: "I agree to the terms of use.", auth_btn_login: "Access Platform", auth_btn_register: "Create Free Account",
@@ -757,7 +792,12 @@
                 driver_mode: "Operation Mode", driver_power: "Unit Power (W)", driver_qty: "Length / Quantity", driver_current: "Current (mA)",
                 opt_cv: "Constant Voltage (CV - 12/24V)", opt_cc: "Constant Current (CC - mA)",
                 opt_util_70: "Light Colors / Open (0.70)", opt_util_60: "Standard / Medium (0.60)", opt_util_40: "Dark Colors / Closed (0.40)",
-                opt_maint_80: "Clean / New (0.80)", opt_maint_70: "Normal / Office (0.70)", opt_maint_60: "Dirty / Industrial (0.60)"
+                opt_maint_80: "Clean / New (0.80)", opt_maint_70: "Normal / Office (0.70)", opt_maint_60: "Dirty / Industrial (0.60)",
+                tab_leed_proj: "LEED<br>PROJECT (LPD)",
+                lbl_add_room: "Add Room",
+                lbl_add_fixture: "New Fixture",
+                lbl_room_name: "Room Name",
+                lbl_compliance: "Compliance Status"
             }
         };
 
@@ -766,8 +806,9 @@
             ponto: { intensity: 3000, height: 3.0, beam: 30, tilt: 0, plane: 0.75, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { intensity: 3000, height: 3.0, dist: 1.0, tilt: 30, beam: 30, flux: 1500, cdklm: 2000, hq: 1.6, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, iesData: null, iesFileName: null, viewMode: 'section' }, 
             homog: { intensity: 3000, height: 3.0, spacing: 2.0, plane: 0.75, beam: 30, flux: 1500, cdklm: 2000, tilt: 0 },
-           grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, falseColor: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 },
-driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 }
+            grid: { height: 3.0, beam: 60, roomW: 6.0, roomL: 4.0, cols: 2, rows: 2, lumenMode: false, falseColor: false, targetLux: 500, flux: 3000, utilFactor: 0.60, maintFactor: 0.80 },
+            driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
+            leedProject: { rooms: [] } // Memória para os ambientes do projeto
         };
         window.currentTool = 'ponto'; window.calcMode = 'direct'; window.currentLang = 'pt';
         window.currentLeedTarget = 'gold';
@@ -1189,43 +1230,41 @@ window.handleGenerateReport = async () => {
         // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
             window.currentTool = toolId;
-            ['ponto', 'vertical', 'homog', 'grid', 'driver', 'query'].forEach(id => {
+            ['ponto', 'vertical', 'homog', 'grid', 'driver', 'query', 'leedProj'].forEach(id => {
                 const btn = document.getElementById('tab-' + id);
                 if(btn) {
                     let cls = "mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ";
                     if (id === 'query') cls += "text-luminous-gold ml-auto "; 
-                    
                     btn.className = cls + (id === toolId ? "tab-active" : "tab-inactive");
                 }
             });
-            document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query');
+
+            document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj');
             document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
+            document.getElementById('leedProj-tool').classList.toggle('hidden', toolId !== 'leedProj');
             
             const modeSelector = document.getElementById('calc-mode-selector');
-            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid');
+            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
 
-            if (toolId !== 'query') {
+            if (toolId !== 'query' && toolId !== 'leedProj') {
                 ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 
-                // Inteligência para separar os menus
                 if (toolId === 'grid') {
                     const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
                     if (gridSel) window.updateCalcMode(gridSel.value);
                 } else if (toolId !== 'driver') {
                     const globalSel = document.querySelector('input[name="calc_mode"]:checked');
                     if (globalSel) window.updateCalcMode(globalSel.value);
-                } else {
-                    window.updateCalcMode(window.calcMode);
                 }
-                
                 window.updateCalculations();
-            } else {
+            } else if (toolId === 'query') {
                  window.switchQueryTab('nbr8995');
             }
         }
-
+                
+                
         window.updateCalcMode = function(mode) {
             window.calcMode = mode;
             document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
@@ -2380,7 +2419,110 @@ function bind(id, key, param) {
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
+// --- GERENCIADOR DE PROJETO LEED (LÓGICA DINÂMICA) ---
+        window.addLeedRoom = function() {
+            const roomId = Date.now();
+            const room = { id: roomId, name: "Novo Ambiente", area: 50, fixtures: [] };
+            window.state.leedProject.rooms.push(room);
+            window.renderLeedProject();
+        };
 
+        window.addLeedFixture = function(roomId) {
+            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
+            if (room) {
+                room.fixtures.push({ id: Date.now(), label: "Luminária A", power: 30, qty: 10 });
+                window.renderLeedProject();
+            }
+        };
+
+        window.renderLeedProject = function() {
+            const container = document.getElementById('leed-project-container');
+            const isEn = window.currentLang === 'en';
+            
+            container.innerHTML = window.state.leedProject.rooms.map(room => `
+                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 animate-fade-in-up">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <div class="flex-grow">
+                            <input type="text" value="${room.name}" onchange="window.updateLeedRoomData(${room.id}, 'name', this.value)" 
+                                class="text-lg font-black text-starlight dark:text-white bg-transparent border-b border-transparent hover:border-luminous-gold transition-colors !w-full md:!w-1/2">
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase">Área (m²):</label>
+                                <input type="number" value="${room.area}" onchange="window.updateLeedRoomData(${room.id}, 'area', this.value)"
+                                    class="!w-20 text-right bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600">
+                            </div>
+                            <button onclick="window.removeLeedRoom(${room.id})" class="text-red-400 hover:text-red-600 transition-colors"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    
+                    <table class="w-full text-xs mb-4">
+                        <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700">
+                            <tr>
+                                <th class="text-left pb-2">Luminária</th>
+                                <th class="text-center pb-2">Watts</th>
+                                <th class="text-center pb-2">Qtd</th>
+                                <th class="text-right pb-2">Subtotal</th>
+                                <th class="pb-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                            ${room.fixtures.map(f => `
+                                <tr>
+                                    <td class="py-3"><input type="text" value="${f.label}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold !w-full"></td>
+                                    <td class="py-3 text-center"><input type="number" value="${f.power}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="!w-16 text-center"></td>
+                                    <td class="py-3 text-center"><input type="number" value="${f.qty}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="!w-16 text-center"></td>
+                                    <td class="py-3 text-right font-black text-starlight dark:text-white">${(f.power * f.qty).toFixed(1)} W</td>
+                                    <td class="py-3 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-400"><i class="fas fa-times"></i></button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest">
+                        <i class="fas fa-plus-circle mr-1"></i> Adicionar Luminária
+                    </button>
+                </div>
+            `).join('');
+            
+            window.updateGlobalLeedSummary();
+        };
+
+        window.updateLeedRoomData = (roomId, field, val) => {
+            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
+            if (room) { room[field] = field === 'area' ? parseFloat(val) : val; window.renderLeedProject(); }
+        };
+
+        window.updateLeedFixtureData = (roomId, fixtureId, field, val) => {
+            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
+            const fixture = room?.fixtures.find(f => f.id === fixtureId);
+            if (fixture) { fixture[field] = field === 'label' ? val : parseFloat(val); window.renderLeedProject(); }
+        };
+
+        window.removeLeedRoom = (id) => { window.state.leedProject.rooms = window.state.leedProject.rooms.filter(r => r.id !== id); window.renderLeedProject(); };
+        window.removeLeedFixture = (roomId, fId) => {
+            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
+            if (room) { room.fixtures = room.fixtures.filter(f => f.id !== fId); window.renderLeedProject(); }
+        };
+
+        window.updateGlobalLeedSummary = () => {
+            let totalW = 0, totalArea = 0;
+            window.state.leedProject.rooms.forEach(r => {
+                totalArea += r.area;
+                r.fixtures.forEach(f => totalW += (f.power * f.qty));
+            });
+            const lpd = totalArea > 0 ? (totalW / totalArea) : 0;
+            
+            document.getElementById('global-leed-watts').innerHTML = `${totalW.toFixed(1)} <span class="text-lg font-light text-slate-400">Watts</span>`;
+            document.getElementById('global-leed-lpd').innerHTML = `${lpd.toFixed(2)} <span class="text-lg font-light text-slate-400">W/m²</span>`;
+            
+            const statusBox = document.getElementById('global-leed-status');
+            if (lpd > 0) {
+                statusBox.classList.remove('animate-pulse');
+                statusBox.innerText = lpd < 8 ? "PROJETO EFICIENTE (DENTRO DO LEED)" : "ALERTA: CARGA ELEVADA";
+                statusBox.className = lpd < 8 ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest" : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest";
+            }
+        };
         window.AuthManager.init();
         window.switchTool('ponto');
     </script>
