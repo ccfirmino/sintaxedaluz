@@ -244,7 +244,7 @@
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
                     <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-drafting-compass text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
                     <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
-                    <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span>DIMENSIONAR<br>DRIVER</span></button>
+                    <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span data-i18n="tab_driver">DIMENSIONAR<br>DRIVER</span></button>
                     <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                 </div>
 
@@ -350,9 +350,49 @@
 </div>
                                 <div id="inputs-grid" class="hidden">
                                     <div class="flex flex-row items-center justify-center gap-6 p-1 mb-6 border-b border-slate-200 pb-4">
-                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="direct" checked onchange="window.updateCalcMode('direct')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Luminária Manual</span></label>
-                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="ies" onchange="window.updateCalcMode('ies')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Arquivo IES</span></label>
+                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="direct" checked onchange="window.updateCalcMode('direct')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_manual_source">Luminária Manual</span></label>
+                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="ies" onchange="window.updateCalcMode('ies')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_ies_file">Arquivo IES</span></label>
                                     </div>
+
+                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                                    
+                                    <div class="mode-standard-only">
+                                        <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
+                                    </div>
+
+                                    <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-slate-200 pt-4">
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <input type="file" id="g-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                                            <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-6 mb-6 border-t border-slate-200 pt-4">
+                                        
+                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="100000" step="100" value="3000" class="transition-opacity"></div>
+                                        
+                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_power_w">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30" class="transition-opacity"></div>
+                                        
+                                        <div class="flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                            <div class="group">
+                                                <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block" data-i18n="lbl_util_factor">Fator Utilização (U)</label>
+                                                <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
+                                                    <option value="0.70" data-i18n="opt_util_70">Cores Claras / Aberto (0.70)</option>
+                                                    <option value="0.60" selected data-i18n="opt_util_60">Padrão / Médio (0.60)</option>
+                                                    <option value="0.40" data-i18n="opt_util_40">Cores Escuras / Fechado (0.40)</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="group">
+                                                <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block" data-i18n="lbl_maint_factor">Fator Manutenção (FM)</label>
+                                                <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
+                                                    <option value="0.80" selected data-i18n="opt_maint_80">Limpo / Novo (0.80)</option>
+                                                    <option value="0.70" data-i18n="opt_maint_70">Normal / Escritório (0.70)</option>
+                                                    <option value="0.60" data-i18n="opt_maint_60">Sujo / Industrial (0.60)</option>
+                                                </select>
+                                            </div>
+                                        </div>
 
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                     
@@ -670,7 +710,7 @@
         // 1. I18N DICTIONARY
         window.i18n = {
             pt: {
-                nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "DISTRIBUIÇÃO<br>EM PLANTA",
+                nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "DIMENSIONAR<br>DRIVER",
                 calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ies_upload: "CARREGAR ARQUIVO .IES", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 lbl_room_w: "LARGURA DO AMB. (X)", lbl_room_l: "COMPRIMENTO DO AMB. (Y)", lbl_grid_sug: "MALHA SUGERIDA", lbl_grid_unit: "PEÇAS", lbl_grid_desc: "Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.",
@@ -689,10 +729,21 @@
                 auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora.",
                 search_placeholder: "Buscar ambiente ou tarefa...",
                 lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)",
-                lbl_frame_w: "Largura Quadro", lbl_frame_h: "Altura Quadro", lbl_qty: "Qtd. Peças"
+                lbl_frame_w: "Largura Quadro", lbl_frame_h: "Altura Quadro", lbl_qty: "Qtd. Peças",
+                
+                // NOVAS CHAVES INSERIDAS:
+                auth_signup_free: "CADASTRE-SE GRATUITAMENTE", auth_tab_login: "Login", auth_tab_register: "Cadastro",
+                auth_email: "E-mail", auth_pass: "Senha", auth_name: "Nome", auth_surname: "Sobrenome", auth_corp_email: "E-mail Corporativo",
+                auth_terms: "Concordo com os termos de uso.", auth_btn_login: "Acessar Plataforma", auth_btn_register: "Criar Conta Gratuita",
+                btn_v_section: "Corte Técnico", btn_v_elevation: "Elevação Frontal", lbl_manual_source: "Luminária Manual", lbl_ies_file: "Arquivo IES",
+                lbl_power_w: "POTÊNCIA (W)", lbl_false_color: "CORES FALSAS (HEATMAP)",
+                driver_mode: "Modo de Operação", driver_power: "Potência Unitária (W)", driver_qty: "Metragem / Quantidade", driver_current: "Corrente (mA)",
+                opt_cv: "Tensão Constante (CV - 12/24V)", opt_cc: "Corrente Constante (CC - mA)",
+                opt_util_70: "Cores Claras / Aberto (0.70)", opt_util_60: "Padrão / Médio (0.60)", opt_util_40: "Cores Escuras / Fechado (0.40)",
+                opt_maint_80: "Limpo / Novo (0.80)", opt_maint_70: "Normal / Escritório (0.70)", opt_maint_60: "Sujo / Industrial (0.60)"
             },
             en: {
-                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "FLOOR PLAN<br>GRID",
+                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
                 calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES", lbl_ies_upload: "UPLOAD .IES FILE", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
                 lbl_room_w: "ROOM WIDTH (X)", lbl_room_l: "ROOM LENGTH (Y)", lbl_grid_sug: "SUGGESTED GRID", lbl_grid_unit: "FIXTURES", lbl_grid_desc: "Autonomous distribution aiming for 25% beam overlap on the projected light spot.",
@@ -715,7 +766,18 @@
                 auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now.",
                 search_placeholder: "Search room or task...",
                 lbl_lumen_mode: "LUMEN METHOD (SMART)", lbl_target_lux: "TARGET ILLUMINANCE (EM)", lbl_fixture_flux: "FIXTURE FLUX (LM)", lbl_util_factor: "UTILIZATION FACTOR (U)", lbl_maint_factor: "MAINTENANCE FACTOR (FM)",
-                lbl_frame_w: "Frame Width", lbl_frame_h: "Frame Height", lbl_qty: "Qty."
+                lbl_frame_w: "Frame Width", lbl_frame_h: "Frame Height", lbl_qty: "Qty.",
+                
+                // NOVAS CHAVES INSERIDAS:
+                auth_signup_free: "SIGN UP FOR FREE", auth_tab_login: "Login", auth_tab_register: "Register",
+                auth_email: "E-mail", auth_pass: "Password", auth_name: "First Name", auth_surname: "Last Name", auth_corp_email: "Corporate E-mail",
+                auth_terms: "I agree to the terms of use.", auth_btn_login: "Access Platform", auth_btn_register: "Create Free Account",
+                btn_v_section: "Technical Section", btn_v_elevation: "Front Elevation", lbl_manual_source: "Manual Fixture", lbl_ies_file: "IES File",
+                lbl_power_w: "POWER (W)", lbl_false_color: "FALSE COLORS (HEATMAP)",
+                driver_mode: "Operation Mode", driver_power: "Unit Power (W)", driver_qty: "Length / Quantity", driver_current: "Current (mA)",
+                opt_cv: "Constant Voltage (CV - 12/24V)", opt_cc: "Constant Current (CC - mA)",
+                opt_util_70: "Light Colors / Open (0.70)", opt_util_60: "Standard / Medium (0.60)", opt_util_40: "Dark Colors / Closed (0.40)",
+                opt_maint_80: "Clean / New (0.80)", opt_maint_70: "Normal / Office (0.70)", opt_maint_60: "Dirty / Industrial (0.60)"
             }
         };
 
