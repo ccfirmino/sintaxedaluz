@@ -2332,30 +2332,48 @@ window.handleGenerateReport = async () => {
         }
         window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
 
-        // BINDING
-        function bind(id, key, param) { 
-            const el = document.getElementById(id); if(!el) return;
-            
-            if (!el.hasAttribute('data-base-min')) {
-                el.setAttribute('data-base-min', el.min);
-                el.setAttribute('data-base-max', el.max);
-                el.setAttribute('data-base-step', el.step || '1');
+        // 1. Adicione esta variável fora da função para controlar o tempo de envio (Debounce)
+let trackingTimeout;
+
+function bind(id, key, param) { 
+    const el = document.getElementById(id); 
+    if(!el) return; 
+    
+    el.addEventListener('input', (e) => { 
+        let val = parseFloat(e.target.value); 
+        const isEn = window.currentLang === 'en';
+        const isDist = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL', 'frameW', 'frameH'].includes(param);
+        
+        // Conversão de unidades se necessário
+        const valInMeters = (isEn && isDist) ? val / 3.28084 : val;
+
+        // Atualiza o par (input número <-> range)
+        const pairId = id.includes('range') ? id.replace('range-', '') : 'range-' + id;
+        if(document.getElementById(pairId)) document.getElementById(pairId).value = val;
+        
+        // Atualiza o estado global e os cálculos
+        window.state[key][param] = valInMeters; 
+        window.updateCalculations(); 
+
+        // --- INÍCIO DA RECOLHA DE DADOS (GOOGLE ANALYTICS) ---
+        // Limpa o temporizador anterior enquanto o utilizador ainda está a deslizar o dedo
+        clearTimeout(trackingTimeout);
+
+        // Define um novo temporizador de 1.5 segundos
+        trackingTimeout = setTimeout(() => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'calc_adjustment', {
+                    'tool': key,           // ex: ponto, vertical, homog
+                    'parameter': param,    // ex: intensity, beam, height
+                    'value': valInMeters.toFixed(2), // o valor final escolhido
+                    'mode': window.calcMode // direct ou photometric
+                });
+                console.log(`Dados enviados ao GA4: ${key} -> ${param}: ${valInMeters}`);
             }
-
-            el.addEventListener('input', (e) => { 
-                let val = parseFloat(e.target.value); 
-                const isEn = window.currentLang === 'en';
-                const isDist = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL', 'frameW', 'frameH'].includes(param);
-                
-                const valInMeters = (isEn && isDist) ? val / 3.28084 : val;
-
-                const pairId = id.includes('range') ? id.replace('range-', '') : 'range-' + id;
-                if(document.getElementById(pairId)) document.getElementById(pairId).value = val;
-                
-                window.state[key][param] = valInMeters; 
-                window.updateCalculations(); 
-            }); 
-        }
+        }, 1500); 
+        // --- FIM DA RECOLHA DE DADOS ---
+    }); 
+}
         
         // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
         ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
