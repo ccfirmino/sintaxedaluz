@@ -282,7 +282,7 @@
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-slate-200 pt-4">
                                         <div class="group">
                                             <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
-                                            <input type="file" id="p-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                                            <input type="file" id="p-ies-input" accept=".ies, .lt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
                                             <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
                                     </div>
@@ -317,7 +317,7 @@
                                     </div>
                                     <div class="mode-ies-group hidden space-y-6 mb-6 border-t border-slate-200 pt-4">
                                         <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
                                             <input type="file" id="v-ies-input" accept=".ies" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
                                             <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                                         </div>
@@ -1361,14 +1361,25 @@ window.handleGenerateReport = async () => {
             window.updateCalculations();
         }
 
-        // --- IES PARSER & LOGIC ---
+        // --- PHOTOMETRIC PARSER & LOGIC (IES + LDT) ---
         window.handleIESUpload = function(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
+                const extension = file.name.split('.').pop().toLowerCase();
                 const reader = new FileReader();
+                
                 reader.onload = function(e) {
                     const content = e.target.result;
-                    const parsed = window.parseIES(content);
+                    let parsed = null;
+
+                    // Strategy Pattern: Roteia para o parser correto
+                    if (extension === 'ldt') {
+                        parsed = window.parseLDT(content);
+                    } else if (extension === 'ies') {
+                        parsed = window.parseIES(content);
+                    } else {
+                        return alert("Formato não suportado. Por favor, utilize ficheiros .IES ou .LDT");
+                    }
                     
                     if (parsed) {
                         const targetKey = window.currentTool;
@@ -1385,14 +1396,73 @@ window.handleGenerateReport = async () => {
                             statusEl.innerText = `Carregado: ${file.name}`;
                             statusEl.classList.add('text-luminous-gold');
                         }
+                        
+                        // Atualiza a UI com o fluxo total calculado se for LDT
+                        if (extension === 'ldt' && parsed.totalFlux) {
+                             window.state[targetKey].flux = parsed.totalFlux;
+                             const fluxInput = document.getElementById(targetKey[0] + '-flux');
+                             if(fluxInput) fluxInput.value = parsed.totalFlux;
+                             const rangeFlux = document.getElementById('range-' + targetKey[0] + '-flux');
+                             if(rangeFlux) rangeFlux.value = parsed.totalFlux;
+                        }
+
                         window.updateCalculations();
                     } else {
-                        alert("Erro ao ler arquivo " + file.name + ". Verifique se é um arquivo IES válido.");
+                        alert("Erro ao ler arquivo " + file.name + ". Verifique se não está corrompido.");
                     }
                 };
                 reader.readAsText(file);
             }
-        }
+        };
+
+        // Motor EULUMDAT (LDT)
+        window.parseLDT = function(rawData) {
+            try {
+                const lines = rawData.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(l => l !== '');
+                if (lines.length < 43) return null;
+
+                const cPlanesCount = parseInt(lines[3], 10);
+                const gammaAnglesCount = parseInt(lines[5], 10);
+
+                const numLamps = parseInt(lines[25], 10) || 1; 
+                const lumensPerLamp = parseFloat(lines[26]) || 1000;
+                const multiplierInfo = parseFloat(lines[27]) || 1;
+                
+                const totalFlux = numLamps * lumensPerLamp;
+                const conversionFactor = (totalFlux / 1000) * multiplierInfo;
+
+                let offset = 42 + (numLamps > 1 ? (numLamps - 1) * 3 : 0) + 1;
+
+                const hAngles = [];
+                for (let i = 0; i < cPlanesCount; i++) {
+                    hAngles.push(parseFloat(lines[offset++]));
+                }
+
+                const vAngles = [];
+                for (let i = 0; i < gammaAnglesCount; i++) {
+                    vAngles.push(parseFloat(lines[offset++]));
+                }
+
+                const candelas = [];
+                for (let c = 0; c < cPlanesCount; c++) {
+                    const planeIntensities = [];
+                    for (let g = 0; g < gammaAnglesCount; g++) {
+                        const relativeCd = parseFloat(lines[offset++]);
+                        // Conversão de cd/klm para Candelas Absolutas (Igual ao IES)
+                        const absoluteCd = isNaN(relativeCd) ? 0 : relativeCd * conversionFactor;
+                        planeIntensities.push(absoluteCd);
+                    }
+                    candelas.push(planeIntensities);
+                }
+
+                // Adapter: Devolve na exata mesma nomenclatura de variáveis que o IES usa!
+                return { vAngles, hAngles, candelas, multiplier: 1, totalFlux };
+
+            } catch (err) {
+                console.error("[LuxSintax] Erro no Parse LDT:", err);
+                return null;
+            }
+        };
 
         window.parseIES = function(content) {
             try {
