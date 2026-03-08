@@ -2526,17 +2526,18 @@ window.renderLeedProject = function() {
             </div>
 
             <div class="w-full lg:w-auto bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                <label class="text-[9px] text-slate-500 font-bold uppercase tracking-widest block mb-2">Projetos Salvos na Nuvem</label>
+                <label class="text-[9px] text-slate-500 font-bold uppercase tracking-widest block mb-2">Projetos na Nuvem</label>
                 <div class="flex gap-2">
-                    <select id="load-leed-select" class="bg-slate-800 text-slate-300 border border-slate-600 rounded-lg px-2 py-1 font-bold text-xs outline-none w-full lg:w-40 cursor-pointer">
-                        <option value="" disabled selected>Selecione...</option>
+                    <select id="load-leed-select" onchange="window.loadSpecificLeedProject()" class="bg-slate-800 text-slate-300 border border-slate-600 rounded-lg px-2 py-1 font-bold text-xs outline-none w-full lg:w-40 cursor-pointer">
+                        <option value="" disabled selected>Selecione para abrir...</option>
                         ${savedOptions}
                     </select>
-                    <button onclick="window.loadSpecificLeedProject()" class="bg-slate-700 hover:bg-slate-600 text-luminous-gold px-3 py-1 rounded-lg text-xs font-black transition-all border border-slate-600" title="Carregar Projeto"><i class="fas fa-cloud-download-alt"></i></button>
                     <button onclick="window.deleteSpecificLeedProject()" class="bg-slate-700 hover:bg-red-600 text-slate-400 hover:text-white px-3 py-1 rounded-lg text-xs font-black transition-all border border-slate-600" title="Deletar Projeto Selecionado"><i class="fas fa-trash"></i></button>
                 </div>
-            </div> <div class="flex gap-2 w-full lg:w-auto">
-                <button onclick="window.saveLeedProject()" class="flex-1 lg:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
+            </div>
+
+            <div class="flex gap-2 w-full lg:w-auto">
+                <button onclick="window.saveLeedProject()" id="btn-save-leed" class="flex-1 lg:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
                 <button onclick="window.generateLeedReport()" class="flex-1 lg:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
             </div>
         </div>
@@ -2625,11 +2626,10 @@ window.saveLeedProject = async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return alert("Você precisa estar logado para salvar o projeto.");
 
-        const btn = document.querySelector('button[onclick="window.saveLeedProject()"]');
+        const btn = document.getElementById('btn-save-leed');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Salvando...';
 
-        // Limpeza dos dados para o banco
         const cleanData = JSON.parse(JSON.stringify(window.state.leedProject));
 
         const payload = {
@@ -2673,19 +2673,17 @@ window.fetchUserLeedProjects = async () => {
 
 window.loadSpecificLeedProject = () => {
     const select = document.getElementById('load-leed-select');
-    if (!select || !select.value) return alert("Por favor, selecione um projeto na lista primeiro.");
+    if (!select || !select.value) return;
 
     const proj = window.userLeedProjects.find(p => p.id === select.value);
     if (proj) {
         try {
-            // Conversão segura String -> Object
             let rawData = proj.project_data;
             if (typeof rawData === 'string') {
                 rawData = JSON.parse(rawData);
             }
 
-            // Fallbacks de Segurança
-            if (!rawData.rooms) rawData.rooms = [];
+            if (!rawData.rooms || !Array.isArray(rawData.rooms)) rawData.rooms = [];
             if (!rawData.target) rawData.target = 'baseline';
             if (!rawData.name) rawData.name = proj.project_name;
 
@@ -2693,7 +2691,20 @@ window.loadSpecificLeedProject = () => {
             window.state.leedProject.db_id = proj.id;
             
             window.renderLeedProject();
-            alert(`Projeto "${proj.project_name}" carregado com sucesso!`);
+            
+            // UX: Botão Salvar pisca verde para confirmar que carregou!
+            const btn = document.getElementById('btn-save-leed');
+            if (btn) {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Carregado!';
+                btn.classList.remove('bg-slate-800');
+                btn.classList.add('bg-leed-green');
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.classList.add('bg-slate-800');
+                    btn.classList.remove('bg-leed-green');
+                }, 2500);
+            }
         } catch (err) {
             console.error("[LuxSintax] Erro ao processar dados salvos:", err);
             alert("Falha ao ler as informações do projeto. Os dados podem estar corrompidos.");
@@ -2711,7 +2722,8 @@ window.deleteSpecificLeedProject = async () => {
     if (!confirm(`TEM CERTEZA? O projeto "${proj.project_name}" será apagado permanentemente da nuvem.`)) return;
 
     try {
-        const btn = document.querySelector('button[onclick="window.deleteSpecificLeedProject()"]');
+        const btn = select.nextElementSibling;
+        const orig = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         const { error } = await supabase.from('leed_projects').delete().eq('id', proj.id);
@@ -2720,11 +2732,15 @@ window.deleteSpecificLeedProject = async () => {
         window.userLeedProjects = window.userLeedProjects.filter(p => p.id !== proj.id);
 
         if (window.state.leedProject.db_id === proj.id) {
-            window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
+            window.state.leedProject = { 
+                name: "Novo Projeto LEED",
+                target: "baseline",
+                rooms: [] 
+            };
         }
 
         window.renderLeedProject();
-        alert('Projeto deletado com sucesso.');
+        
     } catch (err) {
         console.error("[LuxSintax] Erro ao deletar:", err);
         alert("Falha ao deletar o projeto. Verifique sua conexão.");
