@@ -2627,7 +2627,7 @@ window.saveLeedProject = async () => {
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Salvando...';
 
-        // Garante que o Supabase receba um Objeto JSON limpo e estruturado
+        // Limpeza dos dados para o banco
         const cleanData = JSON.parse(JSON.stringify(window.state.leedProject));
 
         const payload = {
@@ -2676,22 +2676,20 @@ window.loadSpecificLeedProject = () => {
     const proj = window.userLeedProjects.find(p => p.id === select.value);
     if (proj) {
         try {
-            // 1. Correção do formato do Banco de Dados (String vs Object)
+            // Conversão segura String -> Object
             let rawData = proj.project_data;
             if (typeof rawData === 'string') {
                 rawData = JSON.parse(rawData);
             }
 
-            // 2. Validação de segurança (evitar tela branca se o projeto for antigo)
+            // Fallbacks de Segurança
             if (!rawData.rooms) rawData.rooms = [];
             if (!rawData.target) rawData.target = 'baseline';
             if (!rawData.name) rawData.name = proj.project_name;
 
-            // 3. Injeta no estado da aplicação de forma profunda
             window.state.leedProject = JSON.parse(JSON.stringify(rawData));
             window.state.leedProject.db_id = proj.id;
             
-            // 4. Renderiza a tela
             window.renderLeedProject();
             alert(`Projeto "${proj.project_name}" carregado com sucesso!`);
         } catch (err) {
@@ -2700,6 +2698,7 @@ window.loadSpecificLeedProject = () => {
         }
     }
 };
+
 window.deleteSpecificLeedProject = async () => {
     const select = document.getElementById('load-leed-select');
     if (!select || !select.value) return alert("Por favor, selecione um projeto na lista primeiro para deletar.");
@@ -2707,23 +2706,18 @@ window.deleteSpecificLeedProject = async () => {
     const proj = window.userLeedProjects.find(p => p.id === select.value);
     if (!proj) return;
 
-    // Trava de Segurança (Confirmação do Usuário)
     if (!confirm(`TEM CERTEZA? O projeto "${proj.project_name}" será apagado permanentemente da nuvem.`)) return;
 
     try {
-        // Feedback visual no botão
         const btn = document.querySelector('button[onclick="window.deleteSpecificLeedProject()"]');
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-        // Executa o comando de DELETE no Supabase
         const { error } = await supabase.from('leed_projects').delete().eq('id', proj.id);
         if (error) throw error;
 
-        // Atualiza a memória local (remove o projeto deletado da lista do cache)
         window.userLeedProjects = window.userLeedProjects.filter(p => p.id !== proj.id);
 
-        // Se o projeto deletado for o mesmo que está aberto na tela no momento, limpa a tela (Reset)
         if (window.state.leedProject.db_id === proj.id) {
             window.state.leedProject = { 
                 name: "Novo Projeto LEED",
@@ -2732,7 +2726,6 @@ window.deleteSpecificLeedProject = async () => {
             };
         }
 
-        // Redesenha a interface atualizada
         window.renderLeedProject();
         alert('Projeto deletado com sucesso.');
 
@@ -2743,32 +2736,6 @@ window.deleteSpecificLeedProject = async () => {
     }
 };
 
-window.fetchUserLeedProjects = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    
-    const { data, error } = await supabase.from('leed_projects').select('id, project_name, project_data').order('updated_at', { ascending: false });
-        
-    if (!error && data) {
-        window.userLeedProjects = data;
-        if (window.currentTool === 'leedProj') window.renderLeedProject();
-    }
-};
-
-window.loadSpecificLeedProject = () => {
-    const select = document.getElementById('load-leed-select');
-    if (!select || !select.value) return alert("Por favor, selecione um projeto na lista primeiro.");
-
-    const proj = window.userLeedProjects.find(p => p.id === select.value);
-    if (proj) {
-        // Deep copy para garantir que os dados sejam injetados limpos
-        window.state.leedProject = JSON.parse(JSON.stringify(proj.project_data));
-        window.state.leedProject.db_id = proj.id;
-        window.renderLeedProject();
-        alert(`Projeto "${proj.project_name}" carregado com sucesso!`);
-    }
-};
-
 window.generateLeedReport = async () => {
     if (!window.PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
     
@@ -2776,7 +2743,7 @@ window.generateLeedReport = async () => {
     if (s.rooms.length === 0) return alert('Adicione ao menos um ambiente ao projeto.');
 
     const pdfDoc = await window.PDFLib.PDFDocument.create();
-    let page = pdfDoc.addPage([595.28, 841.89]); // Mudamos de const para let para permitir paginação
+    let page = pdfDoc.addPage([595.28, 841.89]);
     const { width, height } = page.getSize();
 
     page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
@@ -2793,7 +2760,6 @@ window.generateLeedReport = async () => {
     let totalArea = 0, totalWatts = 0, allowedWatts = 0;
 
     s.rooms.forEach((r, idx) => {
-        // Quebra de página de segurança
         if (cy < 100) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
 
         let roomWatts = r.fixtures.reduce((acc, f) => acc + (f.power * f.qty), 0);
@@ -2803,11 +2769,9 @@ window.generateLeedReport = async () => {
         totalWatts += roomWatts;
         allowedWatts += roomAllowed;
 
-        // Título do Ambiente
         page.drawText(`${idx + 1}. ${r.name.toUpperCase()} (${r.area} m²) - Tipo: ${r.baseLpd} W/m²`, { x: 50, y: cy, size: 11, color: window.PDFLib.rgb(0.3, 0.48, 0.06) });
         cy -= 15;
 
-        // LÓGICA NOVA: Lista de Luminárias
         r.fixtures.forEach(f => {
             if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
             page.drawText(`- ${f.qty} un x ${f.label} (${f.power}W) = ${(f.qty * f.power).toFixed(1)}W`, { x: 60, y: cy, size: 9, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
@@ -2816,12 +2780,10 @@ window.generateLeedReport = async () => {
 
         if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
 
-        // Resumo do Ambiente
         page.drawText(`Carga Instalada: ${roomWatts.toFixed(1)}W | Limite: ${roomAllowed.toFixed(1)}W`, { x: 60, y: cy, size: 9, color: window.PDFLib.rgb(0.2, 0.2, 0.2) });
         cy -= 25;
     });
 
-    // Diagnóstico Global
     if (cy < 150) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
 
     cy -= 10;
