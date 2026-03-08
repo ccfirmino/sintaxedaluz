@@ -205,6 +205,7 @@
                 <div class="hidden md:flex gap-8 items-center">
                     <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
                     <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
+                    <button onclick="window.toggleLanguage()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase lang-display" title="Alternar Idioma">PT / EN</button>
                     <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase" title="Alternar Tema">
                         <span class="dark:hidden"><i class="fas fa-moon text-[14px]"></i></span>
                         <span class="hidden dark:inline"><i class="fas fa-sun text-[14px]"></i></span>
@@ -1294,6 +1295,8 @@ window.handleGenerateReport = async () => {
                 window.updateCalculations();
             } else if (toolId === 'query') {
                  window.switchQueryTab('nbr8995');
+            } else if (toolId === 'leedProj') {
+                 window.renderLeedProject();
             }
         }
                 
@@ -2710,7 +2713,6 @@ window.deleteSpecificLeedProject = async () => {
 
     try {
         const btn = document.querySelector('button[onclick="window.deleteSpecificLeedProject()"]');
-        const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         const { error } = await supabase.from('leed_projects').delete().eq('id', proj.id);
@@ -2719,16 +2721,11 @@ window.deleteSpecificLeedProject = async () => {
         window.userLeedProjects = window.userLeedProjects.filter(p => p.id !== proj.id);
 
         if (window.state.leedProject.db_id === proj.id) {
-            window.state.leedProject = { 
-                name: "Novo Projeto LEED",
-                target: "baseline",
-                rooms: [] 
-            };
+            window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
         }
 
         window.renderLeedProject();
         alert('Projeto deletado com sucesso.');
-
     } catch (err) {
         console.error("[LuxSintax] Erro ao deletar:", err);
         alert("Falha ao deletar o projeto. Verifique sua conexão.");
