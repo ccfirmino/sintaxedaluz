@@ -895,9 +895,27 @@
         ];
 
         window.lpdBaselines = [
-            { type: "Escritório (Office)", base: 6.9 }, { type: "Varejo (Retail)", base: 9.0 },
-            { type: "Escola / Educacional", base: 7.5 }, { type: "Hospital / Saúde", base: 9.0 },
-            { type: "Indústria / Galpão", base: 6.0 }, { type: "Estacionamento (Garagem)", base: 1.6 }
+            { type: "Armazém/Estoque (Bulky/Medium)", base: 6.2 },
+            { type: "Banheiros (Restrooms)", base: 10.5 },
+            { type: "Biblioteca (Acervo/Stacks)", base: 18.4 },
+            { type: "Biblioteca (Área de Leitura)", base: 10.0 },
+            { type: "Corredor/Transição", base: 7.1 },
+            { type: "Cozinha/Preparo de Alimentos", base: 10.7 },
+            { type: "Escadas (Stairway)", base: 7.4 },
+            { type: "Escritório Aberto (Open Plan)", base: 10.5 },
+            { type: "Escritório Fechado (Enclosed)", base: 11.9 },
+            { type: "Estacionamento (Garage Area)", base: 2.0 },
+            { type: "Hospital (Exame/Tratamento)", base: 17.9 },
+            { type: "Hospital (Quarto de Paciente)", base: 6.7 },
+            { type: "Hospital (Sala de Cirurgia)", base: 20.3 },
+            { type: "Indústria (Manufatura Detalhada)", base: 13.9 },
+            { type: "Laboratório", base: 13.8 },
+            { type: "Lobby / Recepção", base: 9.7 },
+            { type: "Refeitório (Dining Area)", base: 7.0 },
+            { type: "Sala de Aula/Treinamento", base: 13.3 },
+            { type: "Sala de Reunião/Conferência", base: 13.2 },
+            { type: "Varejo (Área de Vendas)", base: 18.1 },
+            { type: "Varejo (Circulação de Mall)", base: 11.8 }
         ];
 
         window.mClassTable = {
@@ -2650,13 +2668,15 @@ window.fetchUserLeedProjects = async () => {
 
 window.loadSpecificLeedProject = () => {
     const select = document.getElementById('load-leed-select');
-    if (!select || !select.value) return;
+    if (!select || !select.value) return alert("Por favor, selecione um projeto na lista primeiro.");
 
     const proj = window.userLeedProjects.find(p => p.id === select.value);
     if (proj) {
-        window.state.leedProject = proj.project_data;
+        // Deep copy para garantir que os dados sejam injetados limpos
+        window.state.leedProject = JSON.parse(JSON.stringify(proj.project_data));
         window.state.leedProject.db_id = proj.id;
         window.renderLeedProject();
+        alert(`Projeto "${proj.project_name}" carregado com sucesso!`);
     }
 };
 
@@ -2667,7 +2687,7 @@ window.generateLeedReport = async () => {
     if (s.rooms.length === 0) return alert('Adicione ao menos um ambiente ao projeto.');
 
     const pdfDoc = await window.PDFLib.PDFDocument.create();
-    const page = pdfDoc.addPage([595.28, 841.89]);
+    let page = pdfDoc.addPage([595.28, 841.89]); // Mudamos de const para let para permitir paginação
     const { width, height } = page.getSize();
 
     page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
@@ -2684,6 +2704,9 @@ window.generateLeedReport = async () => {
     let totalArea = 0, totalWatts = 0, allowedWatts = 0;
 
     s.rooms.forEach((r, idx) => {
+        // Quebra de página de segurança
+        if (cy < 100) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
+
         let roomWatts = r.fixtures.reduce((acc, f) => acc + (f.power * f.qty), 0);
         let roomAllowed = r.area * (r.baseLpd || 0) * window.leedTargets[s.target].factor;
         
@@ -2691,13 +2714,28 @@ window.generateLeedReport = async () => {
         totalWatts += roomWatts;
         allowedWatts += roomAllowed;
 
-        page.drawText(`${idx + 1}. ${r.name.toUpperCase()} (${r.area} m²)`, { x: 50, y: cy, size: 11, color: window.PDFLib.rgb(0.3, 0.48, 0.06) });
+        // Título do Ambiente
+        page.drawText(`${idx + 1}. ${r.name.toUpperCase()} (${r.area} m²) - Tipo: ${r.baseLpd} W/m²`, { x: 50, y: cy, size: 11, color: window.PDFLib.rgb(0.3, 0.48, 0.06) });
         cy -= 15;
+
+        // LÓGICA NOVA: Lista de Luminárias
+        r.fixtures.forEach(f => {
+            if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
+            page.drawText(`- ${f.qty} un x ${f.label} (${f.power}W) = ${(f.qty * f.power).toFixed(1)}W`, { x: 60, y: cy, size: 9, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
+            cy -= 12;
+        });
+
+        if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
+
+        // Resumo do Ambiente
         page.drawText(`Carga Instalada: ${roomWatts.toFixed(1)}W | Limite: ${roomAllowed.toFixed(1)}W`, { x: 60, y: cy, size: 9, color: window.PDFLib.rgb(0.2, 0.2, 0.2) });
         cy -= 25;
     });
 
-    cy -= 20;
+    // Diagnóstico Global
+    if (cy < 150) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
+
+    cy -= 10;
     page.drawLine({ start: { x: 50, y: cy }, end: { x: width - 50, y: cy }, thickness: 1, color: window.PDFLib.rgb(0.8, 0.8, 0.8) });
     cy -= 30;
 
