@@ -245,12 +245,14 @@
                     <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-drafting-compass text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
                     <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span data-i18n="tab_driver">DIMENSIONAR<br>DRIVER</span></button>
-                <button onclick="window.switchTool('leedProj')" id="tab-leedProj" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
-                        <i class="fas fa-building text-lg mb-1"></i>
-                        <span data-i18n="tab_leed_proj">PROJETO<br>LEED (LPD)</span>
-                    </button>    
-		<button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold ml-auto"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
-                </div>
+                <button onclick="window.switchTool('leedProj')" id="tab-leedProj" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap ml-auto">
+                    <i class="fas fa-building text-lg mb-1"></i>
+                    <span data-i18n="tab_leed_proj">PROJETO<br>LEED (LPD)</span>
+                </button>    
+                <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold">
+                    <i class="fas fa-search text-lg mb-1"></i>
+                    <span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span>
+                </button>
 
                 <div id="calculator-interface" class="w-full relative">
                     <div id="visual-tools" class="grid grid-cols-1 md:grid-cols-12 gap-8 w-full transition-opacity duration-300 hidden">
@@ -959,6 +961,7 @@
                 document.getElementById('app-content').classList.remove('app-locked'); 
                 window.populateCategoryFilter();
                 window.filterNorms();
+                if (window.fetchUserLeedProjects) window.fetchUserLeedProjects(); // Injeta os projetos salvos
                 setTimeout(() => window.updateCalculations(), 100); 
             },
             switchTab: function(tab) {
@@ -2481,21 +2484,39 @@ window.renderLeedProject = function() {
     const container = document.getElementById('leed-project-container');
     const s = window.state.leedProject;
 
+    const savedOptions = (window.userLeedProjects || []).map(p => 
+        `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`
+    ).join('');
+
     let html = `
-        <div class="bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
-            <div class="flex-grow w-full md:w-auto">
+        <div class="bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg">
+            
+            <div class="flex-grow w-full lg:w-auto">
                 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
                 <input type="text" value="${s.name}" onchange="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-700 text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1">
             </div>
-            <div class="w-full md:w-auto">
+
+            <div class="w-full lg:w-auto">
                 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Meta ASHRAE 90.1</label>
                 <select onchange="window.state.leedProject.target = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-slate-800 text-luminous-gold border border-slate-700 rounded-lg px-4 py-2 font-bold text-xs uppercase outline-none w-full cursor-pointer">
                     ${Object.entries(window.leedTargets).map(([key, data]) => `<option value="${key}" ${s.target === key ? 'selected' : ''}>${data.label}</option>`).join('')}
                 </select>
             </div>
-            <div class="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
-                <button onclick="window.saveLeedProject()" class="flex-1 md:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-700"><i class="fas fa-save mr-2"></i> Salvar</button>
-                <button onclick="window.generateLeedReport()" class="flex-1 md:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
+
+            <div class="w-full lg:w-auto bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                <label class="text-[9px] text-slate-500 font-bold uppercase tracking-widest block mb-2">Projetos Salvos na Nuvem</label>
+                <div class="flex gap-2">
+                    <select id="load-leed-select" class="bg-slate-800 text-slate-300 border border-slate-600 rounded-lg px-2 py-1 font-bold text-xs outline-none w-full lg:w-40 cursor-pointer">
+                        <option value="" disabled selected>Selecione...</option>
+                        ${savedOptions}
+                    </select>
+                    <button onclick="window.loadSpecificLeedProject()" class="bg-slate-700 hover:bg-slate-600 text-luminous-gold px-3 py-1 rounded-lg text-xs font-black transition-all border border-slate-600" title="Carregar Projeto"><i class="fas fa-cloud-download-alt"></i></button>
+                </div>
+            </div>
+
+            <div class="flex gap-2 w-full lg:w-auto">
+                <button onclick="window.saveLeedProject()" class="flex-1 lg:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
+                <button onclick="window.generateLeedReport()" class="flex-1 lg:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
             </div>
         </div>
     `;
@@ -2576,6 +2597,8 @@ window.updateGlobalLeedSummary = () => {
     }
 };
 
+window.userLeedProjects = []; 
+
 window.saveLeedProject = async () => {
     try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -2592,16 +2615,47 @@ window.saveLeedProject = async () => {
             updated_at: new Date()
         };
 
-        const { error } = await supabase.from('leed_projects').upsert(payload, { onConflict: 'id' }); 
+        if (window.state.leedProject.db_id) {
+            payload.id = window.state.leedProject.db_id;
+        }
+
+        const { data, error } = await supabase.from('leed_projects').upsert(payload).select().single(); 
         
         if (error) throw error;
         
+        if(data) window.state.leedProject.db_id = data.id;
+        await window.fetchUserLeedProjects(); 
+
         btn.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!';
         setTimeout(() => btn.innerHTML = originalText, 2000);
 
     } catch (err) {
         console.error("[LuxSintax] Erro de persistência:", err);
-        alert("Falha ao salvar o projeto. Verifique sua conexão.");
+        alert("Falha ao salvar o projeto.");
+    }
+};
+
+window.fetchUserLeedProjects = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    const { data, error } = await supabase.from('leed_projects').select('id, project_name, project_data').order('updated_at', { ascending: false });
+        
+    if (!error && data) {
+        window.userLeedProjects = data;
+        if (window.currentTool === 'leedProj') window.renderLeedProject();
+    }
+};
+
+window.loadSpecificLeedProject = () => {
+    const select = document.getElementById('load-leed-select');
+    if (!select || !select.value) return;
+
+    const proj = window.userLeedProjects.find(p => p.id === select.value);
+    if (proj) {
+        window.state.leedProject = proj.project_data;
+        window.state.leedProject.db_id = proj.id;
+        window.renderLeedProject();
     }
 };
 
