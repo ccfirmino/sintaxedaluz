@@ -2627,10 +2627,13 @@ window.saveLeedProject = async () => {
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Salvando...';
 
+        // Garante que o Supabase receba um Objeto JSON limpo e estruturado
+        const cleanData = JSON.parse(JSON.stringify(window.state.leedProject));
+
         const payload = {
             user_id: session.user.id,
             project_name: window.state.leedProject.name,
-            project_data: window.state.leedProject,
+            project_data: cleanData,
             updated_at: new Date()
         };
 
@@ -2651,6 +2654,50 @@ window.saveLeedProject = async () => {
     } catch (err) {
         console.error("[LuxSintax] Erro de persistência:", err);
         alert("Falha ao salvar o projeto.");
+    }
+};
+
+window.fetchUserLeedProjects = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    const { data, error } = await supabase.from('leed_projects').select('id, project_name, project_data').order('updated_at', { ascending: false });
+        
+    if (!error && data) {
+        window.userLeedProjects = data;
+        if (window.currentTool === 'leedProj') window.renderLeedProject();
+    }
+};
+
+window.loadSpecificLeedProject = () => {
+    const select = document.getElementById('load-leed-select');
+    if (!select || !select.value) return alert("Por favor, selecione um projeto na lista primeiro.");
+
+    const proj = window.userLeedProjects.find(p => p.id === select.value);
+    if (proj) {
+        try {
+            // 1. Correção do formato do Banco de Dados (String vs Object)
+            let rawData = proj.project_data;
+            if (typeof rawData === 'string') {
+                rawData = JSON.parse(rawData);
+            }
+
+            // 2. Validação de segurança (evitar tela branca se o projeto for antigo)
+            if (!rawData.rooms) rawData.rooms = [];
+            if (!rawData.target) rawData.target = 'baseline';
+            if (!rawData.name) rawData.name = proj.project_name;
+
+            // 3. Injeta no estado da aplicação de forma profunda
+            window.state.leedProject = JSON.parse(JSON.stringify(rawData));
+            window.state.leedProject.db_id = proj.id;
+            
+            // 4. Renderiza a tela
+            window.renderLeedProject();
+            alert(`Projeto "${proj.project_name}" carregado com sucesso!`);
+        } catch (err) {
+            console.error("[LuxSintax] Erro ao processar dados salvos:", err);
+            alert("Falha ao ler as informações do projeto. Os dados podem estar corrompidos.");
+        }
     }
 };
 
