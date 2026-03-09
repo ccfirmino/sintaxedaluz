@@ -1,4 +1,4 @@
-f<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -196,47 +196,7 @@ f<!DOCTYPE html>
     </div>
 
     <div id="app-content" class="transition-all duration-700 app-locked flex flex-col min-h-screen">
-        <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm transition-colors duration-300">
-            <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <a href="#" class="text-xl font-black tracking-[0.2em] text-starlight">LUX<span class="text-luminous-gold font-light">SINTAX</span></a>
-                    <span class="bg-amber-100 text-luminous-gold text-[9px] font-black px-2 py-0.5 rounded border border-amber-200 tracking-widest animate-pulse">BETA</span>
-                </div>
-                <div class="hidden md:flex gap-8 items-center">
-                    <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
-<a href="#lab" class="nav-link"><span data-i18n="nav_lab">LABORATÓRIO</span></a>
-<a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
-                    <button onclick="window.toggleLanguage()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase lang-display" title="Alternar Idioma">PT / EN</button>
-                    <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase" title="Alternar Tema">
-                        <span class="dark:hidden"><i class="fas fa-moon text-[14px]"></i></span>
-                        <span class="hidden dark:inline"><i class="fas fa-sun text-[14px]"></i></span>
-                    </button>
-                    <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-slate-300">
-                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-starlight font-bold text-xs border border-slate-200"><i class="fas fa-user"></i></div>
-                        <div class="flex flex-col">
-                            <span id="user-name-display" class="text-[10px] font-black text-starlight uppercase leading-none">Usuário</span>
-                            <div class="flex items-center gap-2 mt-1">
-                                <button onclick="window.AuthManager.openProfile()" class="text-[9px] text-dim-gray hover:text-luminous-gold text-left uppercase font-bold transition-colors" data-i18n="nav_profile">PERFIL</button>
-                                <span class="text-slate-300 text-[8px]">|</span>
-                                <button onclick="window.AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-500 text-left uppercase font-bold transition-colors" data-i18n="nav_logout">SAIR</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="md:hidden text-starlight text-2xl cursor-pointer" onclick="window.toggleMobileMenu()"><i class="fas fa-bars"></i></div>
-            </div>
-            <a href="#calculadora" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
-<a href="#lab" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_lab">LABORATÓRIO</a>
-<a href="#fundamentos" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
-                 <button onclick="window.AuthManager.openProfile(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase" data-i18n="nav_profile">PERFIL</button>
-                 <button onclick="window.AuthManager.logout()" class="text-sm font-bold tracking-widest text-red-500 text-left" data-i18n="nav_logout">SAIR</button>
-                 <div class="h-[1px] bg-slate-200 w-full"></div>
-                 <button onclick="window.toggleLanguage(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left lang-display">PT / EN</button>
-                 <button onclick="window.toggleTheme(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase">
-                    <span class="inline-block w-5"><span class="dark:hidden"><i class="fas fa-moon"></i></span><span class="hidden dark:inline"><i class="fas fa-sun"></i></span></span> TEMA
-                 </button>
-            </div>
-        </nav>
+        <nav
 
         <section id="calculadora" class="pt-24 pb-10 px-4 md:px-8 relative min-h-screen">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-50"></div>
@@ -591,6 +551,38 @@ f<!DOCTYPE html>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+<section id="lab" class="py-24 px-6 border-t border-slate-200 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+            <div class="max-w-[1800px] mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl text-starlight dark:text-white font-black tracking-widest mb-4 uppercase" data-i18n="lab_title">LABORATÓRIO DE LUZ</h2>
+                    <p class="text-xs text-luminous-gold font-bold tracking-[0.2em] uppercase" data-i18n="lab_subtitle">EXPERIMENTE A PLÁSTICA DA LUZ NO AMBIENTE</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-8 relative aspect-video bg-starlight rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800">
+                        <div id="layer-base" class="absolute inset-0 bg-slate-800 opacity-100 flex items-center justify-center text-slate-600 font-black">IMAGEM BASE</div>
+                        <div id="layer-indirect" class="absolute inset-0 bg-blue-500/30 opacity-0 transition-opacity duration-700 mix-blend-screen flex items-center justify-center text-white font-black">LUZ INDIRETA</div>
+                        <div id="layer-wash" class="absolute inset-0 bg-amber-500/30 opacity-0 transition-opacity duration-700 mix-blend-screen flex items-center justify-center text-white font-black">WALLWASHING</div>
+                        <div id="layer-grazing" class="absolute inset-0 bg-lime-500/30 opacity-0 transition-opacity duration-700 mix-blend-screen flex items-center justify-center text-white font-black">GRAZING</div>
+                    </div>
+
+                    <div class="lg:col-span-4 flex flex-col gap-4">
+                        <button onclick="window.toggleLabLayer('indirect')" class="lab-toggle p-6 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
+                            <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_ambient">Luz Indireta</span>
+                            <i class="fas fa-cloud text-slate-300 group-hover:text-luminous-gold"></i>
+                        </button>
+                        <button onclick="window.toggleLabLayer('wash')" class="lab-toggle p-6 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
+                            <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_wash">Wallwashing</span>
+                            <i class="fas fa-stream text-slate-300 group-hover:text-luminous-gold"></i>
+                        </button>
+                        <button onclick="window.toggleLabLayer('grazing')" class="lab-toggle p-6 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
+                            <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_grazing">Wall Grazing</span>
+                            <i class="fas fa-braille text-slate-300 group-hover:text-luminous-gold"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2966,6 +2958,17 @@ window.generateLeedReport = async () => {
     link.download = `LuxSintax_LEED_${s.name.replace(/\s+/g, '_')}.pdf`; 
     link.click();
 };
+window.toggleLabLayer = function(layerId) {
+            const layer = document.getElementById('layer-' + layerId);
+            if (layer) {
+                const isVisible = layer.style.opacity === "1";
+                layer.style.opacity = isVisible ? "0" : "1";
+                if (event && event.currentTarget) {
+                    event.currentTarget.classList.toggle('border-luminous-gold');
+                    event.currentTarget.classList.toggle('bg-amber-50');
+                }
+            }
+        };
         window.AuthManager.init();
         window.switchTool('ponto');
     </script>
