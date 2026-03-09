@@ -609,17 +609,17 @@
                     <div class="lg:col-span-8 relative aspect-video bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800">
                         
                         <div id="layer-base" class="absolute inset-0">
-                            <img src="00.png" alt="Sala Base" class="absolute inset-0 w-full h-full object-cover">
+                            <img src="base.png" alt="Cenário Base" class="absolute inset-0 w-full h-full object-cover">
                         </div>
 
-                        <img id="layer-general" src="01.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        <img id="layer-cove" src="03.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        <img id="layer-wash" src="04.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        <img id="layer-grazing" src="05.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        <img id="layer-accent" src="02.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                        <img id="layer-general" src="light_general.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                        <img id="layer-cove" src="light_cove.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                        <img id="layer-wash" src="light_wash.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                        <img id="layer-grazing" src="light_grazing.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                        <img id="layer-accent" src="light_accent.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
                         
-                        <div class="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700 text-[10px] text-luminous-gold font-bold tracking-widest z-10">
-                            <i class="fas fa-layer-group mr-2"></i> MOTOR GRÁFICO (CAMADAS)
+                        <div class="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700 text-[10px] text-luminous-gold font-bold tracking-widest z-10 uppercase">
+                            <i class="fas fa-layer-group mr-2"></i> Renderização em Camadas
                         </div>
                     </div>
 
@@ -627,23 +627,23 @@
                         <button onclick="window.toggleLabLayer('general')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
                             <div class="flex flex-col text-left">
                                 <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_general">Luz Geral</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Expansão Difusa</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Preenchimento (Ambient)</span>
                             </div>
-                            <i class="fas fa-expand-arrows-alt text-slate-300 group-hover:text-luminous-gold text-lg"></i>
+                            <i class="fas fa-circle-nodes text-slate-300 group-hover:text-luminous-gold text-lg"></i>
                         </button>
 
                         <button onclick="window.toggleLabLayer('cove')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
                             <div class="flex flex-col text-left">
                                 <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_cove">Sanca (Indireta)</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Luz Rebatida no Teto</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Iluminação Linear Rebatida</span>
                             </div>
-                            <i class="fas fa-arrow-up text-slate-300 group-hover:text-luminous-gold text-lg"></i>
+                            <i class="fas fa-arrows-up-to-line text-slate-300 group-hover:text-luminous-gold text-lg"></i>
                         </button>
 
                         <button onclick="window.toggleLabLayer('wash')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
                             <div class="flex flex-col text-left">
                                 <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_wash">Wallwashing</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Cobertura Vertical Uniforme</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Lavagem Vertical Uniforme</span>
                             </div>
                             <i class="fas fa-grip-lines text-slate-300 group-hover:text-luminous-gold text-lg"></i>
                         </button>
@@ -651,7 +651,7 @@
                         <button onclick="window.toggleLabLayer('grazing')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
                             <div class="flex flex-col text-left">
                                 <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_grazing">Wall Grazing</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Textura e Dramatismo</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Destaque de Texturas e Relevos</span>
                             </div>
                             <i class="fas fa-barcode text-slate-300 group-hover:text-luminous-gold text-lg"></i>
                         </button>
@@ -659,9 +659,9 @@
                         <button onclick="window.toggleLabLayer('accent')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
                             <div class="flex flex-col text-left">
                                 <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_accent">Luz de Destaque</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Foco no Alvo (Spot)</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Foco Direcionado (Spotlight)</span>
                             </div>
-                            <i class="fas fa-crosshairs text-slate-300 group-hover:text-luminous-gold text-lg"></i>
+                            <i class="fas fa-bullseye text-slate-300 group-hover:text-luminous-gold text-lg"></i>
                         </button>
                     </div>
                 </div>
