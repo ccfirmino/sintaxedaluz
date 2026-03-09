@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+f<!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -204,12 +204,11 @@
                 </div>
                 <div class="hidden md:flex gap-8 items-center">
                     <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
-                    <a href="#lab" class="nav-link"><span data-i18n="nav_lab">LABORATÓRIO</span></a>
                     <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
                     <button onclick="window.toggleLanguage()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase lang-display" title="Alternar Idioma">PT / EN</button>
-                    <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase flex items-center justify-center w-8" title="Alternar Tema">
-                        <i class="fas fa-moon block dark:hidden text-[14px]"></i>
-                        <i class="fas fa-sun hidden dark:block text-[14px]"></i>
+                    <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase" title="Alternar Tema">
+                        <span class="dark:hidden"><i class="fas fa-moon text-[14px]"></i></span>
+                        <span class="hidden dark:inline"><i class="fas fa-sun text-[14px]"></i></span>
                     </button>
                     <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-slate-300">
                         <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-starlight font-bold text-xs border border-slate-200"><i class="fas fa-user"></i></div>
@@ -225,18 +224,15 @@
                 </div>
                 <div class="md:hidden text-starlight text-2xl cursor-pointer" onclick="window.toggleMobileMenu()"><i class="fas fa-bars"></i></div>
             </div>
-            
-            <div id="mobile-menu" class="hidden md:hidden flex-col gap-4 px-6 pb-6 pt-2 bg-white/95 backdrop-blur-xl border-b border-slate-200">
+            <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-200 p-6 flex flex-col gap-6 shadow-2xl transition-all duration-300">
                  <a href="#calculadora" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
-                 <a href="#lab" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_lab">LABORATÓRIO</a>
                  <a href="#fundamentos" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
                  <button onclick="window.AuthManager.openProfile(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase" data-i18n="nav_profile">PERFIL</button>
                  <button onclick="window.AuthManager.logout()" class="text-sm font-bold tracking-widest text-red-500 text-left" data-i18n="nav_logout">SAIR</button>
                  <div class="h-[1px] bg-slate-200 w-full"></div>
                  <button onclick="window.toggleLanguage(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left lang-display">PT / EN</button>
-                 <button onclick="window.toggleTheme(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase flex items-center gap-2">
-                    <i class="fas fa-moon block dark:hidden text-[14px]"></i>
-                    <i class="fas fa-sun hidden dark:block text-[14px]"></i> <span>TEMA</span>
+                 <button onclick="window.toggleTheme(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase">
+                    <span class="inline-block w-5"><span class="dark:hidden"><i class="fas fa-moon"></i></span><span class="hidden dark:inline"><i class="fas fa-sun"></i></span></span> TEMA
                  </button>
             </div>
         </nav>
@@ -598,75 +594,6 @@
                 </div>
             </div>
         </section>
-<section id="lab" class="py-24 px-6 border-t border-slate-200 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-            <div class="max-w-[1800px] mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl text-starlight dark:text-white font-black tracking-widest mb-4 uppercase" data-i18n="lab_title">LABORATÓRIO DE LUZ</h2>
-                    <p class="text-xs text-luminous-gold font-bold tracking-[0.2em] uppercase" data-i18n="lab_subtitle">EXPERIMENTE A PLÁSTICA DA LUZ NO AMBIENTE</p>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                    <div class="lg:col-span-8 relative aspect-video bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800">
-                        
-                        <div id="layer-base" class="absolute inset-0">
-                            <img src="base.png" alt="Cenário Base" class="absolute inset-0 w-full h-full object-cover">
-                        </div>
-
-                        <img id="layer-general" src="light_general.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        <img id="layer-cove" src="light_cove.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        <img id="layer-wash" src="light_wash.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        <img id="layer-grazing" src="light_grazing.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        <img id="layer-accent" src="light_accent.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                        
-                        <div class="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700 text-[10px] text-luminous-gold font-bold tracking-widest z-10 uppercase">
-                            <i class="fas fa-layer-group mr-2"></i> Renderização em Camadas
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-4 flex flex-col gap-3">
-                        <button onclick="window.toggleLabLayer('general')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
-                            <div class="flex flex-col text-left">
-                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_general">Luz Geral</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Preenchimento (Ambient)</span>
-                            </div>
-                            <i class="fas fa-circle-nodes text-slate-300 group-hover:text-luminous-gold text-lg"></i>
-                        </button>
-
-                        <button onclick="window.toggleLabLayer('cove')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
-                            <div class="flex flex-col text-left">
-                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_cove">Sanca (Indireta)</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Iluminação Linear Rebatida</span>
-                            </div>
-                            <i class="fas fa-arrows-up-to-line text-slate-300 group-hover:text-luminous-gold text-lg"></i>
-                        </button>
-
-                        <button onclick="window.toggleLabLayer('wash')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
-                            <div class="flex flex-col text-left">
-                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_wash">Wallwashing</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Lavagem Vertical Uniforme</span>
-                            </div>
-                            <i class="fas fa-grip-lines text-slate-300 group-hover:text-luminous-gold text-lg"></i>
-                        </button>
-
-                        <button onclick="window.toggleLabLayer('grazing')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
-                            <div class="flex flex-col text-left">
-                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_grazing">Wall Grazing</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Destaque de Texturas e Relevos</span>
-                            </div>
-                            <i class="fas fa-barcode text-slate-300 group-hover:text-luminous-gold text-lg"></i>
-                        </button>
-
-                        <button onclick="window.toggleLabLayer('accent')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
-                            <div class="flex flex-col text-left">
-                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_accent">Luz de Destaque</span>
-                                <span class="text-[9px] text-slate-400 font-bold uppercase">Foco Direcionado (Spotlight)</span>
-                            </div>
-                            <i class="fas fa-bullseye text-slate-300 group-hover:text-luminous-gold text-lg"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <section id="fundamentos" class="py-24 px-6 border-t border-slate-200 bg-white transition-colors duration-300">
             <div class="max-w-[1800px] mx-auto">
@@ -837,16 +764,7 @@
                 lbl_add_room: "Adicionar Ambiente",
                 lbl_add_fixture: "Nova Luminária",
                 lbl_room_name: "Nome do Ambiente",
-                lbl_compliance: "Status de Conformidade",
-lbl_compliance: "Status de Conformidade", // Adicione a vírgula aqui
-            nav_lab: "LABORATÓRIO",
-            lab_title: "LABORATÓRIO DE LUZ",
-            lab_subtitle: "EXPERIMENTE A PLÁSTICA DA LUZ NO AMBIENTE",
-            lbl_general: "Luz Geral",
-            lbl_cove: "Sanca (Indireta)",
-            lbl_wash: "Wallwashing",
-            lbl_grazing: "Wall Grazing",
-            lbl_accent: "Luz de Destaque"
+                lbl_compliance: "Status de Conformidade"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
@@ -882,15 +800,7 @@ lbl_compliance: "Status de Conformidade", // Adicione a vírgula aqui
                 lbl_add_room: "Add Room",
                 lbl_add_fixture: "New Fixture",
                 lbl_room_name: "Room Name",
-                lbl_compliance: "Compliance Status",lbl_compliance: "Compliance Status", // Adicione a vírgula aqui
-            nav_lab: "LAB",
-            lab_title: "LIGHTING LAB",
-            lab_subtitle: "EXPERIMENT WITH LIGHTING EFFECTS IN REAL-TIME",
-            lbl_general: "General Light",
-            lbl_cove: "Cove Lighting",
-            lbl_wash: "Wallwashing",
-            lbl_grazing: "Wall Grazing",
-            lbl_accent: "Accent Lighting"
+                lbl_compliance: "Compliance Status"
             }
         };
 
@@ -3040,17 +2950,6 @@ window.generateLeedReport = async () => {
     link.download = `LuxSintax_LEED_${s.name.replace(/\s+/g, '_')}.pdf`; 
     link.click();
 };
-window.toggleLabLayer = function(layerId) {
-            const layer = document.getElementById('layer-' + layerId);
-            if (layer) {
-                const isVisible = layer.style.opacity === "1";
-                layer.style.opacity = isVisible ? "0" : "1";
-                if (event && event.currentTarget) {
-                    event.currentTarget.classList.toggle('border-luminous-gold');
-                    event.currentTarget.classList.toggle('bg-amber-50');
-                }
-            }
-        };
         window.AuthManager.init();
         window.switchTool('ponto');
     </script>
