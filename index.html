@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+f<!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -732,7 +732,7 @@
         window.i18n = {
             pt: {
                 nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "SUPERFÍCIE<br>HORIZONTAL", tab_vert: "SUPERFÍCIE<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "DIMENSIONAR<br>DRIVER",
-                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES", lbl_ies_upload: "CARREGAR .IES / .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
+                calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES / LDT", lbl_ies_upload: "CARREGAR .IES / .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
                 lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
                 lbl_room_w: "LARGURA DO AMB. (X)", lbl_room_l: "COMPRIMENTO DO AMB. (Y)", lbl_grid_sug: "MALHA SUGERIDA", lbl_grid_unit: "PEÇAS", lbl_grid_desc: "Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.",
                 hdr_results: "Resultados em Tempo Real", hdr_query: "Centro de Consultas", query_subtitle: "Acesso rápido a normas e referências técnicas.",
@@ -768,7 +768,7 @@
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
-                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES", lbl_ies_upload: "UPLOAD .IES / .LDT", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
+                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES / LDT", lbl_ies_upload: "UPLOAD .IES / .LDT", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
                 lbl_room_w: "ROOM WIDTH (X)", lbl_room_l: "ROOM LENGTH (Y)", lbl_grid_sug: "SUGGESTED GRID", lbl_grid_unit: "FIXTURES", lbl_grid_desc: "Autonomous distribution aiming for 25% beam overlap on the projected light spot.",
                 hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
@@ -1418,44 +1418,50 @@ window.handleGenerateReport = async () => {
         // Motor EULUMDAT (LDT)
         // Motor EULUMDAT (LDT) Blindado
         // Motor EULUMDAT (LDT) Blindado
+        // Motor EULUMDAT (LDT) Blindado Final
         window.parseLDT = function(rawData) {
             try {
-                // 1. Leitura do Cabeçalho (Padrão EULUMDAT Estrito)
-                const lines = rawData.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(l => l !== '');
+                // 1. Preservamos as linhas vazias para garantir que o índice seja idêntico ao ficheiro EULUMDAT
+                const lines = rawData.replace(/\r\n/g, '\n').split('\n').map(l => l.trim());
                 if (lines.length < 30) return null;
 
                 const Mc = parseInt(lines[3], 10);
                 const Mg = parseInt(lines[5], 10);
                 if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-                // Índices oficiais corrigidos para formato LDT
+                // Índices Oficiais do Padrão
                 const conversion = parseFloat(lines[20]) || 1;
                 const numLamps = parseInt(lines[23], 10) || 1;
-                const flux = parseFloat(lines[25]) || 0;
+                
+                // Extrai o Fluxo e limpa qualquer texto adicional na linha (ex: "1800 lm" -> 1800)
+                let fluxStr = lines[25] || "0";
+                let flux = parseFloat(fluxStr.replace(/[^\d.-]/g, ''));
+                if (isNaN(flux)) flux = 0;
 
                 let totalFlux = numLamps * flux;
                 let conversionFactor = 1;
 
-                if (totalFlux <= 0 || isNaN(totalFlux)) {
-                    totalFlux = 1000; // Proteção contra LEDs de fotometria absoluta (fluxo = 0 no header)
+                if (totalFlux <= 0) {
+                    // Fotometria Absoluta: os valores da matriz já estão em Candelas
+                    totalFlux = 1000; // Apenas para injetar no UI (evitar mostrar 0 Lúmens)
                     conversionFactor = conversion;
                 } else {
+                    // Fotometria Relativa: os valores estão em cd/klm. Precisamos do Fator!
                     conversionFactor = (totalFlux / 1000) * conversion;
                 }
 
                 // 2. Extração Matemática da Matriz (Tokenização Reversa)
-                // Ignoramos a formatação do cabeçalho e isolamos apenas os valores numéricos.
                 const allTokens = rawData.replace(/\s+/g, ' ').trim().split(' ');
                 const allNumbers = [];
                 for (const t of allTokens) {
-                    const val = Number(t); // Number() rejeita letras (ex: "3000K"), garantindo pureza
-                    if (!isNaN(val)) allNumbers.push(val);
+                    const val = Number(t);
+                    if (!isNaN(val) && t !== '') allNumbers.push(val);
                 }
 
                 const requiredDataCount = Mc + Mg + (Mc * Mg);
                 if (allNumbers.length < requiredDataCount) return null;
 
-                // Corta EXATAMENTE a matriz fotométrica do fim do ficheiro
+                // Corta a matriz fotométrica EXATAMENTE do final do arquivo, livre de textos
                 const matrixData = allNumbers.slice(allNumbers.length - requiredDataCount);
 
                 let ptr = 0;
@@ -1481,7 +1487,7 @@ window.handleGenerateReport = async () => {
                 console.error("[LuxSintax] Erro no Parse LDT:", err);
                 return null;
             }
-        };
+        };;
 
         window.parseIES = function(content) {
             try {
