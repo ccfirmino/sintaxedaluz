@@ -1420,22 +1420,34 @@ window.handleGenerateReport = async () => {
         // Motor EULUMDAT (LDT) Blindado
         // Motor EULUMDAT (LDT) Blindado Final
         // Motor EULUMDAT (LDT) Dinâmico (Imune a Erros de Fabricantes)
+        // Motor EULUMDAT (LDT) Dinâmico Super-Normalizado
         window.parseLDT = function(rawData) {
             try {
-                // 1. Limpeza rigorosa de quebras de linha
-                const cleanLines = rawData.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(l => l !== '');
+                // 1. Higienização Total: Resolve vírgulas européias e todos os tipos de quebras de linha Windows/Mac/Linux
+                const normalizedData = rawData.replace(/,/g, '.').replace(/\r\n|\r|\n/g, '\n');
+                
+                // 2. Extração Matemática Segura (Tokenização Reversa)
+                const allTokens = normalizedData.replace(/\s+/g, ' ').trim().split(' ');
+                const allNumbers = [];
+                for (const t of allTokens) {
+                    const val = Number(t);
+                    if (!isNaN(val) && t !== '') allNumbers.push(val);
+                }
+
+                // 3. Estruturação Limpa para o Cabeçalho
+                const cleanLines = normalizedData.split('\n').map(l => l.trim()).filter(l => l !== '');
                 if (cleanLines.length < 30) return null;
 
                 const Mc = parseInt(cleanLines[3], 10);
                 const Mg = parseInt(cleanLines[5], 10);
                 if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-                // A MÁGICA: Em vez de confiar em números de linha fixos,
-                // procuramos a primeira palavra (String) após as dimensões. 
-                // Na norma EULUMDAT, essa palavra é obrigatoriamente o "Tipo de Lâmpada" (Ex: LED).
+                const requiredDataCount = Mc + Mg + (Mc * Mg);
+                if (allNumbers.length < requiredDataCount) return null;
+
+                // 4. Busca da Âncora Textual (A Lâmpada) para apurar o Fluxo Luminoso
                 let typeIndex = -1;
-                for (let i = 15; i < 40; i++) {
-                    // isNaN(Number()) verifica se a linha contém texto em vez de apenas números
+                for (let i = 15; i < 45; i++) {
                     if (cleanLines[i] && isNaN(Number(cleanLines[i]))) {
                         typeIndex = i;
                         break;
@@ -1444,42 +1456,32 @@ window.handleGenerateReport = async () => {
 
                 let flux = 1000;
                 let numLamps = 1;
-                
+                let convFactor = 1.0;
+
                 if (typeIndex !== -1) {
-                    // O Fluxo Luminoso está SEMPRE na linha exata APÓS o Tipo de Lâmpada
                     if (typeIndex + 1 < cleanLines.length) {
                         flux = parseFloat(cleanLines[typeIndex + 1].replace(/[^\d.-]/g, ''));
                     }
-                    // A quantidade de lâmpadas está SEMPRE na linha ANTERIOR
                     if (typeIndex - 1 >= 0) {
                         numLamps = parseInt(cleanLines[typeIndex - 1], 10) || 1;
                     }
+                    // O Fator de Conversão LDT costuma estar 4 linhas numéricas antes do Tipo de Lâmpada
+                    if (typeIndex - 4 >= 0) {
+                        convFactor = parseFloat(cleanLines[typeIndex - 4]) || 1.0;
+                    }
                 }
-
-                // O Fator de Conversão de Intensidade (geralmente 1.0)
-                const convFactor = parseFloat(cleanLines[23]) || 1;
 
                 let totalFlux = numLamps * flux;
                 let conversionFactor = 1;
 
                 if (isNaN(totalFlux) || totalFlux <= 0) {
-                    totalFlux = 1000; // Fotometria Absoluta
+                    totalFlux = 1000; 
                     conversionFactor = convFactor;
                 } else {
-                    conversionFactor = (totalFlux / 1000) * convFactor; // Fotometria Relativa
+                    conversionFactor = (totalFlux / 1000) * convFactor; 
                 }
 
-                // 2. Extração Matemática da Matriz (Tokenização Reversa)
-                const allTokens = rawData.replace(/\s+/g, ' ').trim().split(' ');
-                const allNumbers = [];
-                for (const t of allTokens) {
-                    const val = Number(t);
-                    if (!isNaN(val) && t !== '') allNumbers.push(val);
-                }
-
-                const requiredDataCount = Mc + Mg + (Mc * Mg);
-                if (allNumbers.length < requiredDataCount) return null;
-
+                // 5. Corte da Matriz Fotométrica EXATAMENTE do final do ficheiro
                 const matrixData = allNumbers.slice(allNumbers.length - requiredDataCount);
 
                 let ptr = 0;
@@ -1610,15 +1612,23 @@ window.handleGenerateReport = async () => {
                 let halfAngle = 0;
                 for (let i = 0; i < vAngles.length - 1; i++) {
                     if ((row[i] >= targetI && row[i+1] <= targetI) || (row[i] <= targetI && row[i+1] >= targetI)) {
-                        const t = (targetI - row[i]) / (row[i+1] - row[i]);
-                        halfAngle = vAngles[i] + t * (vAngles[i+1] - vAngles[i]);
+                        // Trava de segurança contra divisão por zero (Platô Fotométrico)
+                        if (row[i+1] === row[i]) {
+                            halfAngle = vAngles[i];
+                        } else {
+                            const t = (targetI - row[i]) / (row[i+1] - row[i]);
+                            halfAngle = vAngles[i] + t * (vAngles[i+1] - vAngles[i]);
+                        }
                         break;
                     }
                 }
                 if (halfAngle === 0 && row[row.length-1] > targetI) {
                     halfAngle = vAngles[vAngles.length-1];
                 }
-                return halfAngle * 2 || s.beam; 
+                // Trava de segurança final para garantir que nunca devolvemos NaN para o Canvas
+                if (isNaN(halfAngle) || halfAngle <= 0) return s.beam;
+                
+                return halfAngle * 2; 
             }
             return s.beam;
         }
