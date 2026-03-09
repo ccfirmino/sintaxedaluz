@@ -1417,69 +1417,64 @@ window.handleGenerateReport = async () => {
 
         // Motor EULUMDAT (LDT)
         // Motor EULUMDAT (LDT) Blindado
+        // Motor EULUMDAT (LDT) Blindado
         window.parseLDT = function(rawData) {
             try {
-                // Separa as linhas mas NÃO remove as linhas vazias do meio para preservar os índices do cabeçalho!
-                const rawLines = rawData.replace(/\r\n/g, '\n').split('\n').map(l => l.trim());
-                
-                // Remove apenas as quebras de linha acidentais do final do arquivo
-                // para que o nosso cálculo reverso de offset seja perfeito.
-                while(rawLines.length > 0 && rawLines[rawLines.length - 1] === '') {
-                    rawLines.pop();
-                }
-                const lines = rawLines;
-                
-                if (lines.length < 40) return null;
+                // 1. Leitura do Cabeçalho (Padrão EULUMDAT Estrito)
+                const lines = rawData.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(l => l !== '');
+                if (lines.length < 30) return null;
 
-                const cPlanesCount = parseInt(lines[3], 10);
-                const gammaAnglesCount = parseInt(lines[5], 10);
+                const Mc = parseInt(lines[3], 10);
+                const Mg = parseInt(lines[5], 10);
+                if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-                // No padrão EULUMDAT: Índice 24 = Qtd Lâmpadas, Índice 26 = Fluxo (Lm)
-                const numLamps = parseInt(lines[24], 10) || 1; 
-                const fluxPerLamp = parseFloat(lines[26]);
-                const fileConversionFactor = parseFloat(lines[22]) || 1;
-                
-                let totalFlux = numLamps * fluxPerLamp;
+                // Índices oficiais corrigidos para formato LDT
+                const conversion = parseFloat(lines[20]) || 1;
+                const numLamps = parseInt(lines[23], 10) || 1;
+                const flux = parseFloat(lines[25]) || 0;
+
+                let totalFlux = numLamps * flux;
                 let conversionFactor = 1;
 
-                // Lógica para Fotometria Absoluta (LEDs)
-                // Se o fluxo declarado for 0 ou negativo, o arquivo já está em Candelas Absolutas
-                if (isNaN(totalFlux) || totalFlux <= 0) {
-                    totalFlux = 1000; // Fallback seguro para a UI não quebrar com NaN
-                    conversionFactor = 1 * fileConversionFactor;
+                if (totalFlux <= 0 || isNaN(totalFlux)) {
+                    totalFlux = 1000; // Proteção contra LEDs de fotometria absoluta (fluxo = 0 no header)
+                    conversionFactor = conversion;
                 } else {
-                    conversionFactor = (totalFlux / 1000) * fileConversionFactor; // Padrão relativo: cd/klm
+                    conversionFactor = (totalFlux / 1000) * conversion;
                 }
 
-                // CÁLCULO REVERSO (A Mágica):
-                // Sabemos que o arquivo termina com: (Qtd C) + (Qtd Gamma) + (C * Gamma) linhas de dados.
-                // Subtraindo isso do total de linhas, achamos a linha exata onde os ângulos começam,
-                // ignorando qualquer anomalia ou sujeira que exista no cabeçalho!
-                const dtaLinesCount = cPlanesCount + gammaAnglesCount + (cPlanesCount * gammaAnglesCount);
-                let offset = lines.length - dataLinesCount;
+                // 2. Extração Matemática da Matriz (Tokenização Reversa)
+                // Ignoramos a formatação do cabeçalho e isolamos apenas os valores numéricos.
+                const allTokens = rawData.replace(/\s+/g, ' ').trim().split(' ');
+                const allNumbers = [];
+                for (const t of allTokens) {
+                    const val = Number(t); // Number() rejeita letras (ex: "3000K"), garantindo pureza
+                    if (!isNaN(val)) allNumbers.push(val);
+                }
 
+                const requiredDataCount = Mc + Mg + (Mc * Mg);
+                if (allNumbers.length < requiredDataCount) return null;
+
+                // Corta EXATAMENTE a matriz fotométrica do fim do ficheiro
+                const matrixData = allNumbers.slice(allNumbers.length - requiredDataCount);
+
+                let ptr = 0;
                 const hAngles = [];
-                for (let i = 0; i < cPlanesCount; i++) {
-                    hAngles.push(parseFloat(lines[offset++]));
-                }
+                for (let i = 0; i < Mc; i++) hAngles.push(matrixData[ptr++]);
 
                 const vAngles = [];
-                for (let i = 0; i < gammaAnglesCount; i++) {
-                    vAngles.push(parseFloat(lines[offset++]));
-                }
+                for (let i = 0; i < Mg; i++) vAngles.push(matrixData[ptr++]);
 
                 const candelas = [];
-                for (let c = 0; c < cPlanesCount; c++) {
-                    const planeIntensities = [];
-                    for (let g = 0; g < gammaAnglesCount; g++) {
-                        const relativeCd = parseFloat(lines[offset++]);
-                        const absoluteCd = isNaN(relativeCd) ? 0 : relativeCd * conversionFactor;
-                        planeIntensities.push(absoluteCd);
+                for (let c = 0; c < Mc; c++) {
+                    const row = [];
+                    for (let g = 0; g < Mg; g++) {
+                        const relativeCd = matrixData[ptr++];
+                        row.push(relativeCd * conversionFactor);
                     }
-                    candelas.push(planeIntensities);
+                    candelas.push(row);
                 }
 
-                // Adapter para a Engine do LuxSintax
                 return { vAngles, hAngles, candelas, multiplier: 1, totalFlux };
 
             } catch (err) {
