@@ -264,7 +264,7 @@ f<!DOCTYPE html>
                                     <div id="calc-mode-selector" class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6 mt-4 transition-opacity duration-300">
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
                                         <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
-                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">IES</span></label>
+                                        <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">IES / LDT</span></label>
                                     </div>
                                 </div>
                                 <div id="inputs-ponto" class="hidden">
@@ -358,7 +358,7 @@ f<!DOCTYPE html>
                                 <div id="inputs-grid" class="hidden">
                                     <div class="flex flex-row items-center justify-center gap-6 p-1 mb-6 border-b border-slate-200 pb-4">
                                         <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="direct" checked onchange="window.updateCalcMode('direct')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_manual_source">Luminária Manual</span></label>
-                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="ies" onchange="window.updateCalcMode('ies')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_ies_file">Arquivo IES</span></label>
+                                        <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="ies" onchange="window.updateCalcMode('ies')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_ies_file">Arquivo IES/ LDT</span></label>
                                     </div>
 
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
@@ -754,7 +754,7 @@ f<!DOCTYPE html>
                 auth_signup_free: "CADASTRE-SE GRATUITAMENTE", auth_tab_login: "Login", auth_tab_register: "Cadastro",
                 auth_email: "E-mail", auth_pass: "Senha", auth_name: "Nome", auth_surname: "Sobrenome", auth_corp_email: "E-mail Corporativo",
                 auth_terms: "Concordo com os termos de uso.", auth_btn_login: "Acessar Plataforma", auth_btn_register: "Criar Conta Gratuita",
-                btn_v_section: "Corte Técnico", btn_v_elevation: "Elevação Frontal", lbl_manual_source: "Luminária Manual", lbl_ies_file: "Arquivo IES",
+                btn_v_section: "Corte Técnico", btn_v_elevation: "Elevação Frontal", lbl_manual_source: "Luminária Manual", lbl_ies_file: "Arquivo IES / LDT",
                 lbl_power_w: "POTÊNCIA (W)", lbl_false_color: "CORES FALSAS (HEATMAP)",
                 driver_mode: "Modo de Operação", driver_power: "Potência Unitária (W)", driver_qty: "Metragem / Quantidade", driver_current: "Corrente (mA)",
                 opt_cv: "Tensão Constante (CV - 12/24V)", opt_cc: "Corrente Constante (CC - mA)",
@@ -790,7 +790,7 @@ f<!DOCTYPE html>
                 auth_signup_free: "SIGN UP FOR FREE", auth_tab_login: "Login", auth_tab_register: "Register",
                 auth_email: "E-mail", auth_pass: "Password", auth_name: "First Name", auth_surname: "Last Name", auth_corp_email: "Corporate E-mail",
                 auth_terms: "I agree to the terms of use.", auth_btn_login: "Access Platform", auth_btn_register: "Create Free Account",
-                btn_v_section: "Technical Section", btn_v_elevation: "Front Elevation", lbl_manual_source: "Manual Fixture", lbl_ies_file: "IES File",
+                btn_v_section: "Technical Section", btn_v_elevation: "Front Elevation", lbl_manual_source: "Manual Fixture", lbl_ies_file: "IES / LDT File",
                 lbl_power_w: "POWER (W)", lbl_false_color: "FALSE COLORS (HEATMAP)",
                 driver_mode: "Operation Mode", driver_power: "Unit Power (W)", driver_qty: "Length / Quantity", driver_current: "Current (mA)",
                 opt_cv: "Constant Voltage (CV - 12/24V)", opt_cc: "Constant Current (CC - mA)",
@@ -1419,35 +1419,54 @@ window.handleGenerateReport = async () => {
         // Motor EULUMDAT (LDT) Blindado
         // Motor EULUMDAT (LDT) Blindado
         // Motor EULUMDAT (LDT) Blindado Final
+        // Motor EULUMDAT (LDT) Dinâmico (Imune a Erros de Fabricantes)
         window.parseLDT = function(rawData) {
             try {
-                // 1. Preservamos as linhas vazias para garantir que o índice seja idêntico ao ficheiro EULUMDAT
-                const lines = rawData.replace(/\r\n/g, '\n').split('\n').map(l => l.trim());
-                if (lines.length < 30) return null;
+                // 1. Limpeza rigorosa de quebras de linha
+                const cleanLines = rawData.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(l => l !== '');
+                if (cleanLines.length < 30) return null;
 
-                const Mc = parseInt(lines[3], 10);
-                const Mg = parseInt(lines[5], 10);
+                const Mc = parseInt(cleanLines[3], 10);
+                const Mg = parseInt(cleanLines[5], 10);
                 if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-                // Índices Oficiais do Padrão
-                const conversion = parseFloat(lines[20]) || 1;
-                const numLamps = parseInt(lines[23], 10) || 1;
+                // A MÁGICA: Em vez de confiar em números de linha fixos,
+                // procuramos a primeira palavra (String) após as dimensões. 
+                // Na norma EULUMDAT, essa palavra é obrigatoriamente o "Tipo de Lâmpada" (Ex: LED).
+                let typeIndex = -1;
+                for (let i = 15; i < 40; i++) {
+                    // isNaN(Number()) verifica se a linha contém texto em vez de apenas números
+                    if (cleanLines[i] && isNaN(Number(cleanLines[i]))) {
+                        typeIndex = i;
+                        break;
+                    }
+                }
+
+                let flux = 1000;
+                let numLamps = 1;
                 
-                // Extrai o Fluxo e limpa qualquer texto adicional na linha (ex: "1800 lm" -> 1800)
-                let fluxStr = lines[25] || "0";
-                let flux = parseFloat(fluxStr.replace(/[^\d.-]/g, ''));
-                if (isNaN(flux)) flux = 0;
+                if (typeIndex !== -1) {
+                    // O Fluxo Luminoso está SEMPRE na linha exata APÓS o Tipo de Lâmpada
+                    if (typeIndex + 1 < cleanLines.length) {
+                        flux = parseFloat(cleanLines[typeIndex + 1].replace(/[^\d.-]/g, ''));
+                    }
+                    // A quantidade de lâmpadas está SEMPRE na linha ANTERIOR
+                    if (typeIndex - 1 >= 0) {
+                        numLamps = parseInt(cleanLines[typeIndex - 1], 10) || 1;
+                    }
+                }
+
+                // O Fator de Conversão de Intensidade (geralmente 1.0)
+                const convFactor = parseFloat(cleanLines[23]) || 1;
 
                 let totalFlux = numLamps * flux;
                 let conversionFactor = 1;
 
-                if (totalFlux <= 0) {
-                    // Fotometria Absoluta: os valores da matriz já estão em Candelas
-                    totalFlux = 1000; // Apenas para injetar no UI (evitar mostrar 0 Lúmens)
-                    conversionFactor = conversion;
+                if (isNaN(totalFlux) || totalFlux <= 0) {
+                    totalFlux = 1000; // Fotometria Absoluta
+                    conversionFactor = convFactor;
                 } else {
-                    // Fotometria Relativa: os valores estão em cd/klm. Precisamos do Fator!
-                    conversionFactor = (totalFlux / 1000) * conversion;
+                    conversionFactor = (totalFlux / 1000) * convFactor; // Fotometria Relativa
                 }
 
                 // 2. Extração Matemática da Matriz (Tokenização Reversa)
@@ -1461,7 +1480,6 @@ window.handleGenerateReport = async () => {
                 const requiredDataCount = Mc + Mg + (Mc * Mg);
                 if (allNumbers.length < requiredDataCount) return null;
 
-                // Corta a matriz fotométrica EXATAMENTE do final do arquivo, livre de textos
                 const matrixData = allNumbers.slice(allNumbers.length - requiredDataCount);
 
                 let ptr = 0;
@@ -1487,7 +1505,7 @@ window.handleGenerateReport = async () => {
                 console.error("[LuxSintax] Erro no Parse LDT:", err);
                 return null;
             }
-        };;
+        };
 
         window.parseIES = function(content) {
             try {
