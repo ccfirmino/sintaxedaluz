@@ -204,7 +204,8 @@ f<!DOCTYPE html>
                 </div>
                 <div class="hidden md:flex gap-8 items-center">
                     <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
-                    <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
+<a href="#lab" class="nav-link"><span data-i18n="nav_lab">LABORATÓRIO</span></a>
+<a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
                     <button onclick="window.toggleLanguage()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase lang-display" title="Alternar Idioma">PT / EN</button>
                     <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase" title="Alternar Tema">
                         <span class="dark:hidden"><i class="fas fa-moon text-[14px]"></i></span>
@@ -224,9 +225,9 @@ f<!DOCTYPE html>
                 </div>
                 <div class="md:hidden text-starlight text-2xl cursor-pointer" onclick="window.toggleMobileMenu()"><i class="fas fa-bars"></i></div>
             </div>
-            <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-200 p-6 flex flex-col gap-6 shadow-2xl transition-all duration-300">
-                 <a href="#calculadora" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
-                 <a href="#fundamentos" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
+            <a href="#calculadora" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
+<a href="#lab" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_lab">LABORATÓRIO</a>
+<a href="#fundamentos" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
                  <button onclick="window.AuthManager.openProfile(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase" data-i18n="nav_profile">PERFIL</button>
                  <button onclick="window.AuthManager.logout()" class="text-sm font-bold tracking-widest text-red-500 text-left" data-i18n="nav_logout">SAIR</button>
                  <div class="h-[1px] bg-slate-200 w-full"></div>
@@ -764,7 +765,15 @@ f<!DOCTYPE html>
                 lbl_add_room: "Adicionar Ambiente",
                 lbl_add_fixture: "Nova Luminária",
                 lbl_room_name: "Nome do Ambiente",
-                lbl_compliance: "Status de Conformidade"
+                lbl_compliance: "Status de Conformidade",
+lbl_compliance: "Status de Conformidade", // Adicione a vírgula aqui
+            nav_lab: "LABORATÓRIO",
+            lab_title: "LABORATÓRIO DE LUZ",
+            lab_subtitle: "EXPERIMENTE A PLÁSTICA DA LUZ NO AMBIENTE",
+            lbl_ambient: "Luz Indireta",
+            lbl_accent: "Luz Focalizada",
+            lbl_wash: "Wallwashing",
+            lbl_grazing: "Wall Grazing"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
@@ -800,7 +809,14 @@ f<!DOCTYPE html>
                 lbl_add_room: "Add Room",
                 lbl_add_fixture: "New Fixture",
                 lbl_room_name: "Room Name",
-                lbl_compliance: "Compliance Status"
+                lbl_compliance: "Compliance Status",lbl_compliance: "Compliance Status", // Adicione a vírgula aqui
+            nav_lab: "LAB",
+            lab_title: "LIGHTING LAB",
+            lab_subtitle: "EXPERIMENT WITH LIGHTING EFFECTS IN REAL-TIME",
+            lbl_ambient: "Indirect Light",
+            lbl_accent: "Accent Light",
+            lbl_wash: "Wallwashing",
+            lbl_grazing: "Wall Grazing"
             }
         };
 
