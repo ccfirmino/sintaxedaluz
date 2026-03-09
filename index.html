@@ -1421,67 +1421,82 @@ window.handleGenerateReport = async () => {
         // Motor EULUMDAT (LDT) Blindado Final
         // Motor EULUMDAT (LDT) Dinâmico (Imune a Erros de Fabricantes)
         // Motor EULUMDAT (LDT) Dinâmico Super-Normalizado
+        // Motor EULUMDAT (LDT) Definitivo - Imune a Regionalização e Formatações
         window.parseLDT = function(rawData) {
             try {
-                // 1. Higienização Total: Resolve vírgulas européias e todos os tipos de quebras de linha Windows/Mac/Linux
-                const normalizedData = rawData.replace(/,/g, '.').replace(/\r\n|\r|\n/g, '\n');
+                // 1. Preservamos as linhas vazias para garantir o índice EULUMDAT perfeito
+                const rawLines = rawData.replace(/\r\n|\r|\n/g, '\n').split('\n').map(l => l.trim());
                 
-                // 2. Extração Matemática Segura (Tokenização Reversa)
-                const allTokens = normalizedData.replace(/\s+/g, ' ').trim().split(' ');
+                // Ignoramos linhas vazias APENAS no topo absoluto (caso o ficheiro tenha sujeira no início)
+                let sIdx = 0;
+                while (sIdx < rawLines.length && rawLines[sIdx] === '') sIdx++;
+                
+                if (rawLines.length - sIdx < 30) return null;
+
+                // Captura exata da geometria da matriz
+                const Mc = parseInt(rawLines[sIdx + 3], 10);
+                const Mg = parseInt(rawLines[sIdx + 5], 10);
+                if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
+
+                const requiredDataCount = Mc + Mg + (Mc * Mg);
+
+                // 2. Tokenização Imune a Separadores de Milhar (EUA vs Europa)
+                const allTokens = rawData.replace(/\s+/g, ' ').trim().split(' ');
                 const allNumbers = [];
-                for (const t of allTokens) {
+                for (let t of allTokens) {
+                    if (t.includes('.') && t.includes(',')) {
+                        // Ex: 1.234,56 -> 1234.56
+                        if (t.lastIndexOf(',') > t.lastIndexOf('.')) {
+                            t = t.replace(/\./g, '').replace(/,/g, '.');
+                        } else {
+                            // Ex: 1,234.56 -> 1234.56
+                            t = t.replace(/,/g, '');
+                        }
+                    } else {
+                        // Ex: 1234,56 -> 1234.56
+                        t = t.replace(/,/g, '.');
+                    }
+                    
                     const val = Number(t);
                     if (!isNaN(val) && t !== '') allNumbers.push(val);
                 }
 
-                // 3. Estruturação Limpa para o Cabeçalho
-                const cleanLines = normalizedData.split('\n').map(l => l.trim()).filter(l => l !== '');
-                if (cleanLines.length < 30) return null;
-
-                const Mc = parseInt(cleanLines[3], 10);
-                const Mg = parseInt(cleanLines[5], 10);
-                if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
-
-                const requiredDataCount = Mc + Mg + (Mc * Mg);
+                // Se mesmo com a limpeza faltarem números para montar o facho, aborta em segurança
                 if (allNumbers.length < requiredDataCount) return null;
 
-                // 4. Busca da Âncora Textual (A Lâmpada) para apurar o Fluxo Luminoso
+                // 3. Procura da Âncora Textual (A Lâmpada) para apurar o Fluxo Luminoso
                 let typeIndex = -1;
-                for (let i = 15; i < 45; i++) {
-                    if (cleanLines[i] && isNaN(Number(cleanLines[i]))) {
+                for (let i = sIdx + 22; i < Math.min(sIdx + 45, rawLines.length); i++) {
+                    if (rawLines[i] && isNaN(Number(rawLines[i].replace(/,/g, '.')))) {
                         typeIndex = i;
                         break;
                     }
                 }
 
-                let flux = 1000;
-                let numLamps = 1;
-                let convFactor = 1.0;
+                let flux = 1000, numLamps = 1, convFactor = 1.0;
 
                 if (typeIndex !== -1) {
-                    if (typeIndex + 1 < cleanLines.length) {
-                        flux = parseFloat(cleanLines[typeIndex + 1].replace(/[^\d.-]/g, ''));
-                    }
-                    if (typeIndex - 1 >= 0) {
-                        numLamps = parseInt(cleanLines[typeIndex - 1], 10) || 1;
-                    }
-                    // O Fator de Conversão LDT costuma estar 4 linhas numéricas antes do Tipo de Lâmpada
-                    if (typeIndex - 4 >= 0) {
-                        convFactor = parseFloat(cleanLines[typeIndex - 4]) || 1.0;
-                    }
+                    if (typeIndex + 1 < rawLines.length) flux = parseFloat(rawLines[typeIndex + 1].replace(/[^\d.-]/g, '')) || 0;
+                    if (typeIndex - 1 >= 0) numLamps = parseInt(rawLines[typeIndex - 1], 10) || 1;
+                    if (typeIndex - 4 >= 0) convFactor = parseFloat(rawLines[typeIndex - 4].replace(/,/g, '.')) || 1.0;
+                } else {
+                    // Fallback se não existir texto de lâmpada
+                    flux = parseFloat(rawLines[sIdx + 27].replace(/,/g, '.')) || 1000;
+                    numLamps = parseInt(rawLines[sIdx + 25], 10) || 1;
+                    convFactor = parseFloat(rawLines[sIdx + 22].replace(/,/g, '.')) || 1.0;
                 }
 
                 let totalFlux = numLamps * flux;
                 let conversionFactor = 1;
 
                 if (isNaN(totalFlux) || totalFlux <= 0) {
-                    totalFlux = 1000; 
+                    totalFlux = 1000; // Fotometria absoluta
                     conversionFactor = convFactor;
                 } else {
-                    conversionFactor = (totalFlux / 1000) * convFactor; 
+                    conversionFactor = (totalFlux / 1000) * convFactor; // Fotometria relativa (cd/klm)
                 }
 
-                // 5. Corte da Matriz Fotométrica EXATAMENTE do final do ficheiro
+                // 4. Corte da Matriz Fotométrica EXATAMENTE do final do ficheiro numérico
                 const matrixData = allNumbers.slice(allNumbers.length - requiredDataCount);
 
                 let ptr = 0;
@@ -1495,8 +1510,7 @@ window.handleGenerateReport = async () => {
                 for (let c = 0; c < Mc; c++) {
                     const row = [];
                     for (let g = 0; g < Mg; g++) {
-                        const relativeCd = matrixData[ptr++];
-                        row.push(relativeCd * conversionFactor);
+                        row.push(matrixData[ptr++] * conversionFactor);
                     }
                     candelas.push(row);
                 }
