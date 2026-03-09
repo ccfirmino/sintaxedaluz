@@ -1423,49 +1423,56 @@ window.handleGenerateReport = async () => {
         // Motor EULUMDAT (LDT) Dinâmico Super-Normalizado
         // Motor EULUMDAT (LDT) Definitivo - Imune a Regionalização e Formatações
         // Motor EULUMDAT (LDT) Definitivo - Arquitetura Híbrida
+        // Motor EULUMDAT (LDT) Universal de Alta Precisão
         window.parseLDT = function(rawData) {
             try {
-                // 1. Preservação Absoluta dos Índices Oficiais (Não apagamos linhas vazias)
-                const lines = rawData.replace(/\r\n|\r|\n/g, '\n').split('\n').map(l => l.trim());
+                // 1. Normalização universal de quebras de linha
+                const text = rawData.replace(/\r\n|\r/g, '\n');
+                const lines = text.split('\n').map(l => l.trim());
                 
+                // Ignora linhas iniciais vazias (lixo de exportação)
                 let s = 0;
-                while (s < lines.length && lines[s] === '') s++;
-                if (lines.length - s < 40) return null;
+                while(s < lines.length && lines[s] === '') s++;
+                
+                if (lines.length - s < 30) return null;
 
-                // Captura a Geometria do Facho (Linhas Oficiais 3 e 5)
-                const Mc = parseInt(lines[s + 3], 10);
-                const Mg = parseInt(lines[s + 5], 10);
+                // 2. Extração da Geometria (Linhas oficiais 3 e 5 da norma EULUMDAT)
+                const Mc = parseInt(lines[s+3], 10);
+                const Mg = parseInt(lines[s+5], 10);
                 if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-                const convFactor = parseFloat(lines[s + 23].replace(/,/g, '.')) || 1.0;
-                const nLamps = parseInt(lines[s + 25], 10) || 1;
-                
-                // Extração Segura do Fluxo Luminoso (Linha 28 = Fluxo da primeira lâmpada)
-                const qtyLamps = parseInt(lines[s + 26], 10) || 1;
-                const fluxStr = lines[s + 28].replace(/,/g, '.').replace(/[^\d.-]/g, '');
-                const flux = parseFloat(fluxStr) || 1000;
+                // 3. Extração dos Lúmens e Fatores de Conversão
+                const convFactor = parseFloat(lines[s+23].replace(/,/g, '.')) || 1.0;
+                const nLampsSets = parseInt(lines[s+25], 10) || 1;
 
-                let totalFlux = qtyLamps * flux;
-                let conversionFactor = 1.0;
-
-                if (totalFlux <= 0 || isNaN(totalFlux)) {
-                    totalFlux = 1000; // LEDs Absolutos
-                    conversionFactor = convFactor;
-                } else {
-                    conversionFactor = (totalFlux / 1000) * convFactor; // Lâmpadas Relativas
+                let totalFlux = 0;
+                // Soma o fluxo caso a luminária tenha múltiplos conjuntos de lâmpadas
+                for (let i = 0; i < nLampsSets; i++) {
+                    const baseIdx = s + 26 + (i * 6);
+                    const qty = parseInt(lines[baseIdx], 10) || 1;
+                    const fluxStr = (lines[baseIdx + 2] || '').replace(/,/g, '.').replace(/[^\d.-]/g, '');
+                    const flux = parseFloat(fluxStr) || 0;
+                    totalFlux += qty * flux;
                 }
 
-                // 2. Cálculo do Offset (Linha EXATA onde os ângulos e candelas começam)
-                // Norma: 26 (Lâmpadas) + (nLamps * 6 linhas descritivas) + 10 linhas de Direct Ratios
-                let ptr = s + 26 + (nLamps * 6) + 10;
-                const requiredDataCount = Mc + Mg + (Mc * Mg);
+                let conversionFactor = 1.0;
+                if (totalFlux <= 0 || isNaN(totalFlux)) {
+                    totalFlux = 1000; // Proteção para LEDs de Fotometria Absoluta
+                    conversionFactor = convFactor;
+                } else {
+                    conversionFactor = (totalFlux / 1000) * convFactor; // Fotometria Relativa
+                }
 
-                // 3. Extração Dinâmica da Matriz (Imune a múltiplas candelas na mesma linha e vírgulas)
-                let dataTokens = [];
-                const remainingText = lines.slice(ptr).join(' ');
-                const tokens = remainingText.replace(/\s+/g, ' ').trim().split(' ');
+                // 4. Isolamento da Matriz Fotométrica
+                // A matriz começa sempre após as lâmpadas e os 10 fatores de reflexão
+                const matrixStartLine = s + 26 + (nLampsSets * 6) + 10;
+                const matrixText = lines.slice(matrixStartLine).join(' ');
                 
+                // Tokenização limpa (substitui vírgulas e agrupa números soltos)
+                const tokens = matrixText.replace(/\s+/g, ' ').trim().split(' ');
+                const numbers = [];
                 for (let t of tokens) {
+                    if (t === '') continue;
                     if (t.includes('.') && t.includes(',')) {
                         if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
                         else t = t.replace(/,/g, '');
@@ -1473,15 +1480,22 @@ window.handleGenerateReport = async () => {
                         t = t.replace(/,/g, '.');
                     }
                     const val = Number(t);
-                    if (!isNaN(val) && t !== '') dataTokens.push(val);
+                    if (!isNaN(val)) numbers.push(val);
                 }
 
-                // 4. Fallback de Segurança (Caso o ficheiro exportado omita linhas do cabeçalho)
-                if (dataTokens.length < requiredDataCount) {
-                    console.warn("[LuxSintax] Desvio detetado na norma LDT. Acionando Motor Heurístico Reverso...");
-                    const allT = rawData.replace(/\s+/g, ' ').trim().split(' ');
+                const req = Mc + Mg + (Mc * Mg);
+                let matrixData = [];
+                
+                // 5. Motor de Verificação e Fallback (Paraquedas)
+                if (numbers.length >= req) {
+                    // Pega exatamente o tamanho da matriz, ignorando "lixo" no fim do ficheiro
+                    matrixData = numbers.slice(0, req);
+                } else {
+                    console.warn("[LuxSintax] Desvio da norma LDT detetado. Acionando Fallback Reverso...");
+                    const allT = text.replace(/\s+/g, ' ').trim().split(' ');
                     const allN = [];
                     for (let t of allT) {
+                        if (t === '') continue;
                         if (t.includes('.') && t.includes(',')) {
                             if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
                             else t = t.replace(/,/g, '');
@@ -1489,31 +1503,28 @@ window.handleGenerateReport = async () => {
                             t = t.replace(/,/g, '.');
                         }
                         let v = Number(t);
-                        if (!isNaN(v) && t !== '') allN.push(v);
+                        if (!isNaN(v)) allN.push(v);
                     }
-                    if (allN.length >= requiredDataCount) {
-                        dataTokens = allN.slice(allN.length - requiredDataCount);
+                    if (allN.length >= req) {
+                        matrixData = allN.slice(allN.length - req);
                     } else {
-                        return null; // Ficheiro está verdadeiramente ilegível/corrompido
+                        return null; // O ficheiro está realmente corrompido/incompleto
                     }
-                } else {
-                    // Tranca a matriz no tamanho exato, descartando "lixo" no final do ficheiro
-                    dataTokens = dataTokens.slice(0, requiredDataCount);
                 }
 
-                // 5. Compilação da Curva Fotométrica para o Ecrã
-                let tPtr = 0;
+                // 6. Desenho do Cone de Luz
+                let ptr = 0;
                 const hAngles = [];
-                for (let i = 0; i < Mc; i++) hAngles.push(dataTokens[tPtr++]);
+                for (let i = 0; i < Mc; i++) hAngles.push(matrixData[ptr++]);
 
                 const vAngles = [];
-                for (let i = 0; i < Mg; i++) vAngles.push(dataTokens[tPtr++]);
+                for (let i = 0; i < Mg; i++) vAngles.push(matrixData[ptr++]);
 
                 const candelas = [];
                 for (let c = 0; c < Mc; c++) {
                     const row = [];
                     for (let g = 0; g < Mg; g++) {
-                        row.push(dataTokens[tPtr++] * conversionFactor);
+                        row.push(matrixData[ptr++] * conversionFactor);
                     }
                     candelas.push(row);
                 }
@@ -1521,7 +1532,7 @@ window.handleGenerateReport = async () => {
                 return { vAngles, hAngles, candelas, multiplier: 1, totalFlux };
 
             } catch (err) {
-                console.error("[LuxSintax] Erro no Parse LDT:", err);
+                console.error("[LuxSintax] Erro crasso no Parse LDT:", err);
                 return null;
             }
         };
