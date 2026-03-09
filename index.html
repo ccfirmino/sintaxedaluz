@@ -1424,95 +1424,73 @@ window.handleGenerateReport = async () => {
         // Motor EULUMDAT (LDT) Definitivo - Imune a Regionalização e Formatações
         // Motor EULUMDAT (LDT) Definitivo - Arquitetura Híbrida
         // Motor EULUMDAT (LDT) Universal de Alta Precisão
+        // Motor EULUMDAT (LDT) de Grau Militar (Norma Estrita)
         window.parseLDT = function(rawData) {
             try {
-                // 1. Normalização universal de quebras de linha
-                const text = rawData.replace(/\r\n|\r/g, '\n');
-                const lines = text.split('\n').map(l => l.trim());
-                
-                // Ignora linhas iniciais vazias (lixo de exportação)
-                let s = 0;
-                while(s < lines.length && lines[s] === '') s++;
-                
-                if (lines.length - s < 30) return null;
+                // 1. Preservamos as linhas vazias. Elas são vitais para a contagem oficial da norma!
+                const lines = rawData.replace(/\r\n|\r/g, '\n').split('\n').map(l => l.trim());
 
-                // 2. Extração da Geometria (Linhas oficiais 3 e 5 da norma EULUMDAT)
-                const Mc = parseInt(lines[s+3], 10);
-                const Mg = parseInt(lines[s+5], 10);
+                // Removemos apenas quebras de linha acidentais no começo absoluto (antes do nome da empresa)
+                while (lines.length > 0 && lines[0] === '') lines.shift();
+
+                if (lines.length < 40) return null;
+
+                // 2. Leitura da Geometria (Índices cravados na norma)
+                const Mc = parseInt(lines[3], 10);
+                const Mg = parseInt(lines[5], 10);
                 if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-                // 3. Extração dos Lúmens e Fatores de Conversão
-                const convFactor = parseFloat(lines[s+23].replace(/,/g, '.')) || 1.0;
-                const nLampsSets = parseInt(lines[s+25], 10) || 1;
+                const req = Mc + Mg + (Mc * Mg);
+
+                // 3. Leitura do Fluxo e Fatores
+                const convFactor = parseFloat((lines[23] || '1').replace(/,/g, '.')) || 1.0;
+                const nLampsSets = parseInt(lines[25], 10) || 0; // Pode ser 0 em fotometria absoluta
 
                 let totalFlux = 0;
-                // Soma o fluxo caso a luminária tenha múltiplos conjuntos de lâmpadas
                 for (let i = 0; i < nLampsSets; i++) {
-                    const baseIdx = s + 26 + (i * 6);
+                    const baseIdx = 26 + (i * 6); // Cada lâmpada ocupa 6 linhas exatas
                     const qty = parseInt(lines[baseIdx], 10) || 1;
-                    const fluxStr = (lines[baseIdx + 2] || '').replace(/,/g, '.').replace(/[^\d.-]/g, '');
-                    const flux = parseFloat(fluxStr) || 0;
-                    totalFlux += qty * flux;
+                    const fluxStr = (lines[baseIdx + 2] || '0').replace(/,/g, '.').replace(/[^\d.-]/g, '');
+                    totalFlux += qty * (parseFloat(fluxStr) || 0);
                 }
 
                 let conversionFactor = 1.0;
                 if (totalFlux <= 0 || isNaN(totalFlux)) {
-                    totalFlux = 1000; // Proteção para LEDs de Fotometria Absoluta
+                    totalFlux = 1000;
                     conversionFactor = convFactor;
                 } else {
-                    conversionFactor = (totalFlux / 1000) * convFactor; // Fotometria Relativa
+                    conversionFactor = (totalFlux / 1000) * convFactor; // LDT = cd/klm
                 }
 
-                // 4. Isolamento da Matriz Fotométrica
-                // A matriz começa sempre após as lâmpadas e os 10 fatores de reflexão
-                const matrixStartLine = s + 26 + (nLampsSets * 6) + 10;
-                const matrixText = lines.slice(matrixStartLine).join(' ');
+                // 4. Isolamento Cirúrgico da Matriz
+                // Pela norma, a matriz começa exatamente após as lâmpadas e os 10 fatores de reflexão
+                const matrixStartLine = 26 + (nLampsSets * 6) + 10;
                 
-                // Tokenização limpa (substitui vírgulas e agrupa números soltos)
+                const matrixText = lines.slice(matrixStartLine).join(' ');
                 const tokens = matrixText.replace(/\s+/g, ' ').trim().split(' ');
-                const numbers = [];
+
+                // 5. Conversão Blindada (Transforma tudo em número, substitui lixo por 0 para não quebrar a grelha)
+                const matrixData = [];
                 for (let t of tokens) {
                     if (t === '') continue;
+                    
                     if (t.includes('.') && t.includes(',')) {
                         if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
                         else t = t.replace(/,/g, '');
                     } else {
                         t = t.replace(/,/g, '.');
                     }
+                    
                     const val = Number(t);
-                    if (!isNaN(val)) numbers.push(val);
+                    matrixData.push(isNaN(val) ? 0 : val);
                 }
 
-                const req = Mc + Mg + (Mc * Mg);
-                let matrixData = [];
-                
-                // 5. Motor de Verificação e Fallback (Paraquedas)
-                if (numbers.length >= req) {
-                    // Pega exatamente o tamanho da matriz, ignorando "lixo" no fim do ficheiro
-                    matrixData = numbers.slice(0, req);
-                } else {
-                    console.warn("[LuxSintax] Desvio da norma LDT detetado. Acionando Fallback Reverso...");
-                    const allT = text.replace(/\s+/g, ' ').trim().split(' ');
-                    const allN = [];
-                    for (let t of allT) {
-                        if (t === '') continue;
-                        if (t.includes('.') && t.includes(',')) {
-                            if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
-                            else t = t.replace(/,/g, '');
-                        } else {
-                            t = t.replace(/,/g, '.');
-                        }
-                        let v = Number(t);
-                        if (!isNaN(v)) allN.push(v);
-                    }
-                    if (allN.length >= req) {
-                        matrixData = allN.slice(allN.length - req);
-                    } else {
-                        return null; // O ficheiro está realmente corrompido/incompleto
-                    }
+                // Preenchimento de segurança caso o ficheiro do fabricante esteja cortado no fim
+                while (matrixData.length < req) {
+                    matrixData.push(0);
                 }
 
-                // 6. Desenho do Cone de Luz
+                // 6. Desenho Fotométrico
                 let ptr = 0;
                 const hAngles = [];
                 for (let i = 0; i < Mc; i++) hAngles.push(matrixData[ptr++]);
