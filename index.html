@@ -609,37 +609,21 @@
                     <div class="lg:col-span-8 relative aspect-video bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800">
                         
                         <div id="layer-base" class="absolute inset-0">
-                            <div class="absolute inset-0 bg-slate-900"></div>
-                            <div class="absolute bottom-0 w-full h-1/4 bg-slate-800 border-t border-slate-700" style="transform: perspective(500px) rotateX(15deg); transform-origin: bottom;"></div>
-                            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-32 md:w-48 h-40 md:h-64 border-[6px] border-slate-800 bg-slate-700 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"></div>
-                            <div class="absolute bottom-[20%] left-[15%] w-24 h-24 bg-slate-800 border-t-2 border-slate-600 shadow-2xl"></div>
+                            <img src="base.png" alt="Sala Base" class="absolute inset-0 w-full h-full object-cover">
                         </div>
 
-                        <div id="layer-general" class="absolute inset-0 opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none" style="background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 80%);"></div>
+                        <img id="layer-general" src="light_general.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
 
-                        <div id="layer-cove" class="absolute inset-0 opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                            <div class="absolute top-0 w-full h-24 bg-gradient-to-b from-amber-200/30 to-transparent blur-md"></div>
-                            <div class="absolute bottom-[20%] w-full h-12 bg-gradient-to-t from-amber-200/20 to-transparent blur-md"></div>
-                        </div>
+                        <img id="layer-cove" src="light_cove.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
 
-                        <div id="layer-wash" class="absolute inset-0 opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                            <div class="absolute top-0 w-full h-[80%] bg-gradient-to-b from-amber-100/40 via-amber-100/10 to-transparent"></div>
-                        </div>
+                        <img id="layer-wash" src="light_wash.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
 
-                        <div id="layer-grazing" class="absolute top-0 w-full h-[60%] opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none flex justify-around px-10">
-                            <div class="w-1/4 h-full" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.6) 0%, transparent 70%);"></div>
-                            <div class="w-1/4 h-full" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.6) 0%, transparent 70%);"></div>
-                            <div class="w-1/4 h-full" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.6) 0%, transparent 70%);"></div>
-                            <div class="w-1/4 h-full" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.6) 0%, transparent 70%);"></div>
-                        </div>
+                        <img id="layer-grazing" src="light_grazing.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
 
-                        <div id="layer-accent" class="absolute inset-0 opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
-                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-[60%]" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.8) 0%, transparent 70%); clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);"></div>
-                            <div class="absolute top-[35%] left-1/2 -translate-x-1/2 w-32 h-32" style="background: radial-gradient(circle at center, rgba(251,191,36,0.5) 0%, transparent 60%); blur: 8px;"></div>
-                        </div>
-
+                        <img id="layer-accent" src="light_accent.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                        
                         <div class="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700 text-[10px] text-luminous-gold font-bold tracking-widest z-10">
-                            <i class="fas fa-magic mr-2"></i> MOTOR GRÁFICO CSS
+                            <i class="fas fa-layer-group mr-2"></i> RENDER EM CAMADAS
                         </div>
                     </div>
 
