@@ -606,25 +606,82 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                    <div class="lg:col-span-8 relative aspect-video bg-starlight rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800">
-                        <div id="layer-base" class="absolute inset-0 bg-slate-800 opacity-100 flex items-center justify-center text-slate-600 font-black">IMAGEM BASE</div>
-                        <div id="layer-indirect" class="absolute inset-0 bg-blue-500/30 opacity-0 transition-opacity duration-700 mix-blend-screen flex items-center justify-center text-white font-black">LUZ INDIRETA</div>
-                        <div id="layer-wash" class="absolute inset-0 bg-amber-500/30 opacity-0 transition-opacity duration-700 mix-blend-screen flex items-center justify-center text-white font-black">WALLWASHING</div>
-                        <div id="layer-grazing" class="absolute inset-0 bg-lime-500/30 opacity-0 transition-opacity duration-700 mix-blend-screen flex items-center justify-center text-white font-black">GRAZING</div>
+                    <div class="lg:col-span-8 relative aspect-video bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800">
+                        
+                        <div id="layer-base" class="absolute inset-0">
+                            <div class="absolute inset-0 bg-slate-900"></div>
+                            <div class="absolute bottom-0 w-full h-1/4 bg-slate-800 border-t border-slate-700" style="transform: perspective(500px) rotateX(15deg); transform-origin: bottom;"></div>
+                            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-32 md:w-48 h-40 md:h-64 border-[6px] border-slate-800 bg-slate-700 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"></div>
+                            <div class="absolute bottom-[20%] left-[15%] w-24 h-24 bg-slate-800 border-t-2 border-slate-600 shadow-2xl"></div>
+                        </div>
+
+                        <div id="layer-general" class="absolute inset-0 opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none" style="background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 80%);"></div>
+
+                        <div id="layer-cove" class="absolute inset-0 opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                            <div class="absolute top-0 w-full h-24 bg-gradient-to-b from-amber-200/30 to-transparent blur-md"></div>
+                            <div class="absolute bottom-[20%] w-full h-12 bg-gradient-to-t from-amber-200/20 to-transparent blur-md"></div>
+                        </div>
+
+                        <div id="layer-wash" class="absolute inset-0 opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                            <div class="absolute top-0 w-full h-[80%] bg-gradient-to-b from-amber-100/40 via-amber-100/10 to-transparent"></div>
+                        </div>
+
+                        <div id="layer-grazing" class="absolute top-0 w-full h-[60%] opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none flex justify-around px-10">
+                            <div class="w-1/4 h-full" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.6) 0%, transparent 70%);"></div>
+                            <div class="w-1/4 h-full" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.6) 0%, transparent 70%);"></div>
+                            <div class="w-1/4 h-full" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.6) 0%, transparent 70%);"></div>
+                            <div class="w-1/4 h-full" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.6) 0%, transparent 70%);"></div>
+                        </div>
+
+                        <div id="layer-accent" class="absolute inset-0 opacity-0 transition-opacity duration-700 mix-blend-screen pointer-events-none">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-[60%]" style="background: radial-gradient(ellipse at top, rgba(251,191,36,0.8) 0%, transparent 70%); clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);"></div>
+                            <div class="absolute top-[35%] left-1/2 -translate-x-1/2 w-32 h-32" style="background: radial-gradient(circle at center, rgba(251,191,36,0.5) 0%, transparent 60%); blur: 8px;"></div>
+                        </div>
+
+                        <div class="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700 text-[10px] text-luminous-gold font-bold tracking-widest z-10">
+                            <i class="fas fa-magic mr-2"></i> MOTOR GRÁFICO CSS
+                        </div>
                     </div>
 
-                    <div class="lg:col-span-4 flex flex-col gap-4">
-                        <button onclick="window.toggleLabLayer('indirect')" class="lab-toggle p-6 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
-                            <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_ambient">Luz Indireta</span>
-                            <i class="fas fa-cloud text-slate-300 group-hover:text-luminous-gold"></i>
+                    <div class="lg:col-span-4 flex flex-col gap-3">
+                        <button onclick="window.toggleLabLayer('general')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
+                            <div class="flex flex-col text-left">
+                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_general">Luz Geral</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Preenchimento (Ambient)</span>
+                            </div>
+                            <i class="fas fa-sun text-slate-300 group-hover:text-luminous-gold text-lg"></i>
                         </button>
-                        <button onclick="window.toggleLabLayer('wash')" class="lab-toggle p-6 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
-                            <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_wash">Wallwashing</span>
-                            <i class="fas fa-stream text-slate-300 group-hover:text-luminous-gold"></i>
+
+                        <button onclick="window.toggleLabLayer('cove')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
+                            <div class="flex flex-col text-left">
+                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_cove">Sanca (Indireta)</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Luz Linear e Suavidade</span>
+                            </div>
+                            <i class="fas fa-grip-lines text-slate-300 group-hover:text-luminous-gold text-lg"></i>
                         </button>
-                        <button onclick="window.toggleLabLayer('grazing')" class="lab-toggle p-6 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
-                            <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_grazing">Wall Grazing</span>
-                            <i class="fas fa-braille text-slate-300 group-hover:text-luminous-gold"></i>
+
+                        <button onclick="window.toggleLabLayer('wash')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
+                            <div class="flex flex-col text-left">
+                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_wash">Wallwashing</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Lavagem Vertical Homogênea</span>
+                            </div>
+                            <i class="fas fa-stream text-slate-300 group-hover:text-luminous-gold text-lg"></i>
+                        </button>
+
+                        <button onclick="window.toggleLabLayer('grazing')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
+                            <div class="flex flex-col text-left">
+                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_grazing">Wall Grazing</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Textura, Contraste e Dramatismo</span>
+                            </div>
+                            <i class="fas fa-braille text-slate-300 group-hover:text-luminous-gold text-lg"></i>
+                        </button>
+
+                        <button onclick="window.toggleLabLayer('accent')" class="lab-toggle p-5 glass-panel rounded-2xl flex items-center justify-between group hover:border-luminous-gold transition-all">
+                            <div class="flex flex-col text-left">
+                                <span class="font-black text-xs tracking-widest text-starlight dark:text-white" data-i18n="lbl_accent">Luz de Destaque</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase">Foco Direcionado (Accent)</span>
+                            </div>
+                            <i class="fas fa-bullseye text-slate-300 group-hover:text-luminous-gold text-lg"></i>
                         </button>
                     </div>
                 </div>
@@ -805,10 +862,11 @@ lbl_compliance: "Status de Conformidade", // Adicione a vírgula aqui
             nav_lab: "LABORATÓRIO",
             lab_title: "LABORATÓRIO DE LUZ",
             lab_subtitle: "EXPERIMENTE A PLÁSTICA DA LUZ NO AMBIENTE",
-            lbl_ambient: "Luz Indireta",
-            lbl_accent: "Luz Focalizada",
+            lbl_general: "Luz Geral",
+            lbl_cove: "Sanca (Indireta)",
             lbl_wash: "Wallwashing",
-            lbl_grazing: "Wall Grazing"
+            lbl_grazing: "Wall Grazing",
+            lbl_accent: "Luz de Destaque"
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "HORIZONTAL<br>SURFACE", tab_vert: "VERTICAL<br>SURFACE", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
@@ -848,10 +906,11 @@ lbl_compliance: "Status de Conformidade", // Adicione a vírgula aqui
             nav_lab: "LAB",
             lab_title: "LIGHTING LAB",
             lab_subtitle: "EXPERIMENT WITH LIGHTING EFFECTS IN REAL-TIME",
-            lbl_ambient: "Indirect Light",
-            lbl_accent: "Accent Light",
+            lbl_general: "General Light",
+            lbl_cove: "Cove Lighting",
             lbl_wash: "Wallwashing",
-            lbl_grazing: "Wall Grazing"
+            lbl_grazing: "Wall Grazing",
+            lbl_accent: "Accent Lighting"
             }
         };
 
