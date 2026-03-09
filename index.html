@@ -196,7 +196,50 @@
     </div>
 
     <div id="app-content" class="transition-all duration-700 app-locked flex flex-col min-h-screen">
-        <nav
+        <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm transition-colors duration-300">
+            <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <a href="#" class="text-xl font-black tracking-[0.2em] text-starlight">LUX<span class="text-luminous-gold font-light">SINTAX</span></a>
+                    <span class="bg-amber-100 text-luminous-gold text-[9px] font-black px-2 py-0.5 rounded border border-amber-200 tracking-widest animate-pulse">BETA</span>
+                </div>
+                <div class="hidden md:flex gap-8 items-center">
+                    <a href="#calculadora" class="nav-link"><span data-i18n="nav_home">INICIO</span></a>
+                    <a href="#lab" class="nav-link"><span data-i18n="nav_lab">LABORATÓRIO</span></a>
+                    <a href="#fundamentos" class="nav-link" data-i18n="nav_about">SOBRE</a>
+                    <button onclick="window.toggleLanguage()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase lang-display" title="Alternar Idioma">PT / EN</button>
+                    <button onclick="window.toggleTheme()" class="text-xs text-dim-gray hover:text-luminous-gold transition-colors font-bold tracking-widest border-l border-slate-300 pl-4 uppercase flex items-center justify-center w-8" title="Alternar Tema">
+                        <i class="fas fa-moon block dark:hidden text-[14px]"></i>
+                        <i class="fas fa-sun hidden dark:block text-[14px]"></i>
+                    </button>
+                    <div id="user-display" class="flex items-center gap-2 pl-4 border-l border-slate-300">
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-starlight font-bold text-xs border border-slate-200"><i class="fas fa-user"></i></div>
+                        <div class="flex flex-col">
+                            <span id="user-name-display" class="text-[10px] font-black text-starlight uppercase leading-none">Usuário</span>
+                            <div class="flex items-center gap-2 mt-1">
+                                <button onclick="window.AuthManager.openProfile()" class="text-[9px] text-dim-gray hover:text-luminous-gold text-left uppercase font-bold transition-colors" data-i18n="nav_profile">PERFIL</button>
+                                <span class="text-slate-300 text-[8px]">|</span>
+                                <button onclick="window.AuthManager.logout()" class="text-[9px] text-dim-gray hover:text-red-500 text-left uppercase font-bold transition-colors" data-i18n="nav_logout">SAIR</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:hidden text-starlight text-2xl cursor-pointer" onclick="window.toggleMobileMenu()"><i class="fas fa-bars"></i></div>
+            </div>
+            
+            <div id="mobile-menu" class="hidden md:hidden flex-col gap-4 px-6 pb-6 pt-2 bg-white/95 backdrop-blur-xl border-b border-slate-200">
+                 <a href="#calculadora" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_home">INICIO</a>
+                 <a href="#lab" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_lab">LABORATÓRIO</a>
+                 <a href="#fundamentos" onclick="window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold" data-i18n="nav_about">SOBRE</a>
+                 <button onclick="window.AuthManager.openProfile(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase" data-i18n="nav_profile">PERFIL</button>
+                 <button onclick="window.AuthManager.logout()" class="text-sm font-bold tracking-widest text-red-500 text-left" data-i18n="nav_logout">SAIR</button>
+                 <div class="h-[1px] bg-slate-200 w-full"></div>
+                 <button onclick="window.toggleLanguage(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left lang-display">PT / EN</button>
+                 <button onclick="window.toggleTheme(); window.toggleMobileMenu()" class="text-sm font-bold tracking-widest text-starlight hover:text-luminous-gold text-left uppercase flex items-center gap-2">
+                    <i class="fas fa-moon block dark:hidden text-[14px]"></i>
+                    <i class="fas fa-sun hidden dark:block text-[14px]"></i> <span>TEMA</span>
+                 </button>
+            </div>
+        </nav>
 
         <section id="calculadora" class="pt-24 pb-10 px-4 md:px-8 relative min-h-screen">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-50"></div>
