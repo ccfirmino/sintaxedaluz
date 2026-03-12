@@ -419,8 +419,27 @@
                                 <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
     <h3 class="text-sm text-starlight uppercase tracking-widest font-black m-0" data-i18n="hdr_results">Resultados em Tempo Real</h3>
     
-    <div id="heatmap-toggle-wrapper" class="hidden">
-        <label class="flex items-center gap-3 cursor-pointer group">
+    <div class="flex items-center gap-4 md:gap-6">
+        <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <button onclick="window.toggleGridLevel('HP')" id="btn-gl-hp" class="px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all">Mesa (HP)</button>
+            <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all">Piso (LP)</button>
+        </div>
+
+        <div id="heatmap-toggle-wrapper" class="hidden">
+            <label class="flex items-center gap-3 cursor-pointer group">
+                <div id="heatmap-toggle-wrapper" class="hidden">
+            <label class="flex items-center gap-3 cursor-pointer group">
+                <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">CORES FALSAS (HEATMAP)</span>
+                <div class="relative">
+                    <input type="checkbox" id="g-falseColor" onchange="window.state.grid.falseColor = this.checked; window.updateCalculations()" class="sr-only">
+                    <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
+                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
+                </div>
+            </label>
+        </div>
+    </div>
+</div>
+<div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
             <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">CORES FALSAS (HEATMAP)</span>
             <div class="relative">
                 <input type="checkbox" id="g-falseColor" onchange="window.state.grid.falseColor = this.checked; window.updateCalculations()" class="sr-only">
@@ -755,7 +774,7 @@
                 nav_profile: "PERFIL", nav_logout: "SAIR", profile_title: "Configurações de Conta", profile_email: "E-mail de Cadastro", profile_new_pass: "Nova Senha", profile_confirm_pass: "Confirmar Nova Senha", profile_save: "Atualizar Senha", msg_pass_success: "Senha atualizada com sucesso!", msg_pass_mismatch: "As senhas não coincidem.", profile_help: "<i class=\"fas fa-envelope\"></i> Ajuda e Suporte",
                 auth_forgot: "Esqueceu a senha?", auth_forgot_desc: "Digite seu e-mail para receber um link de recuperação.", auth_send_link: "Enviar Link", auth_back_login: "Voltar ao Login", msg_reset_sent: "Link de recuperação enviado para o seu e-mail!", msg_recovery_prompt: "Sessão de recuperação ativa. Por favor, defina sua nova senha agora.",
                 search_placeholder: "Buscar ambiente ou tarefa...",
-                lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)",
+                lbl_lumen_mode: "MÉTODO DOS LÚMENS", lbl_target_lux: "ILUMINÂNCIA ALVO NO PISO (EM)", lbl_fixture_flux: "FLUXO DA LUMINÁRIA", lbl_util_factor: "FATOR UTILIZAÇÃO (U)", lbl_maint_factor: "FATOR MANUTENÇÃO (FM)",
                 lbl_frame_w: "Largura Quadro", lbl_frame_h: "Altura Quadro", lbl_qty: "Qtd. Peças",
                 auth_signup_free: "CADASTRE-SE GRATUITAMENTE", auth_tab_login: "Login", auth_tab_register: "Cadastro",
                 auth_email: "E-mail", auth_pass: "Senha", auth_name: "Nome", auth_surname: "Sobrenome", auth_corp_email: "E-mail Corporativo",
@@ -815,7 +834,7 @@
             ponto: { height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, viewMode: 'section', iesData: null, iesFileName: null },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            grid: { height: 3.0, plane: 0.75, beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
+            grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
             leedProject: { 
                 name: "Novo Projeto LEED",
@@ -1300,9 +1319,12 @@ window.handleGenerateReport = async () => {
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 
-                // Controle do Wrapper do botão de Cores Falsas (Heatmap)
+                // Controle do Wrapper do botão de Cores Falsas e Toggle de Nível
                 const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
                 if (heatmapWrapper) heatmapWrapper.classList.toggle('hidden', toolId !== 'grid');
+                
+                const gridLevelToggle = document.getElementById('grid-level-toggle');
+                if (gridLevelToggle) gridLevelToggle.classList.toggle('hidden', toolId !== 'grid');
 
                 // Aciona o modo correto de cálculo para a aba ativa
                 if (toolId === 'grid') {
@@ -1349,6 +1371,23 @@ window.handleGenerateReport = async () => {
         }
         
         // LUXSINTAX: Botão Toggle (Corte vs Elevação)
+// LUXSINTAX: Botão Toggle (Piso vs Mesa no Método Lúmens)
+        window.toggleGridLevel = function(level) {
+            window.state.grid.viewLevel = level;
+            const btnHP = document.getElementById('btn-gl-hp');
+            const btnLP = document.getElementById('btn-gl-lp');
+            const activeClass = "px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all";
+            const inactiveClass = "px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all";
+            
+            if (level === 'HP') {
+                btnHP.className = activeClass; 
+                btnLP.className = inactiveClass;
+            } else {
+                btnLP.className = activeClass; 
+                btnHP.className = inactiveClass;
+            }
+            window.updateCalculations();
+        };
         window.toggleVerticalView = function(mode) {
             window.state.vertical.viewMode = mode;
             const btnS = document.getElementById('btn-v-section');
@@ -1959,8 +1998,9 @@ window.handleGenerateReport = async () => {
                         const pxX = offsetX + i * cellPxW;
                         const pxY = offsetY + j * cellPxH;
 
-                        // Heatmap renderiza baseado no Plano de Trabalho
-                        const renderLux = totalLux_HP;
+                        // O Canvas renderiza o Lux baseado na escolha do usuário (Piso ou Mesa)
+                        const currentLevel = s.viewLevel || 'HP';
+                        const renderLux = currentLevel === 'LP' ? totalLux_LP : totalLux_HP;
 
                         if (s.falseColor) {
                             ctx.fillStyle = window.FalseColorEngine.getLuxColor(renderLux, 0.85);
