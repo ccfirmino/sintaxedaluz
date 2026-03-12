@@ -962,145 +962,141 @@
         };
 
         // --- AUTH MANAGER ---
-        window.AuthManager = {
-            init: async function() {
-                const { data: { session } } = await supabase.auth.getSession();
-                this.handleSessionUpdate(session);
-                
-                supabase.auth.onAuthStateChange((event, session) => {
-                    this.handleSessionUpdate(session);
-                    if (event === 'PASSWORD_RECOVERY') {
-                        setTimeout(() => {
-                            alert(window.currentLang === 'en' ? window.i18n.en.msg_recovery_prompt : window.i18n.pt.msg_recovery_prompt);
-                            this.openProfile();
-                        }, 500);
-                    }
-                });
-            },
-            handleSessionUpdate: function(session) {
-                if (session) {
-                    const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
-                    document.getElementById('user-name-display').innerText = name.toUpperCase();
-                    
-                    const emailDisplay = document.getElementById('profile-email-display');
-                    if (emailDisplay) emailDisplay.value = session.user.email;
-
-                    this.unlockApp();
-                } else { this.lockApp(); }
-            },
-            lockApp: function() { document.getElementById('auth-modal').classList.remove('hidden'); document.getElementById('app-content').classList.add('app-locked'); },
-            unlockApp: function() { 
-                document.getElementById('auth-modal').classList.add('hidden'); 
-                document.getElementById('app-content').classList.remove('app-locked'); 
-                window.populateCategoryFilter();
-                window.filterNorms();
-                if (window.fetchUserLeedProjects) window.fetchUserLeedProjects(); // Injeta os projetos salvos
-                setTimeout(() => window.updateCalculations(), 100); 
-            },
-            switchTab: function(tab) {
-                const loginForm = document.getElementById('form-login'); 
-                const regForm = document.getElementById('form-register');
-                const forgotForm = document.getElementById('form-forgot-password');
-                const authTabs = document.getElementById('auth-tabs');
-                
-                const btnLogin = document.getElementById('tab-auth-login'); 
-                const btnReg = document.getElementById('tab-auth-register');
-                
-                authTabs.classList.remove('hidden');
-                forgotForm.classList.add('hidden');
-
-                if (tab === 'login') {
-                    loginForm.classList.remove('hidden'); regForm.classList.add('hidden');
-                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
-                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
-                } else {
-                    loginForm.classList.add('hidden'); regForm.classList.remove('hidden');
-                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
-                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
-                }
-            },
-            showForgotPassword: function() {
-                document.getElementById('form-login').classList.add('hidden');
-                document.getElementById('form-register').classList.add('hidden');
-                document.getElementById('auth-tabs').classList.add('hidden');
-                document.getElementById('form-forgot-password').classList.remove('hidden');
-            },
-            backToLogin: function() {
-                this.switchTab('login');
-            },
-            handlePasswordResetRequest: async function() {
-                const email = document.getElementById('forgot-email').value;
-                if (!email) {
-                    alert("Por favor, insira um e-mail.");
-                    return;
-                }
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + window.location.pathname,
-                });
-                
-                if (error) {
-                    alert(error.message);
-                } else {
-                    alert(window.currentLang === 'en' ? window.i18n.en.msg_reset_sent : window.i18n.pt.msg_reset_sent);
-                    this.backToLogin();
-                }
-            },
-handleLogin: async function() {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                
-                if (!email || !password) {
-                    return alert("Por favor, preencha seu e-mail e senha.");
-                }
-
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                
-                if (error) {
-                    alert("Erro de acesso: " + error.message);
-                } else if (data.session) {
-                    // Força a atualização da interface e destranca a tela na mesma hora
-                    this.handleSessionUpdate(data.session);
-                }
-            },
-            handleRegister: async function() {
-                const email = document.getElementById('reg-email').value;
-                const password = document.getElementById('reg-password').value;
-                const firstName = document.getElementById('reg-name').value;
-                const lastName = document.getElementById('reg-surname').value;
-                if (!document.getElementById('reg-terms').checked) return alert("Aceite os termos.");
-                const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName, last_name: lastName } } });
-                if (error) alert(error.message); 
-                else if (data.session) this.unlockApp();
-                else alert("Cadastro feito. Verifique e-mail.");
-            },
-            logout: async function() { await supabase.auth.signOut(); location.reload(); },
-            openProfile: function() {
-                document.getElementById('profile-modal').classList.remove('hidden');
-            },
-            closeProfile: function() {
-                document.getElementById('profile-modal').classList.add('hidden');
-                document.getElementById('profile-new-pass').value = '';
-                document.getElementById('profile-confirm-pass').value = '';
-            },
-            updatePassword: async function() {
-                const pass1 = document.getElementById('profile-new-pass').value;
-                const pass2 = document.getElementById('profile-confirm-pass').value;
-                
-                if (!pass1 || pass1 !== pass2) {
-                    alert(window.currentLang === 'en' ? window.i18n.en.msg_pass_mismatch : window.i18n.pt.msg_pass_mismatch);
-                    return;
-                }
-                
-                const { error } = await supabase.auth.updateUser({ password: pass1 });
-                
-                if (error) {
-                    alert(error.message);
-                } else {
-                    alert(window.currentLang === 'en' ? window.i18n.en.msg_pass_success : window.i18n.pt.msg_pass_success);
-                    this.closeProfile();
-                }
+        // --- AUTH MANAGER ---
+window.AuthManager = {
+    init: async function() {
+        const { data: { session } } = await supabase.auth.getSession();
+        this.handleSessionUpdate(session);
+        
+        supabase.auth.onAuthStateChange((event, session) => {
+            this.handleSessionUpdate(session);
+            if (event === 'PASSWORD_RECOVERY') {
+                setTimeout(() => {
+                    alert(window.currentLang === 'en' ? window.i18n.en.msg_recovery_prompt : window.i18n.pt.msg_recovery_prompt);
+                    this.openProfile();
+                }, 500);
             }
-        };
+        });
+    },
+    handleSessionUpdate: function(session) {
+        if (session) {
+            const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
+            document.getElementById('user-name-display').innerText = name.toUpperCase();
+            
+            const emailDisplay = document.getElementById('profile-email-display');
+            if (emailDisplay) emailDisplay.value = session.user.email;
+
+            this.unlockApp();
+        } else { 
+            this.lockApp(); 
+        }
+    },
+    lockApp: function() { 
+        document.getElementById('auth-modal').classList.remove('hidden'); 
+        document.getElementById('app-content').classList.add('app-locked'); 
+    },
+    unlockApp: function() { 
+        document.getElementById('auth-modal').classList.add('hidden'); 
+        document.getElementById('app-content').classList.remove('app-locked'); 
+        window.populateCategoryFilter();
+        window.filterNorms();
+        if (window.fetchUserLeedProjects) window.fetchUserLeedProjects();
+        setTimeout(() => window.updateCalculations(), 100); 
+    },
+    switchTab: function(tab) {
+        const loginForm = document.getElementById('form-login'); 
+        const regForm = document.getElementById('form-register');
+        const forgotForm = document.getElementById('form-forgot-password');
+        const authTabs = document.getElementById('auth-tabs');
+        
+        const btnLogin = document.getElementById('tab-auth-login'); 
+        const btnReg = document.getElementById('tab-auth-register');
+        
+        authTabs.classList.remove('hidden');
+        forgotForm.classList.add('hidden');
+
+        if (tab === 'login') {
+            loginForm.classList.remove('hidden'); regForm.classList.add('hidden');
+            btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
+            btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
+        } else {
+            loginForm.classList.add('hidden'); regForm.classList.remove('hidden');
+            btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
+            btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
+        }
+    },
+    showForgotPassword: function() {
+        document.getElementById('form-login').classList.add('hidden');
+        document.getElementById('form-register').classList.add('hidden');
+        document.getElementById('auth-tabs').classList.add('hidden');
+        document.getElementById('form-forgot-password').classList.remove('hidden');
+    },
+    backToLogin: function() {
+        this.switchTab('login');
+    },
+    handlePasswordResetRequest: async function() {
+        const email = document.getElementById('forgot-email').value;
+        if (!email) {
+            alert("Por favor, insira um e-mail.");
+            return;
+        }
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + window.location.pathname,
+        });
+        
+        if (error) {
+            alert(error.message);
+        } else {
+            alert(window.currentLang === 'en' ? window.i18n.en.msg_reset_sent : window.i18n.pt.msg_reset_sent);
+            this.backToLogin();
+        }
+    },
+    handleRegister: async function() {
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const firstName = document.getElementById('reg-name').value;
+        const lastName = document.getElementById('reg-surname').value;
+        if (!document.getElementById('reg-terms').checked) return alert("Aceite os termos.");
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName, last_name: lastName } } });
+        if (error) alert(error.message); 
+        else if (data.session) this.unlockApp();
+        else alert("Cadastro feito. Verifique e-mail.");
+    },
+    logout: async function() { 
+        await supabase.auth.signOut(); 
+        // Garante a morte do cache sujo do GoTrue
+        for (let key in localStorage) {
+            if (key.startsWith('sb-')) {
+                localStorage.removeItem(key);
+            }
+        }
+        location.reload(); 
+    },
+    handleLogin: async function() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        if (!email || !password) {
+            return alert("Por favor, preencha seu e-mail e senha.");
+        }
+
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) throw error;
+            
+            if (data.session) {
+                console.info("[LuxSintax Auth] Login bem-sucedido. Sincronizando sessão...");
+                this.handleSessionUpdate(data.session);
+            }
+        } catch (err) {
+            console.error("[LuxSintax Auth] Falha na autenticação:", err.message);
+            alert("Erro de acesso: " + err.message);
+            // Limpeza preventiva em caso de falha obscura
+            this.logout();
+        }
+    }
+};
 // --- DOMAIN ENGINES (LUX FUTURUM UPGRADE) ---
 window.GlareEngine = {
     calculateGuthIndex: (distX, distY, heightAboveEye) => {
@@ -1309,12 +1305,14 @@ window.handleGenerateReport = async () => {
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 
                 // Controle do Wrapper do botão de Cores Falsas e Toggle de Nível
-                const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
-                if (heatmapWrapper) {
-                    if (toolId === 'grid') heatmapWrapper.classList.remove('hidden');
-                    else heatmapWrapper.classList.add('
-
-                // Aciona o modo correto de cálculo para a aba ativa
+const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
+if (heatmapWrapper) {
+    if (toolId === 'grid') {
+        heatmapWrapper.classList.remove('hidden');
+    } else {
+        heatmapWrapper.classList.add('hidden');
+    }
+}
                 if (toolId === 'grid') {
                     const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
                     if (gridSel) window.updateCalcMode(gridSel.value);
