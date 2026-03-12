@@ -1266,39 +1266,59 @@ window.handleGenerateReport = async () => {
 };
         // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
-    // ... (código existente de classes de botões)
+            // 1. Restaura o estado da ferramenta atual (CRÍTICO PARA O CANVAS)
+            window.currentTool = toolId;
 
-    document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj');
-    document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
-    document.getElementById('leedProj-tool').classList.toggle('hidden', toolId !== 'leedProj');
-    
-    const modeSelector = document.getElementById('calc-mode-selector');
-    if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
+            // 2. Atualiza a UI dos botões de navegação no topo
+            document.querySelectorAll('.mode-tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-luminous-gold');
+                btn.classList.add('tab-inactive');
+            });
+            const activeBtn = document.getElementById('tab-' + toolId);
+            if (activeBtn) {
+                activeBtn.classList.remove('tab-inactive');
+                activeBtn.classList.add('tab-active', 'text-luminous-gold');
+            }
 
-    if (toolId !== 'query' && toolId !== 'leedProj') {
-        ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
-        const selectedInput = document.getElementById('inputs-' + toolId);
-        if (selectedInput) selectedInput.classList.remove('hidden');
-        
-        // --- ADICIONE ESTAS DUAS LINHAS AQUI ---
-        const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
-        if (heatmapWrapper) heatmapWrapper.classList.toggle('hidden', toolId !== 'grid');
-        // --------------------------------------
+            // 3. Controla a visibilidade dos blocos principais do sistema
+            document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj');
+            document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
+            document.getElementById('leedProj-tool').classList.toggle('hidden', toolId !== 'leedProj');
+            
+            // 4. Controla o seletor de modo (Intensidade/Fotometria/IES)
+            const modeSelector = document.getElementById('calc-mode-selector');
+            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
 
-        if (toolId === 'grid') {
-            const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
-            if (gridSel) window.updateCalcMode(gridSel.value);
-        } else if (toolId !== 'driver') {
-            const globalSel = document.querySelector('input[name="calc_mode"]:checked');
-            if (globalSel) window.updateCalcMode(globalSel.value);
-        }
-        window.updateCalculations();
-    } else if (toolId === 'query') {
-         window.switchQueryTab('nbr8995');
-    } else if (toolId === 'leedProj') {
-         window.renderLeedProject();
-    }
-}
+            if (toolId !== 'query' && toolId !== 'leedProj') {
+                // Esconde todos os painéis de inputs e mostra apenas o ativo
+                ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
+                    const el = document.getElementById(id); 
+                    if(el) el.classList.add('hidden'); 
+                });
+                const selectedInput = document.getElementById('inputs-' + toolId);
+                if (selectedInput) selectedInput.classList.remove('hidden');
+                
+                // Controle do Wrapper do botão de Cores Falsas (Heatmap)
+                const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
+                if (heatmapWrapper) heatmapWrapper.classList.toggle('hidden', toolId !== 'grid');
+
+                // Aciona o modo correto de cálculo para a aba ativa
+                if (toolId === 'grid') {
+                    const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
+                    if (gridSel) window.updateCalcMode(gridSel.value);
+                } else if (toolId !== 'driver') {
+                    const globalSel = document.querySelector('input[name="calc_mode"]:checked');
+                    if (globalSel) window.updateCalcMode(globalSel.value);
+                }
+                
+                // Dispara o motor de renderização do Canvas
+                window.updateCalculations();
+            } else if (toolId === 'query') {
+                 window.switchQueryTab('nbr8995');
+            } else if (toolId === 'leedProj') {
+                 window.renderLeedProject();
+            }
+        };
                 
                 
         window.updateCalcMode = function(mode) {
