@@ -260,7 +260,7 @@
                         <div class="md:col-span-4 lg:col-span-3 flex flex-col gap-6">
     <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
         <div class="mb-4">
-            <h3 class="text-md text-starlight mb-2 font-black whitespace-nowrap text-center border-b border-slate-200 pb-3" data-i18n="calc_params">Parâmetros da Fonte</h3>
+            <h3 class="text-md text-starlight mb-4 font-black whitespace-nowrap text-center" data-i18n="calc_params">Parâmetros da Fonte</h3>
             <div id="calc-mode-selector" class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6 mt-4 transition-opacity duration-300">
                 <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
                 <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
@@ -417,38 +417,27 @@
                         <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl flex flex-col relative w-full h-[75vh] min-h-[500px] max-h-[800px]">
                                 <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
-    <h3 class="text-sm text-starlight uppercase tracking-widest font-black m-0" data-i18n="hdr_results">Resultados em Tempo Real</h3>
-    
-    <div class="flex items-center gap-4 md:gap-6">
-        <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-            <button onclick="window.toggleGridLevel('HP')" id="btn-gl-hp" class="px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all">Mesa (HP)</button>
-            <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all">Piso (LP)</button>
-        </div>
+                                    <h3 class="text-sm text-starlight uppercase tracking-widest font-black m-0" data-i18n="hdr_results">Resultados em Tempo Real</h3>
+                                    
+                                    <div class="flex items-center gap-4 md:gap-6">
+                                        <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                            <button onclick="window.toggleGridLevel('HP')" id="btn-gl-hp" class="px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all">Mesa (HP)</button>
+                                            <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all">Piso (LP)</button>
+                                        </div>
 
-        <div id="heatmap-toggle-wrapper" class="hidden">
-            <label class="flex items-center gap-3 cursor-pointer group">
-                <div id="heatmap-toggle-wrapper" class="hidden">
-            <label class="flex items-center gap-3 cursor-pointer group">
-                <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">CORES FALSAS (HEATMAP)</span>
-                <div class="relative">
-                    <input type="checkbox" id="g-falseColor" onchange="window.state.grid.falseColor = this.checked; window.updateCalculations()" class="sr-only">
-                    <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
-                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
-                </div>
-            </label>
-        </div>
-    </div>
-</div>
-<div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
-            <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">CORES FALSAS (HEATMAP)</span>
-            <div class="relative">
-                <input type="checkbox" id="g-falseColor" onchange="window.state.grid.falseColor = this.checked; window.updateCalculations()" class="sr-only">
-                <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
-                <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
-            </div>
-        </label>
-    </div>
-</div>
+                                        <div id="heatmap-toggle-wrapper" class="hidden">
+                                            <label class="flex items-center gap-3 cursor-pointer group">
+                                                <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">CORES FALSAS (HEATMAP)</span>
+                                                <div class="relative">
+                                                    <input type="checkbox" id="g-falseColor" onchange="window.state.grid.falseColor = this.checked; window.updateCalculations()" class="sr-only">
+                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
                                     <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                     <canvas id="beamCanvas" class="absolute inset-0 w-full h-full z-10 block"></canvas>
@@ -779,7 +768,7 @@
                 auth_signup_free: "CADASTRE-SE GRATUITAMENTE", auth_tab_login: "Login", auth_tab_register: "Cadastro",
                 auth_email: "E-mail", auth_pass: "Senha", auth_name: "Nome", auth_surname: "Sobrenome", auth_corp_email: "E-mail Corporativo",
                 auth_terms: "Concordo com os termos de uso.", auth_btn_login: "Acessar Plataforma", auth_btn_register: "Criar Conta Gratuita",
-                btn_v_section: "Corte Técnico", btn_v_elevation: "Elevação Frontal", lbl_manual_source: "Luminária Manual", lbl_ies_file: "Arquivo IES / LDT",
+                btn_v_section: "Corte Técnico", btn_v_elevation: "Elevação Frontal", lbl_manual_source: "FICHA TÉCNICA", lbl_ies_file: "Arquivo IES / LDT",
                 lbl_power_w: "POTÊNCIA (W)", lbl_false_color: "CORES FALSAS (HEATMAP)",
                 driver_mode: "Modo de Operação", driver_power: "Potência Unitária (W)", driver_qty: "Metragem / Quantidade", driver_current: "Corrente (mA)",
                 opt_cv: "Tensão Constante (CV - 12/24V)", opt_cc: "Corrente Constante (CC - mA)",
