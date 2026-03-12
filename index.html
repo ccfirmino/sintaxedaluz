@@ -269,6 +269,7 @@
                                 </div>
                                 <div id="inputs-ponto" class="hidden">
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+<div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="g-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-plane" min="0" max="5" step="0.05" value="0.75"></div>
                                     <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
                                     <div class="mode-standard-only">
                                         <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
@@ -813,7 +814,7 @@
             ponto: { height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             vertical: { height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, viewMode: 'section', iesData: null, iesFileName: null },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            grid: { height: 3.0, beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
+            grid: { height: 3.0, plane: 0.75, beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
             leedProject: { 
                 name: "Novo Projeto LEED",
@@ -1697,7 +1698,24 @@ window.handleGenerateReport = async () => {
             ctx.fillStyle = "#d97706"; ctx.textAlign = "center"; ctx.fillText(text, x, y - 2); ctx.textAlign = "start"; 
         }
 
+        // --- MOTOR DE PERFORMANCE (RequestAnimationFrame) ---
+        // Variável de estado para evitar enfileiramento de frames
+        window._isRenderPending = false;
+        
+        // Padrão Proxy/Debounce: Intercepta todas as chamadas do sistema
         window.updateCalculations = function() {
+            if (!window._isRenderPending) {
+                window._isRenderPending = true;
+                // Sincroniza a execução com o refresh rate do monitor (60Hz/120Hz)
+                requestAnimationFrame(() => {
+                    window.coreRenderEngine();
+                    window._isRenderPending = false;
+                });
+            }
+        };
+
+        // A sua função original pesada agora roda isolada por frame
+        window.coreRenderEngine = function() {
             const canvas = document.getElementById('beamCanvas');
             if (!canvas) return;
             const isDark = document.documentElement.classList.contains('dark');
@@ -1882,48 +1900,69 @@ window.handleGenerateReport = async () => {
                 ctx.textBaseline = "middle";
                 ctx.font = "bold 9px Manrope";
 
-                // 2. RENDERIZAÇÃO DA MATRIZ (GRID) E CÁLCULO DE UNIFORMIDADE
-                let minLux = Infinity;
-                let sumLux = 0;
+                // 2. RENDERIZAÇÃO DA MATRIZ E CÁLCULO DE UNIFORMIDADE (DUPLO: LP e HP)
+                let minLux_LP = Infinity; let sumLux_LP = 0;
+                let minLux_HP = Infinity; let sumLux_HP = 0;
                 let cellCount = 0;
+
+                const hEff_LP = s.height; 
+                const hEff_HP = s.height - (s.plane || 0.75);
 
                 for (let i = 0; i < cellCols; i++) {
                     for (let j = 0; j < cellRows; j++) {
                         const ptX = (i + 0.5) * cellMW;
                         const ptY = (j + 0.5) * cellMH;
                         
-                        let directLux = 0;
+                        let directLux_LP = 0;
+                        let directLux_HP = 0;
+
                         for (const fix of fixtures) {
                             const dx = ptX - fix.x;
                             const dy = ptY - fix.y;
-                            const dist = Math.sqrt(dx*dx + dy*dy);
-                            const angleRad = Math.atan2(dist, s.height);
+                            const distPlane = Math.sqrt(dx*dx + dy*dy);
                             
-                            let I = 0;
+                            // Nível do Piso (LP)
+                            const angleRad_LP = Math.atan2(distPlane, hEff_LP);
+                            let I_LP = 0;
                             if (window.calcMode === 'ies' && s.iesData) {
-                                I = window.getIESIntensity(s, angleRad * 180 / Math.PI);
-                            } else {
-                                if (angleRad < Math.PI / 2) {
-                                    I = maxI * Math.pow(Math.cos(angleRad), n_power);
-                                }
+                                I_LP = window.getIESIntensity(s, angleRad_LP * 180 / Math.PI);
+                            } else if (angleRad_LP < Math.PI / 2) {
+                                I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power);
                             }
-                            if (I > 0) {
-                                directLux += (I * Math.pow(Math.cos(angleRad), 3)) / (s.height * s.height);
+                            if (I_LP > 0) directLux_LP += (I_LP * Math.pow(Math.cos(angleRad_LP), 3)) / (hEff_LP * hEff_LP);
+
+                            // Plano de Trabalho (HP)
+                            if (hEff_HP > 0) {
+                                const angleRad_HP = Math.atan2(distPlane, hEff_HP);
+                                let I_HP = 0;
+                                if (window.calcMode === 'ies' && s.iesData) {
+                                    I_HP = window.getIESIntensity(s, angleRad_HP * 180 / Math.PI);
+                                } else if (angleRad_HP < Math.PI / 2) {
+                                    I_HP = maxI * Math.pow(Math.cos(angleRad_HP), n_power);
+                                }
+                                if (I_HP > 0) directLux_HP += (I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP);
                             }
                         }
 
-                        const totalLux = Math.round(directLux * s.maintFactor + ambientLux);
+                        const totalLux_LP = Math.round(directLux_LP * s.maintFactor + ambientLux);
+                        const totalLux_HP = hEff_HP > 0 ? Math.round(directLux_HP * s.maintFactor + ambientLux) : 0;
                         
-                        // Captura dados para o HUD
-                        if (totalLux < minLux) minLux = totalLux;
-                        sumLux += totalLux;
+                        if (totalLux_LP < minLux_LP) minLux_LP = totalLux_LP;
+                        sumLux_LP += totalLux_LP;
+
+                        if (totalLux_HP < minLux_HP) minLux_HP = totalLux_HP;
+                        sumLux_HP += totalLux_HP;
+
                         cellCount++;
 
                         const pxX = offsetX + i * cellPxW;
                         const pxY = offsetY + j * cellPxH;
 
+                        // Heatmap renderiza baseado no Plano de Trabalho
+                        const renderLux = totalLux_HP;
+
                         if (s.falseColor) {
-                            ctx.fillStyle = window.FalseColorEngine.getLuxColor(totalLux, 0.85);
+                            ctx.fillStyle = window.FalseColorEngine.getLuxColor(renderLux, 0.85);
                             ctx.fillRect(pxX, pxY, cellPxW, cellPxH);
                         } else {
                             ctx.strokeStyle = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
@@ -1933,7 +1972,7 @@ window.handleGenerateReport = async () => {
 
                         if (cellPxW > 24 && cellPxH > 16) {
                             ctx.fillStyle = s.falseColor ? "rgba(0,0,0,0.6)" : (isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)");
-                            ctx.fillText(totalLux, pxX + cellPxW/2, pxY + cellPxH/2);
+                            ctx.fillText(renderLux, pxX + cellPxW/2, pxY + cellPxH/2);
                         }
                     }
                 }
@@ -2039,14 +2078,18 @@ window.handleGenerateReport = async () => {
                 }
 
                 // --- DESENHAR HUD DE RESULTADOS NO CANVAS (FORA DA MÁSCARA) ---
-                const trueAvgLux = Math.round(sumLux / cellCount);
-                const uniformity = trueAvgLux > 0 ? (minLux / trueAvgLux).toFixed(2) : "0.00";
+                const trueAvgLux_LP = Math.round(sumLux_LP / cellCount);
+                const uniformity_LP = trueAvgLux_LP > 0 ? (minLux_LP / trueAvgLux_LP).toFixed(2) : "0.00";
+
+                const trueAvgLux_HP = Math.round(sumLux_HP / cellCount);
+                const uniformity_HP = trueAvgLux_HP > 0 ? (minLux_HP / trueAvgLux_HP).toFixed(2) : "0.00";
+                
                 const actualPieces = s.cols * s.rows;
 
                 const hudX = 20;
                 const hudY = 20;
                 const hudW = 180;
-                const hudH = 95;
+                const hudH = 125;
                 
                 ctx.save();
                 
@@ -2083,15 +2126,19 @@ window.handleGenerateReport = async () => {
                 ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
                 ctx.font = "bold 10px Manrope";
                 ctx.fillText("Arranjo:", hudX + 15, hudY + 42);
-                ctx.fillText("Em Atingida:", hudX + 15, hudY + 58);
-                ctx.fillText("Uniformidade:", hudX + 15, hudY + 74);
+                ctx.fillText("Em (LP):", hudX + 15, hudY + 58);
+                ctx.fillText("U (LP):", hudX + 15, hudY + 74);
+                ctx.fillText("Em (HP):", hudX + 15, hudY + 90);
+                ctx.fillText("U (HP):", hudX + 15, hudY + 106);
 
                 // Valores
                 ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
                 ctx.font = "900 11px Manrope";
                 ctx.fillText(`${s.cols} x ${s.rows} (${actualPieces} un)`, hudX + 90, hudY + 41);
-                ctx.fillText(`${trueAvgLux} lx`, hudX + 90, hudY + 57);
-                ctx.fillText(`${uniformity}`, hudX + 90, hudY + 73);
+                ctx.fillText(`${trueAvgLux_LP} lx`, hudX + 90, hudY + 57);
+                ctx.fillText(`${uniformity_LP}`, hudX + 90, hudY + 73);
+                ctx.fillText(`${trueAvgLux_HP} lx`, hudX + 90, hudY + 89);
+                ctx.fillText(`${uniformity_HP}`, hudX + 90, hudY + 105);
                 
                 ctx.restore();
 
