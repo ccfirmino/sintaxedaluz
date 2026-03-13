@@ -1304,14 +1304,16 @@ window.handleGenerateReport = async () => {
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 
-                // Controle do Wrapper do botão de Cores Falsas e Toggle de Nível
+                // Controle dos Wrappers de Interface da Malha (Heatmap e Nível de Iluminância LP/HP)
 const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
-if (heatmapWrapper) {
-    if (toolId === 'grid') {
-        heatmapWrapper.classList.remove('hidden');
-    } else {
-        heatmapWrapper.classList.add('hidden');
-    }
+const gridLevelToggle = document.getElementById('grid-level-toggle');
+
+if (toolId === 'grid') {
+    if (heatmapWrapper) heatmapWrapper.classList.remove('hidden');
+    if (gridLevelToggle) gridLevelToggle.classList.remove('hidden');
+} else {
+    if (heatmapWrapper) heatmapWrapper.classList.add('hidden');
+    if (gridLevelToggle) gridLevelToggle.classList.add('hidden');
 }
                 if (toolId === 'grid') {
                     const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
