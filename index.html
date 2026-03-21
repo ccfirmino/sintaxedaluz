@@ -439,6 +439,10 @@
                                 </div>
                                 
                                 <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
+                                    <div id="surface-selector" class="absolute top-4 right-4 z-20 flex bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg">
+                                        <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Fonte Única</button>
+                                        <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
+                                    </div>
                                     <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                     <canvas id="beamCanvas" class="absolute inset-0 w-full h-full z-10 block"></canvas>
                                 </div>
@@ -2208,9 +2212,68 @@ window.toggleGridLevel = function(level) {
 
              if (window.currentTool === 'ponto') {
                 const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
-                
-                let I;
-                if(window.calcMode === 'ies') {
+                let I = (window.calcMode === 'ies') ? window.getIESIntensity(s, s.tilt) : getIntensity(s);
+                const sy = floorY - (s.height * scale), py = floorY - (s.plane * scale);
+                const hEff = s.height - s.plane;
+                const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
+                const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
+                const dia = 2 * (s.height / Math.cos(tr)) * Math.tan(br / 2); 
+
+                // Define as origens: 1 no centro, ou 2 se for Estudo de Facho
+                let origins = [centerX];
+                if (window.currentTool === 'ponto' && s.viewMode === 'array') {
+                    const hS = (s.spacing * scale) / 2;
+                    origins = [centerX - hS, centerX + hS];
+                }
+
+                // Linha do Plano de Trabalho (Renderizada apenas 1 vez)
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; 
+                ctx.fillText(`${window.currentLang === 'en' ? 'wp' : 'hp'}: ${window.formatDist(s.plane)}`, 10, py - 8);
+
+                // Loop Otimizado (Renderiza 1 ou 2 fachos)
+                origins.forEach(xPos => {
+                    ctx.save(); ctx.translate(xPos, sy);
+                    const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
+
+                    ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(xPos, sy, 5, 0, Math.PI * 2); ctx.fill();
+
+                    const hitXFloor = xPos + (s.height * scale) * Math.tan(tr);
+                    ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(217, 119, 6, 0.4)"; ctx.moveTo(xPos, sy); ctx.lineTo(hitXFloor, floorY); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.beginPath(); ctx.arc(hitXFloor, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                    
+                    let valText = window.formatIllum(luxFloor);
+                    if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
+                    drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
+                    
+                    if (hEff > 0) { 
+                        const ix = xPos + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
+                        let valTextPlane = window.formatIllum(luxPlane);
+                        if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD IES";
+                        drawTextVal(ctx, valTextPlane, ix, py - 12); 
+                    }
+                });
+
+                // Cotas e Anotações Dinâmicas
+                if (s.viewMode === 'array') {
+                    drawDimLine(ctx, origins[0], sy - 25, origins[1], sy - 25, `D: ${window.formatDist(s.spacing)}`);
+                } else {
+                    ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
+                    ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4); 
+                    
+                    if (s.tilt > 0) {
+                        ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
+                        drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
+                        const distH = s.height * Math.tan(tr);
+                        drawDimLine(ctx, centerX, floorY + 25, centerX + (s.height * scale) * Math.tan(tr), floorY + 25, `d: ${window.formatDist(distH)}`);
+                    }
+                    if (window.calcMode !== 'ies' || s.iesData) {
+                        drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                        const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
+                        drawDimLine(ctx, centerX + xL, floorY + 50, centerX + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
+                    }
+                }
+            }
                     I = window.getIESIntensity(s, s.tilt);
                 } else {
                     I = getIntensity(s);
@@ -2513,7 +2576,7 @@ window.toggleGridLevel = function(level) {
 
                 // Define as origens: 1 no centro, ou 2 se for Estudo de Facho
                 let origins = [centerX];
-                if (window.currentTool === 'homog') {
+                if (window.currentTool === 'ponto' && s.viewMode === 'array') {
                     const hS = (s.spacing * scale) / 2;
                     origins = [centerX - hS, centerX + hS];
                 }
