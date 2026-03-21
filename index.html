@@ -290,12 +290,7 @@
         </div>
         
         <div id="inputs-vertical" class="hidden">
-            <div class="mb-6 flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all">Corte Técnico</button>
-                <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all">Elevação Frontal</button>
-            </div>
-
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0.5" max="10" step="0.1" value="1.6"></div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
             
@@ -400,10 +395,20 @@
                                 <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
                                     <h3 class="text-sm text-starlight uppercase tracking-widest font-black m-0" data-i18n="hdr_results">Resultados em Tempo Real</h3>
                                     
-                                    <div class="flex items-center gap-4 md:gap-6">
-                                        <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                            <button onclick="window.toggleGridLevel('HP')" id="btn-gl-hp" class="px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all">Mesa (HP)</button>
-                                            <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all">Piso (LP)</button>
+                                    <div class="flex flex-wrap justify-end items-center gap-4 md:gap-6">
+                                        <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                            <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Fonte Única</button>
+                                            <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
+                                        </div>
+
+                                        <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                            <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" data-i18n="btn_v_section">Corte Técnico</button>
+                                            <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_elevation">Elevação Frontal</button>
+                                        </div>
+
+                                        <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                            <button onclick="window.toggleGridLevel('HP')" id="btn-gl-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Mesa (HP)</button>
+                                            <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Piso (LP)</button>
                                         </div>
 
                                         <div id="heatmap-toggle-wrapper" class="hidden">
@@ -420,10 +425,6 @@
                                 </div>
                                 
                                 <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
-                                    <div id="surface-selector" class="absolute top-4 right-4 z-20 flex bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg">
-                                        <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Fonte Única</button>
-                                        <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
-                                    </div>
                                     <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                     <canvas id="beamCanvas" class="absolute inset-0 w-full h-full z-10 block"></canvas>
                                 </div>
@@ -1294,22 +1295,12 @@ window.handleGenerateReport = async () => {
 const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
 const gridLevelToggle = document.getElementById('grid-level-toggle');
 const surfaceSelector = document.getElementById('surface-selector');
+const verticalSelector = document.getElementById('vertical-selector');
 
-if (toolId === 'grid') {
-    if (heatmapWrapper) heatmapWrapper.classList.remove('hidden');
-    if (gridLevelToggle) gridLevelToggle.classList.remove('hidden');
-} else {
-    if (heatmapWrapper) heatmapWrapper.classList.add('hidden');
-    if (gridLevelToggle) gridLevelToggle.classList.add('hidden');
-}
-
-if (surfaceSelector) {
-    if (toolId === 'ponto') {
-        surfaceSelector.classList.remove('hidden');
-    } else {
-        surfaceSelector.classList.add('hidden');
-    }
-}
+if (heatmapWrapper) heatmapWrapper.classList.toggle('hidden', toolId !== 'grid');
+if (gridLevelToggle) gridLevelToggle.classList.toggle('hidden', toolId !== 'grid');
+if (surfaceSelector) surfaceSelector.classList.toggle('hidden', toolId !== 'ponto');
+if (verticalSelector) verticalSelector.classList.toggle('hidden', toolId !== 'vertical');
 
 if (toolId === 'grid') {
                     const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
@@ -1378,8 +1369,8 @@ window.toggleGridLevel = function(level) {
             window.state.grid.viewLevel = level;
             const btnHP = document.getElementById('btn-gl-hp');
             const btnLP = document.getElementById('btn-gl-lp');
-            const activeClass = "px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all";
-            const inactiveClass = "px-2 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all";
+            const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+            const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
             
             if (level === 'HP') {
                 btnHP.className = activeClass; 
@@ -1394,8 +1385,8 @@ window.toggleGridLevel = function(level) {
             window.state.vertical.viewMode = mode;
             const btnS = document.getElementById('btn-v-section');
             const btnE = document.getElementById('btn-v-elevation');
-            const activeClass = "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-md bg-white shadow-sm text-luminous-gold dark:bg-slate-700 transition-all";
-            const inactiveClass = "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all";
+            const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+            const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
             
             if (mode === 'section') {
                 btnS.className = activeClass; 
