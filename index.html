@@ -2256,6 +2256,10 @@ window.toggleGridLevel = function(level) {
                 // Cotas e Anotações Dinâmicas
                 if (s.viewMode === 'array') {
                     drawDimLine(ctx, origins[0], sy - 25, origins[1], sy - 25, `D: ${window.formatDist(s.spacing)}`);
+                    
+                    // Cota de Altura (Mostramos apenas na primeira luminária para não poluir o desenho)
+                    ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(origins[0] - 20, sy); ctx.lineTo(origins[0] - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
+                    ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, origins[0] - 50, sy + 4); 
                 } else {
                     ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
                     ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4); 
@@ -2266,11 +2270,15 @@ window.toggleGridLevel = function(level) {
                         const distH = s.height * Math.tan(tr);
                         drawDimLine(ctx, centerX, floorY + 25, centerX + (s.height * scale) * Math.tan(tr), floorY + 25, `d: ${window.formatDist(distH)}`);
                     }
-                    if (window.calcMode !== 'ies' || s.iesData) {
-                        drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                }
+
+                // Cota de Abertura do Facho (Aplicada a TODAS as luminárias desenhadas)
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    origins.forEach(xPos => {
+                        drawAngleDim(ctx, xPos, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
                         const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
-                        drawDimLine(ctx, centerX + xL, floorY + 50, centerX + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
-                    }
+                        drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
+                    });
                 }
             }
             else if (window.currentTool === 'vertical') {
