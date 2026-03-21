@@ -241,9 +241,8 @@
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-50"></div>
             <div class="max-w-[1800px] mx-auto flex flex-col items-center">
                 <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
-                    <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines text-lg mb-1"></i><span data-i18n="tab_horiz">SUPERFÍCIE<br>HORIZONTAL</span></button>
+                    <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-layer-group text-lg mb-1"></i><span>ANÁLISE DE<br>SUPERFÍCIE</span></button>
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
-                    <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-drafting-compass text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
                     <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span data-i18n="tab_driver">DIMENSIONAR<br>DRIVER</span></button>
                 <button onclick="window.switchTool('leedProj')" id="tab-leedProj" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap ml-auto">
@@ -271,6 +270,7 @@
         <div id="inputs-ponto" class="hidden">
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
+            <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
             <div class="mode-standard-only">
                 <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
             </div>
@@ -820,8 +820,7 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            ponto: { height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            vertical: { height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, viewMode: 'section', iesData: null, iesFileName: null },
+            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
