@@ -2274,71 +2274,6 @@ window.toggleGridLevel = function(level) {
                     }
                 }
             }
-                    I = window.getIESIntensity(s, s.tilt);
-                } else {
-                    I = getIntensity(s);
-                }
-
-                const sy = floorY - (s.height * scale), py = floorY - (s.plane * scale);
-                const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
-                const hEff = s.height - s.plane;
-                const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
-                const dia = 2 * (s.height / Math.cos(tr)) * Math.tan(br / 2); 
-                
-                // Source & Beam
-                ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
-                ctx.save(); ctx.translate(centerX, sy);
-                const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
-
-                // Height & Plane Lines
-                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
-                ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4); 
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; 
-                ctx.fillText(`${window.currentLang === 'en' ? 'wp' : 'hp'}: ${window.formatDist(s.plane)}`, 10, py - 8); 
-
-                const axisX = centerX + (s.height * scale) * Math.tan(tr);
-                ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
-                
-                if (s.tilt > 0) {
-                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
-                    drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
-                    const distH = s.height * Math.tan(tr);
-                    drawDimLine(ctx, centerX, floorY + 25, axisX, floorY + 25, `d: ${window.formatDist(distH)}`);
-                }
-
-                if (window.calcMode !== 'ies' || s.iesData) {
-                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
-                }
-
-                const hitXFloor = centerX + (s.height * scale) * Math.tan(tr);
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(217, 119, 6, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(hitXFloor, floorY); ctx.stroke(); ctx.setLineDash([]);
-                ctx.beginPath(); ctx.arc(hitXFloor, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
-                
-                let valText = window.formatIllum(luxFloor);
-                if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
-                drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
-                
-                if (hEff > 0) { 
-                    const ix = centerX + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
-                    let valTextPlane = window.formatIllum(luxPlane);
-                    if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD FILE";
-                    drawTextVal(ctx, valTextPlane, ix, py - 12); 
-                    
-                    if (window.calcMode !== 'ies' || s.iesData) {
-                        const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
-                        const hPx_plane = py - sy;
-                        const xL_p = hPx_plane * Math.tan(tr - br / 2);
-                        const xR_p = hPx_plane * Math.tan(tr + br / 2);
-                        drawDimLine(ctx, centerX + xL_p, py + 20, centerX + xR_p, py + 20, `Ø ${window.formatDist(diaPlane)}`);
-                    }
-                }
-                
-                if (window.calcMode !== 'ies' || s.iesData) {
-                    const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
-                    drawDimLine(ctx, centerX + xL, floorY + 50, centerX + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
-                }
-            }
             else if (window.currentTool === 'vertical') {
                 const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
                 let I_v = (window.calcMode === 'ies') ? window.getIESIntensity(s, s.tilt) : getIntensity(s);
@@ -3126,6 +3061,21 @@ window.generateLeedReport = async () => {
     link.download = `LuxSintax_LEED_${s.name.replace(/\s+/g, '_')}.pdf`; 
     link.click();
 };
+
+window.setSurfaceMode = function(mode) {
+    window.state.ponto.viewMode = mode;
+    const isSingle = mode === 'single';
+    const btnS = document.getElementById('btn-surf-single');
+    const btnA = document.getElementById('btn-surf-array');
+    if (btnS && btnA) {
+        btnS.className = isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+        btnA.className = !isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+    }
+    const inputSpacing = document.getElementById('group-spacing');
+    if (inputSpacing) inputSpacing.classList.toggle('hidden', isSingle);
+    window.updateCalculations();
+};
+
         window.AuthManager.init();
         window.switchTool('ponto');
     </script>
