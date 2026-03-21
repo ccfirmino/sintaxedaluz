@@ -241,10 +241,9 @@
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-50"></div>
             <div class="max-w-[1800px] mx-auto flex flex-col items-center">
                 <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
-                    <button onclick="window.switchTool('surface')" id="tab-surface" class="mode-tab-btn ...">
-    <i class="fas fa- solar-panel text-lg mb-1"></i>
-    <span data-i18n="tab_surface">ANÁLISE DE<br>SUPERFÍCIE</span>
-</button>
+                    <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines text-lg mb-1"></i><span data-i18n="tab_horiz">SUPERFÍCIE<br>HORIZONTAL</span></button>
+                    <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">SUPERFÍCIE<br>VERTICAL</span></button>
+                    <button onclick="window.switchTool('homog')" id="tab-homog" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-drafting-compass text-lg mb-1"></i><span data-i18n="tab_dist">ESTUDO DE<br>FACHO</span></button>
                     <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span data-i18n="tab_driver">DIMENSIONAR<br>DRIVER</span></button>
                 <button onclick="window.switchTool('leedProj')" id="tab-leedProj" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap ml-auto">
@@ -269,27 +268,23 @@
             </div>
         </div>
         
-        <div id="inputs-surface" class="hidden">
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="s-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-s-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="s-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-s-plane" min="0" max="5" step="0.05" value="0.75"></div>
-            
-            <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="s-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-s-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
-
+        <div id="inputs-ponto" class="hidden">
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
             <div class="mode-standard-only">
-                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="s-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-s-beam" min="5" max="120" step="1" value="30"></div>
+                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
             </div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="s-tilt" value="0" min="0" max="60"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-s-tilt" min="0" max="60" step="1" value="0"></div>
-            <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="s-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-s-intensity" min="0" max="20000" step="10" value="3000"></div>
-            
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
+            <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
             <div class="mode-photo-group hidden space-y-6 mb-6">
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="s-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-s-flux" min="0" max="10000" step="10" value="1500"></div>
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="s-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-s-cdklm" min="0" max="10000" step="10" value="2000"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
             </div>
             <div class="mode-ies-group hidden space-y-6 mb-6">
                 <div class="group">
-                    <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                    <input type="file" id="s-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-                    <p id="s-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                    <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                    <input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                    <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                 </div>
             </div>
         </div>
@@ -327,6 +322,25 @@
                     <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
                     <input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
                     <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="inputs-homog" class="hidden">
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="h-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-h-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="h-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-h-plane" min="0.5" max="5" step="0.05" value="0.75"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_spacing">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="h-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-h-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="h-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-h-beam" min="5" max="120" step="1" value="30"></div>
+            <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="h-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-h-intensity" min="0" max="20000" step="10" value="3000"></div>
+            <div class="mode-photo-group hidden space-y-6 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="h-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-h-flux" min="0" max="10000" step="10" value="1500"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="h-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-h-cdklm" min="0" max="10000" step="10" value="2000"></div>
+            </div>
+            <div class="mode-ies-group hidden space-y-6 mb-6">
+                <div class="group">
+                    <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                    <input type="file" id="h-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                    <p id="h-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                 </div>
             </div>
         </div>
@@ -426,11 +440,7 @@
                                 
                                 <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
                                     <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
-<div id="surface-selector" class="absolute top-4 right-4 z-20 flex bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl hidden">
-    <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg bg-luminous-gold text-white transition-all">Ponto Único</button>
-    <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
-</div>                                    
-<canvas id="beamCanvas" class="absolute inset-0 w-full h-full z-10 block"></canvas>
+                                    <canvas id="beamCanvas" class="absolute inset-0 w-full h-full z-10 block"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -810,20 +820,9 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            // Procure por window.state e substitua:
-surface: { 
-    viewMode: 'single', // 'single' (antigo ponto) ou 'array' (antigo homog)
-    height: 3.0, 
-    plane: 0.75, 
-    beam: 30, 
-    tilt: 0, 
-    spacing: 2.0, // usado apenas no modo 'array'
-    intensity: 3000, 
-    flux: 1500, 
-    cdklm: 2000, 
-    iesData: null, 
-    iesFileName: null 
-},
+            ponto: { height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
+            vertical: { height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, viewMode: 'section', iesData: null, iesFileName: null },
+            homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
             leedProject: { 
@@ -1295,14 +1294,10 @@ window.handleGenerateReport = async () => {
             // 4. Controla o seletor de modo (Intensidade/Fotometria/IES)
             const modeSelector = document.getElementById('calc-mode-selector');
             if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
-            
-            // NOVO: Controla o botão flutuante do Canvas
-            const surfaceSelector = document.getElementById('surface-selector');
-            if(surfaceSelector) surfaceSelector.classList.toggle('hidden', toolId !== 'surface');
 
             if (toolId !== 'query' && toolId !== 'leedProj') {
                 // Esconde todos os painéis de inputs e mostra apenas o ativo
-                ['inputs-surface', 'inputs-vertical', 'inputs-grid', 'inputs-driver'].forEach(id => { 
+                ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
                     const el = document.getElementById(id); 
                     if(el) el.classList.add('hidden'); 
                 });
@@ -1784,79 +1779,142 @@ window.toggleGridLevel = function(level) {
             const ch = rect.height;
             const floorY = ch - 70;
             const centerX = cw / 2;
-            
-            // Define escala baseada na ferramenta
-            let boundsH = 3.0; 
+            let boundsH = 3.0;
+            let boundsW = 3.0; 
             const s = window.state[window.currentTool];
-            if(!s) return;
 
-            let scale = 120; // Escala padrão para visão lateral
-            const sy = floorY - (s.height * scale); 
-            const py = floorY - (s.plane * scale);
-            const hEff = s.height - s.plane;
             let currentBeam = window.getEffectiveBeam(s);
 
-            // --- DESENHO: ANÁLISE DE SUPERFÍCIE (UNIFICADO) ---
-            if (window.currentTool === 'surface') {
-                const tr = (s.tilt || 0) * Math.PI / 180;
-                const br = currentBeam * Math.PI / 180;
-
-                let origins = [centerX]; 
-                if (s.viewMode === 'array') {
-                    const hS = (s.spacing * scale) / 2;
-                    origins = [centerX - hS, centerX + hS]; 
-                }
-
-                // Linha de Piso e Plano
-                ctx.strokeStyle = cFloorLine; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
-                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]);
-
-                origins.forEach(xPos => {
-                    let I = (window.calcMode === 'ies') ? window.getIESIntensity(s, s.tilt) : getIntensity(s);
-                    const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
-                    const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
-
-                    // Facho
-                    ctx.save(); ctx.translate(xPos, sy);
-                    const g = ctx.createLinearGradient(0, 0, 0, floorY-sy);
-                    g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); 
-                    ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); 
-                    ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); 
-                    ctx.closePath(); ctx.fill(); ctx.restore();
-
-                    // Luminária
-                    ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(xPos, sy, 5, 0, Math.PI * 2); ctx.fill();
-
-                    // Valores
-                    const hitX = xPos + (s.height * scale) * Math.tan(tr);
-                    drawTextVal(ctx, window.formatIllum(luxFloor), hitX, floorY - 12);
-                });
-
-                if (s.viewMode === 'array') {
-                    drawDimLine(ctx, centerX - (s.spacing*scale/2), sy - 25, centerX + (s.spacing*scale/2), sy - 25, `D: ${window.formatDist(s.spacing)}`);
-                }
-            } 
-            else if (window.currentTool === 'vertical') {
-                // (Mantenha aqui o código da ferramenta vertical se desejar, ou deixe vazio por ora)
+            if (window.currentTool === 'ponto') {
+                boundsH = s.height;
+                const maxAngleRad = (Math.abs(s.tilt) + currentBeam/2) * Math.PI / 180;
+                const limitRad = Math.min(maxAngleRad, 1.48);
+                boundsW = s.height * Math.tan(limitRad);
+            } else if (window.currentTool === 'vertical') {
+                boundsH = s.height;
+                boundsW = Math.max(s.dist * 1.6, 3.5); 
+            } else if (window.currentTool === 'homog') {
+                boundsH = s.height;
+                const halfBeamRad = (currentBeam/2) * Math.PI / 180;
+                boundsW = (s.spacing / 2) + (s.height * Math.tan(halfBeamRad));
+            } else if (window.currentTool === 'grid') {
+                boundsW = s.roomW;
+                boundsH = s.roomL;
             }
-            else if (window.currentTool === 'grid') {
-                const roomPxW = s.roomW * scale;
-                const roomPxH = s.roomL * scale;
-                const offsetX = centerX - roomPxW / 2;
-                const offsetY = floorY - roomPxH - 30;
+
+            ctx.clearRect(0, 0, cw, ch);
+            if (window.currentTool === 'driver') {
+                const d = window.state.driver;
+                const ccParams = document.getElementById('cc-params');
+                if(ccParams) ccParams.classList.toggle('hidden', d.mode !== 'CC');
+
+                const totalPower = d.power * d.qty;
+                const recPower = totalPower * 1.20; // Margem de segurança de 20%
+
+                // Fundo do Dashboard
+                ctx.fillStyle = isDark ? "#1e293b" : "#f8fafc";
+                ctx.strokeStyle = cFloorLine; ctx.lineWidth = 1;
+                if (ctx.roundRect) {
+                    ctx.beginPath(); ctx.roundRect(centerX - 220, ch/2 - 140, 440, 280, 16); ctx.fill(); ctx.stroke();
+                } else {
+                    ctx.fillRect(centerX - 220, ch/2 - 140, 440, 280); ctx.strokeRect(centerX - 220, ch/2 - 140, 440, 280);
+                }
+
+                ctx.textAlign = "center";
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.font = "900 11px Manrope";
+                ctx.fillText("POTÊNCIA TOTAL DA CARGA (W)", centerX, ch/2 - 70);
                 
-                // Configuração da Malha (Lumen Method)
+                ctx.fillStyle = "#d97706";
+                ctx.font = "900 52px Manrope";
+                ctx.fillText(`${totalPower.toFixed(1)} W`, centerX, ch/2 - 20);
+
+                ctx.fillStyle = isDark ? "#cbd5e1" : "#0f172a";
+                ctx.font = "900 11px Manrope";
+                ctx.fillText("DRIVER RECOMENDADO (MARGEM DE +20%)", centerX, ch/2 + 40);
+                
+                ctx.fillStyle = "#0284c7";
+                ctx.font = "900 38px Manrope";
+                ctx.fillText(`Mínimo: ${recPower.toFixed(1)} W`, centerX, ch/2 + 85);
+
+                // Rodapé de Voltagem
+                ctx.fillStyle = isDark ? "#111827" : "#e2e8f0";
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(centerX - 220, ch/2 + 100, 440, 40, {bl: 16, br: 16}); ctx.fill(); } 
+                else { ctx.fillRect(centerX - 220, ch/2 + 100, 440, 40); }
+
+                if (d.mode === 'CC') {
+                    const vForward = totalPower / (d.current / 1000);
+                    ctx.fillStyle = "#4d7c0f"; ctx.font = "bold 12px Manrope";
+                    ctx.fillText(`Saída Exigida: ${d.current}mA  |  Janela de Tensão > ${vForward.toFixed(1)}V DC`, centerX, ch/2 + 125);
+                } else {
+                    ctx.fillStyle = "#4d7c0f"; ctx.font = "bold 12px Manrope";
+                    ctx.fillText(`Saída Exigida: 12V ou 24V DC (Conforme especificação da fita)`, centerX, ch/2 + 125);
+                }
+                
+                ctx.textAlign = "start"; // Reset global
+                return;
+            }
+            if (window.currentTool === 'grid') {
+                const gridDisplay = document.getElementById('grid-suggestion-display');
+                const gridDesc = document.getElementById('grid-desc-display');
+
+                // 1. CÁLCULO OBRIGATÓRIO (MÉTODO DOS LÚMENS)
                 const area = s.roomW * s.roomL;
-                const totalFluxNeeded = (s.targetLux * area) / (s.utilFactor * s.maintFactor);
-                const qtyNeeded = Math.ceil(totalFluxNeeded / s.flux);
+                const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
+                const N = Math.max(1, Math.ceil(targetN));
                 
-                s.cols = Math.max(1, Math.ceil(Math.sqrt(qtyNeeded * (s.roomW / s.roomL))));
-                s.rows = Math.max(1, Math.ceil(qtyNeeded / s.cols));
+                const ratio = s.roomW / s.roomL;
+                let calcCols = Math.round(Math.sqrt(N * ratio));
+                let calcRows = Math.round(Math.sqrt(N / ratio));
                 
+                calcCols = Math.max(1, calcCols);
+                calcRows = Math.max(1, calcRows);
+                
+                while (calcCols * calcRows < N) {
+                    if ((calcCols / calcRows) < ratio) {
+                        calcCols++;
+                    } else {
+                        calcRows++;
+                    }
+                }
+                s.cols = calcCols;
+                s.rows = calcRows;
+                
+                
+
+                const padX = 80;
+                const padY = 80;
+                const availW = cw - padX * 2;
+                const availH = ch - padY * 2;
+                let scale = Math.min(availW / boundsW, availH / boundsH);
+                
+                const roomPxW = boundsW * scale;
+                const roomPxH = boundsH * scale;
+                const offsetX = (cw - roomPxW) / 2;
+                const offsetY = (ch - roomPxH) / 2;
+
+                ctx.fillStyle = isDark ? "#0f172a" : "#f8fafc";
+                ctx.fillRect(offsetX, offsetY, roomPxW, roomPxH);
+                
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(offsetX, offsetY, roomPxW, roomPxH);
+                ctx.clip();
+
+                const br = currentBeam * Math.PI / 180;
                 const spacingX = s.roomW / s.cols;
                 const spacingY = s.roomL / s.rows;
-                
+
+                // 1. MOTOR DE CÁLCULO PONTO A PONTO (Malha de 0.5m x 0.5m)
+                const cellSizeM = 0.5; 
+                const cellCols = Math.ceil(s.roomW / cellSizeM);
+                const cellRows = Math.ceil(s.roomL / cellSizeM);
+                const cellPxW = roomPxW / cellCols;
+                const cellPxH = roomPxH / cellRows;
+                const cellMW = s.roomW / cellCols;
+                const cellMH = s.roomL / cellRows;
+
+                // Mapeia coordenadas das Luminárias
                 const fixtures = [];
                 for (let i = 0; i < s.cols; i++) {
                     for (let j = 0; j < s.rows; j++) {
@@ -1864,28 +1922,19 @@ window.toggleGridLevel = function(level) {
                     }
                 }
 
-                const cellCols = s.cols * 3; 
-                const cellRows = s.rows * 3;
-                const cellMW = s.roomW / cellCols;
-                const cellMH = s.roomL / cellRows;
-                const cellPxW = roomPxW / cellCols;
-                const cellPxH = roomPxH / cellRows;
-
-                ctx.save();
-                ctx.beginPath();
-                ctx.rect(offsetX, offsetY, roomPxW, roomPxH);
-                ctx.clip();
-
+                // Extrai Intensidade Máxima e Cria Curva Fotométrica Perfeita
                 let maxI = 0;
                 let n_power = 1;
-
+                
                 if (window.calcMode === 'ies' && s.iesData) {
                     maxI = s.iesData.candelas[0][0] * s.iesData.multiplier;
                 } else {
                     const halfBeamRad = (currentBeam / 2) * Math.PI / 180;
+                    // Equação FWHM: Calcula o expoente para que a intensidade caia pela metade na exata borda do facho
                     if (halfBeamRad > 0 && halfBeamRad < Math.PI / 2) {
                         n_power = Math.log(0.5) / Math.log(Math.cos(halfBeamRad));
                     }
+                    // Fluxo = Integral da curva. Isolando Imax:
                     maxI = (s.flux * (n_power + 1)) / (2 * Math.PI);
                 }
 
@@ -2143,18 +2192,14 @@ window.toggleGridLevel = function(level) {
                 return; 
             }
 
-            // CORREÇÃO CRÍTICA: Variáveis ajustadas para evitar SyntaxError e ReferenceError
             const availH = floorY - 60; const availW = (cw / 2) - 50; 
-            const boundsW = 3.0; 
-            const scaleH = availH / Math.max(boundsH, 0.5); 
-            const scaleW = availW / Math.max(boundsW, 0.5);
-            scale = Math.min(scaleH, scaleW); 
-            scale = Math.min(Math.max(scale, 12), 160);
+            let scaleH = availH / Math.max(boundsH, 0.5); let scaleW = availW / Math.max(boundsW, 0.5);
+            let scale = Math.min(scaleH, scaleW); scale = Math.min(Math.max(scale, 12), 160);
 
             // DRAW FLOOR (For Standard Modes)
             if(window.currentTool !== 'vertical' || s.viewMode === 'section' || !s.viewMode) {
                 ctx.strokeStyle = cFloorLine; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke(); 
-                if (window.currentTool === 'vertical') {
+                if (window.currentTool === 'ponto' || window.currentTool === 'vertical' || window.currentTool === 'homog') {
                     ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; 
                     ctx.fillText(window.currentLang === 'en' ? "FLOOR LINE (fl)" : "LINHA DE PISO (lp)", 10, floorY + 18); 
                     ctx.fillText(window.currentLang === 'en' ? "fl: 0' 0\"" : "lp: 0.00m", 10, floorY - 8); 
@@ -2162,7 +2207,77 @@ window.toggleGridLevel = function(level) {
                 }
             }
 
-            if (window.currentTool === 'vertical') {
+             if (window.currentTool === 'ponto') {
+                const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
+                
+                let I;
+                if(window.calcMode === 'ies') {
+                    I = window.getIESIntensity(s, s.tilt);
+                } else {
+                    I = getIntensity(s);
+                }
+
+                const sy = floorY - (s.height * scale), py = floorY - (s.plane * scale);
+                const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
+                const hEff = s.height - s.plane;
+                const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
+                const dia = 2 * (s.height / Math.cos(tr)) * Math.tan(br / 2); 
+                
+                // Source & Beam
+                ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.save(); ctx.translate(centerX, sy);
+                const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
+
+                // Height & Plane Lines
+                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
+                ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4); 
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; 
+                ctx.fillText(`${window.currentLang === 'en' ? 'wp' : 'hp'}: ${window.formatDist(s.plane)}`, 10, py - 8); 
+
+                const axisX = centerX + (s.height * scale) * Math.tan(tr);
+                ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(axisX, floorY); ctx.stroke(); ctx.setLineDash([]);
+                
+                if (s.tilt > 0) {
+                    ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX, sy + 60); ctx.stroke(); ctx.setLineDash([]);
+                    drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
+                    const distH = s.height * Math.tan(tr);
+                    drawDimLine(ctx, centerX, floorY + 25, axisX, floorY + 25, `d: ${window.formatDist(distH)}`);
+                }
+
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                }
+
+                const hitXFloor = centerX + (s.height * scale) * Math.tan(tr);
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(217, 119, 6, 0.4)"; ctx.moveTo(centerX, sy); ctx.lineTo(hitXFloor, floorY); ctx.stroke(); ctx.setLineDash([]);
+                ctx.beginPath(); ctx.arc(hitXFloor, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                
+                let valText = window.formatIllum(luxFloor);
+                if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD FILE";
+                drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
+                
+                if (hEff > 0) { 
+                    const ix = centerX + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
+                    let valTextPlane = window.formatIllum(luxPlane);
+                    if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD FILE";
+                    drawTextVal(ctx, valTextPlane, ix, py - 12); 
+                    
+                    if (window.calcMode !== 'ies' || s.iesData) {
+                        const diaPlane = 2 * (hEff / Math.cos(tr)) * Math.tan(br / 2);
+                        const hPx_plane = py - sy;
+                        const xL_p = hPx_plane * Math.tan(tr - br / 2);
+                        const xR_p = hPx_plane * Math.tan(tr + br / 2);
+                        drawDimLine(ctx, centerX + xL_p, py + 20, centerX + xR_p, py + 20, `Ø ${window.formatDist(diaPlane)}`);
+                    }
+                }
+                
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
+                    drawDimLine(ctx, centerX + xL, floorY + 50, centerX + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
+                }
+            }
+            else if (window.currentTool === 'vertical') {
                 const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
                 let I_v = (window.calcMode === 'ies') ? window.getIESIntensity(s, s.tilt) : getIntensity(s);
                 let ev = (s.tilt > 0) ? (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist) : 0;
@@ -2171,19 +2286,30 @@ window.toggleGridLevel = function(level) {
                 const sy = floorY - (s.height * scale);
 
                 if (s.viewMode === 'section' || !s.viewMode) {
+                    // ==========================================
+                    // VISÃO: CORTE TÉCNICO (FULL WIDTH)
+                    // ==========================================
                     const wx = centerX + (s.dist * scale); 
+
                     ctx.beginPath(); ctx.moveTo(wx, floorY); ctx.lineTo(wx, floorY - (s.height * scale * 1.5)); ctx.strokeStyle = cFloorLine; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2;
-                    ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
                     
+                    ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(centerX, sy, 5, 0, Math.PI * 2); ctx.fill();
+
+                    // Cota de Altura
+                    ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(centerX - 20, sy); ctx.lineTo(centerX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]);
+                    ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, centerX - 50, sy + 4);
+
                     const hqY = floorY - (s.hq * scale);
                     ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
                     ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, 10, hqY - 8);
 
+                    // Faixa de Luz
                     ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip();
                     ctx.save(); ctx.translate(centerX, sy);
                     const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
                     ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore();
 
+                    // Ângulos e Eixos
                     if (s.tilt > 0) {
                         const axisX = centerX + (s.height * scale) * Math.tan(tr);
                         ctx.beginPath(); ctx.setLineDash([5, 3, 2, 3]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.5)"; ctx.moveTo(centerX, sy); ctx.lineTo(centerX + (s.height * scale * 2) * Math.tan(tr), floorY + (s.height * scale)); ctx.stroke(); ctx.setLineDash([]);
@@ -2191,6 +2317,7 @@ window.toggleGridLevel = function(level) {
                     }
                     if (window.calcMode !== 'ies' || s.iesData) drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false);
 
+                    // Ponto de Impacto na Parede
                     if (s.tilt > 0) {
                         ctx.beginPath(); ctx.moveTo(centerX, sy); ctx.lineTo(wx, hitY_px); ctx.strokeStyle = "#d97706"; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
                         if (hitY_metric > -10 && hitY_metric < s.height * 3) {
@@ -2204,46 +2331,93 @@ window.toggleGridLevel = function(level) {
                     drawDimLine(ctx, centerX, sy - 35, wx, sy - 35, `d: ${window.formatDist(s.dist)}`);
 
                 } else {
+                    // ==========================================
+                    // VISÃO: ELEVAÇÃO FRONTAL (WALL WASH) - REFAZENDO PARA PRECISÃO
+                    // ==========================================
                     const wallW = Math.max(cw * 0.8, s.frameW * scale * 1.5 + (s.qty * s.spacing * scale));
                     const wallX = (cw - wallW) / 2;
-                    ctx.fillStyle = isDark ? "#1e293b" : "#f1f5f9"; ctx.fillRect(wallX, 60, wallW, floorY - 60);
-                    ctx.strokeStyle = cFloorLine; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
+                    
+                    // Desenho da Parede (Background)
+                    ctx.fillStyle = isDark ? "#1e293b" : "#f1f5f9"; 
+                    ctx.fillRect(wallX, 60, wallW, floorY - 60);
+                    ctx.strokeStyle = cFloorLine; 
+                    ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
 
+                    // Representação do Teto/Trilho (Linha de Profundidade)
                     ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
                     ctx.beginPath(); ctx.moveTo(0, 40); ctx.lineTo(cw, 40); ctx.stroke();
 
+                    // Quadro (Moldura)
                     const fW_px = s.frameW * scale, fH_px = s.frameH * scale, fY_px = floorY - (s.hq * scale);
                     ctx.strokeStyle = "#d97706"; ctx.lineWidth = 2; ctx.setLineDash([5, 5]); 
                     ctx.strokeRect(centerX - fW_px/2, fY_px - fH_px/2, fW_px, fH_px); ctx.setLineDash([]);
 
+                    // Lógica de Mancha de Luz (Light Distribution)
                     const startX = centerX - ((s.qty - 1) * s.spacing * scale) / 2;
+                    const trRad = tr; // Tilt em radianos já calculado
+                    const brRad = br; // Beam em radianos já calculado
 
                     for(let i=0; i < s.qty; i++) {
                         const spotX = startX + (i * s.spacing * scale);
-                        const safeTrRad = Math.max(0.05, tr);
-                        const pathLength = s.dist / Math.sin(safeTrRad);
-                        const bW_px = 2 * (pathLength * Math.tan(br / 2)) * scale;
-                        const bH_px = Math.min((bW_px/scale) / Math.sin(safeTrRad), s.height * 2.5) * scale;
-                        const hitY_px_current = floorY - ((s.height - (s.dist / Math.tan(safeTrRad))) * scale);
-                        const maxRadius = Math.max(bW_px, bH_px) / 2;
                         
+                        // ==========================================
+                        // MATEMÁTICA CORRIGIDA: Projeção de Cone (Scallop)
+                        // ==========================================
+                        const safeTrRad = Math.max(0.05, trRad);
+                        const pathLength = s.dist / Math.sin(safeTrRad);
+                        const bW_metric = 2 * (pathLength * Math.tan(brRad / 2));
+                        const bW_px = bW_metric * scale;
+                        
+                        let bH_metric = bW_metric / Math.sin(safeTrRad);
+                        bH_metric = Math.min(bH_metric, s.height * 2.5); 
+                        const bH_px = bH_metric * scale;
+                        
+                        const hitY_metric_current = s.height - (s.dist / Math.tan(safeTrRad));
+                        const hitY_px_current = floorY - (hitY_metric_current * scale);
+
+                        // Renderização do Gradiente com Drop-off mais acentuado (redução de fade espalhado)
+                        const maxRadius = Math.max(bW_px, bH_px) / 2;
                         const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, maxRadius);
-                        const intensityAlpha = isDark ? 0.8 : 0.7; 
+                        const intensityAlpha = isDark ? 0.8 : 0.7; // Brilho central compensado
+                        
+                        // Curva de degrêde com a cor exata do Corte Técnico (Amber 400)
                         sg.addColorStop(0, `rgba(251, 191, 36, ${intensityAlpha})`);
                         sg.addColorStop(0.6, `rgba(251, 191, 36, ${intensityAlpha * 0.5})`);
                         sg.addColorStop(0.9, `rgba(251, 191, 36, ${intensityAlpha * 0.05})`);
                         sg.addColorStop(1, "rgba(251, 191, 36, 0)");
 
+                        // ==========================================
+                        // CLIPPING (MÁSCARA) E RENDERIZAÇÃO
+                        // ==========================================
                         ctx.save();
-                        ctx.beginPath(); ctx.rect(0, 40, cw, floorY - 40); ctx.clip();
+                        
+                        // 1. Cria a barreira física (Teto = 40px, Chão = floorY)
+                        // A luz desenhada a partir daqui NÃO VAZARÁ além destas linhas
+                        ctx.beginPath();
+                        ctx.rect(0, 40, cw, floorY - 40);
+                        ctx.clip();
+
+                        // 2. Transforma e desenha a elipse (Spot de Luz)
                         ctx.translate(spotX, hitY_px_current);
                         ctx.scale(bW_px / (maxRadius * 2), bH_px / (maxRadius * 2));
-                        ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(0, 0, maxRadius, 0, Math.PI * 2); ctx.fill();
+                        
+                        ctx.fillStyle = sg;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, maxRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // 3. Libera a restrição de barreira para podermos desenhar os objetos por cima
                         ctx.restore();
 
-                        ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(spotX, 40, 4, 0, Math.PI * 2); ctx.fill();
+                        // ==========================================
+                        // ELEMENTOS FÍSICOS (Luminária e Textos)
+                        // ==========================================
+                        // Fonte Luminosa no Teto (Desenhada APÓS o restore para não ser cortada pela máscara)
+                        ctx.fillStyle = '#FBBF24';
+                        ctx.beginPath(); ctx.arc(spotX, 40, 4, 0, Math.PI * 2); ctx.fill();
                         ctx.strokeStyle = "#d97706"; ctx.lineWidth = 1; ctx.stroke();
                         
+                        // Etiqueta com o valor do Lux no centro do quadro
                         if (i === 0 && tr > 0) {
                             let valText = window.formatIllum(ev);
                             if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
@@ -2251,22 +2425,84 @@ window.toggleGridLevel = function(level) {
                         }
                     }
 
+                    // COTAS E DIMENSÕES (Annotations)
+                    // Cota de Altura Total (H)
                     drawDimLineVertical(ctx, wallX - 40, 40, floorY, `H: ${window.formatDist(s.height)}`);
+                    
+                    // Cota de Distância da Parede (D) - Representada como um offset no topo
                     ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = "#94a3b8";
                     ctx.moveTo(startX, 40); ctx.lineTo(startX, 20); ctx.stroke(); ctx.setLineDash([]);
                     ctx.font = "bold 11px Manrope"; ctx.fillStyle = "#d97706";
                     ctx.fillText(`D: ${window.formatDist(s.dist)} (OFFSET)`, startX + 10, 30);
 
+                    // Cotas do Quadro
                     drawDimLine(ctx, centerX - fW_px/2, fY_px + fH_px/2 + 25, centerX + fW_px/2, fY_px + fH_px/2 + 25, `w: ${window.formatDist(s.frameW)}`);
                     drawDimLineVertical(ctx, centerX + fW_px/2 + 30, fY_px - fH_px/2, fY_px + fH_px/2, `h: ${window.formatDist(s.frameH)}`);
                     
+                    // Cota de Eixo (hq)
                     ctx.beginPath(); ctx.setLineDash([4, 2]); ctx.strokeStyle = "rgba(148, 163, 184, 0.5)";
                     ctx.moveTo(wallX, fY_px); ctx.lineTo(wallX + wallW, fY_px); ctx.stroke(); ctx.setLineDash([]);
                     ctx.fillStyle = cBaseText; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, wallX + 10, fY_px - 8);
 
+                    // Cota de Espaçamento entre Fontes
                     if (s.qty > 1) {
                         drawDimLine(ctx, startX, 55, startX + (s.spacing * scale), 55, `s: ${window.formatDist(s.spacing)}`);
                     }
+                }
+            } else if (window.currentTool === 'homog') {
+                const I = getIntensity(window.state.homog); 
+                const sy = floorY - (s.height * scale); const py = floorY - (s.plane * scale); const hS = (s.spacing * scale) / 2;
+                const br = currentBeam * Math.PI / 180; const tl = 0; 
+                const dia = 2 * s.height * Math.tan(br / 2);
+                const hEff = s.height - s.plane;
+                const diaPlane = hEff > 0 ? 2 * hEff * Math.tan(br / 2) : 0;
+                const luxFloor = I / (s.height ** 2);
+                const luxPlane = hEff > 0 ? I / (hEff ** 2) : 0;
+                const leftX = centerX - hS; const rightX = centerX + hS;
+                
+                ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; 
+                ctx.fillText(`${window.currentLang === 'en' ? 'wp' : 'hp'}: ${window.formatDist(s.plane)}`, 10, py - 8); 
+
+                [leftX, rightX].forEach(lx => {
+                    ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(217, 119, 6, 0.4)"; ctx.moveTo(lx, sy); ctx.lineTo(lx, floorY); ctx.stroke(); ctx.setLineDash([]);
+                    
+                    ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(lx, sy, 5, 0, Math.PI * 2); ctx.fill();
+                    ctx.save(); ctx.translate(lx, sy);
+                    const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tl - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tl + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
+                });
+                
+                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(leftX - 20, sy); ctx.lineTo(leftX - 10, sy); ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'; ctx.stroke(); ctx.setLineDash([]); 
+                ctx.font = "bold 13px Manrope"; ctx.fillStyle = cBaseText; ctx.fillText(`${window.formatDist(s.height)}`, leftX - 50, sy + 4);
+
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawAngleDim(ctx, leftX, sy, Math.round(currentBeam), 0, 40, "rgba(217, 119, 6, 0.8)", false);
+                }
+
+                drawDimLine(ctx, leftX, sy - 25, rightX, sy - 25, `D: ${window.formatDist(s.spacing)}`);
+                
+                ctx.beginPath(); ctx.arc(leftX, floorY, 4, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                
+                let valText = window.formatIllum(luxFloor);
+                if (window.calcMode === 'ies' && !window.state.homog.iesData) valText = "LOAD FILE";
+                drawTextVal(ctx, valText, leftX, floorY - 12);
+
+                const rFloor = (floorY - sy) * Math.tan(br/2);
+                if (window.calcMode !== 'ies' || s.iesData) {
+                    drawDimLine(ctx, leftX - rFloor, floorY + 30, leftX + rFloor, floorY + 30, `Ø ${window.formatDist(dia)}`);
+                }
+
+                if (hEff > 0) {
+                     ctx.beginPath(); ctx.arc(leftX, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill();
+                     
+                     let valTextPlane = window.formatIllum(luxPlane);
+                     if (window.calcMode === 'ies' && !window.state.homog.iesData) valTextPlane = "LOAD FILE";
+                     drawTextVal(ctx, valTextPlane, leftX, py - 12);
+                     
+                     if (window.calcMode !== 'ies' || s.iesData) {
+                        const rPlane = (py - sy) * Math.tan(br/2);
+                        drawDimLine(ctx, leftX - rPlane, py + 20, leftX + rPlane, py + 20, `Ø ${window.formatDist(diaPlane)}`);
+                     }
                 }
             }
             
@@ -2276,8 +2512,9 @@ window.toggleGridLevel = function(level) {
                 const maxI = Math.max(...row);
                 const sy = floorY - (s.height * scale);
 
+                // Define as origens: 1 no centro, ou 2 se for Estudo de Facho
                 let origins = [centerX];
-                if (window.currentTool === 'surface' && s.viewMode === 'array') {
+                if (window.currentTool === 'homog') {
                     const hS = (s.spacing * scale) / 2;
                     origins = [centerX - hS, centerX + hS];
                 }
@@ -2285,18 +2522,22 @@ window.toggleGridLevel = function(level) {
                 ctx.strokeStyle = "rgba(217, 119, 6, 0.4)";
                 ctx.setLineDash([]);
 
+                // Desenha a curva IES para cada origem
                 origins.forEach(originX => {
                     ctx.beginPath();
                     for(let i=0; i<vAngles.length; i++) {
                         const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
                         const r = (row[i] / maxI) * (s.height * scale * 0.9);
-                        if(i===0) ctx.moveTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang)); 
-                        else ctx.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
+                        const x = originX + r * Math.sin(ang);
+                        const y = sy + r * Math.cos(ang);
+                        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
                     }
                     for(let i=0; i<vAngles.length; i++) {
                         const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
                         const r = (row[i] / maxI) * (s.height * scale * 0.9);
-                        ctx.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
+                        const x = originX + r * Math.sin(ang);
+                        const y = sy + r * Math.cos(ang);
+                        ctx.lineTo(x,y);
                     }
                     ctx.stroke();
                 });
@@ -2372,7 +2613,7 @@ window.toggleGridLevel = function(level) {
             
             // LUXSINTAX: Adicionada a conversão de unidades para o Quadro
             const distParams = ['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL', 'frameW', 'frameH'];
-            ['surface', 'vertical', 'grid'].forEach(key => {
+            ['ponto', 'vertical', 'homog', 'grid'].forEach(key => {
                 distParams.forEach(param => {
                     const numInput = document.getElementById(`${key[0]}-${param}`);
                     const rangeInput = document.getElementById(`range-${key[0]}-${param}`);
@@ -2453,7 +2694,7 @@ function bind(id, key, param) {
 }
         
         // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
-        ['surface', 'vertical', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
@@ -2823,20 +3064,8 @@ window.generateLeedReport = async () => {
     link.download = `LuxSintax_LEED_${s.name.replace(/\s+/g, '_')}.pdf`; 
     link.click();
 };
-window.setSurfaceMode = function(mode) {
-    window.state.surface.viewMode = mode;
-    const isSingle = mode === 'single';
-    document.getElementById('btn-surf-single').className = isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 transition-all";
-    document.getElementById('btn-surf-array').className = !isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 transition-all";
-    
-    // Esconde/Mostra o input de distância no menu lateral
-    const spacingInput = document.getElementById('group-spacing');
-    if(spacingInput) spacingInput.classList.toggle('hidden', isSingle);
-    
-    window.updateCalculations();
-};        
-window.AuthManager.init();
-        window.switchTool('surface');
+        window.AuthManager.init();
+        window.switchTool('ponto');
     </script>
 </body>
 </html>
