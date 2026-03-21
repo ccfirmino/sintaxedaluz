@@ -1289,8 +1289,10 @@ window.handleGenerateReport = async () => {
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 
                 // Controle dos Wrappers de Interface da Malha (Heatmap e Nível de Iluminância LP/HP)
+// Controle dos Wrappers de Interface da Malha e Botões
 const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
 const gridLevelToggle = document.getElementById('grid-level-toggle');
+const surfaceSelector = document.getElementById('surface-selector');
 
 if (toolId === 'grid') {
     if (heatmapWrapper) heatmapWrapper.classList.remove('hidden');
@@ -1299,7 +1301,16 @@ if (toolId === 'grid') {
     if (heatmapWrapper) heatmapWrapper.classList.add('hidden');
     if (gridLevelToggle) gridLevelToggle.classList.add('hidden');
 }
-                if (toolId === 'grid') {
+
+if (surfaceSelector) {
+    if (toolId === 'ponto') {
+        surfaceSelector.classList.remove('hidden');
+    } else {
+        surfaceSelector.classList.add('hidden');
+    }
+}
+
+if (toolId === 'grid') {
                     const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
                     if (gridSel) window.updateCalcMode(gridSel.value);
                 } else if (toolId !== 'driver') {
@@ -1738,8 +1749,13 @@ window.toggleGridLevel = function(level) {
                 window._isRenderPending = true;
                 // Sincroniza a execução com o refresh rate do monitor (60Hz/120Hz)
                 requestAnimationFrame(() => {
-                    window.coreRenderEngine();
-                    window._isRenderPending = false;
+                    try {
+                        window.coreRenderEngine();
+                    } catch (erro) {
+                        console.error("[LuxSintax] Erro interno de desenho:", erro);
+                    } finally {
+                        window._isRenderPending = false;
+                    }
                 });
             }
         };
