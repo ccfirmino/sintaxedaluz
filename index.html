@@ -2143,9 +2143,13 @@ window.toggleGridLevel = function(level) {
                 return; 
             }
 
+            // CORREÇÃO CRÍTICA: Variáveis ajustadas para evitar SyntaxError e ReferenceError
             const availH = floorY - 60; const availW = (cw / 2) - 50; 
-            let scaleH = availH / Math.max(boundsH, 0.5); let scaleW = availW / Math.max(boundsW, 0.5);
-            let scale = Math.min(scaleH, scaleW); scale = Math.min(Math.max(scale, 12), 160);
+            const boundsW = 3.0; 
+            const scaleH = availH / Math.max(boundsH, 0.5); 
+            const scaleW = availW / Math.max(boundsW, 0.5);
+            scale = Math.min(scaleH, scaleW); 
+            scale = Math.min(Math.max(scale, 12), 160);
 
             // DRAW FLOOR (For Standard Modes)
             if(window.currentTool !== 'vertical' || s.viewMode === 'section' || !s.viewMode) {
