@@ -1778,17 +1778,22 @@ window.toggleGridLevel = function(level) {
             let currentBeam = window.getEffectiveBeam(s);
 
             if (window.currentTool === 'ponto') {
-                boundsH = s.height;
+                boundsH = s.height * 1.15; // 15% de margem superior
                 const maxAngleRad = (Math.abs(s.tilt) + currentBeam/2) * Math.PI / 180;
                 const limitRad = Math.min(maxAngleRad, 1.48);
-                boundsW = s.height * Math.tan(limitRad);
-                // Ajuste de zoom dinâmico para o Estudo de Facho
+                boundsW = s.height * Math.tan(limitRad) * 1.25; // Margem lateral generosa
                 if (s.viewMode === 'array') {
-                    boundsW += (s.spacing / 2);
+                    boundsW += s.spacing; // Garante espaço para a cota D
                 }
+                boundsW = Math.max(boundsW, 3.0);
             } else if (window.currentTool === 'vertical') {
-                boundsH = s.height;
-                boundsW = Math.max(s.dist * 1.6, 3.5); 
+                boundsH = Math.max(s.height, s.hq) * 1.2;
+                if (s.viewMode === 'section' || !s.viewMode) {
+                    boundsW = Math.max(s.dist * 1.8, 3.5);
+                } else {
+                    // Calcula a largura total da parede baseada na quantidade de peças
+                    boundsW = Math.max((s.qty * s.spacing) + (s.frameW * 2), 4.0);
+                }
             } else if (window.currentTool === 'homog') {
                 boundsH = s.height;
                 const halfBeamRad = (currentBeam/2) * Math.PI / 180;
@@ -2190,7 +2195,8 @@ window.toggleGridLevel = function(level) {
 
             const availH = floorY - 60; const availW = (cw / 2) - 50; 
             let scaleH = availH / Math.max(boundsH, 0.5); let scaleW = availW / Math.max(boundsW, 0.5);
-            let scale = Math.min(scaleH, scaleW); scale = Math.min(Math.max(scale, 12), 160);
+            // Reduzido o limite inferior de zoom de 12 para 1.5 (Permite zoom-out massivo sem quebrar)
+            let scale = Math.min(scaleH, scaleW); scale = Math.min(Math.max(scale, 1.5), 160);
 
             // DRAW FLOOR (For Standard Modes)
             if(window.currentTool !== 'vertical' || s.viewMode === 'section' || !s.viewMode) {
