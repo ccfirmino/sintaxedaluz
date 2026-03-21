@@ -2433,7 +2433,7 @@ window.toggleGridLevel = function(level) {
                         drawDimLine(ctx, startX, 55, startX + (s.spacing * scale), 55, `s: ${window.formatDist(s.spacing)}`);
                     }
                 }
-            
+            } // <--- ESTA É A CHAVE MÁGICA QUE FALTAVA!
             
             if (window.calcMode === 'ies' && s.iesData) {
                 const { vAngles, candelas } = s.iesData;
