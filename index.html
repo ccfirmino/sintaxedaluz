@@ -1841,15 +1841,51 @@ window.toggleGridLevel = function(level) {
                 // (Mantenha aqui o código da ferramenta vertical se desejar, ou deixe vazio por ora)
             }
             else if (window.currentTool === 'grid') {
-                // (O código do Método Lúmens começa aqui...)
+                const roomPxW = s.roomW * scale;
+                const roomPxH = s.roomL * scale;
+                const offsetX = centerX - roomPxW / 2;
+                const offsetY = floorY - roomPxH - 30;
+                
+                // Configuração da Malha (Lumen Method)
+                const area = s.roomW * s.roomL;
+                const totalFluxNeeded = (s.targetLux * area) / (s.utilFactor * s.maintFactor);
+                const qtyNeeded = Math.ceil(totalFluxNeeded / s.flux);
+                
+                s.cols = Math.max(1, Math.ceil(Math.sqrt(qtyNeeded * (s.roomW / s.roomL))));
+                s.rows = Math.max(1, Math.ceil(qtyNeeded / s.cols));
+                
+                const spacingX = s.roomW / s.cols;
+                const spacingY = s.roomL / s.rows;
+                
+                const fixtures = [];
+                for (let i = 0; i < s.cols; i++) {
+                    for (let j = 0; j < s.rows; j++) {
+                        fixtures.push({ x: (i + 0.5) * spacingX, y: (j + 0.5) * spacingY });
+                    }
+                }
+
+                const cellCols = s.cols * 3; 
+                const cellRows = s.rows * 3;
+                const cellMW = s.roomW / cellCols;
+                const cellMH = s.roomL / cellRows;
+                const cellPxW = roomPxW / cellCols;
+                const cellPxH = roomPxH / cellRows;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(offsetX, offsetY, roomPxW, roomPxH);
+                ctx.clip();
+
+                let maxI = 0;
+                let n_power = 1;
+
+                if (window.calcMode === 'ies' && s.iesData) {
                     maxI = s.iesData.candelas[0][0] * s.iesData.multiplier;
                 } else {
                     const halfBeamRad = (currentBeam / 2) * Math.PI / 180;
-                    // Equação FWHM: Calcula o expoente para que a intensidade caia pela metade na exata borda do facho
                     if (halfBeamRad > 0 && halfBeamRad < Math.PI / 2) {
                         n_power = Math.log(0.5) / Math.log(Math.cos(halfBeamRad));
                     }
-                    // Fluxo = Integral da curva. Isolando Imax:
                     maxI = (s.flux * (n_power + 1)) / (2 * Math.PI);
                 }
 
