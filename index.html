@@ -275,11 +275,6 @@
         </div>
         
         <div id="inputs-ponto" class="hidden">
-            <div class="mode-ies-group hidden mb-6 group">
-                <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                <input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-                <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-            </div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
             <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
@@ -292,14 +287,16 @@
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
             </div>
+            <div class="mode-ies-group hidden space-y-6 mb-6">
+                <div class="group">
+                    <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                    <input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                    <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                </div>
+            </div>
         </div>
         
         <div id="inputs-vertical" class="hidden">
-            <div class="mode-ies-group hidden mb-6 group">
-                <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                <input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-                <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-            </div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0.5" max="10" step="0.1" value="1.6"></div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
@@ -321,6 +318,13 @@
             <div class="mode-photo-group hidden space-y-6 mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-v-flux" min="0" max="10000" step="10" value="1500"></div>
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-v-cdklm" min="0" max="10000" step="10" value="2000"></div>
+            </div>
+            <div class="mode-ies-group hidden space-y-6 mb-6">
+                <div class="group">
+                    <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
+                    <input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                    <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                </div>
             </div>
         </div>
         
@@ -345,12 +349,6 @@
                 <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="ies" onchange="window.updateCalcMode('ies')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_ies_file">IES / LDT</span></label>
             </div>
 
-            <div class="mode-ies-group hidden mb-6 group">
-                <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                <input type="file" id="g-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-                <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-            </div>
-
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
             
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="g-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-plane" min="0" max="5" step="0.05" value="0.75"></div>
@@ -359,9 +357,17 @@
                 <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
             </div>
 
+            <div class="mode-ies-group hidden space-y-6 mb-6">
+                <div class="group">
+                    <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES</label>
+                    <input type="file" id="g-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
+                    <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                </div>
+            </div>
+            
             <div class="space-y-6 mb-6">
-                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="100000" step="100" value="3000" class="transition-opacity"></div>
-                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_power_w">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30" class="transition-opacity"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="100000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="100000" step="100" value="3000" class="transition-opacity"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_power_w">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30" class="transition-opacity"></div>
                 <div class="group pt-2"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500"></div>
             </div>
 
@@ -1183,110 +1189,246 @@ window.Photometric3DEngine = {
     init: function() {
         if (this.isInitialized) return;
         const container = document.getElementById('webgl-container');
-        if (!container) return;
+        if (!container || typeof THREE === 'undefined') return;
+
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(document.documentElement.classList.contains('dark') ? 0x0f172a : 0x1e293b);
-        this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+
+        const rect = container.getBoundingClientRect();
+        this.camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 1000);
+        
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer.setSize(rect.width, rect.height);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(this.renderer.domElement);
+
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
-        this.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-        const dl = new THREE.DirectionalLight(0xffffff, 0.5); dl.position.set(10, 20, 10); this.scene.add(dl);
+        this.controls.dampingFactor = 0.05;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        this.scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(10, 20, 10);
+        this.scene.add(dirLight);
+
         this.isInitialized = true;
         this.animate();
+
+        window.addEventListener('resize', () => {
+            if (!this.renderer || container.clientWidth === 0) return;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            this.renderer.setSize(width, height);
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+        });
     },
 
     animate: function() {
         requestAnimationFrame(() => window.Photometric3DEngine.animate());
         if (this.controls) this.controls.update();
-        if (this.renderer) this.renderer.render(this.scene, this.camera);
+        if (this.renderer && this.scene && this.camera) {
+            this.renderer.render(this.scene, this.camera);
+        }
     },
 
-    renderPhotometricSolid: function(iesData, toolId, state) {
-        if (!this.isInitialized) this.init();
-        if (!state || !iesData) return;
-        if (this.solidGroup) this.scene.remove(this.solidGroup);
-        this.solidGroup = new THREE.Group();
-
-        const hA = iesData.hAngles, vA = iesData.vAngles, mat = iesData.candelas;
-        if (!hA || !vA || !mat || hA.length === 0 || vA.length === 0) return; // Trava contra arquivo corrompido
-
-        let hFull = [...hA], mFull = mat.map(r => [...r]);
-        let lastH = Math.round(hA[hA.length - 1]);
-
-        if (hA.length === 1 || lastH === 0) {
-            hFull = []; mFull = [];
-            for (let a = 0; a <= 360; a += 15) { hFull.push(a); mFull.push(mat[0]); }
-        } else if (lastH === 90) {
-            for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
-            for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
-        } else if (lastH === 180) {
-            for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
+    clearSolid: function() {
+        if (this.solidGroup && this.scene) {
+            this.scene.remove(this.solidGroup);
+            this.solidGroup.children.forEach(child => {
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) {
+                    if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+                    else child.material.dispose();
+                }
+            });
+            this.solidGroup = null;
         }
-        if (Math.round(hFull[hFull.length - 1]) !== 360) { hFull.push(360); mFull.push(mFull[0]); }
+    },
 
-        let maxI = 0; mFull.forEach(r => r.forEach(v => { if (v > maxI) maxI = v; }));
-        if (maxI <= 0) return;
+    renderPhotometricSolid: function(iesData, toolId = 'ponto', state = null) {
+        if (!this.isInitialized) this.init();
+        this.clearSolid();
+        if (!iesData || !iesData.hAngles || !iesData.vAngles || !iesData.candelas) return;
 
         const pts = [];
-        const matWire = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.4 });
+        const hAngles = iesData.hAngles;
+        const vAngles = iesData.vAngles;
+        const matrix = iesData.candelas;
+        const mult = iesData.multiplier;
 
-        for (let h = 0; h < hFull.length; h++) {
-            for (let v = 0; v < vA.length - 1; v++) {
-                pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h][v+1]/maxI, hFull[h], vA[v+1]));
+        let maxI = 0;
+        for (let h = 0; h < hAngles.length; h++) {
+            for (let v = 0; v < vAngles.length; v++) {
+                if (matrix[h][v] > maxI) maxI = matrix[h][v];
             }
         }
-        for (let v = 0; v < vA.length; v++) {
-            for (let h = 0; h < hFull.length - 1; h++) {
-                pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h+1][v]/maxI, hFull[h+1], vA[v]));
+        if (maxI === 0) return;
+        
+        // Normaliza o sólido para ser fisicamente proporcional ao pé-direito
+        const scaleFactor = (state && state.height) ? (state.height * 0.8) / maxI : 5 / maxI; 
+
+        // LUXSINTAX: Construção do Sólido Fotométrico Contínuo (Wireframe 3D)
+        const webGroup = new THREE.Group();
+        const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
+
+        // 1. Desenha as Curvas Verticais (Planos C / Meridianos)
+        for (let h = 0; h < hAngles.length; h++) {
+            const pts = [];
+            for (let v = 0; v < vAngles.length; v++) {
+                const intensity = matrix[h][v] * mult * scaleFactor;
+                const phi = (hAngles[h] * Math.PI) / 180; 
+                const theta = (vAngles[v] * Math.PI) / 180; 
+                const x = intensity * Math.sin(theta) * Math.cos(phi);
+                const y = -intensity * Math.cos(theta); 
+                const z = intensity * Math.sin(theta) * Math.sin(phi);
+                pts.push(new THREE.Vector3(x, y, z));
             }
-            pts.push(this.sphToCar(mFull[hFull.length-1][v]/maxI, hFull[hFull.length-1], vA[v]), this.sphToCar(mFull[0][v]/maxI, hFull[0], vA[v]));
+            webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
         }
 
-        const geo = new THREE.BufferGeometry().setFromPoints(pts);
-        const wireframe = new THREE.LineSegments(geo, matWire);
-        const scale = state.height * 0.8;
+        // 2. Desenha os Anéis Horizontais (Cones Gamma / Paralelos)
+        for (let v = 0; v < vAngles.length; v++) {
+            const pts = [];
+            for (let h = 0; h < hAngles.length; h++) {
+                const intensity = matrix[h][v] * mult * scaleFactor;
+                const phi = (hAngles[h] * Math.PI) / 180; 
+                const theta = (vAngles[v] * Math.PI) / 180; 
+                const x = intensity * Math.sin(theta) * Math.cos(phi);
+                const y = -intensity * Math.cos(theta); 
+                const z = intensity * Math.sin(theta) * Math.sin(phi);
+                pts.push(new THREE.Vector3(x, y, z));
+            }
+            // Conecta o fim ao início para formar um anel contínuo (se os dados abrangerem 360°)
+            if (hAngles.length > 1 && Math.abs(hAngles[hAngles.length - 1] - hAngles[0]) >= 359) {
+                pts.push(pts[0]);
+            }
+            webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+        }
 
-        if (toolId === 'grid') {
-            const sx = state.roomW / state.cols, sz = state.roomL / state.rows;
+        this.solidGroup = new THREE.Group();
+
+        if (toolId === 'grid' && state) {
+            const spacingX = state.roomW / state.cols;
+            const spacingZ = state.roomL / state.rows; 
+
+            // Contorno do Ambiente (Room Box)
+            const roomGeo = new THREE.BoxGeometry(state.roomW, state.height, state.roomL);
+            const roomEdges = new THREE.EdgesGeometry(roomGeo);
+            const roomMat = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.3 });
+            const roomMesh = new THREE.LineSegments(roomEdges, roomMat);
+            roomMesh.position.set(0, state.height / 2, 0);
+            this.solidGroup.add(roomMesh);
+
+            // Grid de Piso
+            const gridHelper = new THREE.GridHelper(Math.max(state.roomW, state.roomL) * 1.5, 20, 0x334155, 0x1e293b);
+            this.solidGroup.add(gridHelper);
+
+            // Distribuição das Luminárias (Malha)
+            const startX = -state.roomW / 2 + spacingX / 2;
+            const startZ = -state.roomL / 2 + spacingZ / 2;
+
             for (let i = 0; i < state.cols; i++) {
                 for (let j = 0; j < state.rows; j++) {
-                    const inst = wireframe.clone();
-                    inst.scale.set(scale, scale, scale);
-                    inst.position.set(-state.roomW/2 + (i+0.5)*sx, state.height, -state.roomL/2 + (j+0.5)*sz);
-                    this.solidGroup.add(inst);
+                    const mesh = webGroup.clone();
+                    mesh.position.set(startX + i * spacingX, state.height, startZ + j * spacingZ);
+                    this.solidGroup.add(mesh);
                 }
             }
-        } else {
-            wireframe.scale.set(scale, scale, scale);
-            wireframe.position.set(0, state.height, 0);
-            this.solidGroup.add(wireframe);
-        }
-        this.scene.add(this.solidGroup);
-    },
 
-    sphToCar: function(r, h, v) {
-        const phi = h * Math.PI / 180, theta = v * Math.PI / 180;
-        return new THREE.Vector3(r * Math.sin(theta) * Math.cos(phi), -r * Math.cos(theta), r * Math.sin(theta) * Math.sin(phi));
+            // Câmera panorâmica para Método Lúmens
+            this.camera.position.set(state.roomW * 1.2, state.height * 2.5, state.roomL * 1.2);
+            this.controls.target.set(0, state.height / 2, 0);
+
+        } else {
+            const mesh = webGroup.clone();
+            const h = state ? state.height : 3;
+            
+            // Tratamento de Array para o Ponto a Ponto Horizontal
+            if (toolId === 'ponto' && state && state.viewMode === 'array') {
+                const hS = state.spacing / 2;
+                mesh.position.set(-hS, h, 0);
+                
+                const mesh2 = webGroup.clone();
+                mesh2.position.set(hS, h, 0);
+                
+                this.solidGroup.add(mesh);
+                this.solidGroup.add(mesh2);
+            } else {
+                mesh.position.set(0, h, 0);
+                this.solidGroup.add(mesh);
+                const axesHelper = new THREE.AxesHelper(2);
+                axesHelper.position.set(0, h, 0);
+                this.solidGroup.add(axesHelper);
+            }
+
+            const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x1e293b);
+            this.solidGroup.add(gridHelper);
+
+            this.camera.position.set(5, h + 2, 5);
+            this.controls.target.set(0, h / 2, 0);
+        }
+
+        this.scene.add(this.solidGroup);
+        this.controls.update();
     }
 };
 
 window.toggleRenderMode = function(mode) {
-    const s2d = document.getElementById('stage-2d'), s3d = document.getElementById('stage-3d');
-    const b2d = document.getElementById('btn-render-2d'), b3d = document.getElementById('btn-render-3d');
-    const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
-    const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+    const stage2D = document.getElementById('stage-2d');
+    const stage3D = document.getElementById('stage-3d');
+    
+    const activeToolKey = window.currentTool || 'ponto';
+    const btn2D = document.getElementById(`btn-render-2d-${activeToolKey}`) || document.getElementById('btn-render-2d');
+    const btn3D = document.getElementById(`btn-render-3d-${activeToolKey}`) || document.getElementById('btn-render-3d');
+    
+    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
 
     if (mode === '3D') {
-        s2d.classList.add('hidden'); s3d.classList.remove('hidden');
-        b3d.className = act; b2d.className = inact;
-        window.updateCalculations();
+        stage2D.classList.add('hidden');
+        stage3D.classList.remove('hidden');
+        if (btn3D) btn3D.className = activeClass;
+        if (btn2D) btn2D.className = inactiveClass;
+        
+        window.Photometric3DEngine.init();
+        window.updateCalculations(); 
     } else {
-        s3d.classList.add('hidden'); s2d.classList.remove('hidden');
-        b2d.className = act; b3d.className = inact;
+        stage3D.classList.add('hidden');
+        stage2D.classList.remove('hidden');
+        if (btn2D) btn2D.className = activeClass;
+        if (btn3D) btn3D.className = inactiveClass;
+        window.updateCalculations();
+    }
+};
+
+window.toggleRenderMode = function(mode) {
+    const stage2D = document.getElementById('stage-2d');
+    const stage3D = document.getElementById('stage-3d');
+    const btn2D = document.getElementById('btn-render-2d');
+    const btn3D = document.getElementById('btn-render-3d');
+    
+    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+
+    if (mode === '3D') {
+        stage2D.classList.add('hidden');
+        stage3D.classList.remove('hidden');
+        btn3D.className = activeClass;
+        btn2D.className = inactiveClass;
+        
+        window.Photometric3DEngine.init();
+        const currentData = window.state[window.currentTool].iesData;
+        if (currentData) {
+            window.Photometric3DEngine.renderPhotometricSolid(currentData);
+        }
+    } else {
+        stage3D.classList.add('hidden');
+        stage2D.classList.remove('hidden');
+        btn2D.className = activeClass;
+        btn3D.className = inactiveClass;
+        window.updateCalculations();
     }
 };
 
@@ -1653,11 +1795,14 @@ window.toggleGridLevel = function(level) {
                             }
                         }
                         
-                        // LUXSINTAX: Ativa a visibilidade dos controles 3D e dispara o motor de renderização global
+                        // Exibe o Toggle 3D e renderiza caso o modo 3D já esteja ativo
                         const toggleBtn = document.getElementById('view-mode-toggle');
                         if (toggleBtn) toggleBtn.classList.remove('hidden');
                         
-                        // Chamamos apenas o update global que já possui a lógica de proteção e contextos (P2P vs Lúmens)
+                        if (window.Photometric3DEngine && window.Photometric3DEngine.isInitialized && !document.getElementById('stage-3d').classList.contains('hidden')) {
+                             window.Photometric3DEngine.renderPhotometricSolid(parsed);
+                        }
+
                         window.updateCalculations();
                     } else {
                         alert("Erro ao ler arquivo " + file.name + ". Verifique se não está corrompido.");
@@ -1667,160 +1812,283 @@ window.toggleGridLevel = function(level) {
             }
         };
 
-        // --- MOTOR EULUMDAT (LDT) - ASSINATURA MATEMÁTICA ---
-window.parseLDT = function(rawData) {
-    try {
-        const lines = rawData.replace(/\r/g, '').split('\n');
-        if (lines.length < 30) return null;
+        // Motor EULUMDAT (LDT)
+        // Motor EULUMDAT (LDT) Blindado
+        // Motor EULUMDAT (LDT) Blindado
+        // Motor EULUMDAT (LDT) Blindado Final
+        // Motor EULUMDAT (LDT) Dinâmico (Imune a Erros de Fabricantes)
+        // Motor EULUMDAT (LDT) Dinâmico Super-Normalizado
+        // Motor EULUMDAT (LDT) Definitivo - Imune a Regionalização e Formatações
+        // Motor EULUMDAT (LDT) Definitivo - Arquitetura Híbrida
+        // Motor EULUMDAT (LDT) Universal de Alta Precisão
+        // Motor EULUMDAT (LDT) de Grau Militar (Norma Estrita)
+        window.parseLDT = function(rawData) {
+            try {
+                // 1. Preservamos as linhas vazias. Elas são vitais para a contagem oficial da norma!
+                const lines = rawData.replace(/\r\n|\r/g, '\n').split('\n').map(l => l.trim());
 
-        const Mc = parseInt(lines[3].trim()); 
-        const Mg = parseInt(lines[5].trim()); 
-        const nLampsRaw = parseInt(lines[25].trim());
-        const nLamps = isNaN(nLampsRaw) ? 1 : Math.abs(nLampsRaw);
-        
-        if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
+                // Removemos apenas quebras de linha acidentais no começo absoluto (antes do nome da empresa)
+                while (lines.length > 0 && lines[0] === '') lines.shift();
 
-        const totalFlux = parseFloat((lines[23] || '1000').replace(',', '.')) || 1000;
-        let watts = 0;
-        if (nLamps > 0 && lines[26 + 5]) watts = parseFloat(lines[26 + 5].replace(',', '.')) || 0;
+                if (lines.length < 40) return null;
 
-        const allNumbers = rawData.replace(/,/g, '.').split(/\s+/).map(Number).filter(n => !isNaN(n));
-        const expectedCount = Mc + Mg + (Mc * Mg);
-        let dataStream = null;
+                // 2. Leitura da Geometria (Índices cravados na norma)
+                const Mc = parseInt(lines[3], 10);
+                const Mg = parseInt(lines[5], 10);
+                if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-        // LUXSINTAX: Busca pela Assinatura da Matriz (Ângulo C=0 seguido de Ângulo G=0)
-        for (let i = allNumbers.length - expectedCount - 10; i <= allNumbers.length - expectedCount + 10; i++) {
-            if (i >= 0 && allNumbers[i] === 0 && allNumbers[i + Mc] === 0) {
-                dataStream = allNumbers.slice(i, i + expectedCount);
-                break;
-            }
-        }
+                const req = Mc + Mg + (Mc * Mg);
 
-        if (!dataStream || dataStream.length !== expectedCount) {
-            const headerEndIndex = 26 + (nLamps * 6) + 10;
-            const fallbackStream = lines.slice(headerEndIndex).join(' ').replace(/,/g, '.').split(/\s+/).map(Number).filter(n => !isNaN(n));
-            if (fallbackStream.length < expectedCount) return null;
-            dataStream = fallbackStream.slice(0, expectedCount);
-        }
+                // 3. Leitura do Fluxo e Fatores
+                const convFactor = parseFloat((lines[23] || '1').replace(/,/g, '.')) || 1.0;
+                const nLampsSets = parseInt(lines[25], 10) || 0; // Pode ser 0 em fotometria absoluta
 
-        let ptr = 0;
-        const hAngles = dataStream.slice(ptr, ptr + Mc); ptr += Mc;
-        const vAngles = dataStream.slice(ptr, ptr + Mg); ptr += Mg;
-        const matrix = [];
-        for (let c = 0; c < Mc; c++) matrix.push(dataStream.slice(ptr + c * Mg, ptr + (c + 1) * Mg));
-
-        return { vAngles, hAngles, candelas: matrix, multiplier: 1.0, totalFlux: totalFlux, wattage: watts };
-    } catch (e) { 
-        console.error("[LuxSintax] Erro Parse LDT:", e); return null; 
-    }
-};
-
-window.PhotometricAnalyzer = {
-    extractZonalMetrics: function(data) {
-        let totalCandelas = 0, upCandelas = 0;
-        if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0 };
-        for (let h = 0; h < data.hAngles.length; h++) {
-            for (let v = 0; v < data.vAngles.length; v++) {
-                const intensity = data.candelas[h][v] * data.multiplier;
-                totalCandelas += intensity;
-                if (data.vAngles[v] > 90) upCandelas += intensity;
-            }
-        }
-        return { uplightRatio: totalCandelas > 0 ? (upCandelas/totalCandelas)*100 : 0 };
-    }
-};
-
-// --- MOTOR IESNA (IES) ---
-window.parseIES = function(content) {
-    try {
-        let wattage = null;
-        const lines = content.replace(/\r\n|\r/g, '\n').split('\n');
-        for (let line of lines) {
-            if (line.toUpperCase().includes('WATTAGE')) {
-                const match = line.match(/[\d.]+/);
-                if (match) wattage = parseFloat(match[0]);
-            }
-        }
-        const tokens = content.replace(/,/g, '.').split(/\s+/);
-        let cursor = 0, tiltFound = false;
-        for(let i=0; i < tokens.length; i++) {
-            if (tokens[i].startsWith("TILT=")) {
-                cursor = i + 1; tiltFound = true;
-                if (tokens[i].includes("INCLUDE")) {
-                    let tempCursor = cursor;
-                    function _n() { while(tempCursor < tokens.length) { const v = parseFloat(tokens[tempCursor++]); if(!isNaN(v)) return v; } }
-                    _n(); const numAngles = _n(); for(let k=0; k < numAngles * 2; k++) _n();
-                    cursor = tempCursor;
+                let totalFlux = 0;
+                let wattage = 0;
+                for (let i = 0; i < nLampsSets; i++) {
+                    const baseIdx = 26 + (i * 6); // Cada lâmpada ocupa 6 linhas exatas na norma EULUMDAT
+                    const qty = parseInt(lines[baseIdx], 10) || 1;
+                    
+                    // Extração de Fluxo (Linha 3 do bloco da lâmpada)
+                    const fluxStr = (lines[baseIdx + 2] || '0').replace(/,/g, '.').replace(/[^\d.-]/g, '');
+                    totalFlux += qty * (parseFloat(fluxStr) || 0);
+                    
+                    // Extração de Potência / Wattage (Linha 6 do bloco da lâmpada)
+                    const wattStr = (lines[baseIdx + 5] || '0').replace(/,/g, '.').replace(/[^\d.-]/g, '');
+                    wattage += qty * (parseFloat(wattStr) || 0);
                 }
-                break;
+
+                let conversionFactor = 1.0;
+                if (totalFlux <= 0 || isNaN(totalFlux)) {
+                    totalFlux = 1000;
+                    conversionFactor = convFactor;
+                } else {
+                    conversionFactor = (totalFlux / 1000) * convFactor; // LDT = cd/klm
+                }
+
+                // 4. Isolamento Cirúrgico da Matriz
+                // Pela norma, a matriz começa exatamente após as lâmpadas e os 10 fatores de reflexão
+                const matrixStartLine = 26 + (nLampsSets * 6) + 10;
+                
+                const matrixText = lines.slice(matrixStartLine).join(' ');
+                const tokens = matrixText.replace(/\s+/g, ' ').trim().split(' ');
+
+                // 5. Conversão Blindada (Transforma tudo em número, substitui lixo por 0 para não quebrar a grelha)
+                const matrixData = [];
+                for (let t of tokens) {
+                    if (t === '') continue;
+                    
+                    if (t.includes('.') && t.includes(',')) {
+                        if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
+                        else t = t.replace(/,/g, '');
+                    } else {
+                        t = t.replace(/,/g, '.');
+                    }
+                    
+                    const val = Number(t);
+                    matrixData.push(isNaN(val) ? 0 : val);
+                }
+
+                // Preenchimento de segurança caso o ficheiro do fabricante esteja cortado no fim
+                while (matrixData.length < req) {
+                    matrixData.push(0);
+                }
+
+                // 6. Desenho Fotométrico
+                let ptr = 0;
+                const hAngles = [];
+                for (let i = 0; i < Mc; i++) hAngles.push(matrixData[ptr++]);
+
+                const vAngles = [];
+                for (let i = 0; i < Mg; i++) vAngles.push(matrixData[ptr++]);
+
+                const candelas = [];
+                for (let c = 0; c < Mc; c++) {
+                    const row = [];
+                    for (let g = 0; g < Mg; g++) {
+                        row.push(matrixData[ptr++] * conversionFactor);
+                    }
+                    candelas.push(row);
+                }
+
+                return { vAngles, hAngles, candelas, multiplier: 1, totalFlux, wattage };
+
+            } catch (err) {
+                console.error("[LuxSintax] Erro crasso no Parse LDT:", err);
+                return null;
+            }
+        };
+
+        // Engine Analítico Fotométrico
+        window.PhotometricAnalyzer = {
+            extractZonalMetrics: function(data) {
+                // Cálculo aproximado de Uplight (Zonal Lumen Summary simplificado)
+                let totalCandelas = 0;
+                let upCandelas = 0;
+                
+                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0 };
+
+                let maxI = 0;
+                for (let h = 0; h < data.hAngles.length; h++) {
+                    for (let v = 0; v < data.vAngles.length; v++) {
+                        const intensity = data.candelas[h][v] * data.multiplier;
+                        if (intensity > maxI) maxI = intensity;
+                        
+                        totalCandelas += intensity;
+                        // Ângulos verticais > 90 graus representam luz emitida para cima (Uplight)
+                        if (data.vAngles[v] > 90) {
+                            upCandelas += intensity;
+                        }
+                    }
+                }
+                
+                const uplightRatio = totalCandelas > 0 ? (upCandelas / totalCandelas) * 100 : 0;
+                return { uplightRatio, maxCandela: maxI };
+            }
+        };
+
+        window.parseIES = function(content) {
+            try {
+                // Extração de Metadados (Wattage) via Regex Padrão IESNA LM-63
+                let wattage = null;
+                const lines = content.replace(/\r\n|\r/g, '\n').split('\n');
+                for (let line of lines) {
+                    if (line.toUpperCase().includes('WATTAGE') || line.toUpperCase().includes('_WATTAGE') || line.toUpperCase().includes('INPUTFREE')) {
+                        const match = line.match(/[\d.]+/);
+                        if (match) wattage = parseFloat(match[0]);
+                    }
+                }
+
+                const tokens = content.replace(/\s+/g, " ").trim().split(" ");
+                let cursor = 0;
+                let tiltFound = false;
+                for(let i=0; i < tokens.length; i++) {
+                    if (tokens[i].startsWith("TILT=")) {
+                        cursor = i + 1; 
+                        tiltFound = true;
+                        break;
+                    }
+                }
+                
+                if (!tiltFound) return null;
+
+                function nextNum() {
+                    while(cursor < tokens.length) {
+                        const val = parseFloat(tokens[cursor]);
+                        cursor++;
+                        if (!isNaN(val)) return val;
+                    }
+                    return null;
+                }
+
+                nextNum(); nextNum(); 
+                const multiplier = nextNum();
+                const vCount = nextNum();
+                const hCount = nextNum();
+                nextNum(); nextNum(); nextNum(); nextNum(); nextNum();
+                nextNum(); nextNum(); nextNum();
+
+                const vAngles = [];
+                for(let i=0; i<vCount; i++) vAngles.push(nextNum());
+
+                const hAngles = [];
+                for(let i=0; i<hCount; i++) hAngles.push(nextNum());
+
+                const candelas = [];
+                for(let h=0; h<hCount; h++) {
+                    const row = [];
+                    for(let v=0; v<vCount; v++) {
+                        row.push(nextNum());
+                    }
+                    candelas.push(row);
+                }
+
+                // Cálculo de Fluxo Total para IES baseado em integrais esféricas simplificadas
+                // Se a matriz é relativa, calculamos o total de lúmens.
+                // Aqui aplicamos uma aproximação rápida para exibir no Dashboard, pois a integração rigorosa exige matrizes de sólidos.
+                let estimatedTotalFlux = 0;
+                if (multiplier > 0) {
+                   const avgCandela = candelas[0].reduce((a, b) => a + b, 0) / vCount;
+                   estimatedTotalFlux = avgCandela * multiplier * 2 * Math.PI; // Aproximação Esférica (Lambertiana Base)
+                }
+
+                return { vAngles, hAngles, candelas, multiplier, wattage, totalFlux: estimatedTotalFlux };
+
+            } catch (e) {
+                console.error("IES Parse Error", e);
+                return null;
             }
         }
-        if (!tiltFound) return null;
-        function nextNum() { while(cursor < tokens.length) { const val = parseFloat(tokens[cursor++]); if (!isNaN(val)) return val; } return null; }
-        
-        nextNum(); nextNum(); 
-        const multiplier = nextNum() || 1.0;
-        const vCount = nextNum();
-        const hCount = nextNum();
-        
-        if (!vCount || !hCount) return null;
-        for(let i=0; i<8; i++) nextNum();
-        
-        const vAngles = []; for(let i=0; i<vCount; i++) vAngles.push(nextNum() || 0);
-        const hAngles = []; for(let i=0; i<hCount; i++) hAngles.push(nextNum() || 0);
-        const candelas = [];
-        
-        for(let h=0; h<hCount; h++) {
-            const row = []; 
-            for(let v=0; v<vCount; v++) row.push(nextNum() || 0);
-            candelas.push(row);
-        }
-        return { vAngles, hAngles, candelas, multiplier, wattage, totalFlux: (candelas[0][0] * multiplier * 12.57) };
-    } catch (e) { 
-        console.error("[LuxSintax] Erro Parse IES:", e); return null; 
-    }
-};
 
-window.getIESIntensity = function(state, angleDeg) {
-    if (!state.iesData || !state.iesData.vAngles || !state.iesData.candelas) return 0;
-    const data = state.iesData; const vAngles = data.vAngles; const candelaRow = data.candelas[0]; const mult = data.multiplier;
-    if (vAngles.length === 0 || !candelaRow) return 0;
-    let idx = 0;
-    if (angleDeg <= vAngles[0]) return candelaRow[0] * mult;
-    if (angleDeg >= vAngles[vAngles.length-1]) return candelaRow[vAngles.length-1] * mult;
-    while(idx < vAngles.length - 1 && angleDeg > vAngles[idx+1]) idx++;
-    const a1 = vAngles[idx], a2 = vAngles[idx+1], c1 = candelaRow[idx] || 0, c2 = candelaRow[idx+1] || 0;
-    if (a2 === a1) return c1 * mult;
-    return (c1 + ((angleDeg - a1) / (a2 - a1)) * (c2 - c1)) * mult;
-}
+        window.getIESIntensity = function(state, angleDeg) {
+            if (!state.iesData) return 0;
+            
+            const data = state.iesData;
+            const vAngles = data.vAngles;
+            const candelaRow = data.candelas[0]; 
+            const mult = data.multiplier;
 
-function getIntensity(s) {
-    if (window.calcMode === 'direct') return s.intensity;
-    if (window.calcMode === 'ies') return window.getIESIntensity(s, (window.currentTool === 'homog') ? 0 : Math.abs(s.tilt)); 
-    return (s.cdklm * s.flux) / 1000;
-}
+            let idx = 0;
+            if (angleDeg <= vAngles[0]) return candelaRow[0] * mult;
+            if (angleDeg >= vAngles[vAngles.length-1]) return candelaRow[vAngles.length-1] * mult;
 
-window.getEffectiveBeam = function(s) {
-    if (window.calcMode === 'ies' && s.iesData && s.iesData.candelas && s.iesData.vAngles) {
-        const row = s.iesData.candelas[0];
-        if (!row || row.length === 0) return s.beam;
-        const maxI = Math.max(...row);
-        if (isNaN(maxI) || maxI <= 0) return s.beam; 
-        const targetI = maxI / 2;
-        let halfAngle = 0;
-        for (let i = 0; i < s.iesData.vAngles.length - 1; i++) {
-            if ((row[i] >= targetI && row[i+1] <= targetI) || (row[i] <= targetI && row[i+1] >= targetI)) {
-                if (row[i+1] === row[i]) halfAngle = s.iesData.vAngles[i];
-                else halfAngle = s.iesData.vAngles[i] + ((targetI - row[i]) / (row[i+1] - row[i])) * (s.iesData.vAngles[i+1] - s.iesData.vAngles[i]);
-                break;
+            while(idx < vAngles.length - 1 && angleDeg > vAngles[idx+1]) {
+                idx++;
             }
+            
+            const a1 = vAngles[idx];
+            const a2 = vAngles[idx+1];
+            const c1 = candelaRow[idx];
+            const c2 = candelaRow[idx+1];
+            
+            if (a2 === a1) return c1 * mult;
+
+            const t = (angleDeg - a1) / (a2 - a1);
+            const rawVal = c1 + t * (c2 - c1);
+            
+            return rawVal * mult;
         }
-        if (halfAngle === 0 && row[row.length-1] > targetI) halfAngle = s.iesData.vAngles[s.iesData.vAngles.length-1];
-        if (isNaN(halfAngle) || halfAngle <= 0) return s.beam;
-        return halfAngle * 2; 
-    }
-    return s.beam;
-}
+
+        function getIntensity(s) {
+            if (window.calcMode === 'direct') return s.intensity;
+            if (window.calcMode === 'ies') {
+                const tiltVal = (window.currentTool === 'homog') ? 0 : Math.abs(s.tilt);
+                return window.getIESIntensity(s, tiltVal); 
+            }
+            return (s.cdklm * s.flux) / 1000;
+        }
+
+        window.getEffectiveBeam = function(s) {
+            if (window.calcMode === 'ies' && s.iesData) {
+                const data = s.iesData;
+                const vAngles = data.vAngles;
+                const row = data.candelas[0];
+                const maxI = Math.max(...row);
+                if (maxI <= 0) return s.beam; 
+                const targetI = maxI / 2;
+                let halfAngle = 0;
+                for (let i = 0; i < vAngles.length - 1; i++) {
+                    if ((row[i] >= targetI && row[i+1] <= targetI) || (row[i] <= targetI && row[i+1] >= targetI)) {
+                        // Trava de segurança contra divisão por zero (Platô Fotométrico)
+                        if (row[i+1] === row[i]) {
+                            halfAngle = vAngles[i];
+                        } else {
+                            const t = (targetI - row[i]) / (row[i+1] - row[i]);
+                            halfAngle = vAngles[i] + t * (vAngles[i+1] - vAngles[i]);
+                        }
+                        break;
+                    }
+                }
+                if (halfAngle === 0 && row[row.length-1] > targetI) {
+                    halfAngle = vAngles[vAngles.length-1];
+                }
+                // Trava de segurança final para garantir que nunca devolvemos NaN para o Canvas
+                if (isNaN(halfAngle) || halfAngle <= 0) return s.beam;
+                
+                return halfAngle * 2; 
+            }
+            return s.beam;
+        }
 
         // --- CANVAS ENGINE ---
         const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
