@@ -1179,249 +1179,122 @@ window.FalseColorEngine = {
 // --- LUXSINTAX WEBGL ENGINE (SÓLIDO FOTOMÉTRICO 3D) ---
 window.Photometric3DEngine = {
     scene: null, camera: null, renderer: null, controls: null, solidGroup: null, isInitialized: false,
-    webGroupTemplate: null, lastIesFileName: null,
+    cache: new Map(),
 
     init: function() {
         if (this.isInitialized) return;
         const container = document.getElementById('webgl-container');
-        if (!container || typeof THREE === 'undefined') return;
-
+        if (!container) return;
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(document.documentElement.classList.contains('dark') ? 0x0f172a : 0x1e293b);
-
-        const rect = container.getBoundingClientRect();
-        this.camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 1000);
-        
+        this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        this.renderer.setSize(rect.width, rect.height);
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(this.renderer.domElement);
-
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
-        this.controls.dampingFactor = 0.05;
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        this.scene.add(ambientLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-        dirLight.position.set(10, 20, 10);
-        this.scene.add(dirLight);
-
+        this.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        const dl = new THREE.DirectionalLight(0xffffff, 0.5); dl.position.set(10, 20, 10); this.scene.add(dl);
         this.isInitialized = true;
         this.animate();
-
-        window.addEventListener('resize', () => {
-            if (!this.renderer || container.clientWidth === 0) return;
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            this.renderer.setSize(width, height);
-            this.camera.aspect = width / height;
-            this.camera.updateProjectionMatrix();
-        });
     },
 
     animate: function() {
         requestAnimationFrame(() => window.Photometric3DEngine.animate());
         if (this.controls) this.controls.update();
-        if (this.renderer && this.scene && this.camera) {
-            this.renderer.render(this.scene, this.camera);
-        }
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
     },
 
-    clearSolid: function() {
-        if (this.solidGroup && this.scene) {
-            this.scene.remove(this.solidGroup);
-            this.solidGroup = null;
-        }
-    },
-
-    renderPhotometricSolid: function(iesData, toolId = 'ponto', state = null) {
+    renderPhotometricSolid: function(iesData, toolId, state) {
         if (!this.isInitialized) this.init();
-        this.clearSolid();
-        if (!iesData || !iesData.hAngles || !iesData.vAngles || !iesData.candelas) return;
+        if (this.solidGroup) this.scene.remove(this.solidGroup);
+        this.solidGroup = new THREE.Group();
 
-        // 1. ENGINE DE ALTA PERFORMANCE (1 Draw Call por Luminária) e RECONSTRUÇÃO BLINDADA
-        if (!this.webGroupTemplate || this.lastIesFileName !== (state ? state.iesFileName : null)) {
-            this.lastIesFileName = state ? state.iesFileName : null;
-            
-            if (this.webGroupTemplate) {
-                if (this.webGroupTemplate.geometry) this.webGroupTemplate.geometry.dispose();
-                if (this.webGroupTemplate.material) this.webGroupTemplate.material.dispose();
-                this.webGroupTemplate = null;
+        // 1. Reconstrução de Simetria 360° Ultra-Rápida
+        const hA = iesData.hAngles, vA = iesData.vAngles, mat = iesData.candelas;
+        let hFull = [...hA], mFull = mat.map(r => [...r]);
+        const lastH = Math.round(hA[hA.length - 1]);
+
+        if (lastH === 90) { // Simetria Quadrilateral
+            for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
+            for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
+        } else if (lastH === 180) { // Simetria Bilateral
+            for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
+        }
+        if (hFull[hFull.length - 1] !== 360) { hFull.push(360); mFull.push(mFull[0]); }
+
+        // 2. Criação da Geometria Normalizada
+        let maxI = 0; mFull.forEach(r => r.forEach(v => { if (v > maxI) maxI = v; }));
+        const pts = [];
+        const matWire = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.4 });
+
+        for (let h = 0; h < hFull.length; h++) {
+            for (let v = 0; v < vA.length - 1; v++) {
+                const p1 = this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]);
+                const p2 = this.sphToCar(mFull[h][v+1]/maxI, hFull[h], vA[v+1]);
+                pts.push(p1, p2);
             }
-
-            const hAngles = iesData.hAngles;
-            const vAngles = iesData.vAngles;
-            const matrix = iesData.candelas;
-            const mult = iesData.multiplier;
-
-            // Filtro de sujeira do arquivo (elimina ângulos que param no meio do caminho)
-            let cleanH = []; let cleanM = [];
-            for (let i = 0; i < hAngles.length; i++) {
-                if (i > 0 && hAngles[i] <= hAngles[i-1]) break; 
-                cleanH.push(hAngles[i]); cleanM.push(matrix[i]);
+        }
+        for (let v = 0; v < vA.length; v++) {
+            for (let h = 0; h < hFull.length - 1; h++) {
+                const p1 = this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]);
+                const p2 = this.sphToCar(mFull[h+1][v]/maxI, hFull[h+1], vA[v]);
+                pts.push(p1, p2);
             }
-
-            let hFull = [...cleanH];
-            let mFull = cleanM.map(row => [...row]);
-            let lastH = Math.round(hFull[hFull.length - 1]);
-
-            // Algoritmo Robusto de Fechamento de Simetria (360 graus)
-            if (hFull.length === 1 || lastH === 0) {
-                hFull = []; mFull = [];
-                for (let a = 0; a < 360; a += 15) { hFull.push(a); mFull.push(matrix[0]); }
-            } else {
-                if (lastH === 90) {
-                    const len = hFull.length;
-                    for (let i = len - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
-                    lastH = 180;
-                }
-                if (lastH === 180) {
-                    const len = hFull.length;
-                    for (let i = len - 2; i >= 0; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
-                    lastH = 360;
-                }
-                if (lastH === 270) {
-                    hFull.push(360); mFull.push(mFull[0]);
-                    lastH = 360;
-                }
-            }
-            
-            if (Math.round(hFull[hFull.length - 1]) !== 360) {
-                hFull.push(360); mFull.push(mFull[0]);
-            }
-
-            let maxI = 0;
-            for (let h = 0; h < hFull.length; h++) {
-                for (let v = 0; v < vAngles.length; v++) {
-                    if (mFull[h][v] > maxI) maxI = mFull[h][v];
-                }
-            }
-            if (maxI === 0) return;
-            
-            const pts = [];
-
-            // Geração em "LineSegments" contínuo - Normalização Segura (maxRadius cravado em 1.0)
-            for (let h = 0; h < hFull.length; h++) {
-                for (let v = 0; v < vAngles.length - 1; v++) {
-                    const phi1 = (hFull[h] * Math.PI) / 180; const theta1 = (vAngles[v] * Math.PI) / 180; 
-                    const r1 = mFull[h][v] / maxI;
-                    pts.push(new THREE.Vector3(r1 * Math.sin(theta1) * Math.cos(phi1), -r1 * Math.cos(theta1), r1 * Math.sin(theta1) * Math.sin(phi1)));
-                    
-                    const phi2 = (hFull[h] * Math.PI) / 180; const theta2 = (vAngles[v+1] * Math.PI) / 180; 
-                    const r2 = mFull[h][v+1] / maxI;
-                    pts.push(new THREE.Vector3(r2 * Math.sin(theta2) * Math.cos(phi2), -r2 * Math.cos(theta2), r2 * Math.sin(theta2) * Math.sin(phi2)));
-                }
-            }
-            
-            for (let v = 0; v < vAngles.length; v++) {
-                for (let h = 0; h < hFull.length - 1; h++) {
-                    const phi1 = (hFull[h] * Math.PI) / 180; const theta1 = (vAngles[v] * Math.PI) / 180; 
-                    const r1 = mFull[h][v] / maxI;
-                    pts.push(new THREE.Vector3(r1 * Math.sin(theta1) * Math.cos(phi1), -r1 * Math.cos(theta1), r1 * Math.sin(theta1) * Math.sin(phi1)));
-                    
-                    const phi2 = (hFull[h+1] * Math.PI) / 180; const theta2 = (vAngles[v] * Math.PI) / 180; 
-                    const r2 = mFull[h+1][v] / maxI;
-                    pts.push(new THREE.Vector3(r2 * Math.sin(theta2) * Math.cos(phi2), -r2 * Math.cos(theta2), r2 * Math.sin(theta2) * Math.sin(phi2)));
-                }
-            }
-
-            const geometry = new THREE.BufferGeometry().setFromPoints(pts);
-            const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
-            this.webGroupTemplate = new THREE.LineSegments(geometry, material);
+            // LUXSINTAX: Fecha o anel horizontal conectando o último ponto ao primeiro
+            const pLast = this.sphToCar(mFull[hFull.length-1][v]/maxI, hFull[hFull.length-1], vA[v]);
+            const pFirst = this.sphToCar(mFull[0][v]/maxI, hFull[0], vA[v]);
+            pts.push(pLast, pFirst);
         }
 
-        // 2. MONTAGEM DA CENA (Clonagem Rápida)
-        this.solidGroup = new THREE.Group();
-        const S = (state && state.height) ? (state.height * 0.8) : 5; 
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const wireframe = new THREE.LineSegments(geo, matWire);
+        const scale = state.height * 0.8;
 
-        if (toolId === 'grid' && state) {
-            const spacingX = state.roomW / state.cols;
-            const spacingZ = state.roomL / state.rows; 
-
-            const roomGeo = new THREE.BoxGeometry(state.roomW, state.height, state.roomL);
-            const roomEdges = new THREE.EdgesGeometry(roomGeo);
-            const roomMat = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.3 });
-            const roomMesh = new THREE.LineSegments(roomEdges, roomMat);
-            roomMesh.position.set(0, state.height / 2, 0);
-            this.solidGroup.add(roomMesh);
-
-            const gridHelper = new THREE.GridHelper(Math.max(state.roomW, state.roomL) * 1.5, 20, 0x334155, 0x1e293b);
-            this.solidGroup.add(gridHelper);
-
-            const startX = -state.roomW / 2 + spacingX / 2;
-            const startZ = -state.roomL / 2 + spacingZ / 2;
-
+        // 3. Distribuição na Cena
+        if (toolId === 'grid') {
+            const sx = state.roomW / state.cols, sz = state.roomL / state.rows;
             for (let i = 0; i < state.cols; i++) {
                 for (let j = 0; j < state.rows; j++) {
-                    const mesh = this.webGroupTemplate.clone();
-                    mesh.scale.set(S, S, S);
-                    mesh.position.set(startX + i * spacingX, state.height, startZ + j * spacingZ);
-                    this.solidGroup.add(mesh);
+                    const inst = wireframe.clone();
+                    inst.scale.set(scale, scale, scale);
+                    inst.position.set(-state.roomW/2 + (i+0.5)*sx, state.height, -state.roomL/2 + (j+0.5)*sz);
+                    this.solidGroup.add(inst);
                 }
             }
-
-            this.camera.position.set(state.roomW * 1.2, state.height * 2.5, state.roomL * 1.2);
-            this.controls.target.set(0, state.height / 2, 0);
-
+            this.camera.position.set(state.roomW, state.height * 2, state.roomL);
+            this.controls.target.set(0, state.height/2, 0);
         } else {
-            const mesh = this.webGroupTemplate.clone();
-            mesh.scale.set(S, S, S);
-            const h = state ? state.height : 3;
-            
-            if (toolId === 'ponto' && state && state.viewMode === 'array') {
-                const hS = state.spacing / 2;
-                mesh.position.set(-hS, h, 0);
-                const mesh2 = this.webGroupTemplate.clone();
-                mesh2.scale.set(S, S, S);
-                mesh2.position.set(hS, h, 0);
-                this.solidGroup.add(mesh);
-                this.solidGroup.add(mesh2);
-            } else {
-                mesh.position.set(0, h, 0);
-                this.solidGroup.add(mesh);
-                const axesHelper = new THREE.AxesHelper(2);
-                axesHelper.position.set(0, h, 0);
-                this.solidGroup.add(axesHelper);
-            }
-
-            const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x1e293b);
-            this.solidGroup.add(gridHelper);
-
-            this.camera.position.set(5, h + 2, 5);
-            this.controls.target.set(0, h / 2, 0);
+            wireframe.scale.set(scale, scale, scale);
+            wireframe.position.set(0, state.height, 0);
+            this.solidGroup.add(wireframe);
+            this.camera.position.set(scale*2, state.height, scale*2);
+            this.controls.target.set(0, state.height/2, 0);
         }
 
         this.scene.add(this.solidGroup);
-        this.controls.update();
+    },
+
+    sphToCar: function(r, h, v) {
+        const phi = h * Math.PI / 180, theta = v * Math.PI / 180;
+        return new THREE.Vector3(r * Math.sin(theta) * Math.cos(phi), -r * Math.cos(theta), r * Math.sin(theta) * Math.sin(phi));
     }
 };
 
 window.toggleRenderMode = function(mode) {
-    const stage2D = document.getElementById('stage-2d');
-    const stage3D = document.getElementById('stage-3d');
-    
-    const activeToolKey = window.currentTool || 'ponto';
-    const btn2D = document.getElementById(`btn-render-2d-${activeToolKey}`) || document.getElementById('btn-render-2d');
-    const btn3D = document.getElementById(`btn-render-3d-${activeToolKey}`) || document.getElementById('btn-render-3d');
-    
-    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
-    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+    const s2d = document.getElementById('stage-2d'), s3d = document.getElementById('stage-3d');
+    const b2d = document.getElementById('btn-render-2d'), b3d = document.getElementById('btn-render-3d');
+    const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+    const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
 
     if (mode === '3D') {
-        stage2D.classList.add('hidden');
-        stage3D.classList.remove('hidden');
-        if (btn3D) btn3D.className = activeClass;
-        if (btn2D) btn2D.className = inactiveClass;
-        
-        window.Photometric3DEngine.init();
-        window.updateCalculations(); 
-    } else {
-        stage3D.classList.add('hidden');
-        stage2D.classList.remove('hidden');
-        if (btn2D) btn2D.className = activeClass;
-        if (btn3D) btn3D.className = inactiveClass;
+        s2d.classList.add('hidden'); s3d.classList.remove('hidden');
+        b3d.className = act; b2d.className = inact;
         window.updateCalculations();
+    } else {
+        s3d.classList.add('hidden'); s2d.classList.remove('hidden');
+        b2d.className = act; b3d.className = inact;
     }
 };
 
@@ -1817,103 +1690,49 @@ window.toggleGridLevel = function(level) {
         // Motor EULUMDAT (LDT) de Grau Militar (Norma Estrita)
         window.parseLDT = function(rawData) {
             try {
-                // 1. Preservamos as linhas vazias. Elas são vitais para a contagem oficial da norma!
-                const lines = rawData.replace(/\r\n|\r/g, '\n').split('\n').map(l => l.trim());
+                const lines = rawData.split(/\r?\n/).map(l => l.trim());
+                if (lines.length < 30) return null;
 
-                // Removemos apenas quebras de linha acidentais no começo absoluto (antes do nome da empresa)
-                while (lines.length > 0 && lines[0] === '') lines.shift();
+                // 1. Metadados Geométricos (Mc e Mg são as chaves da gaiola 3D)
+                const Mc = parseInt(lines[3]);
+                const Mg = parseInt(lines[5]);
+                const nLamps = parseInt(lines[25]) || 0;
+                if (isNaN(Mc) || isNaN(Mg)) return null;
 
-                if (lines.length < 40) return null;
-
-                // 2. Leitura da Geometria (Índices cravados na norma)
-                const Mc = parseInt(lines[3], 10);
-                const Mg = parseInt(lines[5], 10);
-                if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
-
-                const req = Mc + Mg + (Mc * Mg);
-
-                // 3. Leitura do Fluxo e Fatores
-                const convFactor = parseFloat((lines[23] || '1').replace(/,/g, '.')) || 1.0;
-                const nLampsSets = parseInt(lines[25], 10) || 0; 
-                
-                // LUXSINTAX BUGFIX: Na norma EULUMDAT, mesmo em fotometria absoluta (n=0), o bloco de 6 linhas DEVE existir!
-                const effectiveLampSets = nLampsSets === 0 ? 1 : nLampsSets; 
-
-                let totalFlux = 0;
-                let wattage = 0;
-                for (let i = 0; i < effectiveLampSets; i++) {
-                    const baseIdx = 26 + (i * 6); 
-                    const qty = parseInt(lines[baseIdx], 10) || 1;
-                    
-                    const fluxStr = (lines[baseIdx + 2] || '0').replace(/,/g, '.').replace(/[^\d.-]/g, '');
-                    totalFlux += qty * (parseFloat(fluxStr) || 0);
-                    
-                    const wattStr = (lines[baseIdx + 5] || '0').replace(/,/g, '.').replace(/[^\d.-]/g, '');
-                    wattage += qty * (parseFloat(wattStr) || 0);
-                }
-
-                let conversionFactor = 1.0;
-                if (totalFlux <= 0 || isNaN(totalFlux)) {
-                    totalFlux = 1000;
-                    conversionFactor = convFactor;
-                } else {
-                    conversionFactor = (totalFlux / 1000) * convFactor; // LDT = cd/klm
-                }
-
-                // 4. Isolamento Blindado da Matriz (Lei de Postel / Leitura Traseira)
-                // Ignoramos a contagem de linhas frágil. Transformamos o arquivo todo num array numérico
-                // e capturamos os exatos últimos valores exigidos pela geometria (req = Mc + Mg + Mc*Mg).
-                const allText = lines.join(' ');
-                const rawTokens = allText.replace(/\s+/g, ' ').trim().split(' ');
-                
-                const validNumbers = [];
+                // 2. Extração de Números Puros (Filtragem de GIGO)
+                const allNumbers = [];
+                const rawTokens = rawData.replace(/,/g, '.').split(/\s+/);
                 for (let t of rawTokens) {
-                    if (t === '') continue;
-                    
-                    // Normalização de Decimais (Europa vs EUA)
-                    if (t.includes('.') && t.includes(',')) {
-                        if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
-                        else t = t.replace(/,/g, '');
-                    } else {
-                        t = t.replace(/,/g, '.');
-                    }
-                    
-                    const val = Number(t);
-                    if (!isNaN(val)) validNumbers.push(val);
+                    const n = parseFloat(t);
+                    if (!isNaN(n)) allNumbers.push(n);
                 }
 
-                // Proteção contra arquivos severamente corrompidos (Faltando dados)
-                if (validNumbers.length < req) {
-                    console.warn("[LuxSintax] Ficheiro LDT corrompido: faltam dados na matriz.");
-                    while (validNumbers.length < req) validNumbers.push(0);
-                }
+                // 3. Localização Blindada da Matriz (Indexação Direta)
+                // Encontramos o início real dos dados fotométricos pulando o cabeçalho fixo da norma
+                // Mc e Mg nos dizem exatamente quantos números pular para chegar nas intensidades.
+                const headerCount = allNumbers.length - (Mc + Mg + (Mc * Mg));
+                const data = allNumbers.slice(headerCount > 0 ? headerCount : 0);
+                
+                if (data.length < (Mc + Mg + (Mc * Mg))) return null;
+                
+                if (data.length < totalExpected) return null;
 
-                // O "Golpe de Mestre": Cortamos a matriz exata lendo o array numérico do fim para o começo
-                const matrixData = validNumbers.slice(-req);
-
-                // 6. Desenho Fotométrico
                 let ptr = 0;
-                const hAngles = [];
-                for (let i = 0; i < Mc; i++) hAngles.push(matrixData[ptr++]);
+                const hAngles = data.slice(0, Mc); ptr += Mc;
+                const vAngles = data.slice(ptr, ptr + Mg); ptr += Mg;
+                const intensities = data.slice(ptr);
 
-                const vAngles = [];
-                for (let i = 0; i < Mg; i++) vAngles.push(matrixData[ptr++]);
-
-                const candelas = [];
+                const matrix = [];
                 for (let c = 0; c < Mc; c++) {
-                    const row = [];
-                    for (let g = 0; g < Mg; g++) {
-                        row.push(matrixData[ptr++] * conversionFactor);
-                    }
-                    candelas.push(row);
+                    matrix.push(intensities.slice(c * Mg, (c + 1) * Mg));
                 }
 
-                return { vAngles, hAngles, candelas, multiplier: 1, totalFlux, wattage };
+                // 4. Metadados de Fluxo e Potência
+                const flux = parseFloat(lines[26 + (nLamps > 0 ? 2 : 2)]) || 1000;
+                const watts = parseFloat(lines[26 + (nLamps > 0 ? 5 : 5)]) || 0;
 
-            } catch (err) {
-                console.error("[LuxSintax] Erro crasso no Parse LDT:", err);
-                return null;
-            }
+                return { vAngles, hAngles, candelas: matrix, multiplier: 1, totalFlux: flux, wattage: watts };
+            } catch (e) { return null; }
         };
 
         // Engine Analítico Fotométrico
