@@ -1269,22 +1269,43 @@ window.Photometric3DEngine = {
         // Normaliza o sólido para ser fisicamente proporcional ao pé-direito
         const scaleFactor = (state && state.height) ? (state.height * 0.8) / maxI : 5 / maxI; 
 
+        // LUXSINTAX: Construção do Sólido Fotométrico Contínuo (Wireframe 3D)
+        const webGroup = new THREE.Group();
+        const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
+
+        // 1. Desenha as Curvas Verticais (Planos C / Meridianos)
         for (let h = 0; h < hAngles.length; h++) {
+            const pts = [];
             for (let v = 0; v < vAngles.length; v++) {
                 const intensity = matrix[h][v] * mult * scaleFactor;
                 const phi = (hAngles[h] * Math.PI) / 180; 
                 const theta = (vAngles[v] * Math.PI) / 180; 
-
                 const x = intensity * Math.sin(theta) * Math.cos(phi);
                 const y = -intensity * Math.cos(theta); 
                 const z = intensity * Math.sin(theta) * Math.sin(phi);
-
                 pts.push(new THREE.Vector3(x, y, z));
             }
+            webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
         }
 
-        const geometry = new THREE.BufferGeometry().setFromPoints(pts);
-        const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.6 });
+        // 2. Desenha os Anéis Horizontais (Cones Gamma / Paralelos)
+        for (let v = 0; v < vAngles.length; v++) {
+            const pts = [];
+            for (let h = 0; h < hAngles.length; h++) {
+                const intensity = matrix[h][v] * mult * scaleFactor;
+                const phi = (hAngles[h] * Math.PI) / 180; 
+                const theta = (vAngles[v] * Math.PI) / 180; 
+                const x = intensity * Math.sin(theta) * Math.cos(phi);
+                const y = -intensity * Math.cos(theta); 
+                const z = intensity * Math.sin(theta) * Math.sin(phi);
+                pts.push(new THREE.Vector3(x, y, z));
+            }
+            // Conecta o fim ao início para formar um anel contínuo (se os dados abrangerem 360°)
+            if (hAngles.length > 1 && Math.abs(hAngles[hAngles.length - 1] - hAngles[0]) >= 359) {
+                pts.push(pts[0]);
+            }
+            webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+        }
 
         this.solidGroup = new THREE.Group();
 
@@ -1304,13 +1325,13 @@ window.Photometric3DEngine = {
             const gridHelper = new THREE.GridHelper(Math.max(state.roomW, state.roomL) * 1.5, 20, 0x334155, 0x1e293b);
             this.solidGroup.add(gridHelper);
 
-            // Distribuição das Luminárias
+            // Distribuição das Luminárias (Malha)
             const startX = -state.roomW / 2 + spacingX / 2;
             const startZ = -state.roomL / 2 + spacingZ / 2;
 
             for (let i = 0; i < state.cols; i++) {
                 for (let j = 0; j < state.rows; j++) {
-                    const mesh = new THREE.LineSegments(geometry, material);
+                    const mesh = webGroup.clone();
                     mesh.position.set(startX + i * spacingX, state.height, startZ + j * spacingZ);
                     this.solidGroup.add(mesh);
                 }
@@ -1321,15 +1342,17 @@ window.Photometric3DEngine = {
             this.controls.target.set(0, state.height / 2, 0);
 
         } else {
-            const mesh = new THREE.LineSegments(geometry, material);
+            const mesh = webGroup.clone();
             const h = state ? state.height : 3;
             
             // Tratamento de Array para o Ponto a Ponto Horizontal
             if (toolId === 'ponto' && state && state.viewMode === 'array') {
                 const hS = state.spacing / 2;
                 mesh.position.set(-hS, h, 0);
-                const mesh2 = new THREE.LineSegments(geometry, material);
+                
+                const mesh2 = webGroup.clone();
                 mesh2.position.set(hS, h, 0);
+                
                 this.solidGroup.add(mesh);
                 this.solidGroup.add(mesh2);
             } else {
