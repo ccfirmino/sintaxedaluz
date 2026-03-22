@@ -1425,35 +1425,6 @@ window.toggleRenderMode = function(mode) {
     }
 };
 
-window.toggleRenderMode = function(mode) {
-    const stage2D = document.getElementById('stage-2d');
-    const stage3D = document.getElementById('stage-3d');
-    const btn2D = document.getElementById('btn-render-2d');
-    const btn3D = document.getElementById('btn-render-3d');
-    
-    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
-    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
-
-    if (mode === '3D') {
-        stage2D.classList.add('hidden');
-        stage3D.classList.remove('hidden');
-        btn3D.className = activeClass;
-        btn2D.className = inactiveClass;
-        
-        window.Photometric3DEngine.init();
-        const currentData = window.state[window.currentTool].iesData;
-        if (currentData) {
-            window.Photometric3DEngine.renderPhotometricSolid(currentData);
-        }
-    } else {
-        stage3D.classList.add('hidden');
-        stage2D.classList.remove('hidden');
-        btn2D.className = activeClass;
-        btn3D.className = inactiveClass;
-        window.updateCalculations();
-    }
-};
-
 window.BimIfcAdapter = {
     mapGridToBim: (gridState) => {
         const fixtures = [];
