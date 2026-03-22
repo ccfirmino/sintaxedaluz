@@ -1179,6 +1179,7 @@ window.FalseColorEngine = {
 // --- LUXSINTAX WEBGL ENGINE (SÓLIDO FOTOMÉTRICO 3D) ---
 window.Photometric3DEngine = {
     scene: null, camera: null, renderer: null, controls: null, solidGroup: null, isInitialized: false,
+    webGroupTemplate: null, lastIesData: null,
 
     init: function() {
         if (this.isInitialized) return;
@@ -1230,13 +1231,7 @@ window.Photometric3DEngine = {
     clearSolid: function() {
         if (this.solidGroup && this.scene) {
             this.scene.remove(this.solidGroup);
-            this.solidGroup.children.forEach(child => {
-                if (child.geometry) child.geometry.dispose();
-                if (child.material) {
-                    if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
-                    else child.material.dispose();
-                }
-            });
+            // LUXSINTAX: Geometrias agora são cacheadas no Template. Não destruí-las para evitar repetição de cálculo!
             this.solidGroup = null;
         }
     },
@@ -1246,97 +1241,110 @@ window.Photometric3DEngine = {
         this.clearSolid();
         if (!iesData || !iesData.hAngles || !iesData.vAngles || !iesData.candelas) return;
 
-        const pts = [];
-        const hAngles = iesData.hAngles;
-        const vAngles = iesData.vAngles;
-        const matrix = iesData.candelas;
-        const mult = iesData.multiplier;
-
-        // LUXSINTAX: Motor de Reconstrução de Simetria (0 a 360 graus)
-        let hFull = [...hAngles];
-        let mFull = matrix.map(row => [...row]);
-        const lastH = hAngles[hAngles.length - 1];
-
-        if (hAngles.length === 1 || (hAngles.length === 2 && lastH === 0)) {
-            // Simetria Rotacional Absoluta
-            hFull = []; mFull = [];
-            for (let a = 0; a <= 360; a += 15) {
-                hFull.push(a); mFull.push(matrix[0]);
+        // 1. ENGINE DE ALTA PERFORMANCE: Construção de Molde Base (Template com Interpolação)
+        if (!this.webGroupTemplate || this.lastIesData !== iesData) {
+            this.lastIesData = iesData;
+            
+            if (this.webGroupTemplate) {
+                this.webGroupTemplate.children.forEach(child => {
+                    if (child.geometry) child.geometry.dispose();
+                });
             }
-        } else if (lastH === 90) {
-            // Simetria Quadrilateral (0-90 -> espelha para 0-360)
-            for (let i = hAngles.length - 2; i >= 0; i--) {
-                hFull.push(180 - hAngles[i]);
-                mFull.push(matrix[i]);
-            }
-            const len180 = hFull.length;
-            for (let i = len180 - 2; i >= 0; i--) {
-                hFull.push(360 - hFull[i]);
-                mFull.push(mFull[i]);
-            }
-        } else if (lastH === 180) {
-            // Simetria Bilateral (0-180 -> espelha para 0-360)
-            for (let i = hAngles.length - 2; i >= 0; i--) {
-                hFull.push(360 - hAngles[i]);
-                mFull.push(matrix[i]);
-            }
-        }
 
-        let maxI = 0;
-        for (let h = 0; h < hFull.length; h++) {
-            for (let v = 0; v < vAngles.length; v++) {
-                if (mFull[h][v] > maxI) maxI = mFull[h][v];
+            const hAngles = iesData.hAngles;
+            const vAngles = iesData.vAngles;
+            const matrix = iesData.candelas;
+            const mult = iesData.multiplier;
+
+            // Reconstrução de Simetria (0 a 360 graus)
+            let hFull = [...hAngles];
+            let mFull = matrix.map(row => [...row]);
+            const lastH = hAngles[hAngles.length - 1];
+
+            if (hAngles.length === 1 || (hAngles.length === 2 && lastH === 0)) {
+                hFull = []; mFull = [];
+                for (let a = 0; a <= 360; a += 15) { hFull.push(a); mFull.push(matrix[0]); }
+            } else if (lastH === 90) {
+                for (let i = hAngles.length - 2; i >= 0; i--) { hFull.push(180 - hAngles[i]); mFull.push(matrix[i]); }
+                const len180 = hFull.length;
+                for (let i = len180 - 2; i >= 0; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
+            } else if (lastH === 180) {
+                for (let i = hAngles.length - 2; i >= 0; i--) { hFull.push(360 - hAngles[i]); mFull.push(matrix[i]); }
             }
-        }
-        if (maxI === 0) return;
-        
-        // Normaliza o sólido para ser fisicamente proporcional ao pé-direito
-        const scaleFactor = (state && state.height) ? (state.height * 0.8) / maxI : 5 / maxI; 
 
-        // LUXSINTAX: Construção do Sólido Fotométrico Contínuo (Wireframe 3D)
-        const webGroup = new THREE.Group();
-        const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
-
-        // 1. Desenha as Curvas Verticais (Planos C / Meridianos)
-        for (let h = 0; h < hFull.length; h++) {
-            const pts = [];
-            for (let v = 0; v < vAngles.length; v++) {
-                const intensity = mFull[h][v] * mult * scaleFactor;
-                const phi = (hFull[h] * Math.PI) / 180; 
-                const theta = (vAngles[v] * Math.PI) / 180; 
-                const x = intensity * Math.sin(theta) * Math.cos(phi);
-                const y = -intensity * Math.cos(theta); 
-                const z = intensity * Math.sin(theta) * Math.sin(phi);
-                pts.push(new THREE.Vector3(x, y, z));
+            // Interpolação Linear para Facho Suave (Preenche buracos de C-planes distantes)
+            const newH = []; const newM = [];
+            for(let i=0; i<hFull.length - 1; i++) {
+                let a1 = hFull[i]; let a2 = hFull[i+1];
+                let r1 = mFull[i]; let r2 = mFull[i+1];
+                newH.push(a1); newM.push(r1);
+                let diff = a2 - a1;
+                if (diff > 15) {
+                    let steps = Math.ceil(diff / 15);
+                    let stepSize = diff / steps;
+                    for(let s=1; s<steps; s++) {
+                        let currA = a1 + s * stepSize;
+                        let t = (currA - a1) / diff;
+                        let currR = r1.map((val, idx) => val + t * (r2[idx] - val));
+                        newH.push(currA); newM.push(currR);
+                    }
+                }
             }
-            webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
-        }
+            newH.push(hFull[hFull.length-1]); newM.push(mFull[mFull.length-1]);
+            hFull = newH; mFull = newM;
 
-        // 2. Desenha os Anéis Horizontais (Cones Gamma / Paralelos)
-        for (let v = 0; v < vAngles.length; v++) {
-            const pts = [];
+            let maxI = 0;
             for (let h = 0; h < hFull.length; h++) {
-                const intensity = mFull[h][v] * mult * scaleFactor;
-                const phi = (hFull[h] * Math.PI) / 180; 
-                const theta = (vAngles[v] * Math.PI) / 180; 
-                const x = intensity * Math.sin(theta) * Math.cos(phi);
-                const y = -intensity * Math.cos(theta); 
-                const z = intensity * Math.sin(theta) * Math.sin(phi);
-                pts.push(new THREE.Vector3(x, y, z));
+                for (let v = 0; v < vAngles.length; v++) {
+                    if (mFull[h][v] > maxI) maxI = mFull[h][v];
+                }
             }
-            if (hFull.length > 1 && Math.abs(hFull[hFull.length - 1] - hFull[0]) >= 359) {
-                pts.push(pts[0]);
+            if (maxI === 0) return;
+            
+            // Criação do Modelo Base Escalonado para 1.0 (Isto poupa CPU na renderização da grelha inteira)
+            const baseScale = 1 / maxI; 
+            const webGroup = new THREE.Group();
+            const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
+
+            for (let h = 0; h < hFull.length; h++) {
+                const pts = [];
+                for (let v = 0; v < vAngles.length; v++) {
+                    const intensity = mFull[h][v] * mult * baseScale;
+                    const phi = (hFull[h] * Math.PI) / 180; 
+                    const theta = (vAngles[v] * Math.PI) / 180; 
+                    const x = intensity * Math.sin(theta) * Math.cos(phi);
+                    const y = -intensity * Math.cos(theta); 
+                    const z = intensity * Math.sin(theta) * Math.sin(phi);
+                    pts.push(new THREE.Vector3(x, y, z));
+                }
+                webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
             }
-            webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+            for (let v = 0; v < vAngles.length; v++) {
+                const pts = [];
+                for (let h = 0; h < hFull.length; h++) {
+                    const intensity = mFull[h][v] * mult * baseScale;
+                    const phi = (hFull[h] * Math.PI) / 180; 
+                    const theta = (vAngles[v] * Math.PI) / 180; 
+                    const x = intensity * Math.sin(theta) * Math.cos(phi);
+                    const y = -intensity * Math.cos(theta); 
+                    const z = intensity * Math.sin(theta) * Math.sin(phi);
+                    pts.push(new THREE.Vector3(x, y, z));
+                }
+                if (hFull.length > 1 && Math.abs(hFull[hFull.length - 1] - hFull[0]) >= 359) pts.push(pts[0]);
+                webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+            }
+            
+            this.webGroupTemplate = webGroup;
         }
 
+        // 2. MONTAGEM DA CENA 3D NA INTERFACE (Renderização por Clone)
         this.solidGroup = new THREE.Group();
+        const S = (state && state.height) ? (state.height * 0.8) : 5; // Escalador Dinâmico
 
         if (toolId === 'grid' && state) {
             const spacingX = state.roomW / state.cols;
             const spacingZ = state.roomL / state.rows; 
 
-            // Contorno do Ambiente (Room Box)
             const roomGeo = new THREE.BoxGeometry(state.roomW, state.height, state.roomL);
             const roomEdges = new THREE.EdgesGeometry(roomGeo);
             const roomMat = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.3 });
@@ -1344,38 +1352,35 @@ window.Photometric3DEngine = {
             roomMesh.position.set(0, state.height / 2, 0);
             this.solidGroup.add(roomMesh);
 
-            // Grid de Piso
             const gridHelper = new THREE.GridHelper(Math.max(state.roomW, state.roomL) * 1.5, 20, 0x334155, 0x1e293b);
             this.solidGroup.add(gridHelper);
 
-            // Distribuição das Luminárias (Malha)
             const startX = -state.roomW / 2 + spacingX / 2;
             const startZ = -state.roomL / 2 + spacingZ / 2;
 
             for (let i = 0; i < state.cols; i++) {
                 for (let j = 0; j < state.rows; j++) {
-                    const mesh = webGroup.clone();
+                    const mesh = this.webGroupTemplate.clone();
+                    mesh.scale.set(S, S, S);
                     mesh.position.set(startX + i * spacingX, state.height, startZ + j * spacingZ);
                     this.solidGroup.add(mesh);
                 }
             }
 
-            // Câmera panorâmica para Método Lúmens
             this.camera.position.set(state.roomW * 1.2, state.height * 2.5, state.roomL * 1.2);
             this.controls.target.set(0, state.height / 2, 0);
 
         } else {
-            const mesh = webGroup.clone();
+            const mesh = this.webGroupTemplate.clone();
+            mesh.scale.set(S, S, S);
             const h = state ? state.height : 3;
             
-            // Tratamento de Array para o Ponto a Ponto Horizontal
             if (toolId === 'ponto' && state && state.viewMode === 'array') {
                 const hS = state.spacing / 2;
                 mesh.position.set(-hS, h, 0);
-                
-                const mesh2 = webGroup.clone();
+                const mesh2 = this.webGroupTemplate.clone();
+                mesh2.scale.set(S, S, S);
                 mesh2.position.set(hS, h, 0);
-                
                 this.solidGroup.add(mesh);
                 this.solidGroup.add(mesh2);
             } else {
