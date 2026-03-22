@@ -1215,6 +1215,7 @@ window.Photometric3DEngine = {
         let hFull = [...hA], mFull = mat.map(r => [...r]);
         let lastH = Math.round(hA[hA.length - 1]);
 
+        // Simetria 360 e Fechamento de Malha
         if (lastH === 90) {
             for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
