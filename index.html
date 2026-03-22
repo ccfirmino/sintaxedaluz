@@ -112,7 +112,7 @@
         html.dark .tab-active { background-color: rgba(217, 119, 6, 0.1); border-color: #d97706 !important; }
         html.dark .tab-inactive { color: #94a3b8 !important; }
         html.dark .canvas-container { background: #0f172a; border-color: #334155; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
-        html.dark .canvas-container > div.pointer-events-none { background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px) !important; opacity: 0.7 !important; }
+        html.dark .canvas-container > div.pointer-events-none { background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px) !important; opacity: 0.15 !important; }
         html.dark .query-tab-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
         html.dark .query-tab-active { background-color: rgba(217, 119, 6, 0.1); color: #d97706; border-color: #d97706; }
         html.dark .leed-level-box { background: #1e293b; border-color: #334155; }
@@ -1556,11 +1556,18 @@ window.toggleGridLevel = function(level) {
                 const nLampsSets = parseInt(lines[25], 10) || 0; // Pode ser 0 em fotometria absoluta
 
                 let totalFlux = 0;
+                let wattage = 0;
                 for (let i = 0; i < nLampsSets; i++) {
-                    const baseIdx = 26 + (i * 6); // Cada lâmpada ocupa 6 linhas exatas
+                    const baseIdx = 26 + (i * 6); // Cada lâmpada ocupa 6 linhas exatas na norma EULUMDAT
                     const qty = parseInt(lines[baseIdx], 10) || 1;
+                    
+                    // Extração de Fluxo (Linha 3 do bloco da lâmpada)
                     const fluxStr = (lines[baseIdx + 2] || '0').replace(/,/g, '.').replace(/[^\d.-]/g, '');
                     totalFlux += qty * (parseFloat(fluxStr) || 0);
+                    
+                    // Extração de Potência / Wattage (Linha 6 do bloco da lâmpada)
+                    const wattStr = (lines[baseIdx + 5] || '0').replace(/,/g, '.').replace(/[^\d.-]/g, '');
+                    wattage += qty * (parseFloat(wattStr) || 0);
                 }
 
                 let conversionFactor = 1.0;
@@ -1616,7 +1623,7 @@ window.toggleGridLevel = function(level) {
                     candelas.push(row);
                 }
 
-                return { vAngles, hAngles, candelas, multiplier: 1, totalFlux };
+                return { vAngles, hAngles, candelas, multiplier: 1, totalFlux, wattage };
 
             } catch (err) {
                 console.error("[LuxSintax] Erro crasso no Parse LDT:", err);
