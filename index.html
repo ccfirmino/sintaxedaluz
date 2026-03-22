@@ -1179,7 +1179,6 @@ window.FalseColorEngine = {
 // --- LUXSINTAX WEBGL ENGINE (SÓLIDO FOTOMÉTRICO 3D) ---
 window.Photometric3DEngine = {
     scene: null, camera: null, renderer: null, controls: null, solidGroup: null, isInitialized: false,
-    cache: new Map(),
 
     init: function() {
         if (this.isInitialized) return;
@@ -1216,14 +1215,13 @@ window.Photometric3DEngine = {
         let hFull = [...hA], mFull = mat.map(r => [...r]);
         let lastH = Math.round(hA[hA.length - 1]);
 
-        // LUXSINTAX: Motor de Reconstrução de Simetria 360 Graus
         if (lastH === 90) {
             for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
         } else if (lastH === 180) {
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
         }
-        if (hFull[hFull.length - 1] !== 360) { hFull.push(360); mFull.push(mFull[0]); }
+        if (Math.round(hFull[hFull.length - 1]) !== 360) { hFull.push(360); mFull.push(mFull[0]); }
 
         let maxI = 0; mFull.forEach(r => r.forEach(v => { if (v > maxI) maxI = v; }));
         if (maxI <= 0) return;
@@ -1231,13 +1229,11 @@ window.Photometric3DEngine = {
         const pts = [];
         const matWire = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.4 });
 
-        // Desenha Meridianos
         for (let h = 0; h < hFull.length; h++) {
             for (let v = 0; v < vA.length - 1; v++) {
                 pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h][v+1]/maxI, hFull[h], vA[v+1]));
             }
         }
-        // Desenha Paralelos (Anéis) com Fechamento
         for (let v = 0; v < vA.length; v++) {
             for (let h = 0; h < hFull.length - 1; h++) {
                 pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h+1][v]/maxI, hFull[h+1], vA[v]));
@@ -1671,61 +1667,62 @@ window.toggleGridLevel = function(level) {
         };
 
         // Motor EULUMDAT (LDT)
-        // Motor EULUMDAT (LDT) Blindado
-        // Motor EULUMDAT (LDT) Blindado
-        // Motor EULUMDAT (LDT) Blindado Final
-        // Motor EULUMDAT (LDT) Dinâmico (Imune a Erros de Fabricantes)
-        // Motor EULUMDAT (LDT) Dinâmico Super-Normalizado
-        // Motor EULUMDAT (LDT) Definitivo - Imune a Regionalização e Formatações
-        // Motor EULUMDAT (LDT) Definitivo - Arquitetura Híbrida
-        // Motor EULUMDAT (LDT) Universal de Alta Precisão
-        // Motor EULUMDAT (LDT) de Grau Militar (Norma Estrita)
-        window.parseLDT = function(rawData) {
-            try {
-                const lines = rawData.split(/\r?\n/).map(l => l.trim());
-                if (lines.length < 30) return null;
+        // --- MOTOR EULUMDAT (LDT) - ARQUITETURA DE PRECISÃO LUXSINTAX ---
+window.parseLDT = function(rawData) {
+    try {
+        const lines = rawData.replace(/\r/g, '').split('\n').map(l => l.trim());
+        if (lines.length < 30) return null;
 
-                // 1. Metadados de Geometria e Lâmpadas
-                const Mc = parseInt(lines[3]);
-                const Mg = parseInt(lines[5]);
-                const nLamps = parseInt(lines[25]) || 0;
-                if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
+        // 1. Metadados Fundamentais
+        const Mc = parseInt(lines[3]); // Eixos C
+        const Mg = parseInt(lines[5]); // Ângulos Gamma
+        const nLampsRaw = parseInt(lines[25]) || 0;
+        const nLamps = Math.abs(nLampsRaw);
+        
+        if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-                // 2. Extração Sequencial de Números (Ignora textos do cabeçalho)
-                const allNumbers = [];
-                const rawTokens = rawData.replace(/,/g, '.').split(/\s+/);
-                for (let t of rawTokens) {
-                    const n = parseFloat(t);
-                    if (!isNaN(n)) allNumbers.push(n);
-                }
+        // 2. Extração de Fluxo e Potência (Norma: Linha 24 ou Bloco de Lâmpadas)
+        let totalFlux = parseFloat(lines[23].replace(',', '.')) || 0;
+        let totalWatts = 0;
+        if (nLamps > 0) {
+            for (let i = 0; i < nLamps; i++) {
+                const base = 26 + (i * 6);
+                totalWatts += parseFloat(lines[base + 5]?.replace(',', '.')) || 0;
+                if (totalFlux <= 0) totalFlux += parseFloat(lines[base + 2]?.replace(',', '.')) || 0;
+            }
+        }
 
-                // 3. Localização da Matriz por "Pulo de Cabeçalho" (Standard Eulumdat)
-                // Pulamos os primeiros metadados (aprox 30-40 números) para encontrar os ângulos.
-                // O critério de segurança é buscar o bloco final de tamanho Mc + Mg + (Mc * Mg).
-                const expectedTotal = Mc + Mg + (Mc * Mg);
-                const startIndex = allNumbers.length - expectedTotal;
-                
-                if (startIndex < 0) return null; // Arquivo incompleto ou corrompido
+        // 3. Consumo Sequencial dos Números (Matriz)
+        // Pulamos o cabeçalho estrito: 26 (fixo) + (Lâmpadas * 6) + 10 (fatores de reflexão)
+        const headerOffset = 26 + (nLamps > 0 ? nLamps * 6 : 0) + 10;
+        const dataBody = lines.slice(headerOffset).join(' ');
+        const rawTokens = dataBody.replace(/,/g, '.').split(/\s+/);
+        
+        const stream = [];
+        for (let t of rawTokens) {
+            const n = parseFloat(t);
+            if (!isNaN(n)) stream.push(n);
+        }
 
-                const data = allNumbers.slice(startIndex);
-                let ptr = 0;
-                const hAngles = data.slice(0, Mc); ptr += Mc;
-                const vAngles = data.slice(ptr, ptr + Mg); ptr += Mg;
-                const intensities = data.slice(ptr);
+        const expectedSize = Mc + Mg + (Mc * Mg);
+        if (stream.length < expectedSize) return null; // Ficheiro incompleto
 
-                const matrix = [];
-                for (let c = 0; c < Mc; c++) {
-                    matrix.push(intensities.slice(c * Mg, (c + 1) * Mg));
-                }
+        // 4. Mapeamento dos Ângulos e Matriz
+        let ptr = 0;
+        const hAngles = stream.slice(0, Mc); ptr = Mc;
+        const vAngles = stream.slice(ptr, ptr + Mg); ptr += Mg;
+        
+        const matrix = [];
+        for (let c = 0; c < Mc; c++) {
+            matrix.push(stream.slice(ptr + c * Mg, ptr + (c + 1) * Mg));
+        }
 
-                // 4. Extração de Fluxo e Potência (Posição fixa na Norma)
-                const fluxLine = 26 + (nLamps === 0 ? 0 : 0); // Ajuste fino de offset
-                const flux = parseFloat(lines[26 + 2]) || 1000;
-                const watts = parseFloat(lines[26 + 5]) || 0;
-
-                return { vAngles, hAngles, candelas: matrix, multiplier: 1, totalFlux: flux, wattage: watts };
-            } catch (e) { return null; }
-        };
+        return { vAngles, hAngles, candelas: matrix, multiplier: 1.0, totalFlux: totalFlux || 1000, wattage: totalWatts };
+    } catch (e) { 
+        console.error("[LuxSintax] Erro de Parser:", e);
+        return null; 
+    }
+};
 
         // Engine Analítico Fotométrico
         window.PhotometricAnalyzer = {
