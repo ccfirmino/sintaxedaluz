@@ -2774,7 +2774,18 @@ window.removeLeedRoom = function(roomId) {
 window.updateLeedRoomData = function(roomId, field, value) {
     const room = window.state.leedProject.rooms.find(r => r.id === roomId);
     if (room) {
-        room[field] = field === 'name' ? value : parseFloat(value) || 0;
+        if (field === 'name' || field === 'typology') {
+            room[field] = value;
+        } else {
+            room[field] = parseFloat(value) || 0;
+        }
+        
+        // Se atualizou a tipologia, buscamos automaticamente o LPD correto na norma
+        if (field === 'typology') {
+            const baseline = window.lpdBaselines.find(b => b.type === value);
+            if (baseline) room.baseLpd = baseline.base;
+        }
+        
         window.renderLeedProject();
     }
 };
@@ -2849,17 +2860,16 @@ window.renderLeedProject = function() {
 
     html += s.rooms.map(room => `
         <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 animate-fade-in-up mb-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
                 <div class="flex-grow w-full md:w-1/3">
                     <input type="text" value="${room.name}" onchange="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-sm font-black text-starlight dark:text-white bg-transparent border-b border-slate-300 dark:border-slate-600 focus:border-luminous-gold transition-colors w-full pb-1 uppercase">
                 </div>
                 <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
                     <div class="flex items-center gap-2">
-                        <<div class="flex items-center gap-2">
                         <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tipologia:</label>
-                        <select onchange="window.updateLeedRoomData(${room.id}, 'baseLpd', this.value)" class="custom-select text-xs bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600 outline-none cursor-pointer">
-                            <option value="0" disabled ${!room.baseLpd ? 'selected' : ''}>Selecione...</option>
-                            ${window.lpdBaselines.map(b => `<option value="${b.base}" ${room.baseLpd == b.base ? 'selected' : ''}>${b.type}</option>`).join('')}
+                        <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select max-w-[200px] truncate text-xs bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600 outline-none cursor-pointer">
+                            <option value="" disabled ${!room.typology ? 'selected' : ''}>Selecione...</option>
+                            ${window.lpdBaselines.map(b => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type}</option>`).join('')}
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
