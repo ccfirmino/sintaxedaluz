@@ -1208,52 +1208,47 @@ window.Photometric3DEngine = {
 
     renderPhotometricSolid: function(iesData, toolId, state) {
         if (!this.isInitialized) this.init();
-        if (!state) return; // Trava de segurança (Data Integrity)
+        if (!state || !iesData) return;
         if (this.solidGroup) this.scene.remove(this.solidGroup);
         this.solidGroup = new THREE.Group();
 
-        // 1. Reconstrução de Simetria 360° Ultra-Rápida
         const hA = iesData.hAngles, vA = iesData.vAngles, mat = iesData.candelas;
         let hFull = [...hA], mFull = mat.map(r => [...r]);
-        const lastH = Math.round(hA[hA.length - 1]);
+        let lastH = Math.round(hA[hA.length - 1]);
 
-        if (lastH === 90) { // Simetria Quadrilateral
+        // LUXSINTAX: Motor de Reconstrução de Simetria 360 Graus
+        if (lastH === 90) {
             for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
-        } else if (lastH === 180) { // Simetria Bilateral
+        } else if (lastH === 180) {
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
         }
         if (hFull[hFull.length - 1] !== 360) { hFull.push(360); mFull.push(mFull[0]); }
 
-        // 2. Criação da Geometria Normalizada
         let maxI = 0; mFull.forEach(r => r.forEach(v => { if (v > maxI) maxI = v; }));
+        if (maxI <= 0) return;
+
         const pts = [];
         const matWire = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.4 });
 
+        // Desenha Meridianos
         for (let h = 0; h < hFull.length; h++) {
             for (let v = 0; v < vA.length - 1; v++) {
-                const p1 = this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]);
-                const p2 = this.sphToCar(mFull[h][v+1]/maxI, hFull[h], vA[v+1]);
-                pts.push(p1, p2);
+                pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h][v+1]/maxI, hFull[h], vA[v+1]));
             }
         }
+        // Desenha Paralelos (Anéis) com Fechamento
         for (let v = 0; v < vA.length; v++) {
             for (let h = 0; h < hFull.length - 1; h++) {
-                const p1 = this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]);
-                const p2 = this.sphToCar(mFull[h+1][v]/maxI, hFull[h+1], vA[v]);
-                pts.push(p1, p2);
+                pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h+1][v]/maxI, hFull[h+1], vA[v]));
             }
-            // LUXSINTAX: Fecha o anel horizontal conectando o último ponto ao primeiro
-            const pLast = this.sphToCar(mFull[hFull.length-1][v]/maxI, hFull[hFull.length-1], vA[v]);
-            const pFirst = this.sphToCar(mFull[0][v]/maxI, hFull[0], vA[v]);
-            pts.push(pLast, pFirst);
+            pts.push(this.sphToCar(mFull[hFull.length-1][v]/maxI, hFull[hFull.length-1], vA[v]), this.sphToCar(mFull[0][v]/maxI, hFull[0], vA[v]));
         }
 
         const geo = new THREE.BufferGeometry().setFromPoints(pts);
         const wireframe = new THREE.LineSegments(geo, matWire);
         const scale = state.height * 0.8;
 
-        // 3. Distribuição na Cena
         if (toolId === 'grid') {
             const sx = state.roomW / state.cols, sz = state.roomL / state.rows;
             for (let i = 0; i < state.cols; i++) {
@@ -1264,7 +1259,7 @@ window.Photometric3DEngine = {
                     this.solidGroup.add(inst);
                 }
             }
-            this.camera.position.set(state.roomW, state.height * 2, state.roomL);
+            this.camera.position.set(state.roomW, state.height * 1.5, state.roomL);
             this.controls.target.set(0, state.height/2, 0);
         } else {
             wireframe.scale.set(scale, scale, scale);
@@ -1273,7 +1268,6 @@ window.Photometric3DEngine = {
             this.camera.position.set(scale*2, state.height, scale*2);
             this.controls.target.set(0, state.height/2, 0);
         }
-
         this.scene.add(this.solidGroup);
     },
 
@@ -1691,13 +1685,13 @@ window.toggleGridLevel = function(level) {
                 const lines = rawData.split(/\r?\n/).map(l => l.trim());
                 if (lines.length < 30) return null;
 
-                // 1. Metadados Geométricos (Mc e Mg são as chaves da gaiola 3D)
+                // 1. Metadados de Geometria e Lâmpadas
                 const Mc = parseInt(lines[3]);
                 const Mg = parseInt(lines[5]);
                 const nLamps = parseInt(lines[25]) || 0;
-                if (isNaN(Mc) || isNaN(Mg)) return null;
+                if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-                // 2. Extração de Números Puros (Filtragem de GIGO)
+                // 2. Extração Sequencial de Números (Ignora textos do cabeçalho)
                 const allNumbers = [];
                 const rawTokens = rawData.replace(/,/g, '.').split(/\s+/);
                 for (let t of rawTokens) {
@@ -1705,16 +1699,15 @@ window.toggleGridLevel = function(level) {
                     if (!isNaN(n)) allNumbers.push(n);
                 }
 
-                // 3. Localização Blindada da Matriz (Indexação Direta)
-                // Encontramos o início real dos dados fotométricos pulando o cabeçalho fixo da norma
-                // Mc e Mg nos dizem exatamente quantos números pular para chegar nas intensidades.
-                const headerCount = allNumbers.length - (Mc + Mg + (Mc * Mg));
-                const data = allNumbers.slice(headerCount > 0 ? headerCount : 0);
+                // 3. Localização da Matriz por "Pulo de Cabeçalho" (Standard Eulumdat)
+                // Pulamos os primeiros metadados (aprox 30-40 números) para encontrar os ângulos.
+                // O critério de segurança é buscar o bloco final de tamanho Mc + Mg + (Mc * Mg).
+                const expectedTotal = Mc + Mg + (Mc * Mg);
+                const startIndex = allNumbers.length - expectedTotal;
                 
-                // LUXSINTAX: Validação definitiva do tamanho da matriz
-                const expectedCount = Mc + Mg + (Mc * Mg);
-                if (data.length < expectedCount) return null;
+                if (startIndex < 0) return null; // Arquivo incompleto ou corrompido
 
+                const data = allNumbers.slice(startIndex);
                 let ptr = 0;
                 const hAngles = data.slice(0, Mc); ptr += Mc;
                 const vAngles = data.slice(ptr, ptr + Mg); ptr += Mg;
@@ -1725,9 +1718,10 @@ window.toggleGridLevel = function(level) {
                     matrix.push(intensities.slice(c * Mg, (c + 1) * Mg));
                 }
 
-                // 4. Metadados de Fluxo e Potência
-                const flux = parseFloat(lines[26 + (nLamps > 0 ? 2 : 2)]) || 1000;
-                const watts = parseFloat(lines[26 + (nLamps > 0 ? 5 : 5)]) || 0;
+                // 4. Extração de Fluxo e Potência (Posição fixa na Norma)
+                const fluxLine = 26 + (nLamps === 0 ? 0 : 0); // Ajuste fino de offset
+                const flux = parseFloat(lines[26 + 2]) || 1000;
+                const watts = parseFloat(lines[26 + 5]) || 0;
 
                 return { vAngles, hAngles, candelas: matrix, multiplier: 1, totalFlux: flux, wattage: watts };
             } catch (e) { return null; }
