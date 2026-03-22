@@ -1212,25 +1212,20 @@ window.Photometric3DEngine = {
         this.solidGroup = new THREE.Group();
 
         const hA = iesData.hAngles, vA = iesData.vAngles, mat = iesData.candelas;
+        if (!hA || !vA || !mat || hA.length === 0 || vA.length === 0) return; // Trava contra arquivo corrompido
+
         let hFull = [...hA], mFull = mat.map(r => [...r]);
         let lastH = Math.round(hA[hA.length - 1]);
 
-        // LUXSINTAX: Algoritmo de Fechamento de Simetria Universal
         if (hA.length === 1 || lastH === 0) {
-            // Simetria Rotacional (Cria o cilindro em 360 graus)
             hFull = []; mFull = [];
-            for (let a = 0; a <= 360; a += 15) {
-                hFull.push(a); mFull.push(mat[0]); 
-            }
+            for (let a = 0; a <= 360; a += 15) { hFull.push(a); mFull.push(mat[0]); }
         } else if (lastH === 90) {
-            // Simetria Quadrilateral
             for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
         } else if (lastH === 180) {
-            // Simetria Bilateral
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
         }
-        // Garante a conexão final da malha
         if (Math.round(hFull[hFull.length - 1]) !== 360) { hFull.push(360); mFull.push(mFull[0]); }
 
         let maxI = 0; mFull.forEach(r => r.forEach(v => { if (v > maxI) maxI = v; }));
@@ -1672,10 +1667,9 @@ window.toggleGridLevel = function(level) {
             }
         };
 
-        // --- MOTOR EULUMDAT (LDT) - HÍBRIDO (LINHAS + TOKENS) ---
+        // --- MOTOR EULUMDAT (LDT) - ASSINATURA MATEMÁTICA ---
 window.parseLDT = function(rawData) {
     try {
-        // 1. Cabeçalho: Leitura estrita por linhas (preserva linhas vazias e espaços em nomes)
         const lines = rawData.replace(/\r/g, '').split('\n');
         if (lines.length < 30) return null;
 
@@ -1688,36 +1682,36 @@ window.parseLDT = function(rawData) {
 
         const totalFlux = parseFloat((lines[23] || '1000').replace(',', '.')) || 1000;
         let watts = 0;
-        if (nLamps > 0 && lines[26 + 5]) {
-            watts = parseFloat(lines[26 + 5].replace(',', '.')) || 0;
-        }
+        if (nLamps > 0 && lines[26 + 5]) watts = parseFloat(lines[26 + 5].replace(',', '.')) || 0;
 
-        // 2. Matriz: Isolamento a partir do final do cabeçalho
-        const headerEndIndex = 26 + (nLamps * 6) + 10;
-        
-        // Une o restante do arquivo e extrai apenas os números puros
-        const dataText = lines.slice(headerEndIndex).join(' ');
-        const dataStream = dataText.replace(/,/g, '.').split(/\s+/).filter(t => t.trim().length > 0).map(Number);
-
+        const allNumbers = rawData.replace(/,/g, '.').split(/\s+/).map(Number).filter(n => !isNaN(n));
         const expectedCount = Mc + Mg + (Mc * Mg);
-        if (dataStream.length < expectedCount) {
-            console.error("[LuxSintax] LDT incompleto. Faltam dados na matriz.");
-            return null;
+        let dataStream = null;
+
+        // LUXSINTAX: Busca pela Assinatura da Matriz (Ângulo C=0 seguido de Ângulo G=0)
+        for (let i = allNumbers.length - expectedCount - 10; i <= allNumbers.length - expectedCount + 10; i++) {
+            if (i >= 0 && allNumbers[i] === 0 && allNumbers[i + Mc] === 0) {
+                dataStream = allNumbers.slice(i, i + expectedCount);
+                break;
+            }
         }
 
-        // 3. Mapeamento Geométrico
+        if (!dataStream || dataStream.length !== expectedCount) {
+            const headerEndIndex = 26 + (nLamps * 6) + 10;
+            const fallbackStream = lines.slice(headerEndIndex).join(' ').replace(/,/g, '.').split(/\s+/).map(Number).filter(n => !isNaN(n));
+            if (fallbackStream.length < expectedCount) return null;
+            dataStream = fallbackStream.slice(0, expectedCount);
+        }
+
         let ptr = 0;
         const hAngles = dataStream.slice(ptr, ptr + Mc); ptr += Mc;
         const vAngles = dataStream.slice(ptr, ptr + Mg); ptr += Mg;
         const matrix = [];
-        for (let c = 0; c < Mc; c++) {
-            matrix.push(dataStream.slice(ptr + c * Mg, ptr + (c + 1) * Mg));
-        }
+        for (let c = 0; c < Mc; c++) matrix.push(dataStream.slice(ptr + c * Mg, ptr + (c + 1) * Mg));
 
         return { vAngles, hAngles, candelas: matrix, multiplier: 1.0, totalFlux: totalFlux, wattage: watts };
     } catch (e) { 
-        console.error("[LuxSintax] Erro Parse LDT:", e);
-        return null; 
+        console.error("[LuxSintax] Erro Parse LDT:", e); return null; 
     }
 };
 
@@ -1747,7 +1741,7 @@ window.parseIES = function(content) {
                 if (match) wattage = parseFloat(match[0]);
             }
         }
-        const tokens = content.replace(/\s+/g, " ").trim().split(" ");
+        const tokens = content.replace(/,/g, '.').split(/\s+/);
         let cursor = 0, tiltFound = false;
         for(let i=0; i < tokens.length; i++) {
             if (tokens[i].startsWith("TILT=")) {
@@ -1764,101 +1758,69 @@ window.parseIES = function(content) {
         if (!tiltFound) return null;
         function nextNum() { while(cursor < tokens.length) { const val = parseFloat(tokens[cursor++]); if (!isNaN(val)) return val; } return null; }
         
-        nextNum(); // Pula Num Lamps
-        nextNum(); // Pula Lumens/Lamp
-        
-        const multiplier = nextNum();
+        nextNum(); nextNum(); 
+        const multiplier = nextNum() || 1.0;
         const vCount = nextNum();
         const hCount = nextNum();
         
-        // LUXSINTAX BUGFIX: A norma dita exatamente 8 variáveis restantes antes da matriz, e não 11!
+        if (!vCount || !hCount) return null;
         for(let i=0; i<8; i++) nextNum();
         
-        const vAngles = []; for(let i=0; i<vCount; i++) vAngles.push(nextNum());
-        const hAngles = []; for(let i=0; i<hCount; i++) hAngles.push(nextNum());
+        const vAngles = []; for(let i=0; i<vCount; i++) vAngles.push(nextNum() || 0);
+        const hAngles = []; for(let i=0; i<hCount; i++) hAngles.push(nextNum() || 0);
         const candelas = [];
         
         for(let h=0; h<hCount; h++) {
             const row = []; 
-            for(let v=0; v<vCount; v++) row.push(nextNum());
+            for(let v=0; v<vCount; v++) row.push(nextNum() || 0);
             candelas.push(row);
         }
         return { vAngles, hAngles, candelas, multiplier, wattage, totalFlux: (candelas[0][0] * multiplier * 12.57) };
     } catch (e) { 
-        console.error("Erro Parse IES:", e);
-        return null; 
+        console.error("[LuxSintax] Erro Parse IES:", e); return null; 
     }
 };
 
-        window.getIESIntensity = function(state, angleDeg) {
-            if (!state.iesData) return 0;
-            
-            const data = state.iesData;
-            const vAngles = data.vAngles;
-            const candelaRow = data.candelas[0]; 
-            const mult = data.multiplier;
+window.getIESIntensity = function(state, angleDeg) {
+    if (!state.iesData || !state.iesData.vAngles || !state.iesData.candelas) return 0;
+    const data = state.iesData; const vAngles = data.vAngles; const candelaRow = data.candelas[0]; const mult = data.multiplier;
+    if (vAngles.length === 0 || !candelaRow) return 0;
+    let idx = 0;
+    if (angleDeg <= vAngles[0]) return candelaRow[0] * mult;
+    if (angleDeg >= vAngles[vAngles.length-1]) return candelaRow[vAngles.length-1] * mult;
+    while(idx < vAngles.length - 1 && angleDeg > vAngles[idx+1]) idx++;
+    const a1 = vAngles[idx], a2 = vAngles[idx+1], c1 = candelaRow[idx] || 0, c2 = candelaRow[idx+1] || 0;
+    if (a2 === a1) return c1 * mult;
+    return (c1 + ((angleDeg - a1) / (a2 - a1)) * (c2 - c1)) * mult;
+}
 
-            let idx = 0;
-            if (angleDeg <= vAngles[0]) return candelaRow[0] * mult;
-            if (angleDeg >= vAngles[vAngles.length-1]) return candelaRow[vAngles.length-1] * mult;
+function getIntensity(s) {
+    if (window.calcMode === 'direct') return s.intensity;
+    if (window.calcMode === 'ies') return window.getIESIntensity(s, (window.currentTool === 'homog') ? 0 : Math.abs(s.tilt)); 
+    return (s.cdklm * s.flux) / 1000;
+}
 
-            while(idx < vAngles.length - 1 && angleDeg > vAngles[idx+1]) {
-                idx++;
+window.getEffectiveBeam = function(s) {
+    if (window.calcMode === 'ies' && s.iesData && s.iesData.candelas && s.iesData.vAngles) {
+        const row = s.iesData.candelas[0];
+        if (!row || row.length === 0) return s.beam;
+        const maxI = Math.max(...row);
+        if (isNaN(maxI) || maxI <= 0) return s.beam; 
+        const targetI = maxI / 2;
+        let halfAngle = 0;
+        for (let i = 0; i < s.iesData.vAngles.length - 1; i++) {
+            if ((row[i] >= targetI && row[i+1] <= targetI) || (row[i] <= targetI && row[i+1] >= targetI)) {
+                if (row[i+1] === row[i]) halfAngle = s.iesData.vAngles[i];
+                else halfAngle = s.iesData.vAngles[i] + ((targetI - row[i]) / (row[i+1] - row[i])) * (s.iesData.vAngles[i+1] - s.iesData.vAngles[i]);
+                break;
             }
-            
-            const a1 = vAngles[idx];
-            const a2 = vAngles[idx+1];
-            const c1 = candelaRow[idx];
-            const c2 = candelaRow[idx+1];
-            
-            if (a2 === a1) return c1 * mult;
-
-            const t = (angleDeg - a1) / (a2 - a1);
-            const rawVal = c1 + t * (c2 - c1);
-            
-            return rawVal * mult;
         }
-
-        function getIntensity(s) {
-            if (window.calcMode === 'direct') return s.intensity;
-            if (window.calcMode === 'ies') {
-                const tiltVal = (window.currentTool === 'homog') ? 0 : Math.abs(s.tilt);
-                return window.getIESIntensity(s, tiltVal); 
-            }
-            return (s.cdklm * s.flux) / 1000;
-        }
-
-        window.getEffectiveBeam = function(s) {
-            if (window.calcMode === 'ies' && s.iesData) {
-                const data = s.iesData;
-                const vAngles = data.vAngles;
-                const row = data.candelas[0];
-                const maxI = Math.max(...row);
-                if (maxI <= 0) return s.beam; 
-                const targetI = maxI / 2;
-                let halfAngle = 0;
-                for (let i = 0; i < vAngles.length - 1; i++) {
-                    if ((row[i] >= targetI && row[i+1] <= targetI) || (row[i] <= targetI && row[i+1] >= targetI)) {
-                        // Trava de segurança contra divisão por zero (Platô Fotométrico)
-                        if (row[i+1] === row[i]) {
-                            halfAngle = vAngles[i];
-                        } else {
-                            const t = (targetI - row[i]) / (row[i+1] - row[i]);
-                            halfAngle = vAngles[i] + t * (vAngles[i+1] - vAngles[i]);
-                        }
-                        break;
-                    }
-                }
-                if (halfAngle === 0 && row[row.length-1] > targetI) {
-                    halfAngle = vAngles[vAngles.length-1];
-                }
-                // Trava de segurança final para garantir que nunca devolvemos NaN para o Canvas
-                if (isNaN(halfAngle) || halfAngle <= 0) return s.beam;
-                
-                return halfAngle * 2; 
-            }
-            return s.beam;
-        }
+        if (halfAngle === 0 && row[row.length-1] > targetI) halfAngle = s.iesData.vAngles[s.iesData.vAngles.length-1];
+        if (isNaN(halfAngle) || halfAngle <= 0) return s.beam;
+        return halfAngle * 2; 
+    }
+    return s.beam;
+}
 
         // --- CANVAS ENGINE ---
         const drawDimLine = (ctx, x1, y1, x2, y2, text) => { 
