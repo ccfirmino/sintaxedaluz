@@ -1672,39 +1672,40 @@ window.toggleGridLevel = function(level) {
             }
         };
 
-        // --- MOTOR EULUMDAT (LDT) ---
+        // --- MOTOR EULUMDAT (LDT) - HÍBRIDO (LINHAS + TOKENS) ---
 window.parseLDT = function(rawData) {
     try {
-        // A norma EULUMDAT obriga que o cabeçalho seja lido linha a linha
-        const lines = rawData.replace(/\r/g, '').split('\n').map(l => l.trim());
+        // 1. Cabeçalho: Leitura estrita por linhas (preserva linhas vazias e espaços em nomes)
+        const lines = rawData.replace(/\r/g, '').split('\n');
         if (lines.length < 30) return null;
 
-        const Mc = parseInt(lines[3]); // Eixos C
-        const Mg = parseInt(lines[5]); // Ângulos Gamma
-        const nLampsRaw = parseInt(lines[25]);
+        const Mc = parseInt(lines[3].trim()); 
+        const Mg = parseInt(lines[5].trim()); 
+        const nLampsRaw = parseInt(lines[25].trim());
         const nLamps = isNaN(nLampsRaw) ? 1 : Math.abs(nLampsRaw);
         
         if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
 
-        const totalFlux = parseFloat(lines[23]?.replace(',', '.')) || 1000;
+        const totalFlux = parseFloat((lines[23] || '1000').replace(',', '.')) || 1000;
         let watts = 0;
-        if (nLamps > 0) {
-            watts = parseFloat(lines[26 + 5]?.replace(',', '.')) || 0;
+        if (nLamps > 0 && lines[26 + 5]) {
+            watts = parseFloat(lines[26 + 5].replace(',', '.')) || 0;
         }
 
-        // Pula as linhas do cabeçalho oficial para isolar os dados fotométricos
-        const headerLineCount = 26 + (nLamps * 6) + 10;
-        const dataLines = lines.slice(headerLineCount);
+        // 2. Matriz: Isolamento a partir do final do cabeçalho
+        const headerEndIndex = 26 + (nLamps * 6) + 10;
         
-        // Agora sim, transformamos o corpo de dados numa matriz contínua
-        const dataStream = dataLines.join(' ').replace(/,/g, '.').split(/\s+/).filter(t => t.length > 0).map(Number);
+        // Une o restante do arquivo e extrai apenas os números puros
+        const dataText = lines.slice(headerEndIndex).join(' ');
+        const dataStream = dataText.replace(/,/g, '.').split(/\s+/).filter(t => t.trim().length > 0).map(Number);
 
         const expectedCount = Mc + Mg + (Mc * Mg);
         if (dataStream.length < expectedCount) {
-            console.error("LDT Incompleto");
+            console.error("[LuxSintax] LDT incompleto. Faltam dados na matriz.");
             return null;
         }
 
+        // 3. Mapeamento Geométrico
         let ptr = 0;
         const hAngles = dataStream.slice(ptr, ptr + Mc); ptr += Mc;
         const vAngles = dataStream.slice(ptr, ptr + Mg); ptr += Mg;
@@ -1715,7 +1716,7 @@ window.parseLDT = function(rawData) {
 
         return { vAngles, hAngles, candelas: matrix, multiplier: 1.0, totalFlux: totalFlux, wattage: watts };
     } catch (e) { 
-        console.error("Erro Parse LDT:", e);
+        console.error("[LuxSintax] Erro Parse LDT:", e);
         return null; 
     }
 };
