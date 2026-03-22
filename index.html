@@ -1184,53 +1184,37 @@ window.FalseColorEngine = {
 
 // --- LUXSINTAX WEBGL ENGINE (SÓLIDO FOTOMÉTRICO 3D) ---
 window.Photometric3DEngine = {
-    scene: null, camera: null, renderer: null, controls: null, solidMesh: null, isInitialized: false,
-    
+    scene: null, camera: null, renderer: null, controls: null, solidGroup: null, isInitialized: false,
+
     init: function() {
         if (this.isInitialized) return;
         const container = document.getElementById('webgl-container');
         if (!container || typeof THREE === 'undefined') return;
 
-        // Cena e Fundo
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(document.documentElement.classList.contains('dark') ? 0x0f172a : 0x1e293b);
 
-        // Câmara
         const rect = container.getBoundingClientRect();
         this.camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 1000);
-        this.camera.position.set(15, 10, 15);
-        this.camera.lookAt(0, 0, 0);
-
-        // Renderizador
+        
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setSize(rect.width, rect.height);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(this.renderer.domElement);
 
-        // Controlos de Rotação (OrbitControls)
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
 
-        // Grelhas e Eixos de Referência
-        const gridHelper = new THREE.GridHelper(20, 20, 0x475569, 0x334155);
-        gridHelper.position.y = -5; // Linha de piso virtual
-        this.scene.add(gridHelper);
-        
-        const axesHelper = new THREE.AxesHelper(2);
-        this.scene.add(axesHelper);
-
-        // Iluminação
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
         this.scene.add(ambientLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
         dirLight.position.set(10, 20, 10);
         this.scene.add(dirLight);
 
         this.isInitialized = true;
         this.animate();
 
-        // Responsividade
         window.addEventListener('resize', () => {
             if (!this.renderer || container.clientWidth === 0) return;
             const width = container.clientWidth;
@@ -1250,15 +1234,20 @@ window.Photometric3DEngine = {
     },
 
     clearSolid: function() {
-        if (this.solidMesh && this.scene) {
-            this.scene.remove(this.solidMesh);
-            this.solidMesh.geometry.dispose();
-            this.solidMesh.material.dispose();
-            this.solidMesh = null;
+        if (this.solidGroup && this.scene) {
+            this.scene.remove(this.solidGroup);
+            this.solidGroup.children.forEach(child => {
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) {
+                    if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+                    else child.material.dispose();
+                }
+            });
+            this.solidGroup = null;
         }
     },
 
-    renderPhotometricSolid: function(iesData) {
+    renderPhotometricSolid: function(iesData, toolId = 'ponto', state = null) {
         if (!this.isInitialized) this.init();
         this.clearSolid();
         if (!iesData || !iesData.hAngles || !iesData.vAngles || !iesData.candelas) return;
@@ -1269,25 +1258,23 @@ window.Photometric3DEngine = {
         const matrix = iesData.candelas;
         const mult = iesData.multiplier;
 
-        // Encontrar o valor máximo para normalizar o tamanho da malha 3D
         let maxI = 0;
         for (let h = 0; h < hAngles.length; h++) {
             for (let v = 0; v < vAngles.length; v++) {
                 if (matrix[h][v] > maxI) maxI = matrix[h][v];
             }
         }
-        
         if (maxI === 0) return;
-        const scaleFactor = 10 / maxI; // Normaliza o sólido para caber num raio de ~10 unidades
+        
+        // Normaliza o sólido para ser fisicamente proporcional ao pé-direito
+        const scaleFactor = (state && state.height) ? (state.height * 0.8) / maxI : 5 / maxI; 
 
-        // Geração da Geometria (Wireframe) baseada em coordenadas Esféricas -> Cartesianas
         for (let h = 0; h < hAngles.length; h++) {
             for (let v = 0; v < vAngles.length; v++) {
                 const intensity = matrix[h][v] * mult * scaleFactor;
-                const phi = (hAngles[h] * Math.PI) / 180; // Horizontal
-                const theta = (vAngles[v] * Math.PI) / 180; // Vertical
+                const phi = (hAngles[h] * Math.PI) / 180; 
+                const theta = (vAngles[v] * Math.PI) / 180; 
 
-                // Equação Paramétrica para Iluminação (O eixo Y é "para baixo" na maioria das luminárias)
                 const x = intensity * Math.sin(theta) * Math.cos(phi);
                 const y = -intensity * Math.cos(theta); 
                 const z = intensity * Math.sin(theta) * Math.sin(phi);
@@ -1297,16 +1284,99 @@ window.Photometric3DEngine = {
         }
 
         const geometry = new THREE.BufferGeometry().setFromPoints(pts);
-        
-        // Linhas conectando os pontos para formar a "teia"
-        const material = new THREE.LineBasicMaterial({ 
-            color: 0xfbbf24, // Amber-400 (cor da marca LuxSintax)
-            transparent: true, 
-            opacity: 0.6 
-        });
+        const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.6 });
 
-        this.solidMesh = new THREE.LineSegments(geometry, material);
-        this.scene.add(this.solidMesh);
+        this.solidGroup = new THREE.Group();
+
+        if (toolId === 'grid' && state) {
+            const spacingX = state.roomW / state.cols;
+            const spacingZ = state.roomL / state.rows; 
+
+            // Contorno do Ambiente (Room Box)
+            const roomGeo = new THREE.BoxGeometry(state.roomW, state.height, state.roomL);
+            const roomEdges = new THREE.EdgesGeometry(roomGeo);
+            const roomMat = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.3 });
+            const roomMesh = new THREE.LineSegments(roomEdges, roomMat);
+            roomMesh.position.set(0, state.height / 2, 0);
+            this.solidGroup.add(roomMesh);
+
+            // Grid de Piso
+            const gridHelper = new THREE.GridHelper(Math.max(state.roomW, state.roomL) * 1.5, 20, 0x334155, 0x1e293b);
+            this.solidGroup.add(gridHelper);
+
+            // Distribuição das Luminárias
+            const startX = -state.roomW / 2 + spacingX / 2;
+            const startZ = -state.roomL / 2 + spacingZ / 2;
+
+            for (let i = 0; i < state.cols; i++) {
+                for (let j = 0; j < state.rows; j++) {
+                    const mesh = new THREE.LineSegments(geometry, material);
+                    mesh.position.set(startX + i * spacingX, state.height, startZ + j * spacingZ);
+                    this.solidGroup.add(mesh);
+                }
+            }
+
+            // Câmera panorâmica para Método Lúmens
+            this.camera.position.set(state.roomW * 1.2, state.height * 2.5, state.roomL * 1.2);
+            this.controls.target.set(0, state.height / 2, 0);
+
+        } else {
+            const mesh = new THREE.LineSegments(geometry, material);
+            const h = state ? state.height : 3;
+            
+            // Tratamento de Array para o Ponto a Ponto Horizontal
+            if (toolId === 'ponto' && state && state.viewMode === 'array') {
+                const hS = state.spacing / 2;
+                mesh.position.set(-hS, h, 0);
+                const mesh2 = new THREE.LineSegments(geometry, material);
+                mesh2.position.set(hS, h, 0);
+                this.solidGroup.add(mesh);
+                this.solidGroup.add(mesh2);
+            } else {
+                mesh.position.set(0, h, 0);
+                this.solidGroup.add(mesh);
+                const axesHelper = new THREE.AxesHelper(2);
+                axesHelper.position.set(0, h, 0);
+                this.solidGroup.add(axesHelper);
+            }
+
+            const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x1e293b);
+            this.solidGroup.add(gridHelper);
+
+            this.camera.position.set(5, h + 2, 5);
+            this.controls.target.set(0, h / 2, 0);
+        }
+
+        this.scene.add(this.solidGroup);
+        this.controls.update();
+    }
+};
+
+window.toggleRenderMode = function(mode) {
+    const stage2D = document.getElementById('stage-2d');
+    const stage3D = document.getElementById('stage-3d');
+    
+    const activeToolKey = window.currentTool || 'ponto';
+    const btn2D = document.getElementById(`btn-render-2d-${activeToolKey}`) || document.getElementById('btn-render-2d');
+    const btn3D = document.getElementById(`btn-render-3d-${activeToolKey}`) || document.getElementById('btn-render-3d');
+    
+    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+
+    if (mode === '3D') {
+        stage2D.classList.add('hidden');
+        stage3D.classList.remove('hidden');
+        if (btn3D) btn3D.className = activeClass;
+        if (btn2D) btn2D.className = inactiveClass;
+        
+        window.Photometric3DEngine.init();
+        window.updateCalculations(); 
+    } else {
+        stage3D.classList.add('hidden');
+        stage2D.classList.remove('hidden');
+        if (btn2D) btn2D.className = activeClass;
+        if (btn3D) btn3D.className = inactiveClass;
+        window.updateCalculations();
     }
 };
 
@@ -2043,9 +2113,15 @@ window.toggleGridLevel = function(level) {
         window.updateCalculations = function() {
             if (!window._isRenderPending) {
                 window._isRenderPending = true;
-                // Sincroniza a execução com o refresh rate do monitor (60Hz/120Hz)
                 requestAnimationFrame(() => {
                     try {
+                        const stage3D = document.getElementById('stage-3d');
+                        if (stage3D && !stage3D.classList.contains('hidden')) {
+                            const tool = window.currentTool;
+                            if (window.Photometric3DEngine && window.state[tool].iesData) {
+                                window.Photometric3DEngine.renderPhotometricSolid(window.state[tool].iesData, tool, window.state[tool]);
+                            }
+                        }
                         window.coreRenderEngine();
                     } catch (erro) {
                         console.error("[LuxSintax] Erro interno de desenho:", erro);
@@ -2535,9 +2611,12 @@ window.toggleGridLevel = function(level) {
 
                 // Loop Otimizado (Renderiza 1 ou 2 fachos)
                 origins.forEach(xPos => {
-                    ctx.save(); ctx.translate(xPos, sy);
-                    const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
+                    // LUXSINTAX: Só desenha o triângulo genérico se NÃO for um IES (Se for IES, usamos a representação exata no final do script)
+                    if (window.calcMode !== 'ies') {
+                        ctx.save(); ctx.translate(xPos, sy);
+                        const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                        ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
+                    }
 
                     ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(xPos, sy, 5, 0, Math.PI * 2); ctx.fill();
 
@@ -2765,34 +2844,51 @@ window.toggleGridLevel = function(level) {
                 const maxI = Math.max(...row);
                 const sy = floorY - (s.height * scale);
 
-                // Define as origens: 1 no centro, ou 2 se for Estudo de Facho
                 let origins = [centerX];
                 if (window.currentTool === 'ponto' && s.viewMode === 'array') {
                     const hS = (s.spacing * scale) / 2;
                     origins = [centerX - hS, centerX + hS];
                 }
 
-                ctx.strokeStyle = "rgba(217, 119, 6, 0.4)";
-                ctx.setLineDash([]);
-
-                // Desenha a curva IES para cada origem
                 origins.forEach(originX => {
+                    ctx.save();
+                    
+                    // LUXSINTAX: Máscara de Piso (Clipping)
                     ctx.beginPath();
+                    ctx.rect(0, 0, cw, floorY);
+                    ctx.clip();
+
+                    const path = new Path2D();
                     for(let i=0; i<vAngles.length; i++) {
                         const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                        const r = (row[i] / maxI) * (s.height * scale * 0.9);
+                        const r = (row[i] / maxI) * (s.height * scale * 0.85);
                         const x = originX + r * Math.sin(ang);
                         const y = sy + r * Math.cos(ang);
-                        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                        if(i===0) path.moveTo(x,y); else path.lineTo(x,y);
                     }
                     for(let i=0; i<vAngles.length; i++) {
                         const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                        const r = (row[i] / maxI) * (s.height * scale * 0.9);
+                        const r = (row[i] / maxI) * (s.height * scale * 0.85);
                         const x = originX + r * Math.sin(ang);
                         const y = sy + r * Math.cos(ang);
-                        ctx.lineTo(x,y);
+                        path.lineTo(x,y);
                     }
-                    ctx.stroke();
+                    path.closePath();
+
+                    // Preenchimento radiante realista do fotômetro
+                    const grad = ctx.createRadialGradient(originX, sy, 0, originX, sy, s.height * scale);
+                    grad.addColorStop(0, "rgba(251, 191, 36, 0.45)");
+                    grad.addColorStop(1, "rgba(251, 191, 36, 0.0)");
+                    ctx.fillStyle = grad;
+                    ctx.fill(path);
+
+                    // Contorno do Sólido Fotométrico
+                    ctx.strokeStyle = "rgba(217, 119, 6, 0.8)";
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([]);
+                    ctx.stroke(path);
+
+                    ctx.restore();
                 });
             }
         }
