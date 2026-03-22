@@ -1668,62 +1668,72 @@ window.toggleGridLevel = function(level) {
         };
 
         // Motor EULUMDAT (LDT)
-        // --- MOTOR EULUMDAT (LDT) - ARQUITETURA DE PRECISÃO LUXSINTAX ---
-window.parseLDT = function(rawData) {
-    try {
-        const lines = rawData.replace(/\r/g, '').split('\n').map(l => l.trim());
-        if (lines.length < 30) return null;
+        renderPhotometricSolid: function(iesData, toolId, state) {
+        if (!this.isInitialized) this.init();
+        if (!state || !iesData) return;
+        if (this.solidGroup) this.scene.remove(this.solidGroup);
+        this.solidGroup = new THREE.Group();
 
-        // 1. Metadados Fundamentais
-        const Mc = parseInt(lines[3]); // Eixos C
-        const Mg = parseInt(lines[5]); // Ângulos Gamma
-        const nLampsRaw = parseInt(lines[25]) || 0;
-        const nLamps = Math.abs(nLampsRaw);
-        
-        if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
+        const hA = iesData.hAngles, vA = iesData.vAngles, mat = iesData.candelas;
+        let hFull = [...hA], mFull = mat.map(r => [...r]);
+        let lastH = Math.round(hA[hA.length - 1]);
 
-        // 2. Extração de Fluxo e Potência (Norma: Linha 24 ou Bloco de Lâmpadas)
-        let totalFlux = parseFloat(lines[23].replace(',', '.')) || 0;
-        let totalWatts = 0;
-        if (nLamps > 0) {
-            for (let i = 0; i < nLamps; i++) {
-                const base = 26 + (i * 6);
-                totalWatts += parseFloat(lines[base + 5]?.replace(',', '.')) || 0;
-                if (totalFlux <= 0) totalFlux += parseFloat(lines[base + 2]?.replace(',', '.')) || 0;
+        // Reconstrução de Simetria 360 Graus
+        if (lastH === 90) {
+            for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
+            for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
+        } else if (lastH === 180) {
+            for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
+        }
+        if (Math.round(hFull[hFull.length - 1]) !== 360) { hFull.push(360); mFull.push(mFull[0]); }
+
+        let maxI = 0; mFull.forEach(r => r.forEach(v => { if (v > maxI) maxI = v; }));
+        if (maxI <= 0) return;
+
+        const pts = [];
+        const matWire = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.4 });
+
+        // Meridianos
+        for (let h = 0; h < hFull.length; h++) {
+            for (let v = 0; v < vA.length - 1; v++) {
+                pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h][v+1]/maxI, hFull[h], vA[v+1]));
             }
         }
-
-        // 3. Consumo Sequencial dos Números (Matriz)
-        // Pulamos o cabeçalho estrito: 26 (fixo) + (Lâmpadas * 6) + 10 (fatores de reflexão)
-        const headerOffset = 26 + (nLamps > 0 ? nLamps * 6 : 0) + 10;
-        const dataBody = lines.slice(headerOffset).join(' ');
-        const rawTokens = dataBody.replace(/,/g, '.').split(/\s+/);
-        
-        const stream = [];
-        for (let t of rawTokens) {
-            const n = parseFloat(t);
-            if (!isNaN(n)) stream.push(n);
+        // Paralelos (Anéis) com Fechamento de Círculo
+        for (let v = 0; v < vA.length; v++) {
+            for (let h = 0; h < hFull.length - 1; h++) {
+                pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h+1][v]/maxI, hFull[h+1], vA[v]));
+            }
+            // CONEXÃO DE FECHAMENTO (360 -> 0)
+            pts.push(this.sphToCar(mFull[hFull.length-1][v]/maxI, hFull[hFull.length-1], vA[v]), this.sphToCar(mFull[0][v]/maxI, hFull[0], vA[v]));
         }
 
-        const expectedSize = Mc + Mg + (Mc * Mg);
-        if (stream.length < expectedSize) return null; // Ficheiro incompleto
-
-        // 4. Mapeamento dos Ângulos e Matriz
-        let ptr = 0;
-        const hAngles = stream.slice(0, Mc); ptr = Mc;
-        const vAngles = stream.slice(ptr, ptr + Mg); ptr += Mg;
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const wireframe = new THREE.LineSegments(geo, matWire);
+        const scale = state.height * 0.8;
         
-        const matrix = [];
-        for (let c = 0; c < Mc; c++) {
-            matrix.push(stream.slice(ptr + c * Mg, ptr + (c + 1) * Mg));
+        // ... (resto da lógica de grid/ponto permanece igual)
+        if (toolId === 'grid') {
+            const sx = state.roomW / state.cols, sz = state.roomL / state.rows;
+            for (let i = 0; i < state.cols; i++) {
+                for (let j = 0; j < state.rows; j++) {
+                    const inst = wireframe.clone();
+                    inst.scale.set(scale, scale, scale);
+                    inst.position.set(-state.roomW/2 + (i+0.5)*sx, state.height, -state.roomL/2 + (j+0.5)*sz);
+                    this.solidGroup.add(inst);
+                }
+            }
+            this.camera.position.set(state.roomW, state.height * 1.5, state.roomL);
+            this.controls.target.set(0, state.height/2, 0);
+        } else {
+            wireframe.scale.set(scale, scale, scale);
+            wireframe.position.set(0, state.height, 0);
+            this.solidGroup.add(wireframe);
+            this.camera.position.set(scale*2, state.height, scale*2);
+            this.controls.target.set(0, state.height/2, 0);
         }
-
-        return { vAngles, hAngles, candelas: matrix, multiplier: 1.0, totalFlux: totalFlux || 1000, wattage: totalWatts };
-    } catch (e) { 
-        console.error("[LuxSintax] Erro de Parser:", e);
-        return null; 
-    }
-};
+        this.scene.add(this.solidGroup);
+    },
 
         // Engine Analítico Fotométrico
         window.PhotometricAnalyzer = {
