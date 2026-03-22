@@ -428,13 +428,38 @@
                                     </div>
                                 </div>
                                 
-                                <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300">
-                                    <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
-                                    <canvas id="beamCanvas" class="absolute inset-0 w-full h-full z-10 block"></canvas>
+                                <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
+                                    
+                                    <div id="photometric-dashboard" class="hidden w-full bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 transition-all duration-500 z-20 relative shadow-sm">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <h4 class="text-[10px] font-black tracking-widest text-luminous-gold uppercase"><i class="fas fa-microscope mr-1"></i> Sumário Técnico (IES/LDT)</h4>
+                                            <span id="pd-filename" class="text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded font-bold max-w-[200px] truncate">arquivo.ies</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
+                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Eficácia</div>
+                                                <div class="text-lg font-black text-leed-green"><span id="pd-efficacy">--</span> <span class="text-[10px] font-medium text-slate-500">lm/W</span></div>
+                                            </div>
+                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
+                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Potência (W)</div>
+                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-watts">--</span> <span class="text-[10px] font-medium text-slate-500">W</span></div>
+                                            </div>
+                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
+                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Fluxo Total</div>
+                                                <div class="text-lg font-black text-tech-cyan"><span id="pd-lumens">--</span> <span class="text-[10px] font-medium text-slate-500">lm</span></div>
+                                            </div>
+                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
+                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Upward Light (ULR)</div>
+                                                <div class="text-lg font-black text-luminous-gold"><span id="pd-uplight">--</span> <span class="text-[10px] font-medium text-slate-500">%</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative flex-grow w-full">
+                                        <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
+                                        <canvas id="beamCanvas" class="absolute inset-0 w-full h-full z-10 block"></canvas>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
 
                 <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
                         <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
@@ -1455,13 +1480,39 @@ window.toggleGridLevel = function(level) {
                             statusEl.classList.add('text-luminous-gold');
                         }
                         
-                        // Atualiza a UI com o fluxo total calculado se for LDT
-                        if (extension === 'ldt' && parsed.totalFlux) {
-                             window.state[targetKey].flux = parsed.totalFlux;
+                        // Atualiza a UI com o fluxo e preenche o Dashboard Analítico
+                        let targetFlux = parsed.totalFlux || 0;
+                        if (targetFlux > 0) {
+                             window.state[targetKey].flux = targetFlux;
                              const fluxInput = document.getElementById(targetKey[0] + '-flux');
-                             if(fluxInput) fluxInput.value = parsed.totalFlux;
+                             if(fluxInput) fluxInput.value = Math.round(targetFlux);
                              const rangeFlux = document.getElementById('range-' + targetKey[0] + '-flux');
-                             if(rangeFlux) rangeFlux.value = parsed.totalFlux;
+                             if(rangeFlux) rangeFlux.value = Math.round(targetFlux);
+                        }
+
+                        // Alimentando o Dashboard Fotométrico (LuxSintax Engine)
+                        const dash = document.getElementById('photometric-dashboard');
+                        if (dash) {
+                            dash.classList.remove('hidden');
+                            document.getElementById('pd-filename').innerText = file.name;
+                            
+                            const metrics = window.PhotometricAnalyzer.extractZonalMetrics(parsed);
+                            document.getElementById('pd-uplight').innerText = metrics.uplightRatio.toFixed(1);
+                            
+                            // Tenta pegar a potência (IES) ou fallback para o input manual do sistema
+                            let pWatts = parsed.wattage;
+                            if (!pWatts && document.getElementById('g-watts')) {
+                                pWatts = parseFloat(document.getElementById('g-watts').value);
+                            }
+                            
+                            document.getElementById('pd-watts').innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
+                            document.getElementById('pd-lumens').innerText = targetFlux > 0 ? Math.round(targetFlux) : 'N/D';
+                            
+                            if (pWatts > 0 && targetFlux > 0) {
+                                document.getElementById('pd-efficacy').innerText = Math.round(targetFlux / pWatts);
+                            } else {
+                                document.getElementById('pd-efficacy').innerText = 'N/D';
+                            }
                         }
 
                         window.updateCalculations();
@@ -1573,8 +1624,46 @@ window.toggleGridLevel = function(level) {
             }
         };
 
+        // Engine Analítico Fotométrico
+        window.PhotometricAnalyzer = {
+            extractZonalMetrics: function(data) {
+                // Cálculo aproximado de Uplight (Zonal Lumen Summary simplificado)
+                let totalCandelas = 0;
+                let upCandelas = 0;
+                
+                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0 };
+
+                let maxI = 0;
+                for (let h = 0; h < data.hAngles.length; h++) {
+                    for (let v = 0; v < data.vAngles.length; v++) {
+                        const intensity = data.candelas[h][v] * data.multiplier;
+                        if (intensity > maxI) maxI = intensity;
+                        
+                        totalCandelas += intensity;
+                        // Ângulos verticais > 90 graus representam luz emitida para cima (Uplight)
+                        if (data.vAngles[v] > 90) {
+                            upCandelas += intensity;
+                        }
+                    }
+                }
+                
+                const uplightRatio = totalCandelas > 0 ? (upCandelas / totalCandelas) * 100 : 0;
+                return { uplightRatio, maxCandela: maxI };
+            }
+        };
+
         window.parseIES = function(content) {
             try {
+                // Extração de Metadados (Wattage) via Regex Padrão IESNA LM-63
+                let wattage = null;
+                const lines = content.replace(/\r\n|\r/g, '\n').split('\n');
+                for (let line of lines) {
+                    if (line.toUpperCase().includes('WATTAGE') || line.toUpperCase().includes('_WATTAGE') || line.toUpperCase().includes('INPUTFREE')) {
+                        const match = line.match(/[\d.]+/);
+                        if (match) wattage = parseFloat(match[0]);
+                    }
+                }
+
                 const tokens = content.replace(/\s+/g, " ").trim().split(" ");
                 let cursor = 0;
                 let tiltFound = false;
@@ -1619,7 +1708,16 @@ window.toggleGridLevel = function(level) {
                     candelas.push(row);
                 }
 
-                return { vAngles, hAngles, candelas, multiplier };
+                // Cálculo de Fluxo Total para IES baseado em integrais esféricas simplificadas
+                // Se a matriz é relativa, calculamos o total de lúmens.
+                // Aqui aplicamos uma aproximação rápida para exibir no Dashboard, pois a integração rigorosa exige matrizes de sólidos.
+                let estimatedTotalFlux = 0;
+                if (multiplier > 0) {
+                   const avgCandela = candelas[0].reduce((a, b) => a + b, 0) / vCount;
+                   estimatedTotalFlux = avgCandela * multiplier * 2 * Math.PI; // Aproximação Esférica (Lambertiana Base)
+                }
+
+                return { vAngles, hAngles, candelas, multiplier, wattage, totalFlux: estimatedTotalFlux };
 
             } catch (e) {
                 console.error("IES Parse Error", e);
