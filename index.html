@@ -1253,10 +1253,42 @@ window.Photometric3DEngine = {
         if (!iesData || !iesData.hAngles || !iesData.vAngles || !iesData.candelas) return;
 
         const pts = [];
-        const hAngles = iesData.hAngles;
+        const baseHAngles = iesData.hAngles;
         const vAngles = iesData.vAngles;
-        const matrix = iesData.candelas;
+        const baseMatrix = iesData.candelas;
         const mult = iesData.multiplier;
+
+        // LUXSINTAX: Motor de Suavização Fotométrica 3D (Anti-Pirâmide)
+        // Arquivos LDT/IES otimizados exportam a simetria em apenas 4 planos (0, 90, 180, 270).
+        // Na renderização WebGL, 4 pontos formam um quadrado (pirâmide).
+        // Este algoritmo interpola a matriz para 36 planos (10 graus), garantindo um cone orgânico perfeito.
+        const hAngles = [];
+        const matrix = [];
+        for (let a = 0; a <= 360; a += 10) {
+            hAngles.push(a);
+            const row = [];
+            for (let v = 0; v < vAngles.length; v++) {
+                const maxBaseH = baseHAngles[baseHAngles.length - 1];
+                if (a > maxBaseH) {
+                    const t = (a - maxBaseH) / (360 - maxBaseH || 1);
+                    row.push(baseMatrix[baseHAngles.length - 1][v] * (1 - t) + baseMatrix[0][v] * t);
+                    continue;
+                }
+                let idx1 = 0, idx2 = 0;
+                for (let i = 0; i < baseHAngles.length - 1; i++) {
+                    if (a >= baseHAngles[i] && a <= baseHAngles[i+1]) {
+                        idx1 = i; idx2 = i + 1; break;
+                    }
+                }
+                if (baseHAngles[idx1] === baseHAngles[idx2]) {
+                    row.push(baseMatrix[idx1][v]);
+                } else {
+                    const t = (a - baseHAngles[idx1]) / (baseHAngles[idx2] - baseHAngles[idx1]);
+                    row.push(baseMatrix[idx1][v] * (1 - t) + baseMatrix[idx2][v] * t);
+                }
+            }
+            matrix.push(row);
+        }
 
         let maxI = 0;
         let maxDown = 0;
