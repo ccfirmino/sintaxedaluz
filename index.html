@@ -1208,6 +1208,7 @@ window.Photometric3DEngine = {
 
     renderPhotometricSolid: function(iesData, toolId, state) {
         if (!this.isInitialized) this.init();
+        if (!state) return; // Trava de segurança (Data Integrity)
         if (this.solidGroup) this.scene.remove(this.solidGroup);
         this.solidGroup = new THREE.Group();
 
@@ -1661,14 +1662,11 @@ window.toggleGridLevel = function(level) {
                             }
                         }
                         
-                        // Exibe o Toggle 3D e renderiza caso o modo 3D já esteja ativo
+                        // LUXSINTAX: Ativa a visibilidade dos controles 3D e dispara o motor de renderização global
                         const toggleBtn = document.getElementById('view-mode-toggle');
                         if (toggleBtn) toggleBtn.classList.remove('hidden');
                         
-                        if (window.Photometric3DEngine && window.Photometric3DEngine.isInitialized && !document.getElementById('stage-3d').classList.contains('hidden')) {
-                             window.Photometric3DEngine.renderPhotometricSolid(parsed);
-                        }
-
+                        // Chamamos apenas o update global que já possui a lógica de proteção e contextos (P2P vs Lúmens)
                         window.updateCalculations();
                     } else {
                         alert("Erro ao ler arquivo " + file.name + ". Verifique se não está corrompido.");
@@ -1713,9 +1711,9 @@ window.toggleGridLevel = function(level) {
                 const headerCount = allNumbers.length - (Mc + Mg + (Mc * Mg));
                 const data = allNumbers.slice(headerCount > 0 ? headerCount : 0);
                 
-                if (data.length < (Mc + Mg + (Mc * Mg))) return null;
-                
-                if (data.length < totalExpected) return null;
+                // LUXSINTAX: Validação definitiva do tamanho da matriz
+                const expectedCount = Mc + Mg + (Mc * Mg);
+                if (data.length < expectedCount) return null;
 
                 let ptr = 0;
                 const hAngles = data.slice(0, Mc); ptr += Mc;
