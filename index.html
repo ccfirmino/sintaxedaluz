@@ -1889,17 +1889,17 @@ window.toggleGridLevel = function(level) {
                     conversionFactor = (totalFlux / 1000) * convFactor; // LDT = cd/klm
                 }
 
-                // 4. Isolamento Cirúrgico da Matriz
-                const matrixStartLine = 26 + (effectiveLampSets * 6) + 10;
+                // 4. Isolamento Blindado da Matriz (Lei de Postel / Leitura Traseira)
+                // Ignoramos a contagem de linhas frágil. Transformamos o arquivo todo num array numérico
+                // e capturamos os exatos últimos valores exigidos pela geometria (req = Mc + Mg + Mc*Mg).
+                const allText = lines.join(' ');
+                const rawTokens = allText.replace(/\s+/g, ' ').trim().split(' ');
                 
-                const matrixText = lines.slice(matrixStartLine).join(' ');
-                const tokens = matrixText.replace(/\s+/g, ' ').trim().split(' ');
-
-                // 5. Conversão Blindada (Transforma tudo em número, substitui lixo por 0 para não quebrar a grelha)
-                const matrixData = [];
-                for (let t of tokens) {
+                const validNumbers = [];
+                for (let t of rawTokens) {
                     if (t === '') continue;
                     
+                    // Normalização de Decimais (Europa vs EUA)
                     if (t.includes('.') && t.includes(',')) {
                         if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
                         else t = t.replace(/,/g, '');
@@ -1908,13 +1908,17 @@ window.toggleGridLevel = function(level) {
                     }
                     
                     const val = Number(t);
-                    matrixData.push(isNaN(val) ? 0 : val);
+                    if (!isNaN(val)) validNumbers.push(val);
                 }
 
-                // Preenchimento de segurança caso o ficheiro do fabricante esteja cortado no fim
-                while (matrixData.length < req) {
-                    matrixData.push(0);
+                // Proteção contra arquivos severamente corrompidos (Faltando dados)
+                if (validNumbers.length < req) {
+                    console.warn("[LuxSintax] Ficheiro LDT corrompido: faltam dados na matriz.");
+                    while (validNumbers.length < req) validNumbers.push(0);
                 }
+
+                // O "Golpe de Mestre": Cortamos a matriz exata lendo o array numérico do fim para o começo
+                const matrixData = validNumbers.slice(-req);
 
                 // 6. Desenho Fotométrico
                 let ptr = 0;
