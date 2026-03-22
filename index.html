@@ -1215,7 +1215,6 @@ window.Photometric3DEngine = {
         let hFull = [...hA], mFull = mat.map(r => [...r]);
         let lastH = Math.round(hA[hA.length - 1]);
 
-        // Simetria 360 e Fechamento de Malha
         if (lastH === 90) {
             for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
@@ -1256,14 +1255,10 @@ window.Photometric3DEngine = {
                     this.solidGroup.add(inst);
                 }
             }
-            this.camera.position.set(state.roomW, state.height * 1.5, state.roomL);
-            this.controls.target.set(0, state.height/2, 0);
         } else {
             wireframe.scale.set(scale, scale, scale);
             wireframe.position.set(0, state.height, 0);
             this.solidGroup.add(wireframe);
-            this.camera.position.set(scale*2, state.height, scale*2);
-            this.controls.target.set(0, state.height/2, 0);
         }
         this.scene.add(this.solidGroup);
     },
@@ -1667,188 +1662,85 @@ window.toggleGridLevel = function(level) {
             }
         };
 
-        // Motor EULUMDAT (LDT)
-        renderPhotometricSolid: function(iesData, toolId, state) {
-        if (!this.isInitialized) this.init();
-        if (!state || !iesData) return;
-        if (this.solidGroup) this.scene.remove(this.solidGroup);
-        this.solidGroup = new THREE.Group();
-
-        const hA = iesData.hAngles, vA = iesData.vAngles, mat = iesData.candelas;
-        let hFull = [...hA], mFull = mat.map(r => [...r]);
-        let lastH = Math.round(hA[hA.length - 1]);
-
-        // Reconstrução de Simetria 360 Graus
-        if (lastH === 90) {
-            for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
-            for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
-        } else if (lastH === 180) {
-            for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
+        // --- MOTOR EULUMDAT (LDT) - SCANNER DE TOKENS (ULTRA ROBUSTO) ---
+window.parseLDT = function(rawData) {
+    try {
+        const tokens = rawData.replace(/,/g, '.').split(/\s+/).filter(t => t.length > 0);
+        if (tokens.length < 50) return null;
+        const Mc = parseInt(tokens[3]); 
+        const Mg = parseInt(tokens[5]); 
+        const nLamps = Math.abs(parseInt(tokens[25])) || 1;
+        if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
+        const totalFlux = parseFloat(tokens[23]) || 1000;
+        const watts = parseFloat(tokens[26 + 5]) || 0;
+        const matrixStart = 26 + (nLamps * 6) + 10;
+        const dataStream = tokens.slice(matrixStart);
+        if (dataStream.length < (Mc + Mg + (Mc * Mg))) return null;
+        let ptr = 0;
+        const hAngles = dataStream.slice(ptr, ptr + Mc).map(Number); ptr += Mc;
+        const vAngles = dataStream.slice(ptr, ptr + Mg).map(Number); ptr += Mg;
+        const matrix = [];
+        for (let c = 0; c < Mc; c++) {
+            matrix.push(dataStream.slice(ptr + c * Mg, ptr + (c + 1) * Mg).map(Number));
         }
-        if (Math.round(hFull[hFull.length - 1]) !== 360) { hFull.push(360); mFull.push(mFull[0]); }
+        return { vAngles, hAngles, candelas: matrix, multiplier: 1.0, totalFlux: totalFlux, wattage: watts };
+    } catch (e) { return null; }
+};
 
-        let maxI = 0; mFull.forEach(r => r.forEach(v => { if (v > maxI) maxI = v; }));
-        if (maxI <= 0) return;
-
-        const pts = [];
-        const matWire = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.4 });
-
-        // Meridianos
-        for (let h = 0; h < hFull.length; h++) {
-            for (let v = 0; v < vA.length - 1; v++) {
-                pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h][v+1]/maxI, hFull[h], vA[v+1]));
+window.PhotometricAnalyzer = {
+    extractZonalMetrics: function(data) {
+        let totalCandelas = 0, upCandelas = 0;
+        if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0 };
+        for (let h = 0; h < data.hAngles.length; h++) {
+            for (let v = 0; v < data.vAngles.length; v++) {
+                const intensity = data.candelas[h][v] * data.multiplier;
+                totalCandelas += intensity;
+                if (data.vAngles[v] > 90) upCandelas += intensity;
             }
         }
-        // Paralelos (Anéis) com Fechamento de Círculo
-        for (let v = 0; v < vA.length; v++) {
-            for (let h = 0; h < hFull.length - 1; h++) {
-                pts.push(this.sphToCar(mFull[h][v]/maxI, hFull[h], vA[v]), this.sphToCar(mFull[h+1][v]/maxI, hFull[h+1], vA[v]));
-            }
-            // CONEXÃO DE FECHAMENTO (360 -> 0)
-            pts.push(this.sphToCar(mFull[hFull.length-1][v]/maxI, hFull[hFull.length-1], vA[v]), this.sphToCar(mFull[0][v]/maxI, hFull[0], vA[v]));
-        }
+        return { uplightRatio: totalCandelas > 0 ? (upCandelas/totalCandelas)*100 : 0 };
+    }
+};
 
-        const geo = new THREE.BufferGeometry().setFromPoints(pts);
-        const wireframe = new THREE.LineSegments(geo, matWire);
-        const scale = state.height * 0.8;
-        
-        // ... (resto da lógica de grid/ponto permanece igual)
-        if (toolId === 'grid') {
-            const sx = state.roomW / state.cols, sz = state.roomL / state.rows;
-            for (let i = 0; i < state.cols; i++) {
-                for (let j = 0; j < state.rows; j++) {
-                    const inst = wireframe.clone();
-                    inst.scale.set(scale, scale, scale);
-                    inst.position.set(-state.roomW/2 + (i+0.5)*sx, state.height, -state.roomL/2 + (j+0.5)*sz);
-                    this.solidGroup.add(inst);
-                }
-            }
-            this.camera.position.set(state.roomW, state.height * 1.5, state.roomL);
-            this.controls.target.set(0, state.height/2, 0);
-        } else {
-            wireframe.scale.set(scale, scale, scale);
-            wireframe.position.set(0, state.height, 0);
-            this.solidGroup.add(wireframe);
-            this.camera.position.set(scale*2, state.height, scale*2);
-            this.controls.target.set(0, state.height/2, 0);
-        }
-        this.scene.add(this.solidGroup);
-    },
-
-        // Engine Analítico Fotométrico
-        window.PhotometricAnalyzer = {
-            extractZonalMetrics: function(data) {
-                // Cálculo aproximado de Uplight (Zonal Lumen Summary simplificado)
-                let totalCandelas = 0;
-                let upCandelas = 0;
-                
-                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0 };
-
-                let maxI = 0;
-                for (let h = 0; h < data.hAngles.length; h++) {
-                    for (let v = 0; v < data.vAngles.length; v++) {
-                        const intensity = data.candelas[h][v] * data.multiplier;
-                        if (intensity > maxI) maxI = intensity;
-                        
-                        totalCandelas += intensity;
-                        // Ângulos verticais > 90 graus representam luz emitida para cima (Uplight)
-                        if (data.vAngles[v] > 90) {
-                            upCandelas += intensity;
-                        }
-                    }
-                }
-                
-                const uplightRatio = totalCandelas > 0 ? (upCandelas / totalCandelas) * 100 : 0;
-                return { uplightRatio, maxCandela: maxI };
-            }
-        };
-
-        window.parseIES = function(content) {
-            try {
-                // Extração de Metadados (Wattage) via Regex Padrão IESNA LM-63
-                let wattage = null;
-                const lines = content.replace(/\r\n|\r/g, '\n').split('\n');
-                for (let line of lines) {
-                    if (line.toUpperCase().includes('WATTAGE') || line.toUpperCase().includes('_WATTAGE') || line.toUpperCase().includes('INPUTFREE')) {
-                        const match = line.match(/[\d.]+/);
-                        if (match) wattage = parseFloat(match[0]);
-                    }
-                }
-
-                const tokens = content.replace(/\s+/g, " ").trim().split(" ");
-                let cursor = 0;
-                let tiltFound = false;
-                for(let i=0; i < tokens.length; i++) {
-                    if (tokens[i].startsWith("TILT=")) {
-                        cursor = i + 1;
-                        tiltFound = true;
-                        // LUXSINTAX BUGFIX: Se o arquivo usar TILT=INCLUDE, precisamos pular a tabela de ângulos extras!
-                        if (tokens[i].includes("INCLUDE")) {
-                            let tempCursor = cursor;
-                            function _n() {
-                                while(tempCursor < tokens.length) {
-                                    const v = parseFloat(tokens[tempCursor++]);
-                                    if(!isNaN(v)) return v;
-                                }
-                            }
-                            _n(); // Lamp-to-luminaire geometry
-                            const numAngles = _n(); // Quantidade de ângulos de tilt
-                            for(let k=0; k < numAngles * 2; k++) _n(); // Pula Angles + Multipliers
-                            cursor = tempCursor;
-                        }
-                        break;
-                    }
-                }
-                
-                if (!tiltFound) return null;
-
-                function nextNum() {
-                    while(cursor < tokens.length) {
-                        const val = parseFloat(tokens[cursor]);
-                        cursor++;
-                        if (!isNaN(val)) return val;
-                    }
-                    return null;
-                }
-
-                nextNum(); nextNum(); 
-                const multiplier = nextNum();
-                const vCount = nextNum();
-                const hCount = nextNum();
-                nextNum(); nextNum(); nextNum(); nextNum(); nextNum();
-                nextNum(); nextNum(); nextNum();
-
-                const vAngles = [];
-                for(let i=0; i<vCount; i++) vAngles.push(nextNum());
-
-                const hAngles = [];
-                for(let i=0; i<hCount; i++) hAngles.push(nextNum());
-
-                const candelas = [];
-                for(let h=0; h<hCount; h++) {
-                    const row = [];
-                    for(let v=0; v<vCount; v++) {
-                        row.push(nextNum());
-                    }
-                    candelas.push(row);
-                }
-
-                // Cálculo de Fluxo Total para IES baseado em integrais esféricas simplificadas
-                // Se a matriz é relativa, calculamos o total de lúmens.
-                // Aqui aplicamos uma aproximação rápida para exibir no Dashboard, pois a integração rigorosa exige matrizes de sólidos.
-                let estimatedTotalFlux = 0;
-                if (multiplier > 0) {
-                   const avgCandela = candelas[0].reduce((a, b) => a + b, 0) / vCount;
-                   estimatedTotalFlux = avgCandela * multiplier * 2 * Math.PI; // Aproximação Esférica (Lambertiana Base)
-                }
-
-                return { vAngles, hAngles, candelas, multiplier, wattage, totalFlux: estimatedTotalFlux };
-
-            } catch (e) {
-                console.error("IES Parse Error", e);
-                return null;
+window.parseIES = function(content) {
+    try {
+        let wattage = null;
+        const lines = content.replace(/\r\n|\r/g, '\n').split('\n');
+        for (let line of lines) {
+            if (line.toUpperCase().includes('WATTAGE')) {
+                const match = line.match(/[\d.]+/);
+                if (match) wattage = parseFloat(match[0]);
             }
         }
+        const tokens = content.replace(/\s+/g, " ").trim().split(" ");
+        let cursor = 0, tiltFound = false;
+        for(let i=0; i < tokens.length; i++) {
+            if (tokens[i].startsWith("TILT=")) {
+                cursor = i + 1; tiltFound = true;
+                if (tokens[i].includes("INCLUDE")) {
+                    let tempCursor = cursor;
+                    function _n() { while(tempCursor < tokens.length) { const v = parseFloat(tokens[tempCursor++]); if(!isNaN(v)) return v; } }
+                    _n(); const numAngles = _n(); for(let k=0; k < numAngles * 2; k++) _n();
+                    cursor = tempCursor;
+                }
+                break;
+            }
+        }
+        if (!tiltFound) return null;
+        function nextNum() { while(cursor < tokens.length) { const val = parseFloat(tokens[cursor++]); if (!isNaN(val)) return val; } return null; }
+        nextNum(); nextNum(); 
+        const multiplier = nextNum(), vCount = nextNum(), hCount = nextNum();
+        for(let i=0; i<11; i++) nextNum();
+        const vAngles = []; for(let i=0; i<vCount; i++) vAngles.push(nextNum());
+        const hAngles = []; for(let i=0; i<hCount; i++) hAngles.push(nextNum());
+        const candelas = [];
+        for(let h=0; h<hCount; h++) {
+            const row = []; for(let v=0; v<vCount; v++) row.push(nextNum());
+            candelas.push(row);
+        }
+        return { vAngles, hAngles, candelas, multiplier, wattage, totalFlux: (candelas[0][0] * multiplier * 12.57) };
+    } catch (e) { return null; }
+};
 
         window.getIESIntensity = function(state, angleDeg) {
             if (!state.iesData) return 0;
