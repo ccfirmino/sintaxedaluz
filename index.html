@@ -418,6 +418,13 @@
                                             <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Piso (LP)</button>
                                         </div>
 
+                                        <div id="view-mode-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                            <button onclick="window.toggleRenderMode('2D')" id="btn-render-2d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Vista 2D</button>
+                                            <button onclick="window.toggleRenderMode('3D')" id="btn-render-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Sólido 3D</button>
+                                        </div>
+
+                                        <div id="heatmap-toggle-wrapper" class="hidden">
+
                                         <div id="heatmap-toggle-wrapper" class="hidden">
                                             <label class="flex items-center gap-3 cursor-pointer group">
                                                 <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">CORES FALSAS (HEATMAP)</span>
@@ -455,13 +462,6 @@
                                                 <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Upward Light (ULR)</div>
                                                 <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-uplight">--</span> <span class="text-[10px] font-medium text-slate-500">%</span></div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <div id="view-mode-toggle" class="absolute top-4 right-4 z-30 hidden">
-                                        <div class="flex bg-white dark:bg-slate-900 p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md">
-                                            <button onclick="window.toggleRenderMode('2D')" id="btn-render-2d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all">Vista 2D</button>
-                                            <button onclick="window.toggleRenderMode('3D')" id="btn-render-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all">Sólido 3D</button>
                                         </div>
                                     </div>
 
@@ -1318,8 +1318,8 @@ window.toggleRenderMode = function(mode) {
     const btn2D = document.getElementById('btn-render-2d');
     const btn3D = document.getElementById('btn-render-3d');
     
-    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all";
-    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all";
+    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
 
     if (mode === '3D') {
         stage2D.classList.add('hidden');
@@ -1531,6 +1531,19 @@ if (toolId === 'grid') {
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
             document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
             document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
+            
+            // Controlo de Visibilidade Contextual do Botão 3D
+            const viewModeToggle = document.getElementById('view-mode-toggle');
+            if (viewModeToggle) {
+                if (mode === 'ies' && window.state[window.currentTool]?.iesData) {
+                    viewModeToggle.classList.remove('hidden');
+                } else {
+                    viewModeToggle.classList.add('hidden');
+                    window.toggleRenderMode('2D'); // Força o retorno ao 2D como proteção de estado
+                }
+            }
+            
+            // Lógica de Bloqueio (Data Integrity Lock)
             
             // Lógica de Bloqueio (Data Integrity Lock)
             const fluxInput = document.getElementById('g-flux');
