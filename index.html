@@ -5,6 +5,9 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WJ9RV22BTF"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -455,9 +458,22 @@
                                         </div>
                                     </div>
 
+                                    <div id="view-mode-toggle" class="absolute top-4 right-4 z-30 hidden">
+                                        <div class="flex bg-white dark:bg-slate-900 p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md">
+                                            <button onclick="window.toggleRenderMode('2D')" id="btn-render-2d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all">Vista 2D</button>
+                                            <button onclick="window.toggleRenderMode('3D')" id="btn-render-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all">Sólido 3D</button>
+                                        </div>
+                                    </div>
+
                                     <div class="relative flex-grow w-full">
-                                        <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
-                                        <canvas id="beamCanvas" class="absolute inset-0 w-full h-full z-10 block"></canvas>
+                                        <div id="stage-2d" class="absolute inset-0 w-full h-full z-10 block">
+                                            <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
+                                            <canvas id="beamCanvas" class="absolute inset-0 w-full h-full block"></canvas>
+                                        </div>
+                                        
+                                        <div id="stage-3d" class="absolute inset-0 w-full h-full z-20 hidden bg-slate-900">
+                                            <div id="webgl-container" class="w-full h-full cursor-move"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1168,6 +1184,163 @@ window.FalseColorEngine = {
     }
 };
 
+// --- LUXSINTAX WEBGL ENGINE (SÓLIDO FOTOMÉTRICO 3D) ---
+window.Photometric3DEngine = {
+    scene: null, camera: null, renderer: null, controls: null, solidMesh: null, isInitialized: false,
+    
+    init: function() {
+        if (this.isInitialized) return;
+        const container = document.getElementById('webgl-container');
+        if (!container || typeof THREE === 'undefined') return;
+
+        // Cena e Fundo
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(document.documentElement.classList.contains('dark') ? 0x0f172a : 0x1e293b);
+
+        // Câmara
+        const rect = container.getBoundingClientRect();
+        this.camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 1000);
+        this.camera.position.set(15, 10, 15);
+        this.camera.lookAt(0, 0, 0);
+
+        // Renderizador
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setSize(rect.width, rect.height);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(this.renderer.domElement);
+
+        // Controlos de Rotação (OrbitControls)
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.05;
+
+        // Grelhas e Eixos de Referência
+        const gridHelper = new THREE.GridHelper(20, 20, 0x475569, 0x334155);
+        gridHelper.position.y = -5; // Linha de piso virtual
+        this.scene.add(gridHelper);
+        
+        const axesHelper = new THREE.AxesHelper(2);
+        this.scene.add(axesHelper);
+
+        // Iluminação
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        this.scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 10);
+        this.scene.add(dirLight);
+
+        this.isInitialized = true;
+        this.animate();
+
+        // Responsividade
+        window.addEventListener('resize', () => {
+            if (!this.renderer || container.clientWidth === 0) return;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            this.renderer.setSize(width, height);
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+        });
+    },
+
+    animate: function() {
+        requestAnimationFrame(() => window.Photometric3DEngine.animate());
+        if (this.controls) this.controls.update();
+        if (this.renderer && this.scene && this.camera) {
+            this.renderer.render(this.scene, this.camera);
+        }
+    },
+
+    clearSolid: function() {
+        if (this.solidMesh && this.scene) {
+            this.scene.remove(this.solidMesh);
+            this.solidMesh.geometry.dispose();
+            this.solidMesh.material.dispose();
+            this.solidMesh = null;
+        }
+    },
+
+    renderPhotometricSolid: function(iesData) {
+        if (!this.isInitialized) this.init();
+        this.clearSolid();
+        if (!iesData || !iesData.hAngles || !iesData.vAngles || !iesData.candelas) return;
+
+        const pts = [];
+        const hAngles = iesData.hAngles;
+        const vAngles = iesData.vAngles;
+        const matrix = iesData.candelas;
+        const mult = iesData.multiplier;
+
+        // Encontrar o valor máximo para normalizar o tamanho da malha 3D
+        let maxI = 0;
+        for (let h = 0; h < hAngles.length; h++) {
+            for (let v = 0; v < vAngles.length; v++) {
+                if (matrix[h][v] > maxI) maxI = matrix[h][v];
+            }
+        }
+        
+        if (maxI === 0) return;
+        const scaleFactor = 10 / maxI; // Normaliza o sólido para caber num raio de ~10 unidades
+
+        // Geração da Geometria (Wireframe) baseada em coordenadas Esféricas -> Cartesianas
+        for (let h = 0; h < hAngles.length; h++) {
+            for (let v = 0; v < vAngles.length; v++) {
+                const intensity = matrix[h][v] * mult * scaleFactor;
+                const phi = (hAngles[h] * Math.PI) / 180; // Horizontal
+                const theta = (vAngles[v] * Math.PI) / 180; // Vertical
+
+                // Equação Paramétrica para Iluminação (O eixo Y é "para baixo" na maioria das luminárias)
+                const x = intensity * Math.sin(theta) * Math.cos(phi);
+                const y = -intensity * Math.cos(theta); 
+                const z = intensity * Math.sin(theta) * Math.sin(phi);
+
+                pts.push(new THREE.Vector3(x, y, z));
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry().setFromPoints(pts);
+        
+        // Linhas conectando os pontos para formar a "teia"
+        const material = new THREE.LineBasicMaterial({ 
+            color: 0xfbbf24, // Amber-400 (cor da marca LuxSintax)
+            transparent: true, 
+            opacity: 0.6 
+        });
+
+        this.solidMesh = new THREE.LineSegments(geometry, material);
+        this.scene.add(this.solidMesh);
+    }
+};
+
+window.toggleRenderMode = function(mode) {
+    const stage2D = document.getElementById('stage-2d');
+    const stage3D = document.getElementById('stage-3d');
+    const btn2D = document.getElementById('btn-render-2d');
+    const btn3D = document.getElementById('btn-render-3d');
+    
+    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all";
+    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all";
+
+    if (mode === '3D') {
+        stage2D.classList.add('hidden');
+        stage3D.classList.remove('hidden');
+        btn3D.className = activeClass;
+        btn2D.className = inactiveClass;
+        
+        window.Photometric3DEngine.init();
+        const currentData = window.state[window.currentTool].iesData;
+        if (currentData) {
+            window.Photometric3DEngine.renderPhotometricSolid(currentData);
+        }
+    } else {
+        stage3D.classList.add('hidden');
+        stage2D.classList.remove('hidden');
+        btn2D.className = activeClass;
+        btn3D.className = inactiveClass;
+        window.updateCalculations();
+    }
+};
+
 window.BimIfcAdapter = {
     mapGridToBim: (gridState) => {
         const fixtures = [];
@@ -1516,6 +1689,14 @@ window.toggleGridLevel = function(level) {
                             } else {
                                 document.getElementById('pd-efficacy').innerText = 'N/D';
                             }
+                        }
+                        
+                        // Exibe o Toggle 3D e renderiza caso o modo 3D já esteja ativo
+                        const toggleBtn = document.getElementById('view-mode-toggle');
+                        if (toggleBtn) toggleBtn.classList.remove('hidden');
+                        
+                        if (window.Photometric3DEngine && window.Photometric3DEngine.isInitialized && !document.getElementById('stage-3d').classList.contains('hidden')) {
+                             window.Photometric3DEngine.renderPhotometricSolid(parsed);
                         }
 
                         window.updateCalculations();
