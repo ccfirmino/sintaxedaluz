@@ -1386,33 +1386,7 @@ window.Photometric3DEngine = {
     }
 };
 
-window.toggleRenderMode = function(mode) {
-    const stage2D = document.getElementById('stage-2d');
-    const stage3D = document.getElementById('stage-3d');
-    
-    const activeToolKey = window.currentTool || 'ponto';
-    const btn2D = document.getElementById(`btn-render-2d-${activeToolKey}`) || document.getElementById('btn-render-2d');
-    const btn3D = document.getElementById(`btn-render-3d-${activeToolKey}`) || document.getElementById('btn-render-3d');
-    
-    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
-    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
-
-    if (mode === '3D') {
-        stage2D.classList.add('hidden');
-        stage3D.classList.remove('hidden');
-        if (btn3D) btn3D.className = activeClass;
-        if (btn2D) btn2D.className = inactiveClass;
-        
-        window.Photometric3DEngine.init();
-        window.updateCalculations(); 
-    } else {
-        stage3D.classList.add('hidden');
-        stage2D.classList.remove('hidden');
-        if (btn2D) btn2D.className = activeClass;
-        if (btn3D) btn3D.className = inactiveClass;
-        window.updateCalculations();
-    }
-};
+// LUXSINTAX: Função duplicada 'toggleRenderMode' removida para evitar colisão de estado (Lag de Renderização)
 
 window.toggleRenderMode = function(mode) {
     const stage2D = document.getElementById('stage-2d');
@@ -1890,13 +1864,13 @@ window.toggleGridLevel = function(level) {
 
                 // 6. Desenho Fotométrico
                 let ptr = 0;
-                const hAngles = [];
+                let hAngles = [];
                 for (let i = 0; i < Mc; i++) hAngles.push(matrixData[ptr++]);
 
                 const vAngles = [];
                 for (let i = 0; i < Mg; i++) vAngles.push(matrixData[ptr++]);
 
-                const candelas = [];
+                let candelas = [];
                 for (let c = 0; c < Mc; c++) {
                     const row = [];
                     for (let g = 0; g < Mg; g++) {
@@ -1904,6 +1878,33 @@ window.toggleGridLevel = function(level) {
                     }
                     candelas.push(row);
                 }
+
+                // LUXSINTAX: Expansão de Simetria Fotométrica (0-360)
+                const lastH = hAngles[hAngles.length - 1];
+                if (hAngles.length === 1 || lastH === 0) {
+                    hAngles = [0, 90, 180, 270, 360];
+                    const c0 = candelas[0];
+                    candelas = [c0, c0, c0, c0, c0];
+                } else if (lastH === 90) {
+                    const len = hAngles.length;
+                    for (let i = len - 2; i >= 0; i--) {
+                        hAngles.push(180 - hAngles[i]);
+                        candelas.push(candelas[i]);
+                    }
+                    const len180 = hAngles.length;
+                    for (let i = len180 - 2; i >= 0; i--) {
+                        hAngles.push(360 - hAngles[i]);
+                        candelas.push(candelas[i]);
+                    }
+                } else if (lastH === 180) {
+                    const len = hAngles.length;
+                    for (let i = len - 2; i >= 0; i--) {
+                        hAngles.push(360 - hAngles[i]);
+                        candelas.push(candelas[i]);
+                    }
+                }
+
+                return { vAngles, hAngles, candelas, multiplier: 1, totalFlux, wattage };
 
                 return { vAngles, hAngles, candelas, multiplier: 1, totalFlux, wattage };
 
@@ -1985,10 +1986,10 @@ window.toggleGridLevel = function(level) {
                 const vAngles = [];
                 for(let i=0; i<vCount; i++) vAngles.push(nextNum());
 
-                const hAngles = [];
+                let hAngles = [];
                 for(let i=0; i<hCount; i++) hAngles.push(nextNum());
 
-                const candelas = [];
+                let candelas = [];
                 for(let h=0; h<hCount; h++) {
                     const row = [];
                     for(let v=0; v<vCount; v++) {
@@ -1996,6 +1997,33 @@ window.toggleGridLevel = function(level) {
                     }
                     candelas.push(row);
                 }
+
+                // LUXSINTAX: Expansão de Simetria Fotométrica (0-360)
+                const lastH = hAngles[hAngles.length - 1];
+                if (hAngles.length === 1 || lastH === 0) {
+                    hAngles = [0, 90, 180, 270, 360];
+                    const c0 = candelas[0];
+                    candelas = [c0, c0, c0, c0, c0];
+                } else if (lastH === 90) {
+                    const len = hAngles.length;
+                    for (let i = len - 2; i >= 0; i--) {
+                        hAngles.push(180 - hAngles[i]);
+                        candelas.push(candelas[i]);
+                    }
+                    const len180 = hAngles.length;
+                    for (let i = len180 - 2; i >= 0; i--) {
+                        hAngles.push(360 - hAngles[i]);
+                        candelas.push(candelas[i]);
+                    }
+                } else if (lastH === 180) {
+                    const len = hAngles.length;
+                    for (let i = len - 2; i >= 0; i--) {
+                        hAngles.push(360 - hAngles[i]);
+                        candelas.push(candelas[i]);
+                    }
+                }
+
+                // Cálculo de Fluxo Total para IES baseado em integrais esféricas simplificadas
 
                 // Cálculo de Fluxo Total para IES baseado em integrais esféricas simplificadas
                 // Se a matriz é relativa, calculamos o total de lúmens.
