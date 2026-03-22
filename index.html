@@ -1259,22 +1259,32 @@ window.Photometric3DEngine = {
         const mult = iesData.multiplier;
 
         let maxI = 0;
+        let maxDown = 0;
         for (let h = 0; h < hAngles.length; h++) {
             for (let v = 0; v < vAngles.length; v++) {
-                if (matrix[h][v] > maxI) maxI = matrix[h][v];
+                const i_val = matrix[h][v];
+                if (i_val > maxI) maxI = i_val;
+                
+                // Extração do limite de profundidade real (Bounding Box Inferior)
+                const theta = (vAngles[v] * Math.PI) / 180;
+                const down = i_val * mult * Math.cos(theta);
+                if (down > maxDown) maxDown = down;
             }
         }
         if (maxI === 0) return;
         
-        // Normaliza o sólido para ser fisicamente proporcional ao pé-direito
-        const scaleFactor = (state && state.height) ? (state.height * 0.8) / maxI : 5 / maxI; 
+        // LUXSINTAX: Auto-Scale Inteligente preservando a integridade fotométrica.
+        // O sólido é escalado organicamente para que o pico inferior beije o piso exato, sem fatiamentos.
+        let scaleFactor = 1;
+        if (state && state.height && maxDown > 0) {
+            scaleFactor = state.height / maxDown;
+        } else {
+            scaleFactor = (state && state.height) ? (state.height * 0.8) / (maxI * mult) : 5 / (maxI * mult);
+        }
 
         // LUXSINTAX: Construção do Sólido Fotométrico Contínuo (Wireframe 3D)
         const webGroup = new THREE.Group();
         const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
-
-        // LUXSINTAX: Definição da altura paramétrica do piso para Clipping 3D
-        const h_floor = (state && state.height) ? state.height : 3.0;
 
         // 1. Desenha as Curvas Verticais (Planos C / Meridianos)
         for (let h = 0; h < hAngles.length; h++) {
@@ -1283,15 +1293,10 @@ window.Photometric3DEngine = {
                 const intensity = matrix[h][v] * mult * scaleFactor;
                 const phi = (hAngles[h] * Math.PI) / 180; 
                 const theta = (vAngles[v] * Math.PI) / 180; 
-                let x = intensity * Math.sin(theta) * Math.cos(phi);
-                let y = -intensity * Math.cos(theta); 
-                let z = intensity * Math.sin(theta) * Math.sin(phi);
+                const x = intensity * Math.sin(theta) * Math.cos(phi);
+                const y = -intensity * Math.cos(theta); 
+                const z = intensity * Math.sin(theta) * Math.sin(phi);
                 
-                // Clipping paramétrico com projeção na placa inferior
-                if (y < -h_floor) {
-                    const t = -h_floor / y;
-                    x *= t; y *= t; z *= t;
-                }
                 pts.push(new THREE.Vector3(x, y, z));
             }
             webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
@@ -1304,15 +1309,10 @@ window.Photometric3DEngine = {
                 const intensity = matrix[h][v] * mult * scaleFactor;
                 const phi = (hAngles[h] * Math.PI) / 180; 
                 const theta = (vAngles[v] * Math.PI) / 180; 
-                let x = intensity * Math.sin(theta) * Math.cos(phi);
-                let y = -intensity * Math.cos(theta); 
-                let z = intensity * Math.sin(theta) * Math.sin(phi);
+                const x = intensity * Math.sin(theta) * Math.cos(phi);
+                const y = -intensity * Math.cos(theta); 
+                const z = intensity * Math.sin(theta) * Math.sin(phi);
                 
-                // Clipping paramétrico com projeção na placa inferior
-                if (y < -h_floor) {
-                    const t = -h_floor / y;
-                    x *= t; y *= t; z *= t;
-                }
                 pts.push(new THREE.Vector3(x, y, z));
             }
             webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
