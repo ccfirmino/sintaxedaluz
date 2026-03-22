@@ -1258,10 +1258,8 @@ window.Photometric3DEngine = {
         const baseMatrix = iesData.candelas;
         const mult = iesData.multiplier;
 
-        // LUXSINTAX: Motor de Suavização Fotométrica 3D (Anti-Pirâmide)
-        // Arquivos LDT/IES otimizados exportam a simetria em apenas 4 planos (0, 90, 180, 270).
-        // Na renderização WebGL, 4 pontos formam um quadrado (pirâmide).
-        // Este algoritmo interpola a matriz para 36 planos (10 graus), garantindo um cone orgânico perfeito.
+        // LUXSINTAX: Motor de Interpolação Orgânica Definitivo (Cosine Smoothing)
+        // Substitui a interpolação linear por cossenoidal para eliminar quinas radiais (diamantes).
         const hAngles = [];
         const matrix = [];
         for (let a = 0; a <= 360; a += 10) {
@@ -1271,7 +1269,8 @@ window.Photometric3DEngine = {
                 const maxBaseH = baseHAngles[baseHAngles.length - 1];
                 if (a > maxBaseH) {
                     const t = (a - maxBaseH) / (360 - maxBaseH || 1);
-                    row.push(baseMatrix[baseHAngles.length - 1][v] * (1 - t) + baseMatrix[0][v] * t);
+                    const smoothT = (1 - Math.cos(t * Math.PI)) / 2;
+                    row.push(baseMatrix[baseHAngles.length - 1][v] * (1 - smoothT) + baseMatrix[0][v] * smoothT);
                     continue;
                 }
                 let idx1 = 0, idx2 = 0;
@@ -1284,7 +1283,8 @@ window.Photometric3DEngine = {
                     row.push(baseMatrix[idx1][v]);
                 } else {
                     const t = (a - baseHAngles[idx1]) / (baseHAngles[idx2] - baseHAngles[idx1]);
-                    row.push(baseMatrix[idx1][v] * (1 - t) + baseMatrix[idx2][v] * t);
+                    const smoothT = (1 - Math.cos(t * Math.PI)) / 2;
+                    row.push(baseMatrix[idx1][v] * (1 - smoothT) + baseMatrix[idx2][v] * smoothT);
                 }
             }
             matrix.push(row);
@@ -1863,30 +1863,28 @@ window.toggleGridLevel = function(level) {
                     conversionFactor = (totalFlux / 1000) * convFactor; // LDT = cd/klm
                 }
 
-                // 4. Isolamento Cirúrgico da Matriz
-                // Pela norma, a matriz começa exatamente após as lâmpadas e os 10 fatores de reflexão
-                const matrixStartLine = 26 + (nLampsSets * 6) + 10;
-                
-                const matrixText = lines.slice(matrixStartLine).join(' ');
-                const tokens = matrixText.replace(/\s+/g, ' ').trim().split(' ');
-
-                // 5. Conversão Blindada (Transforma tudo em número, substitui lixo por 0 para não quebrar a grelha)
-                const matrixData = [];
-                for (let t of tokens) {
-                    if (t === '') continue;
-                    
-                    if (t.includes('.') && t.includes(',')) {
-                        if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
-                        else t = t.replace(/,/g, '');
-                    } else {
-                        t = t.replace(/,/g, '.');
+                // LUXSINTAX: Isolamento de Matriz à Prova de Falhas (Reverse Extraction)
+                // Laboratórios frequentemente inserem linhas extras fora do padrão EULUMDAT.
+                // Como a matriz é sempre o bloco final, extraímos os últimos 'req' números válidos do documento inteiro.
+                let allNumbers = [];
+                for (let i = 26; i < lines.length; i++) {
+                    const tokens = lines[i].replace(/\s+/g, ' ').trim().split(' ');
+                    for (let t of tokens) {
+                        if (t === '') continue;
+                        if (t.includes('.') && t.includes(',')) {
+                            if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
+                            else t = t.replace(/,/g, '');
+                        } else {
+                            t = t.replace(/,/g, '.');
+                        }
+                        const val = Number(t);
+                        if (!isNaN(val)) allNumbers.push(val);
                     }
-                    
-                    const val = Number(t);
-                    matrixData.push(isNaN(val) ? 0 : val);
                 }
+                
+                let matrixData = allNumbers.slice(-req);
 
-                // Preenchimento de segurança caso o ficheiro do fabricante esteja cortado no fim
+                // Preenchimento de segurança extremo caso o arquivo esteja corrompido ou muito curto
                 while (matrixData.length < req) {
                     matrixData.push(0);
                 }
