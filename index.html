@@ -1215,12 +1215,22 @@ window.Photometric3DEngine = {
         let hFull = [...hA], mFull = mat.map(r => [...r]);
         let lastH = Math.round(hA[hA.length - 1]);
 
-        if (lastH === 90) {
+        // LUXSINTAX: Algoritmo de Fechamento de Simetria Universal
+        if (hA.length === 1 || lastH === 0) {
+            // Simetria Rotacional (Cria o cilindro em 360 graus)
+            hFull = []; mFull = [];
+            for (let a = 0; a <= 360; a += 15) {
+                hFull.push(a); mFull.push(mat[0]); 
+            }
+        } else if (lastH === 90) {
+            // Simetria Quadrilateral
             for (let i = hFull.length - 2; i >= 0; i--) { hFull.push(180 - hFull[i]); mFull.push(mFull[i]); }
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
         } else if (lastH === 180) {
+            // Simetria Bilateral
             for (let i = hFull.length - 2; i >= 1; i--) { hFull.push(360 - hFull[i]); mFull.push(mFull[i]); }
         }
+        // Garante a conexão final da malha
         if (Math.round(hFull[hFull.length - 1]) !== 360) { hFull.push(360); mFull.push(mFull[0]); }
 
         let maxI = 0; mFull.forEach(r => r.forEach(v => { if (v > maxI) maxI = v; }));
@@ -1662,29 +1672,52 @@ window.toggleGridLevel = function(level) {
             }
         };
 
-        // --- MOTOR EULUMDAT (LDT) - SCANNER DE TOKENS (ULTRA ROBUSTO) ---
+        // --- MOTOR EULUMDAT (LDT) ---
 window.parseLDT = function(rawData) {
     try {
-        const tokens = rawData.replace(/,/g, '.').split(/\s+/).filter(t => t.length > 0);
-        if (tokens.length < 50) return null;
-        const Mc = parseInt(tokens[3]); 
-        const Mg = parseInt(tokens[5]); 
-        const nLamps = Math.abs(parseInt(tokens[25])) || 1;
+        // A norma EULUMDAT obriga que o cabeçalho seja lido linha a linha
+        const lines = rawData.replace(/\r/g, '').split('\n').map(l => l.trim());
+        if (lines.length < 30) return null;
+
+        const Mc = parseInt(lines[3]); // Eixos C
+        const Mg = parseInt(lines[5]); // Ângulos Gamma
+        const nLampsRaw = parseInt(lines[25]);
+        const nLamps = isNaN(nLampsRaw) ? 1 : Math.abs(nLampsRaw);
+        
         if (isNaN(Mc) || isNaN(Mg) || Mc <= 0 || Mg <= 0) return null;
-        const totalFlux = parseFloat(tokens[23]) || 1000;
-        const watts = parseFloat(tokens[26 + 5]) || 0;
-        const matrixStart = 26 + (nLamps * 6) + 10;
-        const dataStream = tokens.slice(matrixStart);
-        if (dataStream.length < (Mc + Mg + (Mc * Mg))) return null;
+
+        const totalFlux = parseFloat(lines[23]?.replace(',', '.')) || 1000;
+        let watts = 0;
+        if (nLamps > 0) {
+            watts = parseFloat(lines[26 + 5]?.replace(',', '.')) || 0;
+        }
+
+        // Pula as linhas do cabeçalho oficial para isolar os dados fotométricos
+        const headerLineCount = 26 + (nLamps * 6) + 10;
+        const dataLines = lines.slice(headerLineCount);
+        
+        // Agora sim, transformamos o corpo de dados numa matriz contínua
+        const dataStream = dataLines.join(' ').replace(/,/g, '.').split(/\s+/).filter(t => t.length > 0).map(Number);
+
+        const expectedCount = Mc + Mg + (Mc * Mg);
+        if (dataStream.length < expectedCount) {
+            console.error("LDT Incompleto");
+            return null;
+        }
+
         let ptr = 0;
-        const hAngles = dataStream.slice(ptr, ptr + Mc).map(Number); ptr += Mc;
-        const vAngles = dataStream.slice(ptr, ptr + Mg).map(Number); ptr += Mg;
+        const hAngles = dataStream.slice(ptr, ptr + Mc); ptr += Mc;
+        const vAngles = dataStream.slice(ptr, ptr + Mg); ptr += Mg;
         const matrix = [];
         for (let c = 0; c < Mc; c++) {
-            matrix.push(dataStream.slice(ptr + c * Mg, ptr + (c + 1) * Mg).map(Number));
+            matrix.push(dataStream.slice(ptr + c * Mg, ptr + (c + 1) * Mg));
         }
+
         return { vAngles, hAngles, candelas: matrix, multiplier: 1.0, totalFlux: totalFlux, wattage: watts };
-    } catch (e) { return null; }
+    } catch (e) { 
+        console.error("Erro Parse LDT:", e);
+        return null; 
+    }
 };
 
 window.PhotometricAnalyzer = {
@@ -1702,6 +1735,7 @@ window.PhotometricAnalyzer = {
     }
 };
 
+// --- MOTOR IESNA (IES) ---
 window.parseIES = function(content) {
     try {
         let wattage = null;
@@ -1728,18 +1762,31 @@ window.parseIES = function(content) {
         }
         if (!tiltFound) return null;
         function nextNum() { while(cursor < tokens.length) { const val = parseFloat(tokens[cursor++]); if (!isNaN(val)) return val; } return null; }
-        nextNum(); nextNum(); 
-        const multiplier = nextNum(), vCount = nextNum(), hCount = nextNum();
-        for(let i=0; i<11; i++) nextNum();
+        
+        nextNum(); // Pula Num Lamps
+        nextNum(); // Pula Lumens/Lamp
+        
+        const multiplier = nextNum();
+        const vCount = nextNum();
+        const hCount = nextNum();
+        
+        // LUXSINTAX BUGFIX: A norma dita exatamente 8 variáveis restantes antes da matriz, e não 11!
+        for(let i=0; i<8; i++) nextNum();
+        
         const vAngles = []; for(let i=0; i<vCount; i++) vAngles.push(nextNum());
         const hAngles = []; for(let i=0; i<hCount; i++) hAngles.push(nextNum());
         const candelas = [];
+        
         for(let h=0; h<hCount; h++) {
-            const row = []; for(let v=0; v<vCount; v++) row.push(nextNum());
+            const row = []; 
+            for(let v=0; v<vCount; v++) row.push(nextNum());
             candelas.push(row);
         }
         return { vAngles, hAngles, candelas, multiplier, wattage, totalFlux: (candelas[0][0] * multiplier * 12.57) };
-    } catch (e) { return null; }
+    } catch (e) { 
+        console.error("Erro Parse IES:", e);
+        return null; 
+    }
 };
 
         window.getIESIntensity = function(state, angleDeg) {
