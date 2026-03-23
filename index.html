@@ -296,7 +296,6 @@
             <div class="mode-standard-only">
                 <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
             </div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="0" max="60"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="0" max="60" step="1" value="0"></div>
             <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
             <div class="mode-photo-group hidden space-y-6 mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
@@ -3635,10 +3634,20 @@ window.setSurfaceMode = function(mode) {
         btnS.className = isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
         btnA.className = !isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
     }
+    
+    // Mostra/Oculta a Orientação dos Fachos
     const tiltModeGrp = document.getElementById('p-tilt-mode-group');
     if (tiltModeGrp) {
         tiltModeGrp.style.display = isSingle ? 'none' : 'block';
     }
+    
+    // LUXSINTAX: Mostra/Oculta a Distância Entre Fontes
+    const spacingGrp = document.getElementById('group-spacing');
+    if (spacingGrp) {
+        if (isSingle) spacingGrp.classList.add('hidden');
+        else spacingGrp.classList.remove('hidden');
+    }
+    
     window.updateCalculations();
 };
 
