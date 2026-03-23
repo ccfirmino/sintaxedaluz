@@ -1356,7 +1356,8 @@ window.Photometric3DEngine = {
             
             const tiltModeEl3D = document.querySelector('input[name="p_tilt_mode"]:checked');
             const tiltMode3D = tiltModeEl3D ? tiltModeEl3D.value : 'same';
-            const baseTiltRad = (state && state.tilt ? state.tilt : 0) * Math.PI / 180;
+            // LUXSINTAX: Conversão rigorosa para Número para evitar rotações bizarras no sólido
+            const baseTiltRad = (state && state.tilt ? Number(state.tilt) : 0) * Math.PI / 180;
 
             if (toolId === 'ponto' && state && state.viewMode === 'array') {
                 const hS = state.spacing / 2;
@@ -2798,7 +2799,8 @@ window.toggleGridLevel = function(level) {
 
                 if (window.calcMode !== 'ies' || s.iesData) {
                     origins.forEach((xPos, idx) => {
-                        let currentTilt = s.tilt || 0;
+                        // LUXSINTAX: Conversão rigorosa para Número para evitar concatenação de String da UI
+                        let currentTilt = Number(s.tilt) || 0;
                         // Inverte o eixo da segunda luminária para criar o foco central
                         if (origins.length === 2 && tiltMode === 'cross' && idx === 1) currentTilt = -currentTilt;
                         const currentTr = currentTilt * Math.PI / 180;
@@ -3022,7 +3024,8 @@ window.toggleGridLevel = function(level) {
                 origins.forEach((originX, idx) => {
                     ctx.save();
                     
-                    let currentTilt = s.tilt || 0;
+                    // LUXSINTAX: Conversão rigorosa para Número para evitar explosão matemática no SVG
+                    let currentTilt = Number(s.tilt) || 0;
                     if (origins.length === 2 && tiltMode2 === 'cross' && idx === 1) currentTilt = -currentTilt;
 
                     // LUXSINTAX: Máscara de Piso (Clipping)
