@@ -1882,6 +1882,25 @@ window.toggleGridLevel = function(level) {
                     candelas.push(row);
                 }
 
+                // LUXSINTAX: Escudo Anti-Zeros Dinâmico (Symmetry Restorer)
+                // Laboratórios declaram 360° no cabeçalho, mas preenchem a metade com ZEROS.
+                // O motor varre a matriz. Se a luz sumir abruptamente após os 90° ou 180°, nós amputamos os zeros falsos.
+                let hasLightOver90 = false;
+                let hasLightOver180 = false;
+                for (let i = 0; i < hAngles.length; i++) {
+                    const maxVal = Math.max(...candelas[i]);
+                    if (hAngles[i] > 90 && maxVal > 0.5) hasLightOver90 = true;
+                    if (hAngles[i] > 180 && maxVal > 0.5) hasLightOver180 = true;
+                }
+
+                if (!hasLightOver90 && hAngles[hAngles.length - 1] > 90) {
+                    const vc = hAngles.filter(a => Math.round(a) <= 90).length;
+                    hAngles = hAngles.slice(0, vc); candelas = candelas.slice(0, vc);
+                } else if (!hasLightOver180 && hAngles[hAngles.length - 1] > 180) {
+                    const vc = hAngles.filter(a => Math.round(a) <= 180).length;
+                    hAngles = hAngles.slice(0, vc); candelas = candelas.slice(0, vc);
+                }
+
                 // LUXSINTAX: Expansão de Simetria e Normalização Universal
                 let firstH = Math.round(hAngles[0]);
                 let lastH = Math.round(hAngles[hAngles.length - 1]);
