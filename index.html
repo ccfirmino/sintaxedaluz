@@ -1863,14 +1863,12 @@ window.toggleGridLevel = function(level) {
                     conversionFactor = (totalFlux / 1000) * convFactor; // LDT = cd/klm
                 }
 
-                // LUXSINTAX: Extração de Matriz Sequencial Robusta (Forward Filter)
-                // Removemos a extração reversa. Se o laboratório colocar lixo no final do arquivo, 
-                // o slice deslocaria toda a matriz e inverteria o facho para cima (Efeito Ampulheta).
-                // Agora partimos da linha teórica e extraímos rigorosamente os próximos 'req' números.
-                const matrixStartLine = 26 + (nLampsSets * 6) + 10;
+                // LUXSINTAX: Motor LDT com Janela Deslizante (Smart Windowing)
+                // Substitui a contagem de linhas falha por um scanner matemático.
+                // Extrai todos os números do documento e desliza uma janela exata (req) pelo final.
+                // Encontra a matriz validando a assinatura oficial: Planos C e V começando em 0.
                 let allNumbers = [];
-                
-                for (let i = matrixStartLine; i < lines.length; i++) {
+                for (let i = 0; i < lines.length; i++) {
                     const tokens = lines[i].replace(/\s+/g, ' ').trim().split(' ');
                     for (let t of tokens) {
                         if (t === '') continue;
@@ -1881,17 +1879,34 @@ window.toggleGridLevel = function(level) {
                             t = t.replace(/,/g, '.');
                         }
                         const val = Number(t);
-                        if (!isNaN(val)) {
-                            allNumbers.push(val);
-                            if (allNumbers.length === req) break; // Para imediatamente ao formar a matriz
-                        }
+                        if (!isNaN(val)) allNumbers.push(val);
                     }
-                    if (allNumbers.length === req) break;
                 }
                 
-                let matrixData = allNumbers;
+                let bestStart = Math.max(0, allNumbers.length - req);
+                // Procura até 50 posições ignorando lixo de rodapé (telefones, observações)
+                for (let offset = 0; offset <= 50; offset++) {
+                    const idx = allNumbers.length - req - offset;
+                    // Assinatura EULUMDAT: O primeiro ângulo C e o primeiro ângulo Gamma são SEMPRE 0.
+                    if (idx >= 0 && allNumbers[idx] === 0 && allNumbers[idx + Mc] === 0) {
+                        let isValidAngles = true;
+                        // Valida a progressão geométrica crescente
+                        for (let k = 0; k < Mc - 1; k++) {
+                            if (allNumbers[idx + k] >= allNumbers[idx + k + 1]) {
+                                isValidAngles = false;
+                                break;
+                            }
+                        }
+                        if (isValidAngles) {
+                            bestStart = idx;
+                            break;
+                        }
+                    }
+                }
+                
+                let matrixData = allNumbers.slice(bestStart, bestStart + req);
 
-                // Preenchimento de segurança extremo caso o arquivo esteja corrompido ou cortado
+                // Preenchimento de segurança em caso de arquivo truncado
                 while (matrixData.length < req) {
                     matrixData.push(0);
                 }
