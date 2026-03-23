@@ -1270,36 +1270,9 @@ window.Photometric3DEngine = {
         const textLabel = beamObj.isOval ? `${Math.round(beamObj.c0)}° x ${Math.round(beamObj.c90)}°` : `${Math.round(beamObj.c0)}°`;
         overlay.innerHTML = `<div class="bg-slate-900/80 backdrop-blur border border-luminous-gold/50 text-luminous-gold px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest uppercase shadow-lg">Facho FWHM: ${textLabel}</div>`;
 
-        // LUXSINTAX: Motor de Interpolação Orgânica Definitivo (Cosine Smoothing)
-        const hAngles = [];
-        const matrix = [];
-        for (let a = 0; a <= 360; a += 10) {
-            hAngles.push(a);
-            const row = [];
-            for (let v = 0; v < vAngles.length; v++) {
-                const maxBaseH = baseHAngles[baseHAngles.length - 1];
-                if (a > maxBaseH) {
-                    const t = (a - maxBaseH) / (360 - maxBaseH || 1);
-                    const smoothT = (1 - Math.cos(t * Math.PI)) / 2;
-                    row.push(baseMatrix[baseHAngles.length - 1][v] * (1 - smoothT) + baseMatrix[0][v] * smoothT);
-                    continue;
-                }
-                let idx1 = 0, idx2 = 0;
-                for (let i = 0; i < baseHAngles.length - 1; i++) {
-                    if (a >= baseHAngles[i] && a <= baseHAngles[i+1]) {
-                        idx1 = i; idx2 = i + 1; break;
-                    }
-                }
-                if (baseHAngles[idx1] === baseHAngles[idx2]) {
-                    row.push(baseMatrix[idx1][v]);
-                } else {
-                    const t = (a - baseHAngles[idx1]) / (baseHAngles[idx2] - baseHAngles[idx1]);
-                    const smoothT = (1 - Math.cos(t * Math.PI)) / 2;
-                    row.push(baseMatrix[idx1][v] * (1 - smoothT) + baseMatrix[idx2][v] * smoothT);
-                }
-            }
-            matrix.push(row);
-        }
+        // LUXSINTAX: Matriz já chega normalizada do parser (37 planos, 0 a 360 de 10 em 10)
+        const hAngles = baseHAngles;
+        const matrix = baseMatrix;
 
         let maxI = 0;
         let maxDown = 0;
@@ -1917,42 +1890,50 @@ window.toggleGridLevel = function(level) {
                     candelas.push(row);
                 }
 
-                // LUXSINTAX: Expansão de Simetria Fotométrica Avançada (0-360 Smooth)
+                // LUXSINTAX: Expansão de Simetria e Normalização Universal
                 let firstH = Math.round(hAngles[0]);
                 let lastH = Math.round(hAngles[hAngles.length - 1]);
 
                 if (hAngles.length === 1 || (firstH === 0 && lastH === 0)) {
                     const c0 = candelas[0];
-                    hAngles = [];
-                    candelas = [];
-                    for (let a = 0; a <= 360; a += 10) {
-                        hAngles.push(a);
-                        candelas.push(c0);
-                    }
+                    hAngles = [0, 90, 180, 270, 360];
+                    candelas = [c0, c0, c0, c0, c0];
                 } else {
                     if (firstH === 0 && lastH === 90) {
                         const len = hAngles.length;
-                        for (let i = len - 2; i >= 0; i--) {
-                            hAngles.push(180 - hAngles[i]);
-                            candelas.push(candelas[i]);
-                        }
+                        for (let i = len - 2; i >= 0; i--) { hAngles.push(180 - hAngles[i]); candelas.push(candelas[i]); }
                         lastH = 180;
                     }
                     if (firstH === 0 && lastH === 180) {
                         const len = hAngles.length;
-                        for (let i = len - 2; i >= 0; i--) {
-                            hAngles.push(360 - hAngles[i]);
-                            candelas.push(candelas[i]);
-                        }
+                        for (let i = len - 2; i >= 0; i--) { hAngles.push(360 - hAngles[i]); candelas.push(candelas[i]); }
                     }
-                    // Garantia estrutural de fechamento do sólido 3D WebGL
                     if (Math.round(hAngles[hAngles.length - 1]) < 360) {
-                        hAngles.push(360);
-                        candelas.push(candelas[0]);
+                        hAngles.push(360); candelas.push(candelas[0]);
                     }
                 }
 
-                return { vAngles, hAngles, candelas, multiplier: 1, totalFlux, wattage };
+                const normH = []; const normC = [];
+                for (let a = 0; a <= 360; a += 10) {
+                    normH.push(a);
+                    const row = [];
+                    for (let v = 0; v < vAngles.length; v++) {
+                        let idx1 = 0, idx2 = 0;
+                        for (let i = 0; i < hAngles.length - 1; i++) {
+                            if (a >= hAngles[i] && a <= hAngles[i+1]) { idx1 = i; idx2 = i + 1; break; }
+                        }
+                        if (hAngles[idx1] === hAngles[idx2] || a === hAngles[idx1]) {
+                            row.push(candelas[idx1][v]);
+                        } else {
+                            const t = (a - hAngles[idx1]) / (hAngles[idx2] - hAngles[idx1]);
+                            const smoothT = (1 - Math.cos(t * Math.PI)) / 2;
+                            row.push(candelas[idx1][v] * (1 - smoothT) + candelas[idx2][v] * smoothT);
+                        }
+                    }
+                    normC.push(row);
+                }
+
+                return { vAngles, hAngles: normH, candelas: normC, multiplier: 1, totalFlux, wattage };
 
             } catch (err) {
                 console.error("[LuxSintax] Erro crasso no Parse LDT:", err);
@@ -2044,40 +2025,50 @@ window.toggleGridLevel = function(level) {
                     candelas.push(row);
                 }
 
-                // LUXSINTAX: Expansão de Simetria Fotométrica Avançada (0-360 Smooth)
+                // LUXSINTAX: Expansão de Simetria e Normalização Universal
                 let firstH = Math.round(hAngles[0]);
                 let lastH = Math.round(hAngles[hAngles.length - 1]);
 
                 if (hAngles.length === 1 || (firstH === 0 && lastH === 0)) {
                     const c0 = candelas[0];
-                    hAngles = [];
-                    candelas = [];
-                    for (let a = 0; a <= 360; a += 10) {
-                        hAngles.push(a);
-                        candelas.push(c0);
-                    }
+                    hAngles = [0, 90, 180, 270, 360];
+                    candelas = [c0, c0, c0, c0, c0];
                 } else {
                     if (firstH === 0 && lastH === 90) {
                         const len = hAngles.length;
-                        for (let i = len - 2; i >= 0; i--) {
-                            hAngles.push(180 - hAngles[i]);
-                            candelas.push(candelas[i]);
-                        }
+                        for (let i = len - 2; i >= 0; i--) { hAngles.push(180 - hAngles[i]); candelas.push(candelas[i]); }
                         lastH = 180;
                     }
                     if (firstH === 0 && lastH === 180) {
                         const len = hAngles.length;
-                        for (let i = len - 2; i >= 0; i--) {
-                            hAngles.push(360 - hAngles[i]);
-                            candelas.push(candelas[i]);
-                        }
+                        for (let i = len - 2; i >= 0; i--) { hAngles.push(360 - hAngles[i]); candelas.push(candelas[i]); }
                     }
-                    // Garantia estrutural de fechamento do sólido 3D WebGL
                     if (Math.round(hAngles[hAngles.length - 1]) < 360) {
-                        hAngles.push(360);
-                        candelas.push(candelas[0]);
+                        hAngles.push(360); candelas.push(candelas[0]);
                     }
                 }
+
+                const normH = []; const normC = [];
+                for (let a = 0; a <= 360; a += 10) {
+                    normH.push(a);
+                    const row = [];
+                    for (let v = 0; v < vAngles.length; v++) {
+                        let idx1 = 0, idx2 = 0;
+                        for (let i = 0; i < hAngles.length - 1; i++) {
+                            if (a >= hAngles[i] && a <= hAngles[i+1]) { idx1 = i; idx2 = i + 1; break; }
+                        }
+                        if (hAngles[idx1] === hAngles[idx2] || a === hAngles[idx1]) {
+                            row.push(candelas[idx1][v]);
+                        } else {
+                            const t = (a - hAngles[idx1]) / (hAngles[idx2] - hAngles[idx1]);
+                            const smoothT = (1 - Math.cos(t * Math.PI)) / 2;
+                            row.push(candelas[idx1][v] * (1 - smoothT) + candelas[idx2][v] * smoothT);
+                        }
+                    }
+                    normC.push(row);
+                }
+                hAngles = normH;
+                candelas = normC;
 
                 // Cálculo de Fluxo Total para IES baseado em integrais esféricas simplificadas
 
@@ -2967,25 +2958,13 @@ window.toggleGridLevel = function(level) {
             } // <--- ESTA É A CHAVE MÁGICA QUE FALTAVA!
             
             if (window.calcMode === 'ies' && s.iesData) {
-                const { vAngles, hAngles, candelas } = s.iesData;
+                const { vAngles, candelas } = s.iesData;
                 
-                // Extração dos 4 quadrantes para montagem de gráficos assimétricos reais (C0/C180 e C90/C270)
-                const getRow = (targetH) => {
-                    let minDiff = 999; let idx = 0;
-                    for(let i=0; i<hAngles.length; i++) {
-                        let diff = Math.abs(hAngles[i] - targetH);
-                        // Trata a virada circular de 360 graus
-                        if (Math.abs(hAngles[i] - (targetH + 360)) < diff) diff = Math.abs(hAngles[i] - (targetH + 360));
-                        if (Math.abs(hAngles[i] - (targetH - 360)) < diff) diff = Math.abs(hAngles[i] - (targetH - 360));
-                        if(diff < minDiff) { minDiff = diff; idx = i; }
-                    }
-                    return candelas[idx];
-                };
-
-                const rowC0 = getRow(0);
-                const rowC180 = getRow(180);
-                const rowC90 = getRow(90);
-                const rowC270 = getRow(270);
+                // Matriz já está normalizada e simétrica (Índices fixos: 0=C0, 9=C90, 18=C180, 27=C270)
+                const rowC0 = candelas[0];
+                const rowC90 = candelas[9];
+                const rowC180 = candelas[18] || candelas[0];
+                const rowC270 = candelas[27] || candelas[9];
 
                 let maxI = 0;
                 for(let r of candelas) { const m = Math.max(...r); if(m > maxI) maxI = m; }
