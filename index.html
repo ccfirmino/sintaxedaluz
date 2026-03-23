@@ -1863,67 +1863,65 @@ window.toggleGridLevel = function(level) {
                     conversionFactor = (totalFlux / 1000) * convFactor; // LDT = cd/klm
                 }
 
-                // LUXSINTAX: Motor LDT com Janela Deslizante (Smart Windowing)
-                // Substitui a contagem de linhas falha por um scanner matemático.
-                // Extrai todos os números do documento e desliza uma janela exata (req) pelo final.
-                // Encontra a matriz validando a assinatura oficial: Planos C e V começando em 0.
-                let allNumbers = [];
-                for (let i = 0; i < lines.length; i++) {
-                    const tokens = lines[i].replace(/\s+/g, ' ').trim().split(' ');
-                    for (let t of tokens) {
-                        if (t === '') continue;
-                        if (t.includes('.') && t.includes(',')) {
-                            if (t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(/,/g, '.');
-                            else t = t.replace(/,/g, '');
-                        } else {
-                            t = t.replace(/,/g, '.');
-                        }
-                        const val = Number(t);
-                        if (!isNaN(val)) allNumbers.push(val);
-                    }
-                }
+                // LUXSINTAX: Motor LDT de Assinatura Angular (The Ultimate Parser)
+                // Ignora formatação de texto, espaços ou linhas quebradas enviadas pelo laboratório.
+                // Varrer a matriz em busca da "Digital Numérica" exata dos ângulos C e Gamma.
+                const matrixStartLine = 26 + (nLampsSets * 6);
+                const restOfFile = lines.slice(matrixStartLine).join(' ');
+                const tokens = restOfFile.replace(/\s+/g, ' ').trim().split(' ');
                 
-                let bestStart = Math.max(0, allNumbers.length - req);
-                // Procura até 50 posições ignorando lixo de rodapé (telefones, observações)
-                for (let offset = 0; offset <= 50; offset++) {
-                    const idx = allNumbers.length - req - offset;
-                    // Assinatura EULUMDAT: O primeiro ângulo C e o primeiro ângulo Gamma são SEMPRE 0.
-                    if (idx >= 0 && allNumbers[idx] === 0 && allNumbers[idx + Mc] === 0) {
-                        let isValidAngles = true;
-                        // Valida a progressão geométrica crescente
-                        for (let k = 0; k < Mc - 1; k++) {
-                            if (allNumbers[idx + k] >= allNumbers[idx + k + 1]) {
-                                isValidAngles = false;
+                let nums = [];
+                for (let t of tokens) {
+                    if (t === '') continue;
+                    let str = t;
+                    if (str.includes('.') && str.includes(',')) {
+                        if (str.lastIndexOf(',') > str.lastIndexOf('.')) str = str.replace(/\./g, '').replace(/,/g, '.');
+                        else str = str.replace(/,/g, '');
+                    } else {
+                        str = str.replace(/,/g, '.');
+                    }
+                    const val = Number(str);
+                    if (!isNaN(val)) nums.push(val);
+                }
+
+                let startIndex = 0;
+                let found = false;
+                
+                // Busca a assinatura matemática: Ângulos C crescentes seguidos de Ângulos G crescentes, ambos iniciando em 0.
+                for (let i = 0; i < 50; i++) {
+                    if (i + Mc + Mg <= nums.length) {
+                        if (nums[i] === 0 && nums[i + Mc] === 0) {
+                            let valid = true;
+                            for (let k = 0; k < Mc - 1; k++) if (nums[i + k] >= nums[i + k + 1]) { valid = false; break; }
+                            if (valid) {
+                                for (let k = 0; k < Mg - 1; k++) if (nums[i + Mc + k] >= nums[i + Mc + k + 1]) { valid = false; break; }
+                            }
+                            if (valid) {
+                                startIndex = i;
+                                found = true;
                                 break;
                             }
                         }
-                        if (isValidAngles) {
-                            bestStart = idx;
-                            break;
-                        }
                     }
                 }
                 
-                let matrixData = allNumbers.slice(bestStart, bestStart + req);
+                if (!found) startIndex = 10; // Fallback para o padrão estrito (10 Direct Ratios presentes)
 
-                // Preenchimento de segurança em caso de arquivo truncado
-                while (matrixData.length < req) {
-                    matrixData.push(0);
-                }
-
-                // 6. Desenho Fotométrico
-                let ptr = 0;
+                let ptr = startIndex;
+                
+                // 6. Desenho Fotométrico Dinâmico com preenchimento de segurança
                 let hAngles = [];
-                for (let i = 0; i < Mc; i++) hAngles.push(matrixData[ptr++]);
+                for (let i = 0; i < Mc; i++) hAngles.push(ptr < nums.length ? nums[ptr++] : 0);
 
                 const vAngles = [];
-                for (let i = 0; i < Mg; i++) vAngles.push(matrixData[ptr++]);
+                for (let i = 0; i < Mg; i++) vAngles.push(ptr < nums.length ? nums[ptr++] : 0);
 
                 let candelas = [];
                 for (let c = 0; c < Mc; c++) {
                     const row = [];
                     for (let g = 0; g < Mg; g++) {
-                        row.push(matrixData[ptr++] * conversionFactor);
+                        const val = ptr < nums.length ? nums[ptr++] : 0;
+                        row.push(val * conversionFactor);
                     }
                     candelas.push(row);
                 }
