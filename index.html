@@ -282,15 +282,7 @@
                     <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                 </div>
             </div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">INCLINAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
-            
-            <div id="p-tilt-mode-group" class="mb-6 group" style="display: none;">
-                <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-2 block">ORIENTAÇÃO DOS FACHOS (ARRAY)</label>
-                <div class="flex gap-4 p-1">
-                    <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="p_tilt_mode" value="same" checked onchange="window.updateCalculations()" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Mesmo Lado</span></label>
-                    <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="p_tilt_mode" value="cross" onchange="window.updateCalculations()" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Cruzados</span></label>
-                </div>
-            </div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
             <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
             <div class="mode-standard-only">
@@ -300,6 +292,15 @@
             <div class="mode-photo-group hidden space-y-6 mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
+            </div>
+
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
+            <div id="p-tilt-mode-group" class="mb-6 group" style="display: none;">
+                <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-2 block">CRUZAMENTO DE FACHOS (ARRAY)</label>
+                <div class="flex gap-4 p-1">
+                    <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="p_tilt_mode" value="same" checked onchange="window.updateCalculations()" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Mesmo Lado</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="p_tilt_mode" value="cross" onchange="window.updateCalculations()" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Cruzados</span></label>
+                </div>
             </div>
         </div>
         
@@ -1361,17 +1362,17 @@ window.Photometric3DEngine = {
             if (toolId === 'ponto' && state && state.viewMode === 'array') {
                 const hS = state.spacing / 2;
                 mesh.position.set(-hS, h, 0);
-                mesh.rotation.z = -baseTiltRad; // Z-axis rotation for side tilt
+                mesh.rotation.z = baseTiltRad; // LUXSINTAX: Rotação positiva joga o foco para a direita (Meio)
                 
                 const mesh2 = webGroup.clone();
                 mesh2.position.set(hS, h, 0);
-                mesh2.rotation.z = tiltMode3D === 'cross' ? baseTiltRad : -baseTiltRad;
+                mesh2.rotation.z = tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad; // - joga o foco para a esquerda
                 
                 this.solidGroup.add(mesh);
                 this.solidGroup.add(mesh2);
             } else {
                 mesh.position.set(0, h, 0);
-                mesh.rotation.z = -baseTiltRad;
+                mesh.rotation.z = baseTiltRad;
                 this.solidGroup.add(mesh);
                 const axesHelper = new THREE.AxesHelper(2);
                 axesHelper.position.set(0, h, 0);
@@ -2727,13 +2728,9 @@ window.toggleGridLevel = function(level) {
             }
 
              if (window.currentTool === 'ponto') {
-                const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
-                let I = (window.calcMode === 'ies') ? window.getIESIntensity(s, s.tilt) : getIntensity(s);
                 const sy = floorY - (s.height * scale), py = floorY - (s.plane * scale);
                 const hEff = s.height - s.plane;
-                const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
-                const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
-                const dia = 2 * (s.height / Math.cos(tr)) * Math.tan(br / 2); 
+                const br = currentBeam * Math.PI / 180;
 
                 // Define as origens: 1 no centro, ou 2 se for Estudo de Facho
                 let origins = [centerX];
@@ -2742,13 +2739,24 @@ window.toggleGridLevel = function(level) {
                     origins = [centerX - hS, centerX + hS];
                 }
 
+                const tiltModeElGen = document.querySelector('input[name="p_tilt_mode"]:checked');
+                const tiltModeGen = tiltModeElGen ? tiltModeElGen.value : 'same';
+
                 // Linha do Plano de Trabalho (Renderizada apenas 1 vez)
                 ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, py); ctx.lineTo(cw, py); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; 
                 ctx.fillText(`${window.currentLang === 'en' ? 'wp' : 'hp'}: ${window.formatDist(s.plane)}`, 10, py - 8);
 
                 // Loop Otimizado (Renderiza 1 ou 2 fachos)
-                origins.forEach(xPos => {
-                    // LUXSINTAX: Só desenha o triângulo genérico se NÃO for um IES (Se for IES, usamos a representação exata no final do script)
+                origins.forEach((xPos, idx) => {
+                    let currentTilt = Number(s.tilt) || 0;
+                    if (origins.length === 2 && tiltModeGen === 'cross' && idx === 1) currentTilt = -currentTilt;
+                    const tr = currentTilt * Math.PI / 180;
+                    
+                    let I = (window.calcMode === 'ies') ? window.getIESIntensity(s, Math.abs(currentTilt)) : getIntensity(s);
+                    const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
+                    const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
+                    
+                    // LUXSINTAX: Só desenha o triângulo genérico se NÃO for um IES
                     if (window.calcMode !== 'ies') {
                         ctx.save(); ctx.translate(xPos, sy);
                         const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
