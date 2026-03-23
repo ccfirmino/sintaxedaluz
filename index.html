@@ -2822,6 +2822,9 @@ window.toggleGridLevel = function(level) {
                             drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${window.formatDist(diaC0)} x ${window.formatDist(diaC90)}`);
                         } else {
                             drawAngleDim(ctx, xPos, sy, Math.round(currentBeam), currentTilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                            
+                            // LUXSINTAX: Restauração da variável 'dia' para a cota de piso
+                            const dia = 2 * (s.height / Math.cos(currentTr)) * Math.tan(br / 2);
                             const xL = (floorY - sy) * Math.tan(currentTr - br / 2), xR = (floorY - sy) * Math.tan(currentTr + br / 2); 
                             drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
                         }
