@@ -2969,12 +2969,23 @@ window.toggleGridLevel = function(level) {
             if (window.calcMode === 'ies' && s.iesData) {
                 const { vAngles, hAngles, candelas } = s.iesData;
                 
-                let idxC0 = 0, idxC90 = 0, minDiff90 = 999;
-                for(let i=0; i<hAngles.length; i++) {
-                    if(Math.abs(hAngles[i] - 90) < minDiff90) { minDiff90 = Math.abs(hAngles[i] - 90); idxC90 = i; }
-                }
-                const rowC0 = candelas[idxC0];
-                const rowC90 = candelas[idxC90];
+                // Extração dos 4 quadrantes para montagem de gráficos assimétricos reais (C0/C180 e C90/C270)
+                const getRow = (targetH) => {
+                    let minDiff = 999; let idx = 0;
+                    for(let i=0; i<hAngles.length; i++) {
+                        let diff = Math.abs(hAngles[i] - targetH);
+                        // Trata a virada circular de 360 graus
+                        if (Math.abs(hAngles[i] - (targetH + 360)) < diff) diff = Math.abs(hAngles[i] - (targetH + 360));
+                        if (Math.abs(hAngles[i] - (targetH - 360)) < diff) diff = Math.abs(hAngles[i] - (targetH - 360));
+                        if(diff < minDiff) { minDiff = diff; idx = i; }
+                    }
+                    return candelas[idx];
+                };
+
+                const rowC0 = getRow(0);
+                const rowC180 = getRow(180);
+                const rowC90 = getRow(90);
+                const rowC270 = getRow(270);
 
                 let maxI = 0;
                 for(let r of candelas) { const m = Math.max(...r); if(m > maxI) maxI = m; }
@@ -2996,18 +3007,21 @@ window.toggleGridLevel = function(level) {
                     ctx.rect(0, 0, cw, floorY);
                     ctx.clip();
 
-                    const drawCurve = (row, lineColor, fillColor) => {
+                    const drawCurve = (rowA, rowB, lineColor, fillColor) => {
                         const path = new Path2D();
+                        // 1. Desenha o Lado Direito do Eixo (Ex: C0) com ângulos Positivos
                         for(let i=0; i<vAngles.length; i++) {
                             const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                            const r = (row[i] / maxI) * (s.height * scale * 0.85);
+                            const r = (rowA[i] / maxI) * (s.height * scale * 0.85);
                             const x = originX + r * Math.sin(ang);
                             const y = sy + r * Math.cos(ang);
                             if(i===0) path.moveTo(x,y); else path.lineTo(x,y);
                         }
-                        for(let i=0; i<vAngles.length; i++) {
+                        // 2. Desenha o Lado Esquerdo do Eixo (Ex: C180) com ângulos Negativos
+                        // A ordem inversa (do final pro começo) é vital para fechar o SVG sem cruzar as linhas
+                        for(let i = vAngles.length - 1; i >= 0; i--) {
                             const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                            const r = (row[i] / maxI) * (s.height * scale * 0.85);
+                            const r = (rowB[i] / maxI) * (s.height * scale * 0.85);
                             const x = originX + r * Math.sin(ang);
                             const y = sy + r * Math.cos(ang);
                             path.lineTo(x,y);
@@ -3026,12 +3040,14 @@ window.toggleGridLevel = function(level) {
                         ctx.stroke(path);
                     };
 
-                    // Desenha C90 (Azul) ao fundo se o facho for oval
-                    if (minDiff90 < 5 && JSON.stringify(rowC0) !== JSON.stringify(rowC90)) {
-                        drawCurve(rowC90, "rgba(2, 132, 199, 0.8)", "rgba(2, 132, 199, 0.15)");
+                    const isOval = JSON.stringify(rowC0) !== JSON.stringify(rowC90) || JSON.stringify(rowC180) !== JSON.stringify(rowC270);
+                    
+                    // Desenha a fatia Transversal (Azul) ao fundo se o facho for oval ou assimétrico
+                    if (isOval) {
+                        drawCurve(rowC90, rowC270, "rgba(2, 132, 199, 0.8)", "rgba(2, 132, 199, 0.15)");
                     }
-                    // Desenha C0 (Laranja) na frente
-                    drawCurve(rowC0, "rgba(217, 119, 6, 0.8)", "rgba(251, 191, 36, 0.45)");
+                    // Desenha a fatia Longitudinal (Laranja) na frente
+                    drawCurve(rowC0, rowC180, "rgba(217, 119, 6, 0.8)", "rgba(251, 191, 36, 0.45)");
 
                     ctx.restore();
                 });
