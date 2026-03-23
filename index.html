@@ -1863,11 +1863,14 @@ window.toggleGridLevel = function(level) {
                     conversionFactor = (totalFlux / 1000) * convFactor; // LDT = cd/klm
                 }
 
-                // LUXSINTAX: Isolamento de Matriz à Prova de Falhas (Reverse Extraction)
-                // Laboratórios frequentemente inserem linhas extras fora do padrão EULUMDAT.
-                // Como a matriz é sempre o bloco final, extraímos os últimos 'req' números válidos do documento inteiro.
+                // LUXSINTAX: Extração de Matriz Sequencial Robusta (Forward Filter)
+                // Removemos a extração reversa. Se o laboratório colocar lixo no final do arquivo, 
+                // o slice deslocaria toda a matriz e inverteria o facho para cima (Efeito Ampulheta).
+                // Agora partimos da linha teórica e extraímos rigorosamente os próximos 'req' números.
+                const matrixStartLine = 26 + (nLampsSets * 6) + 10;
                 let allNumbers = [];
-                for (let i = 26; i < lines.length; i++) {
+                
+                for (let i = matrixStartLine; i < lines.length; i++) {
                     const tokens = lines[i].replace(/\s+/g, ' ').trim().split(' ');
                     for (let t of tokens) {
                         if (t === '') continue;
@@ -1878,13 +1881,17 @@ window.toggleGridLevel = function(level) {
                             t = t.replace(/,/g, '.');
                         }
                         const val = Number(t);
-                        if (!isNaN(val)) allNumbers.push(val);
+                        if (!isNaN(val)) {
+                            allNumbers.push(val);
+                            if (allNumbers.length === req) break; // Para imediatamente ao formar a matriz
+                        }
                     }
+                    if (allNumbers.length === req) break;
                 }
                 
-                let matrixData = allNumbers.slice(-req);
+                let matrixData = allNumbers;
 
-                // Preenchimento de segurança extremo caso o arquivo esteja corrompido ou muito curto
+                // Preenchimento de segurança extremo caso o arquivo esteja corrompido ou cortado
                 while (matrixData.length < req) {
                     matrixData.push(0);
                 }
