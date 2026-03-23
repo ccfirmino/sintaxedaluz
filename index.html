@@ -1275,29 +1275,17 @@ window.Photometric3DEngine = {
         const matrix = baseMatrix;
 
         let maxI = 0;
-        let maxDown = 0;
         for (let h = 0; h < hAngles.length; h++) {
             for (let v = 0; v < vAngles.length; v++) {
-                const i_val = matrix[h][v];
-                if (i_val > maxI) maxI = i_val;
-                
-                const theta = (vAngles[v] * Math.PI) / 180;
-                const down = i_val * mult * Math.cos(theta);
-                if (down > maxDown) maxDown = down;
+                if (matrix[h][v] > maxI) maxI = matrix[h][v];
             }
         }
         if (maxI === 0) return;
         
-        // LUXSINTAX: Auto-Scale Blindado contra Fachos Assimétricos (Wall-Washers e Indiretas)
-        let scaleFactor = 1;
-        const fallbackScale = (state && state.height) ? (state.height * 0.8) / (maxI * mult) : 5 / (maxI * mult);
-        
-        // Se a luz para baixo for muito fraca, o scaleFactor explodiria. A trava de 15% impede a invisibilidade.
-        if (state && state.height && maxDown > (maxI * 0.15)) {
-            scaleFactor = state.height / maxDown;
-        } else {
-            scaleFactor = fallbackScale;
-        }
+        // LUXSINTAX: Escalonamento Fixo Baseado no Pico Absoluto (Solução Anti-Explosão)
+        // Wall-washers quase não jogam luz para baixo. Tentar forçá-los a tocar no piso causava explosão matemática.
+        // Agora, o vetor mais intenso do sólido ocupará exatamente 80% da altura da sala, garantindo proporção impecável.
+        const scaleFactor = (state && state.height) ? (state.height * 0.8) / (maxI * mult) : 5 / (maxI * mult);
 
         const webGroup = new THREE.Group();
         const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
@@ -2993,36 +2981,50 @@ window.toggleGridLevel = function(level) {
                     ctx.clip();
 
                     const drawCurve = (rowA, rowB, lineColor, fillColor) => {
-                        const path = new Path2D();
-                        // 1. Desenha o Lado Direito do Eixo (Ex: C0) com ângulos Positivos
+                        // Construção do polígono perfeito para preenchimento (ancorado na origem)
+                        const fillPath = new Path2D();
+                        fillPath.moveTo(originX, sy);
+                        // C0 é convencionalmente plotado à esquerda (ângulos negativos) no mercado luminotécnico
                         for(let i=0; i<vAngles.length; i++) {
-                            const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                            const r = (rowA[i] / maxI) * (s.height * scale * 0.85);
-                            const x = originX + r * Math.sin(ang);
-                            const y = sy + r * Math.cos(ang);
-                            if(i===0) path.moveTo(x,y); else path.lineTo(x,y);
-                        }
-                        // 2. Desenha o Lado Esquerdo do Eixo (Ex: C180) com ângulos Negativos
-                        // A ordem inversa (do final pro começo) é vital para fechar o SVG sem cruzar as linhas
-                        for(let i = vAngles.length - 1; i >= 0; i--) {
                             const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                            const r = (rowB[i] / maxI) * (s.height * scale * 0.85);
-                            const x = originX + r * Math.sin(ang);
-                            const y = sy + r * Math.cos(ang);
-                            path.lineTo(x,y);
+                            const r = (rowA[i] / maxI) * (s.height * scale * 0.85);
+                            fillPath.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
                         }
-                        path.closePath();
+                        // C180 é plotado à direita (ângulos positivos)
+                        for(let i = vAngles.length - 1; i >= 0; i--) {
+                            const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const r = (rowB[i] / maxI) * (s.height * scale * 0.85);
+                            fillPath.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
+                        }
+                        fillPath.closePath(); // Fecha na origem sem cruzar o gráfico
 
                         const grad = ctx.createRadialGradient(originX, sy, 0, originX, sy, s.height * scale);
                         grad.addColorStop(0, fillColor);
                         grad.addColorStop(1, "rgba(255, 255, 255, 0)");
                         ctx.fillStyle = grad;
-                        ctx.fill(path);
+                        ctx.fill(fillPath);
+
+                        // O contorno (stroke) é desenhado separadamente para não criar a linha reta falsa no teto
+                        const strokePathL = new Path2D();
+                        for(let i=0; i<vAngles.length; i++) {
+                            const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const r = (rowA[i] / maxI) * (s.height * scale * 0.85);
+                            if(i===0) strokePathL.moveTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang)); 
+                            else strokePathL.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
+                        }
+                        const strokePathR = new Path2D();
+                        for(let i=0; i<vAngles.length; i++) {
+                            const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const r = (rowB[i] / maxI) * (s.height * scale * 0.85);
+                            if(i===0) strokePathR.moveTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang)); 
+                            else strokePathR.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
+                        }
 
                         ctx.strokeStyle = lineColor;
                         ctx.lineWidth = 1.5;
                         ctx.setLineDash([]);
-                        ctx.stroke(path);
+                        ctx.stroke(strokePathL);
+                        ctx.stroke(strokePathR);
                     };
 
                     const isOval = JSON.stringify(rowC0) !== JSON.stringify(rowC90) || JSON.stringify(rowC180) !== JSON.stringify(rowC270);
