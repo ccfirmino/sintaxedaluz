@@ -282,7 +282,15 @@
                     <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                 </div>
             </div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">INCLINAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
+            
+            <div id="p-tilt-mode-group" class="mb-6 group" style="display: none;">
+                <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-2 block">ORIENTAÇÃO DOS FACHOS (ARRAY)</label>
+                <div class="flex gap-4 p-1">
+                    <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="p_tilt_mode" value="same" checked onchange="window.updateCalculations()" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Mesmo Lado</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="p_tilt_mode" value="cross" onchange="window.updateCalculations()" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase">Cruzados</span></label>
+                </div>
+            </div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
             <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
             <div class="mode-standard-only">
@@ -1346,15 +1354,24 @@ window.Photometric3DEngine = {
             const mesh = webGroup.clone();
             const h = state ? state.height : 3;
             
+            const tiltModeEl3D = document.querySelector('input[name="p_tilt_mode"]:checked');
+            const tiltMode3D = tiltModeEl3D ? tiltModeEl3D.value : 'same';
+            const baseTiltRad = (state && state.tilt ? state.tilt : 0) * Math.PI / 180;
+
             if (toolId === 'ponto' && state && state.viewMode === 'array') {
                 const hS = state.spacing / 2;
                 mesh.position.set(-hS, h, 0);
+                mesh.rotation.z = -baseTiltRad; // Z-axis rotation for side tilt
+                
                 const mesh2 = webGroup.clone();
                 mesh2.position.set(hS, h, 0);
+                mesh2.rotation.z = tiltMode3D === 'cross' ? baseTiltRad : -baseTiltRad;
+                
                 this.solidGroup.add(mesh);
                 this.solidGroup.add(mesh2);
             } else {
                 mesh.position.set(0, h, 0);
+                mesh.rotation.z = -baseTiltRad;
                 this.solidGroup.add(mesh);
                 const axesHelper = new THREE.AxesHelper(2);
                 axesHelper.position.set(0, h, 0);
@@ -2776,19 +2793,27 @@ window.toggleGridLevel = function(level) {
                 }
 
                 // Cota de Abertura do Facho (Aplicada a TODAS as luminárias desenhadas)
+                const tiltModeEl = document.querySelector('input[name="p_tilt_mode"]:checked');
+                const tiltMode = tiltModeEl ? tiltModeEl.value : 'same';
+
                 if (window.calcMode !== 'ies' || s.iesData) {
-                    origins.forEach(xPos => {
+                    origins.forEach((xPos, idx) => {
+                        let currentTilt = s.tilt || 0;
+                        // Inverte o eixo da segunda luminária para criar o foco central
+                        if (origins.length === 2 && tiltMode === 'cross' && idx === 1) currentTilt = -currentTilt;
+                        const currentTr = currentTilt * Math.PI / 180;
+
                         if (currentBeamObj.isOval) {
                             // Renderiza anotações assimétricas (C0 / C90)
-                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeamObj.c0), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
-                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeamObj.c90), s.tilt, 55, "rgba(2, 132, 199, 0.8)", false); 
-                            const diaC0 = 2 * (s.height / Math.cos(tr)) * Math.tan((currentBeamObj.c0 * Math.PI / 180) / 2);
-                            const diaC90 = 2 * (s.height / Math.cos(tr)) * Math.tan((currentBeamObj.c90 * Math.PI / 180) / 2);
-                            const xL = (floorY - sy) * Math.tan(tr - (currentBeamObj.c0 * Math.PI / 180) / 2), xR = (floorY - sy) * Math.tan(tr + (currentBeamObj.c0 * Math.PI / 180) / 2); 
+                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeamObj.c0), currentTilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeamObj.c90), currentTilt, 55, "rgba(2, 132, 199, 0.8)", false); 
+                            const diaC0 = 2 * (s.height / Math.cos(currentTr)) * Math.tan((currentBeamObj.c0 * Math.PI / 180) / 2);
+                            const diaC90 = 2 * (s.height / Math.cos(currentTr)) * Math.tan((currentBeamObj.c90 * Math.PI / 180) / 2);
+                            const xL = (floorY - sy) * Math.tan(currentTr - (currentBeamObj.c0 * Math.PI / 180) / 2), xR = (floorY - sy) * Math.tan(currentTr + (currentBeamObj.c0 * Math.PI / 180) / 2); 
                             drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${window.formatDist(diaC0)} x ${window.formatDist(diaC90)}`);
                         } else {
-                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
-                            const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
+                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeam), currentTilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                            const xL = (floorY - sy) * Math.tan(currentTr - br / 2), xR = (floorY - sy) * Math.tan(currentTr + br / 2); 
                             drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
                         }
                     });
@@ -2991,9 +3016,15 @@ window.toggleGridLevel = function(level) {
                     origins = [centerX - hS, centerX + hS];
                 }
 
-                origins.forEach(originX => {
+                const tiltModeEl2 = document.querySelector('input[name="p_tilt_mode"]:checked');
+                const tiltMode2 = tiltModeEl2 ? tiltModeEl2.value : 'same';
+
+                origins.forEach((originX, idx) => {
                     ctx.save();
                     
+                    let currentTilt = s.tilt || 0;
+                    if (origins.length === 2 && tiltMode2 === 'cross' && idx === 1) currentTilt = -currentTilt;
+
                     // LUXSINTAX: Máscara de Piso (Clipping)
                     ctx.beginPath();
                     ctx.rect(0, 0, cw, floorY);
@@ -3005,13 +3036,13 @@ window.toggleGridLevel = function(level) {
                         fillPath.moveTo(originX, sy);
                         // C0 é convencionalmente plotado à esquerda (ângulos negativos) no mercado luminotécnico
                         for(let i=0; i<vAngles.length; i++) {
-                            const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const ang = (-vAngles[i] + currentTilt) * Math.PI / 180;
                             const r = (rowA[i] / maxI) * (s.height * scale * 0.85);
                             fillPath.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
                         }
                         // C180 é plotado à direita (ângulos positivos)
                         for(let i = vAngles.length - 1; i >= 0; i--) {
-                            const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const ang = (vAngles[i] + currentTilt) * Math.PI / 180;
                             const r = (rowB[i] / maxI) * (s.height * scale * 0.85);
                             fillPath.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
                         }
@@ -3026,14 +3057,14 @@ window.toggleGridLevel = function(level) {
                         // O contorno (stroke) é desenhado separadamente para não criar a linha reta falsa no teto
                         const strokePathL = new Path2D();
                         for(let i=0; i<vAngles.length; i++) {
-                            const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const ang = (-vAngles[i] + currentTilt) * Math.PI / 180;
                             const r = (rowA[i] / maxI) * (s.height * scale * 0.85);
                             if(i===0) strokePathL.moveTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang)); 
                             else strokePathL.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
                         }
                         const strokePathR = new Path2D();
                         for(let i=0; i<vAngles.length; i++) {
-                            const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const ang = (vAngles[i] + currentTilt) * Math.PI / 180;
                             const r = (rowB[i] / maxI) * (s.height * scale * 0.85);
                             if(i===0) strokePathR.moveTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang)); 
                             else strokePathR.lineTo(originX + r * Math.sin(ang), sy + r * Math.cos(ang));
@@ -3601,8 +3632,10 @@ window.setSurfaceMode = function(mode) {
         btnS.className = isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
         btnA.className = !isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
     }
-    const inputSpacing = document.getElementById('group-spacing');
-    if (inputSpacing) inputSpacing.classList.toggle('hidden', isSingle);
+    const tiltModeGrp = document.getElementById('p-tilt-mode-group');
+    if (tiltModeGrp) {
+        tiltModeGrp.style.display = isSingle ? 'none' : 'block';
+    }
     window.updateCalculations();
 };
 
