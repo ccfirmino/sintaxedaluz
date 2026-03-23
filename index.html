@@ -1485,7 +1485,7 @@ window.handleGenerateReport = async () => {
     const lpd = (totalFixtures * (grid.flux / 100)) / area; 
 
     // Extração de Dados da Luminária (IES ou Genérica)
-    const effectiveBeam = window.getEffectiveBeam(grid);
+    const effectiveBeamObj = window.getEffectiveBeam(grid);
     const luminaireName = grid.iesFileName ? grid.iesFileName : "Fonte Genérica (Distribuição Lambertiana)";
 
     // Parâmetros de Ofuscamento (UGR) com Fallback seguro
@@ -1522,10 +1522,7 @@ window.handleGenerateReport = async () => {
     drawSect('2. ESPECIFICAÇÃO DA LUMINÁRIA');
     drawRow('Modelo / Arquivo IES', luminaireName);
     drawRow('Fluxo Luminoso', `${grid.flux} lúmens`);
-    drawRow('Abertura de Facho (FWHM)', `${Math.round(effectiveBeam)}°`);
-    drawRow('Fator de Utilização (U)', `${grid.utilFactor.toFixed(2)}`);
-    drawRow('Fator de Manutenção (FM)', `${grid.maintFactor.toFixed(2)}`);
-    cy -= 10;
+    drawRow('Abertura de Facho (FWHM)', effectiveBeamObj.isOval ? `${Math.round(effectiveBeamObj.c0)}° x ${Math.round(effectiveBeamObj.c90)}°` : `${Math.round(effectiveBeamObj.c0)}°`);
 
     // Seção 3: Geometria da Malha
     drawSect('3. DISTRIBUIÇÃO ESPACIAL');
@@ -2149,32 +2146,41 @@ window.toggleGridLevel = function(level) {
             if (window.calcMode === 'ies' && s.iesData) {
                 const data = s.iesData;
                 const vAngles = data.vAngles;
-                const row = data.candelas[0];
-                const maxI = Math.max(...row);
-                if (maxI <= 0) return s.beam; 
-                const targetI = maxI / 2;
-                let halfAngle = 0;
-                for (let i = 0; i < vAngles.length - 1; i++) {
-                    if ((row[i] >= targetI && row[i+1] <= targetI) || (row[i] <= targetI && row[i+1] >= targetI)) {
-                        // Trava de segurança contra divisão por zero (Platô Fotométrico)
-                        if (row[i+1] === row[i]) {
-                            halfAngle = vAngles[i];
-                        } else {
-                            const t = (targetI - row[i]) / (row[i+1] - row[i]);
-                            halfAngle = vAngles[i] + t * (vAngles[i+1] - vAngles[i]);
+                const hAngles = data.hAngles;
+
+                const calcHalfAngle = (row) => {
+                    const maxI = Math.max(...row);
+                    if (maxI <= 0) return s.beam / 2; 
+                    const targetI = maxI / 2;
+                    let halfAngle = 0;
+                    for (let i = 0; i < vAngles.length - 1; i++) {
+                        if ((row[i] >= targetI && row[i+1] <= targetI) || (row[i] <= targetI && row[i+1] >= targetI)) {
+                            if (row[i+1] === row[i]) halfAngle = vAngles[i];
+                            else {
+                                const t = (targetI - row[i]) / (row[i+1] - row[i]);
+                                halfAngle = vAngles[i] + t * (vAngles[i+1] - vAngles[i]);
+                            }
+                            break;
                         }
-                        break;
                     }
+                    if (halfAngle === 0 && row[row.length-1] > targetI) halfAngle = vAngles[vAngles.length-1];
+                    if (isNaN(halfAngle) || halfAngle <= 0) return s.beam / 2;
+                    return halfAngle;
+                };
+
+                const rowC0 = data.candelas[0];
+                let c90Idx = 0, minDiff = 999;
+                for(let i=0; i<hAngles.length; i++) {
+                    if(Math.abs(hAngles[i] - 90) < minDiff) { minDiff = Math.abs(hAngles[i] - 90); c90Idx = i; }
                 }
-                if (halfAngle === 0 && row[row.length-1] > targetI) {
-                    halfAngle = vAngles[vAngles.length-1];
-                }
-                // Trava de segurança final para garantir que nunca devolvemos NaN para o Canvas
-                if (isNaN(halfAngle) || halfAngle <= 0) return s.beam;
-                
-                return halfAngle * 2; 
+                const rowC90 = data.candelas[c90Idx];
+
+                const bC0 = calcHalfAngle(rowC0) * 2;
+                const bC90 = calcHalfAngle(rowC90) * 2;
+
+                return { c0: bC0, c90: bC90, isOval: Math.abs(bC0 - bC90) > 2 };
             }
-            return s.beam;
+            return { c0: s.beam, c90: s.beam, isOval: false };
         }
 
         // --- CANVAS ENGINE ---
@@ -2265,7 +2271,8 @@ window.toggleGridLevel = function(level) {
             let boundsW = 3.0; 
             const s = window.state[window.currentTool];
 
-            let currentBeam = window.getEffectiveBeam(s);
+            let currentBeamObj = window.getEffectiveBeam(s);
+            let currentBeam = currentBeamObj.c0; // Retro-compatibilidade escalar
 
             if (window.currentTool === 'ponto') {
                 boundsH = s.height * 1.15; // 15% de margem superior
@@ -2568,16 +2575,23 @@ window.toggleGridLevel = function(level) {
                     }
                 }
 
-                // 4. DESENHA AS LUMINÁRIAS POR CIMA (Para Referência)
-                const radiusPx = (s.height * Math.tan(br / 2)) * scale;
+                // 4. DESENHA AS LUMINÁRIAS POR CIMA (Para Referência - Elipse Inteligente)
+                const rPxX = (s.height * Math.tan((currentBeamObj.c90 * Math.PI / 180) / 2)) * scale;
+                const rPxY = (s.height * Math.tan((currentBeamObj.c0 * Math.PI / 180) / 2)) * scale;
+                const maxRad = Math.max(rPxX, rPxY);
+
                 for (const fix of fixtures) {
                     const cxPx = offsetX + fix.x * scale;
                     const cyPx = offsetY + fix.y * scale;
 
                     if (!s.falseColor) {
                         ctx.beginPath();
-                        ctx.arc(cxPx, cyPx, radiusPx, 0, Math.PI * 2);
-                        const spotGradient = ctx.createRadialGradient(cxPx, cyPx, 0, cxPx, cyPx, radiusPx);
+                        if (ctx.ellipse) {
+                            ctx.ellipse(cxPx, cyPx, rPxX, rPxY, 0, 0, Math.PI * 2);
+                        } else {
+                            ctx.arc(cxPx, cyPx, maxRad, 0, Math.PI * 2);
+                        }
+                        const spotGradient = ctx.createRadialGradient(cxPx, cyPx, 0, cxPx, cyPx, maxRad);
                         spotGradient.addColorStop(0, isDark ? "rgba(217, 119, 6, 0.25)" : "rgba(251, 191, 36, 0.25)");
                         spotGradient.addColorStop(0.5, isDark ? "rgba(217, 119, 6, 0.08)" : "rgba(251, 191, 36, 0.08)");
                         spotGradient.addColorStop(1, "rgba(251, 191, 36, 0)");
@@ -2768,9 +2782,19 @@ window.toggleGridLevel = function(level) {
                 // Cota de Abertura do Facho (Aplicada a TODAS as luminárias desenhadas)
                 if (window.calcMode !== 'ies' || s.iesData) {
                     origins.forEach(xPos => {
-                        drawAngleDim(ctx, xPos, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
-                        const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
-                        drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
+                        if (currentBeamObj.isOval) {
+                            // Renderiza anotações assimétricas (C0 / C90)
+                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeamObj.c0), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeamObj.c90), s.tilt, 55, "rgba(2, 132, 199, 0.8)", false); 
+                            const diaC0 = 2 * (s.height / Math.cos(tr)) * Math.tan((currentBeamObj.c0 * Math.PI / 180) / 2);
+                            const diaC90 = 2 * (s.height / Math.cos(tr)) * Math.tan((currentBeamObj.c90 * Math.PI / 180) / 2);
+                            const xL = (floorY - sy) * Math.tan(tr - (currentBeamObj.c0 * Math.PI / 180) / 2), xR = (floorY - sy) * Math.tan(tr + (currentBeamObj.c0 * Math.PI / 180) / 2); 
+                            drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${window.formatDist(diaC0)} x ${window.formatDist(diaC90)}`);
+                        } else {
+                            drawAngleDim(ctx, xPos, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                            const xL = (floorY - sy) * Math.tan(tr - br / 2), xR = (floorY - sy) * Math.tan(tr + br / 2); 
+                            drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${window.formatDist(dia)}`);
+                        }
                     });
                 }
             }
@@ -2949,9 +2973,19 @@ window.toggleGridLevel = function(level) {
             } // <--- ESTA É A CHAVE MÁGICA QUE FALTAVA!
             
             if (window.calcMode === 'ies' && s.iesData) {
-                const { vAngles, candelas } = s.iesData;
-                const row = candelas[0];
-                const maxI = Math.max(...row);
+                const { vAngles, hAngles, candelas } = s.iesData;
+                
+                let idxC0 = 0, idxC90 = 0, minDiff90 = 999;
+                for(let i=0; i<hAngles.length; i++) {
+                    if(Math.abs(hAngles[i] - 90) < minDiff90) { minDiff90 = Math.abs(hAngles[i] - 90); idxC90 = i; }
+                }
+                const rowC0 = candelas[idxC0];
+                const rowC90 = candelas[idxC90];
+
+                let maxI = 0;
+                for(let r of candelas) { const m = Math.max(...r); if(m > maxI) maxI = m; }
+                if(maxI === 0) maxI = 1;
+
                 const sy = floorY - (s.height * scale);
 
                 let origins = [centerX];
@@ -2968,35 +3002,42 @@ window.toggleGridLevel = function(level) {
                     ctx.rect(0, 0, cw, floorY);
                     ctx.clip();
 
-                    const path = new Path2D();
-                    for(let i=0; i<vAngles.length; i++) {
-                        const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                        const r = (row[i] / maxI) * (s.height * scale * 0.85);
-                        const x = originX + r * Math.sin(ang);
-                        const y = sy + r * Math.cos(ang);
-                        if(i===0) path.moveTo(x,y); else path.lineTo(x,y);
-                    }
-                    for(let i=0; i<vAngles.length; i++) {
-                        const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
-                        const r = (row[i] / maxI) * (s.height * scale * 0.85);
-                        const x = originX + r * Math.sin(ang);
-                        const y = sy + r * Math.cos(ang);
-                        path.lineTo(x,y);
-                    }
-                    path.closePath();
+                    const drawCurve = (row, lineColor, fillColor) => {
+                        const path = new Path2D();
+                        for(let i=0; i<vAngles.length; i++) {
+                            const ang = (vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const r = (row[i] / maxI) * (s.height * scale * 0.85);
+                            const x = originX + r * Math.sin(ang);
+                            const y = sy + r * Math.cos(ang);
+                            if(i===0) path.moveTo(x,y); else path.lineTo(x,y);
+                        }
+                        for(let i=0; i<vAngles.length; i++) {
+                            const ang = (-vAngles[i] + (s.tilt || 0)) * Math.PI / 180;
+                            const r = (row[i] / maxI) * (s.height * scale * 0.85);
+                            const x = originX + r * Math.sin(ang);
+                            const y = sy + r * Math.cos(ang);
+                            path.lineTo(x,y);
+                        }
+                        path.closePath();
 
-                    // Preenchimento radiante realista do fotômetro
-                    const grad = ctx.createRadialGradient(originX, sy, 0, originX, sy, s.height * scale);
-                    grad.addColorStop(0, "rgba(251, 191, 36, 0.45)");
-                    grad.addColorStop(1, "rgba(251, 191, 36, 0.0)");
-                    ctx.fillStyle = grad;
-                    ctx.fill(path);
+                        const grad = ctx.createRadialGradient(originX, sy, 0, originX, sy, s.height * scale);
+                        grad.addColorStop(0, fillColor);
+                        grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+                        ctx.fillStyle = grad;
+                        ctx.fill(path);
 
-                    // Contorno do Sólido Fotométrico
-                    ctx.strokeStyle = "rgba(217, 119, 6, 0.8)";
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([]);
-                    ctx.stroke(path);
+                        ctx.strokeStyle = lineColor;
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([]);
+                        ctx.stroke(path);
+                    };
+
+                    // Desenha C90 (Azul) ao fundo se o facho for oval
+                    if (minDiff90 < 5 && JSON.stringify(rowC0) !== JSON.stringify(rowC90)) {
+                        drawCurve(rowC90, "rgba(2, 132, 199, 0.8)", "rgba(2, 132, 199, 0.15)");
+                    }
+                    // Desenha C0 (Laranja) na frente
+                    drawCurve(rowC0, "rgba(217, 119, 6, 0.8)", "rgba(251, 191, 36, 0.45)");
 
                     ctx.restore();
                 });
