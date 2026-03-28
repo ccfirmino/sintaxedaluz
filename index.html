@@ -814,23 +814,43 @@
         // LUXSINTAX: Variável global do módulo para que todas as funções a vejam
         let supabase;
 
-        // LUXSINTAX: Inicialização Assíncrona Protegida
+        // LUXSINTAX: Inicialização Inteligente (Local + Produção)
         async function initializeApp() {
             try {
-                const envResponse = await fetch('/api/get-env');
-                const env = await envResponse.json();
+                let env;
                 
-                // Inicializa a variável do módulo e também anexa ao window por segurança
+                // Deteta se está a correr no seu computador ou na Vercel
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    console.log("LuxSintax: Modo Local Detetado. Usando chaves de desenvolvimento.");
+                    env = {
+                        url: 'https://ozytwdhuxsdefnunzinm.supabase.co',
+                        key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s'
+                    };
+                } else {
+                    // Na Vercel, busca as chaves escondidas no servidor
+                    const envResponse = await fetch('/api/get-env');
+                    if (!envResponse.ok) throw new Error("Erro ao buscar chaves na API");
+                    env = await envResponse.json();
+                }
+                
+                // Inicializa o Supabase
                 supabase = createClient(env.url, env.key);
                 window.supabase = supabase;
                 
-                // Só inicia o gerenciador de autenticação APÓS ter as chaves carregadas
+                // Liberta o AuthManager
                 if (window.AuthManager) {
                     await window.AuthManager.init();
                 }
             } catch (err) {
-                console.error("Falha Crítica na Infraestrutura:", err);
-                alert("Erro de conexão com o servidor de segurança. Verifique sua internet.");
+                console.error("Falha Crítica:", err);
+                // Se tudo falhar, avisa o utilizador
+                const modal = document.getElementById('auth-modal');
+                if(modal) {
+                    const errorMsg = document.createElement('p');
+                    errorMsg.className = "text-red-500 text-[10px] mt-2 text-center";
+                    errorMsg.innerText = "Erro de conexão com o servidor de segurança.";
+                    modal.querySelector('.bg-white').appendChild(errorMsg);
+                }
             }
         }
 
@@ -1198,7 +1218,13 @@ window.AuthManager = {
         }
         location.reload(); 
     },
-    handleLogin: async function() {
+   login: async function() {
+        // LUXSINTAX: Impede o clique se o sistema ainda estiver a carregar as chaves
+        if (!window.supabase) {
+            alert("O sistema de segurança está a inicializar. Aguarde 2 segundos.");
+            return;
+        }
+        
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
         
