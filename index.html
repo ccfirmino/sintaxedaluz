@@ -444,13 +444,22 @@
                                             <button onclick="window.toggleRenderMode('3D')" id="btn-render-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Sólido 3D</button>
                                         </div>
 
-                                        <div id="heatmap-toggle-wrapper" class="hidden">
-                                            <label class="flex items-center gap-3 cursor-pointer group">
-                                                <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">CORES FALSAS (HEATMAP)</span>
+                                        <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
+                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">HEATMAP</span>
                                                 <div class="relative">
                                                     <input type="checkbox" id="g-falseColor" onchange="window.toggleHeatmap(this.checked)" class="sr-only">
-                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
+                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
+                                                </div>
+                                            </label>
+                                            <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
+                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
+                                                <span class="text-[9px] text-luminous-gold font-black uppercase tracking-wider">ISOLINHAS</span>
+                                                <div class="relative">
+                                                    <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
+                                                    <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
                                                 </div>
                                             </label>
                                         </div>
@@ -1640,6 +1649,24 @@ if (toolId === 'grid') {
         
         // LUXSINTAX: Botão Toggle (Corte vs Elevação)
         // LUXSINTAX: Botão Toggle (Piso vs Mesa no Método Lúmens)
+        window.toggleIsolines = function(isChecked) {
+            window.state.grid.showIsolines = isChecked;
+            const bgToggle = document.getElementById('iso-toggle-bg');
+            const dotToggle = document.getElementById('iso-toggle-dot');
+            if (bgToggle && dotToggle) {
+                if (isChecked) {
+                    bgToggle.classList.add('bg-tech-cyan'); 
+                    bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.add('translate-x-3');
+                } else {
+                    bgToggle.classList.remove('bg-tech-cyan'); 
+                    bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.remove('translate-x-3');
+                }
+            }
+            window.updateCalculations();
+        };
+
         // LUXSINTAX: Controle Robusto do Heatmap (Desacoplado do Canvas)
         window.toggleHeatmap = function(isChecked) {
             window.state.grid.falseColor = isChecked;
@@ -2482,8 +2509,12 @@ window.toggleGridLevel = function(level) {
 
                 const hEff_LP = s.height; 
                 const hEff_HP = s.height - (s.plane || 0.75);
+                
+                // LUXSINTAX: Matriz para armazenamento topográfico
+                const luxMatrix = [];
 
                 for (let i = 0; i < cellCols; i++) {
+                    luxMatrix[i] = [];
                     for (let j = 0; j < cellRows; j++) {
                         const ptX = (i + 0.5) * cellMW;
                         const ptY = (j + 0.5) * cellMH;
@@ -2536,6 +2567,9 @@ window.toggleGridLevel = function(level) {
                         // O Canvas renderiza o Lux baseado na escolha do usuário (Piso ou Mesa)
                         const currentLevel = s.viewLevel || 'HP';
                         const renderLux = currentLevel === 'LP' ? totalLux_LP : totalLux_HP;
+                        
+                        // Grava na memória para o motor de Isolinhas
+                        luxMatrix[i][j] = renderLux;
 
                         if (s.falseColor) {
                             ctx.fillStyle = window.FalseColorEngine.getLuxColor(renderLux, 0.85);
@@ -2554,6 +2588,68 @@ window.toggleGridLevel = function(level) {
                 }
 
                 
+
+                // LUXSINTAX: MOTOR DE ISOLINHAS (TOPOGRAFIA LUMINOTÉCNICA)
+                if (s.showIsolines !== false) {
+                    // Níveis normativos padronizados para o desenho das curvas
+                    const thresholds = [100, 200, 300, 500, 750, 1000, 1500, 2000];
+                    ctx.lineWidth = 1.5;
+                    ctx.lineJoin = "round";
+
+                    // Função de interpolação linear vetorial
+                    const getLerp = (v1, v2, vThreshold) => {
+                        if (v1 === v2) return 0.5;
+                        return (vThreshold - v1) / (v2 - v1);
+                    };
+
+                    for (let t = 0; t < thresholds.length; t++) {
+                        const threshold = thresholds[t];
+                        ctx.beginPath();
+                        // Cor da isolinha extraída diretamente do nosso motor de Heatmap
+                        ctx.strokeStyle = window.FalseColorEngine.getLuxColor(threshold, 0.95); 
+                        
+                        for (let i = 0; i < cellCols - 1; i++) {
+                            for (let j = 0; j < cellRows - 1; j++) {
+                                const vTL = luxMatrix[i][j];
+                                const vTR = luxMatrix[i+1][j];
+                                const vBL = luxMatrix[i][j+1];
+                                const vBR = luxMatrix[i+1][j+1];
+                                
+                                const xTL = offsetX + (i + 0.5) * cellPxW;
+                                const yTL = offsetY + (j + 0.5) * cellPxH;
+                                const xTR = xTL + cellPxW;
+                                const yBL = yTL + cellPxH;
+
+                                // Identifica o estado do marching squares (0 a 15)
+                                let state = 0;
+                                if (vTL >= threshold) state |= 8;
+                                if (vTR >= threshold) state |= 4;
+                                if (vBR >= threshold) state |= 2;
+                                if (vBL >= threshold) state |= 1;
+
+                                if (state === 0 || state === 15) continue;
+
+                                const pTop = { x: xTL + getLerp(vTL, vTR, threshold) * cellPxW, y: yTL };
+                                const pBottom = { x: xTL + getLerp(vBL, vBR, threshold) * cellPxW, y: yBL };
+                                const pLeft = { x: xTL, y: yTL + getLerp(vTL, vBL, threshold) * cellPxH };
+                                const pRight = { x: xTR, y: yTL + getLerp(vTR, vBR, threshold) * cellPxH };
+
+                                // Conecta os vetores baseados no peso da célula
+                                switch (state) {
+                                    case 1: case 14: ctx.moveTo(pLeft.x, pLeft.y); ctx.lineTo(pBottom.x, pBottom.y); break;
+                                    case 2: case 13: ctx.moveTo(pBottom.x, pBottom.y); ctx.lineTo(pRight.x, pRight.y); break;
+                                    case 3: case 12: ctx.moveTo(pLeft.x, pLeft.y); ctx.lineTo(pRight.x, pRight.y); break;
+                                    case 4: case 11: ctx.moveTo(pTop.x, pTop.y); ctx.lineTo(pRight.x, pRight.y); break;
+                                    case 5: ctx.moveTo(pLeft.x, pLeft.y); ctx.lineTo(pTop.x, pTop.y); ctx.moveTo(pBottom.x, pBottom.y); ctx.lineTo(pRight.x, pRight.y); break;
+                                    case 6: case 9: ctx.moveTo(pTop.x, pTop.y); ctx.lineTo(pBottom.x, pBottom.y); break;
+                                    case 7: case 8: ctx.moveTo(pLeft.x, pLeft.y); ctx.lineTo(pTop.x, pTop.y); break;
+                                    case 10: ctx.moveTo(pTop.x, pTop.y); ctx.lineTo(pRight.x, pRight.y); ctx.moveTo(pBottom.x, pBottom.y); ctx.lineTo(pLeft.x, pLeft.y); break;
+                                }
+                            }
+                        }
+                        ctx.stroke();
+                    }
+                }
 
                 // LEGENDA DE FALSA COR (HEATMAP)
                 if (s.falseColor) {
