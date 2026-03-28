@@ -811,17 +811,23 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         
+        // LUXSINTAX: Variável global do módulo para que todas as funções a vejam
+        let supabase;
+
         // LUXSINTAX: Inicialização Assíncrona Protegida
         async function initializeApp() {
             try {
                 const envResponse = await fetch('/api/get-env');
                 const env = await envResponse.json();
                 
-                // Define o cliente Supabase globalmente para os outros motores usarem
-                window.supabase = createClient(env.url, env.key);
+                // Inicializa a variável do módulo e também anexa ao window por segurança
+                supabase = createClient(env.url, env.key);
+                window.supabase = supabase;
                 
-                // Só inicia o gerenciador de autenticação APÓS ter as chaves
-                if (window.AuthManager) window.AuthManager.init();
+                // Só inicia o gerenciador de autenticação APÓS ter as chaves carregadas
+                if (window.AuthManager) {
+                    await window.AuthManager.init();
+                }
             } catch (err) {
                 console.error("Falha Crítica na Infraestrutura:", err);
                 alert("Erro de conexão com o servidor de segurança. Verifique sua internet.");
@@ -1081,9 +1087,10 @@
         };
 
         // --- AUTH MANAGER ---
-        // --- AUTH MANAGER ---
 window.AuthManager = {
     init: async function() {
+        // LUXSINTAX: Proteção contra tentativa de leitura antes do fetch terminar
+        if (!supabase) return; 
         const { data: { session } } = await supabase.auth.getSession();
         this.handleSessionUpdate(session);
         
