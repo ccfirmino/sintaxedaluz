@@ -1899,9 +1899,16 @@ window.toggleGridLevel = function(level) {
                             else if (upperName.match(/[-_ ]6K/)) detectedRatio = 1.10;
                         }
 
+                        // LUXSINTAX: Aplica a cor detectada e fecha o bloco corretamente
                         if (detectedRatio) {
-                        
-                        // Atualiza a UI com o fluxo e preenche o Dashboard Analítico
+                            window.state[targetKey].mRatio = detectedRatio;
+                            ['p-mRatio', 'v-mRatio'].forEach(id => {
+                                const dropdown = document.getElementById(id);
+                                if (dropdown) dropdown.value = detectedRatio;
+                            });
+                        } // <--- A chave que estava faltando é esta!
+
+                        // O código abaixo agora roda para QUALQUER arquivo, com ou sem cor detectada
                         let targetFlux = parsed.totalFlux || 0;
                         if (targetFlux > 0) {
                              window.state[targetKey].flux = targetFlux;
