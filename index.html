@@ -296,7 +296,7 @@
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
             </div>
 
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label id="lbl-p-tilt" class="text-[10px] text-slate-500 font-bold whitespace-nowrap transition-colors"><span data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</span> <span id="warn-p-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-2 animate-pulse border border-red-200 dark:border-red-800">⚠️ MAX 30º</span></label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
             
             <div class="mb-6 group bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                 <label class="text-[9px] text-tech-cyan font-black uppercase tracking-widest block mb-2" data-i18n="lbl_source_type">ESPECTRO / CCT</label>
@@ -922,7 +922,7 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52 },
+            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
@@ -1658,8 +1658,25 @@ if (heatmapWrapper) heatmapWrapper.classList.toggle('hidden', toolId !== 'grid')
 if (gridLevelToggle) gridLevelToggle.classList.toggle('hidden', toolId !== 'grid');
 if (surfaceSelector) surfaceSelector.classList.toggle('hidden', toolId !== 'ponto');
 if (verticalSelector) verticalSelector.classList.toggle('hidden', toolId !== 'vertical');
-if (glareWrapper) glareWrapper.classList.toggle('hidden', toolId !== 'vertical' || window.state.vertical.viewMode === 'elevation');
+if (glareWrapper) glareWrapper.classList.toggle('hidden', (toolId !== 'vertical' && toolId !== 'ponto') || (toolId === 'vertical' && window.state.vertical.viewMode === 'elevation'));
 if (hclWrapper) hclWrapper.classList.toggle('hidden', toolId !== 'ponto' && toolId !== 'vertical');
+
+// Sincroniza o estado visual do botão ao trocar de abas
+const glareToggle = document.getElementById('v-glareZone');
+if (glareToggle && window.state[toolId] && window.state[toolId].showGlareZone !== undefined) {
+    glareToggle.checked = window.state[toolId].showGlareZone;
+    const bgToggle = document.getElementById('glare-toggle-bg');
+    const dotToggle = document.getElementById('glare-toggle-dot');
+    if (bgToggle && dotToggle) {
+        if (glareToggle.checked) {
+            bgToggle.classList.add('bg-red-500'); bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+            dotToggle.classList.add('translate-x-3');
+        } else {
+            bgToggle.classList.remove('bg-red-500'); bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+            dotToggle.classList.remove('translate-x-3');
+        }
+    }
+}
 
 if (toolId === 'grid') {
                     const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
@@ -1722,9 +1739,9 @@ if (toolId === 'grid') {
             window.updateCalculations();
         };
 
-        // LUXSINTAX: Visualizador de Glare Zone
+        // LUXSINTAX: Visualizador de Glare Zone Dinâmico
         window.toggleGlareZone = function(isChecked) {
-            window.state.vertical.showGlareZone = isChecked;
+            if(window.state[window.currentTool]) window.state[window.currentTool].showGlareZone = isChecked;
             const bgToggle = document.getElementById('glare-toggle-bg');
             const dotToggle = document.getElementById('glare-toggle-dot');
             if (bgToggle && dotToggle) {
@@ -2983,6 +3000,45 @@ window.toggleGridLevel = function(level) {
                         ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                     }
 
+                    // LUXSINTAX: Visualizador de Glare Zone para Ponto a Ponto Horizontal
+                    if (s.showGlareZone) {
+                        ctx.save();
+                        ctx.translate(xPos, sy);
+                        
+                        const nadir = Math.PI / 2; // Eixo 0º apontando para o chão
+                        const limitRad = 65 * (Math.PI / 180);
+                        const arcLength = (s.height * scale) * 0.85;
+
+                        // Zonas Vermelhas (>65º)
+                        ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, arcLength, 0, nadir - limitRad, false);
+                        ctx.fillStyle = "rgba(220, 38, 38, 0.15)"; ctx.fill();
+                        ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, arcLength, nadir + limitRad, Math.PI, false); ctx.fill();
+
+                        // Demarcações Vermelhas
+                        ctx.beginPath(); ctx.setLineDash([4, 4]); ctx.strokeStyle = "rgba(220, 38, 38, 0.8)"; 
+                        ctx.moveTo(0, 0); ctx.lineTo(arcLength * Math.cos(nadir - limitRad), arcLength * Math.sin(nadir - limitRad));
+                        ctx.moveTo(0, 0); ctx.lineTo(arcLength * Math.cos(nadir + limitRad), arcLength * Math.sin(nadir + limitRad));
+                        ctx.stroke();
+
+                        // Cone de Segurança Verde (Máx 30º)
+                        const safeTiltRad = 30 * (Math.PI / 180);
+                        ctx.strokeStyle = "rgba(16, 185, 129, 0.6)"; 
+                        ctx.moveTo(0, 0); ctx.lineTo(arcLength * 0.6 * Math.cos(nadir - safeTiltRad), arcLength * 0.6 * Math.sin(nadir - safeTiltRad));
+                        ctx.moveTo(0, 0); ctx.lineTo(arcLength * 0.6 * Math.cos(nadir + safeTiltRad), arcLength * 0.6 * Math.sin(nadir + safeTiltRad));
+                        ctx.stroke(); ctx.setLineDash([]);
+                        ctx.beginPath(); ctx.arc(0, 0, arcLength * 0.5, nadir - safeTiltRad, nadir + safeTiltRad, false);
+                        ctx.strokeStyle = "rgba(16, 185, 129, 0.3)"; ctx.lineWidth = 4; ctx.stroke(); ctx.lineWidth = 1.5;
+                        
+                        // Detecção Ativa
+                        const maxBeamAngle = Math.abs(tr) + (br / 2);
+                        if (maxBeamAngle > limitRad) {
+                            ctx.fillStyle = "rgba(220, 38, 38, 0.9)"; ctx.font = "900 11px Manrope"; ctx.textAlign = "center";
+                            ctx.fillText("⚠️ RISCO DE OFUSCAMENTO (>65°)", 0, -15);
+                            ctx.font = "bold 9px Manrope"; ctx.fillText("Facho ultrapassou o ângulo de corte seguro.", 0, -4);
+                        }
+                        ctx.restore();
+                    }
+
                     ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(xPos, sy, 5, 0, Math.PI * 2); ctx.fill();
 
                     const hitXFloor = xPos + (s.height * scale) * Math.tan(tr);
@@ -3018,6 +3074,19 @@ window.toggleGridLevel = function(level) {
                         }
                     }
                 });
+
+                // LUXSINTAX: Validação de Norma na Interface (Horizontal)
+                const lblPTilt = document.getElementById('lbl-p-tilt');
+                const warnPTilt = document.getElementById('warn-p-tilt');
+                if (lblPTilt && warnPTilt) {
+                    if (Math.abs(s.tilt) > 30) {
+                        lblPTilt.classList.add('text-red-500'); lblPTilt.classList.remove('text-slate-500');
+                        warnPTilt.classList.remove('hidden');
+                    } else {
+                        lblPTilt.classList.remove('text-red-500'); lblPTilt.classList.add('text-slate-500');
+                        warnPTilt.classList.add('hidden');
+                    }
+                }
 
                 // Cotas e Anotações Dinâmicas
                 if (s.viewMode === 'array') {
