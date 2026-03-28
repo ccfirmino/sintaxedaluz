@@ -1834,23 +1834,28 @@ window.toggleGridLevel = function(level) {
                             statusEl.classList.add('text-luminous-gold');
                         }
 
-                        // LUXSINTAX: Detector Inteligente de CCT (Lê o nome do arquivo)
+                        // LUXSINTAX: Super Detector Heurístico de CCT (Refinado contra Falsos Positivos)
                         const upperName = file.name.toUpperCase();
+                        const upperContent = content.toUpperCase();
                         let detectedRatio = null;
-                        if (upperName.includes("2700K")) detectedRatio = 0.45;
-                        else if (upperName.includes("3000K")) detectedRatio = 0.52;
-                        else if (upperName.includes("4000K")) detectedRatio = 0.68;
-                        else if (upperName.includes("5000K") || upperName.includes("5700K")) detectedRatio = 0.92;
-                        else if (upperName.includes("6500K")) detectedRatio = 1.10;
+
+                        // 1. Busca Segura (Apenas números da escala Kelvin ou com 'K')
+                        if (upperName.includes("2700") || upperContent.includes("2700")) detectedRatio = 0.45;
+                        else if (upperName.includes("3000") || upperContent.includes("3000")) detectedRatio = 0.52;
+                        else if (upperName.includes("4000") || upperContent.includes("4000")) detectedRatio = 0.68;
+                        else if (upperName.includes("5000") || upperContent.includes("5000") || upperName.includes("5700")) detectedRatio = 0.92;
+                        else if (upperName.includes("6500") || upperContent.includes("6500")) detectedRatio = 1.10;
+                        
+                        // 2. Busca de Abreviações com 'K' explícito (Ex: 3K, 4K) para evitar conflito com ângulos de facho (ex: -40)
+                        if (!detectedRatio) {
+                            if (upperName.match(/[-_ ]2K/)) detectedRatio = 0.45;
+                            else if (upperName.match(/[-_ ]3K/)) detectedRatio = 0.52;
+                            else if (upperName.match(/[-_ ]4K/)) detectedRatio = 0.68;
+                            else if (upperName.match(/[-_ ]5K/)) detectedRatio = 0.92;
+                            else if (upperName.match(/[-_ ]6K/)) detectedRatio = 1.10;
+                        }
 
                         if (detectedRatio) {
-                            window.state[targetKey].mRatio = detectedRatio;
-                            // Atualiza os dropdowns visuais para o utilizador ver a mágica acontecer
-                            ['p-mRatio', 'v-mRatio'].forEach(id => {
-                                const dropdown = document.getElementById(id);
-                                if (dropdown) dropdown.value = detectedRatio;
-                            });
-                        }
                         
                         // Atualiza a UI com o fluxo e preenche o Dashboard Analítico
                         let targetFlux = parsed.totalFlux || 0;
