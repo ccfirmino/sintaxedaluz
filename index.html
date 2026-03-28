@@ -459,6 +459,17 @@
                                             </label>
                                         </div>
 
+                                        <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-indigo-50 p-1.5 rounded-lg dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 shadow-sm">
+                                            <label class="flex items-center gap-2 cursor-pointer group px-2" title="Espectrofotômetro e Impacto Circadiano">
+                                                <span class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-wider">HCL SPECTRUM</span>
+                                                <div class="relative">
+                                                    <input type="checkbox" id="g-showHCL" onchange="window.toggleHCL(this.checked)" checked class="sr-only">
+                                                    <div class="block bg-indigo-500 w-7 h-4 rounded-full transition-colors duration-300" id="hcl-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="hcl-toggle-dot"></div>
+                                                </div>
+                                            </label>
+                                        </div>
+
                                         <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                             <button onclick="window.toggleGridLevel('HP')" id="btn-gl-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Mesa (HP)</button>
                                             <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Piso (LP)</button>
@@ -1189,6 +1200,19 @@ window.AuthManager = {
     }
 };
 // --- DOMAIN ENGINES (LUX FUTURUM UPGRADE) ---
+window.HCLEngine = {
+    // Arrays normalizados (380nm a 780nm) simulando a Distribuição Espectral de Potência (SPD)
+    spds: {
+        "0.45": [0.01, 0.02, 0.05, 0.15, 0.20, 0.10, 0.15, 0.40, 0.70, 0.95, 1.00, 0.85, 0.60, 0.30, 0.10, 0.05, 0.02], // 2700K
+        "0.52": [0.01, 0.02, 0.08, 0.25, 0.35, 0.15, 0.20, 0.50, 0.80, 1.00, 0.95, 0.75, 0.50, 0.20, 0.08, 0.03, 0.01], // 3000K
+        "0.68": [0.02, 0.05, 0.15, 0.50, 0.70, 0.30, 0.35, 0.60, 0.90, 1.00, 0.85, 0.60, 0.35, 0.15, 0.05, 0.02, 0.01], // 4000K
+        "0.92": [0.03, 0.08, 0.25, 0.70, 0.95, 0.50, 0.50, 0.70, 0.90, 1.00, 0.75, 0.50, 0.25, 0.10, 0.03, 0.01, 0.00], // 5000K
+        "1.10": [0.05, 0.10, 0.40, 0.85, 1.00, 0.65, 0.65, 0.75, 0.85, 0.85, 0.60, 0.40, 0.20, 0.08, 0.02, 0.01, 0.00]  // 6500K
+    },
+    photopic: [0.00, 0.00, 0.00, 0.01, 0.05, 0.20, 0.60, 1.00, 0.80, 0.50, 0.20, 0.05, 0.01, 0.00, 0.00, 0.00, 0.00], // Visão
+    melanopic: [0.00, 0.01, 0.10, 0.50, 1.00, 0.80, 0.40, 0.10, 0.02, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00] // Relógio Biológico
+};
+
 window.GlareEngine = {
     calculateGuthIndex: (distX, distY, heightAboveEye) => {
         const d = Math.sqrt(distX ** 2 + distY ** 2);
@@ -1628,12 +1652,14 @@ const gridLevelToggle = document.getElementById('grid-level-toggle');
 const surfaceSelector = document.getElementById('surface-selector');
 const verticalSelector = document.getElementById('vertical-selector');
 const glareWrapper = document.getElementById('glare-toggle-wrapper');
+const hclWrapper = document.getElementById('hcl-toggle-wrapper');
 
 if (heatmapWrapper) heatmapWrapper.classList.toggle('hidden', toolId !== 'grid');
 if (gridLevelToggle) gridLevelToggle.classList.toggle('hidden', toolId !== 'grid');
 if (surfaceSelector) surfaceSelector.classList.toggle('hidden', toolId !== 'ponto');
 if (verticalSelector) verticalSelector.classList.toggle('hidden', toolId !== 'vertical');
 if (glareWrapper) glareWrapper.classList.toggle('hidden', toolId !== 'vertical' || window.state.vertical.viewMode === 'elevation');
+if (hclWrapper) hclWrapper.classList.toggle('hidden', toolId !== 'ponto' && toolId !== 'vertical');
 
 if (toolId === 'grid') {
                     const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
@@ -1676,6 +1702,26 @@ if (toolId === 'grid') {
         
         // LUXSINTAX: Botão Toggle (Corte vs Elevação)
         // LUXSINTAX: Botão Toggle (Piso vs Mesa no Método Lúmens)
+        window.state.showHCL = true; // Estado global para o espectro HCL
+
+        window.toggleHCL = function(isChecked) {
+            window.state.showHCL = isChecked;
+            const bgToggle = document.getElementById('hcl-toggle-bg');
+            const dotToggle = document.getElementById('hcl-toggle-dot');
+            if (bgToggle && dotToggle) {
+                if (isChecked) {
+                    bgToggle.classList.add('bg-indigo-500'); 
+                    bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.add('translate-x-3');
+                } else {
+                    bgToggle.classList.remove('bg-indigo-500'); 
+                    bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.remove('translate-x-3');
+                }
+            }
+            window.updateCalculations();
+        };
+
         // LUXSINTAX: Visualizador de Glare Zone
         window.toggleGlareZone = function(isChecked) {
             window.state.vertical.showGlareZone = isChecked;
@@ -3367,6 +3413,120 @@ window.toggleGridLevel = function(level) {
 
                     ctx.restore();
                 });
+            }
+
+            // LUXSINTAX: Renderização do Espectrofotômetro HCL
+            if (window.state.showHCL && window.HCLEngine && (window.currentTool === 'ponto' || window.currentTool === 'vertical')) {
+                const hclW = 260;
+                const hclH = 150;
+                const hclX = cw - hclW - 20;
+                const hclY = 20;
+
+                ctx.save();
+                
+                // Fundo do Espectrofotômetro
+                ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)";
+                ctx.shadowColor = "rgba(0,0,0,0.15)";
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetY = 5;
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hclX, hclY, hclW, hclH, 12); ctx.fill(); } 
+                else { ctx.fillRect(hclX, hclY, hclW, hclH); }
+                ctx.shadowColor = "transparent";
+
+                // Borda
+                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+                ctx.lineWidth = 1;
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hclX, hclY, hclW, hclH, 12); ctx.stroke(); } 
+                else { ctx.strokeRect(hclX, hclY, hclW, hclH); }
+
+                // Cabeçalho
+                ctx.textAlign = "left";
+                ctx.textBaseline = "top";
+                ctx.fillStyle = "#6366f1"; // Indigo 500
+                ctx.font = "900 10px Manrope";
+                ctx.fillText("ESPECTROFOTÔMETRO (HCL)", hclX + 15, hclY + 12);
+
+                const currentMRatio = (s.mRatio || 0.52).toString();
+                let cctLabel = "3000K";
+                if(currentMRatio === "0.45") cctLabel = "2700K";
+                if(currentMRatio === "0.68") cctLabel = "4000K";
+                if(currentMRatio === "0.92") cctLabel = "5000K";
+                if(currentMRatio === "1.10") cctLabel = "6500K";
+
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.font = "bold 9px Manrope";
+                ctx.fillText(`CCT: ${cctLabel} | Razão Melanópica: ${currentMRatio}`, hclX + 15, hclY + 26);
+
+                // Eixos do Gráfico
+                const gX = hclX + 25;
+                const gY = hclY + 115;
+                const gW = hclW - 40;
+                const gH = 65;
+
+                ctx.beginPath();
+                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+                ctx.moveTo(gX, gY - gH); ctx.lineTo(gX, gY); ctx.lineTo(gX + gW, gY);
+                ctx.stroke();
+
+                // Fundo Gradiente Arco-Íris para o espectro visível (380 a 780nm)
+                const rainbow = ctx.createLinearGradient(gX, 0, gX + gW, 0);
+                rainbow.addColorStop(0, "rgba(139, 92, 246, 0.15)"); // Violeta
+                rainbow.addColorStop(0.25, "rgba(59, 130, 246, 0.15)"); // Azul
+                rainbow.addColorStop(0.5, "rgba(34, 197, 94, 0.15)"); // Verde
+                rainbow.addColorStop(0.75, "rgba(234, 179, 8, 0.15)"); // Amarelo
+                rainbow.addColorStop(1, "rgba(239, 68, 68, 0.15)"); // Vermelho
+                ctx.fillStyle = rainbow;
+                ctx.fillRect(gX, gY - gH, gW, gH);
+
+                const numPoints = 17;
+                const drawSpectralCurve = (dataArray, color, lineWidth = 2, isDashed = false) => {
+                    ctx.beginPath();
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = lineWidth;
+                    if (isDashed) ctx.setLineDash([3, 3]); else ctx.setLineDash([]);
+                    for(let i=0; i<numPoints; i++) {
+                        const px = gX + (i / (numPoints - 1)) * gW;
+                        const py = gY - (dataArray[i] * gH);
+                        
+                        if (i === 0) {
+                            ctx.moveTo(px, py);
+                        } else {
+                            // Curva Bezier Suave
+                            const prevPx = gX + ((i - 1) / (numPoints - 1)) * gW;
+                            const prevPy = gY - (dataArray[i - 1] * gH);
+                            const cp1x = prevPx + (px - prevPx) / 2;
+                            const cp1y = prevPy;
+                            const cp2x = prevPx + (px - prevPx) / 2;
+                            const cp2y = py;
+                            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, px, py);
+                        }
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                };
+
+                const spdData = window.HCLEngine.spds[currentMRatio] || window.HCLEngine.spds["0.52"];
+                
+                // Desenhar Curva Melanópica (Azul Cyan pontilhada)
+                drawSpectralCurve(window.HCLEngine.melanopic, "#06b6d4", 1.5, true);
+                // Desenhar Curva Fotópica V(lambda) (Amarela pontilhada)
+                drawSpectralCurve(window.HCLEngine.photopic, "#fbbf24", 1.5, true);
+                // Desenhar Curva SPD do LED (Branca/Preta Sólida)
+                drawSpectralCurve(spdData, isDark ? "#f8fafc" : "#0f172a", 2.5);
+
+                // Legenda do Gráfico
+                ctx.font = "bold 8px Manrope";
+                
+                ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
+                ctx.fillText("━━ SPD (Emissão do LED)", hclX + 15, hclY + 128);
+                
+                ctx.fillStyle = "#fbbf24";
+                ctx.fillText("--- V(λ) Visão Fotópica", hclX + 15, hclY + 138);
+                
+                ctx.fillStyle = "#06b6d4";
+                ctx.fillText("--- Curva Melanópica (ipRGC)", hclX + 125, hclY + 138);
+
+                ctx.restore();
             }
         }
 
