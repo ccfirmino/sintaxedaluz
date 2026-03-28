@@ -297,16 +297,30 @@
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
             
             <div class="mb-6 group bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                <label class="text-[9px] text-tech-cyan font-black uppercase tracking-widest block mb-2" data-i18n="lbl_source_type">ESPECTRO / CCT</label>
-                <select id="p-mRatio" onchange="window.state.ponto.mRatio = parseFloat(this.value); window.updateCalculations();" class="w-full bg-white dark:bg-slate-700 text-[10px] font-bold py-1.5 px-2 rounded border border-slate-200 dark:border-slate-600 outline-none">
-                    <option value="0.45">LED 2700K (M/P: 0.45)</option>
-                    <option value="0.52" selected>LED 3000K (M/P: 0.52)</option>
-                    <option value="0.68">LED 4000K (M/P: 0.68)</option>
-                    <option value="0.92">LED 5000K (M/P: 0.92)</option>
-                    <option value="1.10">LED 6500K (M/P: 1.10)</option>
-                </select>
-                <p class="text-[8px] text-slate-400 mt-2 italic font-medium">Fator M/P baseado em Lark Spectral (Espectros Típicos).</p>
-            </div>
+                                            <label class="text-[9px] text-tech-cyan font-black uppercase tracking-widest block mb-2" data-i18n="lbl_source_type">ESPECTRO / CCT</label>
+                                            <select id="v-mRatio" onchange="window.state.vertical.mRatio = parseFloat(this.value); window.updateCalculations();" class="w-full bg-white dark:bg-slate-700 text-[10px] font-bold py-1.5 px-2 rounded border border-slate-200 dark:border-slate-600 outline-none">
+                                                <option value="0.45">LED 2700K (M/P: 0.45)</option>
+                                                <option value="0.52" selected>LED 3000K (M/P: 0.52)</option>
+                                                <option value="0.68">LED 4000K (M/P: 0.68)</option>
+                                                <option value="0.92">LED 5000K (M/P: 0.92)</option>
+                                                <option value="1.10">LED 6500K (M/P: 1.10)</option>
+                                            </select>
+                                            <p class="text-[8px] text-slate-400 mt-2 italic font-medium">Fator M/P baseado em Lark Spectral (Espectros Típicos).</p>
+                                        </div>
+
+                                        <div class="mb-6 group bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800 shadow-inner">
+                                            <label class="flex items-center justify-between gap-3 cursor-pointer group">
+                                                <div class="flex flex-col">
+                                                    <span class="text-[9px] text-red-700 dark:text-red-400 font-black uppercase tracking-wider">ZONA DE OFUSCAMENTO (GLARE)</span>
+                                                    <span class="text-[8px] text-red-500 dark:text-red-600 font-medium mt-1">Sinaliza ângulos acima de 65º (NBR/IES).</span>
+                                                </div>
+                                                <div class="relative">
+                                                    <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
+                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="glare-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="glare-toggle-dot"></div>
+                                                </div>
+                                            </label>
+                                        </div>
 
             <div id="p-tilt-mode-group" class="mb-6 group" style="display: none;">
                 <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-2 block">CRUZAMENTO DE FACHOS (ARRAY)</label>
@@ -455,7 +469,7 @@
                                             </label>
                                             <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
                                             <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-luminous-gold font-black uppercase tracking-wider">ISOLINHAS</span>
+                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
                                                 <div class="relative">
                                                     <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
                                                     <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
@@ -887,7 +901,7 @@
         // 2. GLOBAL STATE
         window.state = {
             ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52 },
-            vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52 },
+            vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
@@ -1649,6 +1663,25 @@ if (toolId === 'grid') {
         
         // LUXSINTAX: Botão Toggle (Corte vs Elevação)
         // LUXSINTAX: Botão Toggle (Piso vs Mesa no Método Lúmens)
+        // LUXSINTAX: Visualizador de Glare Zone
+        window.toggleGlareZone = function(isChecked) {
+            window.state.vertical.showGlareZone = isChecked;
+            const bgToggle = document.getElementById('glare-toggle-bg');
+            const dotToggle = document.getElementById('glare-toggle-dot');
+            if (bgToggle && dotToggle) {
+                if (isChecked) {
+                    bgToggle.classList.add('bg-red-500'); 
+                    bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.add('translate-x-3');
+                } else {
+                    bgToggle.classList.remove('bg-red-500'); 
+                    bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.remove('translate-x-3');
+                }
+            }
+            window.updateCalculations();
+        };
+
         window.toggleIsolines = function(isChecked) {
             window.state.grid.showIsolines = isChecked;
             const bgToggle = document.getElementById('iso-toggle-bg');
@@ -2993,6 +3026,38 @@ window.toggleGridLevel = function(level) {
                     ctx.save(); ctx.translate(centerX, sy);
                     const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
                     ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore();
+
+                    // LUXSINTAX: Visualizador de Glare Zone (Ângulo de Corte ERCO/IESna)
+                    if (s.showGlareZone) {
+                        ctx.save();
+                        ctx.translate(centerX, sy);
+                        
+                        const glareAngleLimit = 65 * (Math.PI / 180); // Limite normativo (65 graus)
+                        const arcLength = (s.height * scale) * 0.85;
+
+                        // Arco à direita (glare positivo)
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.arc(0, 0, arcLength, glareAngleLimit, Math.PI / 2, false);
+                        ctx.fillStyle = "rgba(220, 38, 38, 0.15)";
+                        ctx.fill();
+                        
+                        // Arco à esquerda (glare negativo)
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.arc(0, 0, arcLength, Math.PI / 2, Math.PI - glareAngleLimit, false);
+                        ctx.fill();
+
+                        // Desenha o limite geométrico exato (Darklight cutoff)
+                        ctx.beginPath();
+                        ctx.setLineDash([3, 2]);
+                        ctx.strokeStyle = "rgba(220, 38, 38, 0.6)"; 
+                        ctx.moveTo(arcLength * Math.sin(glareAngleLimit), arcLength * Math.cos(glareAngleLimit));
+                        ctx.lineTo(0, 0);
+                        ctx.lineTo(-arcLength * Math.sin(glareAngleLimit), arcLength * Math.cos(glareAngleLimit));
+                        ctx.stroke();
+                        ctx.restore();
+                    }
 
                     // Ângulos e Eixos
                     if (s.tilt > 0) {
