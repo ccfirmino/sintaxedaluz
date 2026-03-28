@@ -1833,6 +1833,24 @@ window.toggleGridLevel = function(level) {
                             statusEl.innerText = `Carregado: ${file.name}`;
                             statusEl.classList.add('text-luminous-gold');
                         }
+
+                        // LUXSINTAX: Detector Inteligente de CCT (Lê o nome do arquivo)
+                        const upperName = file.name.toUpperCase();
+                        let detectedRatio = null;
+                        if (upperName.includes("2700K")) detectedRatio = 0.45;
+                        else if (upperName.includes("3000K")) detectedRatio = 0.52;
+                        else if (upperName.includes("4000K")) detectedRatio = 0.68;
+                        else if (upperName.includes("5000K") || upperName.includes("5700K")) detectedRatio = 0.92;
+                        else if (upperName.includes("6500K")) detectedRatio = 1.10;
+
+                        if (detectedRatio) {
+                            window.state[targetKey].mRatio = detectedRatio;
+                            // Atualiza os dropdowns visuais para o utilizador ver a mágica acontecer
+                            ['p-mRatio', 'v-mRatio'].forEach(id => {
+                                const dropdown = document.getElementById(id);
+                                if (dropdown) dropdown.value = detectedRatio;
+                            });
+                        }
                         
                         // Atualiza a UI com o fluxo e preenche o Dashboard Analítico
                         let targetFlux = parsed.totalFlux || 0;
