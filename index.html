@@ -283,7 +283,7 @@
                 </div>
             </div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label id="lbl-v-tilt" class="text-[10px] text-slate-500 font-bold whitespace-nowrap transition-colors"><span data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</span> <span id="warn-v-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-2 animate-pulse border border-red-200 dark:border-red-800">⚠️ MAX 30º</span></label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
             <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
             <div class="mode-standard-only">
                 <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
@@ -3056,9 +3056,25 @@ window.toggleGridLevel = function(level) {
                         ctx.moveTo(0, 0); ctx.lineTo(arcLength * Math.cos(nadir - limitRad), arcLength * Math.sin(nadir - limitRad)); // Dir
                         ctx.moveTo(0, 0); ctx.lineTo(arcLength * Math.cos(nadir + limitRad), arcLength * Math.sin(nadir + limitRad)); // Esq
                         ctx.stroke();
+
+                        // LUXSINTAX: Cone de Segurança (Museum Aiming Angle - Máx 30º)
+                        const safeTiltRad = 30 * (Math.PI / 180);
+                        ctx.strokeStyle = "rgba(16, 185, 129, 0.6)"; // Verde Esmeralda (Safe)
+                        ctx.moveTo(0, 0); ctx.lineTo(arcLength * 0.6 * Math.cos(nadir - safeTiltRad), arcLength * 0.6 * Math.sin(nadir - safeTiltRad));
+                        ctx.moveTo(0, 0); ctx.lineTo(arcLength * 0.6 * Math.cos(nadir + safeTiltRad), arcLength * 0.6 * Math.sin(nadir + safeTiltRad));
+                        ctx.stroke();
                         ctx.setLineDash([]);
                         
+                        // Arco Guia Verde
+                        ctx.beginPath();
+                        ctx.arc(0, 0, arcLength * 0.5, nadir - safeTiltRad, nadir + safeTiltRad, false);
+                        ctx.strokeStyle = "rgba(16, 185, 129, 0.3)";
+                        ctx.lineWidth = 4;
+                        ctx.stroke();
+                        ctx.lineWidth = 1.5;
+                        
                         // INTELIGÊNCIA: Detecção Ativa de Invasão da Zona de Glare
+                        const maxBeamAngle = Math.abs(tr) + (br / 2);
                         const maxBeamAngle = Math.abs(tr) + (br / 2);
                         if (maxBeamAngle > limitRad) {
                             ctx.fillStyle = "rgba(220, 38, 38, 0.9)";
@@ -3079,6 +3095,19 @@ window.toggleGridLevel = function(level) {
                         drawAngleDim(ctx, centerX, sy, s.tilt, s.tilt, 70, "#0284c7", true);
                     }
                     if (window.calcMode !== 'ies' || s.iesData) drawAngleDim(ctx, centerX, sy, Math.round(currentBeam), s.tilt, 40, "rgba(217, 119, 6, 0.8)", false);
+
+                    // LUXSINTAX: Validação de Norma na Interface (Máximo 30 graus de Tilt)
+                    const lblTilt = document.getElementById('lbl-v-tilt');
+                    const warnTilt = document.getElementById('warn-v-tilt');
+                    if (lblTilt && warnTilt) {
+                        if (Math.abs(s.tilt) > 30) {
+                            lblTilt.classList.add('text-red-500'); lblTilt.classList.remove('text-slate-500');
+                            warnTilt.classList.remove('hidden');
+                        } else {
+                            lblTilt.classList.remove('text-red-500'); lblTilt.classList.add('text-slate-500');
+                            warnTilt.classList.add('hidden');
+                        }
+                    }
 
                     // Ponto de Impacto na Parede
                     if (s.tilt > 0) {
