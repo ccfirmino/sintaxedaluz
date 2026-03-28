@@ -811,11 +811,22 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         
-        // LUXSINTAX: Busca segura de credenciais via Vercel Serverless API
-        const envResponse = await fetch('/api/get-env');
-        const env = await envResponse.json();
-        
-        const supabase = createClient(env.url, env.key);
+        // LUXSINTAX: Inicialização Assíncrona Protegida
+        async function initializeApp() {
+            try {
+                const envResponse = await fetch('/api/get-env');
+                const env = await envResponse.json();
+                
+                // Define o cliente Supabase globalmente para os outros motores usarem
+                window.supabase = createClient(env.url, env.key);
+                
+                // Só inicia o gerenciador de autenticação APÓS ter as chaves
+                if (window.AuthManager) window.AuthManager.init();
+            } catch (err) {
+                console.error("Falha Crítica na Infraestrutura:", err);
+                alert("Erro de conexão com o servidor de segurança. Verifique sua internet.");
+            }
+        }
 
         // --- THEME INITIALIZATION ---
         window.toggleTheme = function() {
@@ -3858,7 +3869,8 @@ window.setSurfaceMode = function(mode) {
     window.updateCalculations();
 };
 
-        window.AuthManager.init();
+        // LUXSINTAX: Disparo do motor de arranque
+        initializeApp();
         window.switchTool('ponto');
     </script>
 </body>
