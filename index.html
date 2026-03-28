@@ -308,20 +308,6 @@
                                             <p class="text-[8px] text-slate-400 mt-2 italic font-medium">Fator M/P baseado em Lark Spectral (Espectros Típicos).</p>
                                         </div>
 
-                                        <div class="mb-6 group bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800 shadow-inner">
-                                            <label class="flex items-center justify-between gap-3 cursor-pointer group">
-                                                <div class="flex flex-col">
-                                                    <span class="text-[9px] text-red-700 dark:text-red-400 font-black uppercase tracking-wider">ZONA DE OFUSCAMENTO (GLARE)</span>
-                                                    <span class="text-[8px] text-red-500 dark:text-red-600 font-medium mt-1">Sinaliza ângulos acima de 65º (NBR/IES).</span>
-                                                </div>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
-                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-8 h-5 rounded-full transition-colors duration-300" id="glare-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300" id="glare-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                        </div>
-
             <div id="p-tilt-mode-group" class="mb-6 group" style="display: none;">
                 <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-2 block">CRUZAMENTO DE FACHOS (ARRAY)</label>
                 <div class="flex gap-4 p-1">
@@ -446,6 +432,17 @@
                                         <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                             <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" data-i18n="btn_v_section">Corte Técnico</button>
                                             <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_elevation">Elevação Frontal</button>
+                                        </div>
+
+                                        <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
+                                            <label class="flex items-center gap-2 cursor-pointer group px-2" title="Sinaliza ângulos ofuscantes acima de 65º (NBR/IES).">
+                                                <span class="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider">GLARE >65º</span>
+                                                <div class="relative">
+                                                    <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
+                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="glare-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="glare-toggle-dot"></div>
+                                                </div>
+                                            </label>
                                         </div>
 
                                         <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -1616,11 +1613,13 @@ const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
 const gridLevelToggle = document.getElementById('grid-level-toggle');
 const surfaceSelector = document.getElementById('surface-selector');
 const verticalSelector = document.getElementById('vertical-selector');
+const glareWrapper = document.getElementById('glare-toggle-wrapper');
 
 if (heatmapWrapper) heatmapWrapper.classList.toggle('hidden', toolId !== 'grid');
 if (gridLevelToggle) gridLevelToggle.classList.toggle('hidden', toolId !== 'grid');
 if (surfaceSelector) surfaceSelector.classList.toggle('hidden', toolId !== 'ponto');
 if (verticalSelector) verticalSelector.classList.toggle('hidden', toolId !== 'vertical');
+if (glareWrapper) glareWrapper.classList.toggle('hidden', toolId !== 'vertical' || window.state.vertical.viewMode === 'elevation');
 
 if (toolId === 'grid') {
                     const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
@@ -3027,35 +3026,49 @@ window.toggleGridLevel = function(level) {
                     const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
                     ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore();
 
-                    // LUXSINTAX: Visualizador de Glare Zone (Ângulo de Corte ERCO/IESna)
+                    // LUXSINTAX: Visualizador de Glare Zone Otimizado (Darklight Cutoff)
                     if (s.showGlareZone) {
                         ctx.save();
                         ctx.translate(centerX, sy);
                         
-                        const glareAngleLimit = 65 * (Math.PI / 180); // Limite normativo (65 graus)
+                        const nadir = Math.PI / 2; // O eixo 0º real da luminária (apontando para o chão)
+                        const limitRad = 65 * (Math.PI / 180); // Ângulo de Corte Crítico (65 graus)
                         const arcLength = (s.height * scale) * 0.85;
 
-                        // Arco à direita (glare positivo)
+                        // ZONA DE OFUSCAMENTO REAL: Acima de 65º em relação ao Nadir.
+                        // Arco à direita (Da linha do teto até o limite de 65º)
                         ctx.beginPath();
                         ctx.moveTo(0, 0);
-                        ctx.arc(0, 0, arcLength, glareAngleLimit, Math.PI / 2, false);
+                        ctx.arc(0, 0, arcLength, 0, nadir - limitRad, false);
                         ctx.fillStyle = "rgba(220, 38, 38, 0.15)";
                         ctx.fill();
                         
-                        // Arco à esquerda (glare negativo)
+                        // Arco à esquerda (Do limite de 65º até a linha do teto do outro lado)
                         ctx.beginPath();
                         ctx.moveTo(0, 0);
-                        ctx.arc(0, 0, arcLength, Math.PI / 2, Math.PI - glareAngleLimit, false);
+                        ctx.arc(0, 0, arcLength, nadir + limitRad, Math.PI, false);
                         ctx.fill();
 
-                        // Desenha o limite geométrico exato (Darklight cutoff)
+                        // Linhas de Demarcação (Cutoff Angle Lines)
                         ctx.beginPath();
-                        ctx.setLineDash([3, 2]);
-                        ctx.strokeStyle = "rgba(220, 38, 38, 0.6)"; 
-                        ctx.moveTo(arcLength * Math.sin(glareAngleLimit), arcLength * Math.cos(glareAngleLimit));
-                        ctx.lineTo(0, 0);
-                        ctx.lineTo(-arcLength * Math.sin(glareAngleLimit), arcLength * Math.cos(glareAngleLimit));
+                        ctx.setLineDash([4, 4]);
+                        ctx.strokeStyle = "rgba(220, 38, 38, 0.8)"; 
+                        ctx.moveTo(0, 0); ctx.lineTo(arcLength * Math.cos(nadir - limitRad), arcLength * Math.sin(nadir - limitRad)); // Dir
+                        ctx.moveTo(0, 0); ctx.lineTo(arcLength * Math.cos(nadir + limitRad), arcLength * Math.sin(nadir + limitRad)); // Esq
                         ctx.stroke();
+                        ctx.setLineDash([]);
+                        
+                        // INTELIGÊNCIA: Detecção Ativa de Invasão da Zona de Glare
+                        const maxBeamAngle = Math.abs(tr) + (br / 2);
+                        if (maxBeamAngle > limitRad) {
+                            ctx.fillStyle = "rgba(220, 38, 38, 0.9)";
+                            ctx.font = "900 11px Manrope";
+                            ctx.textAlign = "center";
+                            ctx.fillText("⚠️ RISCO DE OFUSCAMENTO (>65°)", 0, -15);
+                            ctx.font = "bold 9px Manrope";
+                            ctx.fillText("Facho ultrapassou o ângulo de corte seguro.", 0, -4);
+                        }
+                        
                         ctx.restore();
                     }
 
