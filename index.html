@@ -397,13 +397,6 @@
                 </select>
                 <p class="text-[8px] text-slate-400 mt-2 italic font-medium">Fator M/P baseado em Lark Spectral.</p>
             </div>
-                    <option value="0.52" selected>LED 3000K (M/P: 0.52)</option>
-                    <option value="0.68">LED 4000K (M/P: 0.68)</option>
-                    <option value="0.92">LED 5000K (M/P: 0.92)</option>
-                    <option value="1.10">LED 6500K (M/P: 1.10)</option>
-                </select>
-                <p class="text-[8px] text-slate-400 mt-2 italic font-medium">Fator M/P baseado em Lark Spectral.</p>
-            </div>
         </div>
         
         <div id="inputs-driver" class="hidden">
@@ -563,12 +556,37 @@
                                         </div>
 
                                         <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-indigo-50 p-1.5 rounded-lg dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2" title="Espectrofotômetro e Impacto Circadiano">
-                                                <span class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-wider">HCL SPECTRUM</span>
+                                            <label class="flex items-center gap-2 cursor-pointer relative group px-2">
+                                                <span class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-wider border-b border-dashed border-indigo-300 dark:border-indigo-700 pb-0.5">HCL SPECTRUM</span>
                                                 <div class="relative">
                                                     <input type="checkbox" id="g-showHCL" onchange="window.toggleHCL(this.checked)" checked class="sr-only">
                                                     <div class="block bg-indigo-500 w-7 h-4 rounded-full transition-colors duration-300" id="hcl-toggle-bg"></div>
                                                     <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="hcl-toggle-dot"></div>
+                                                </div>
+                                                
+                                                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] cursor-default pointer-events-none p-4">
+                                                    <div class="w-full h-24 mb-3 relative bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center">
+                                                        <svg viewBox="0 0 100 60" class="w-full h-full">
+                                                            <path d="M10,45 Q50,-15 90,45" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="2,2"/>
+                                                            
+                                                            <circle cx="50" cy="15" r="6" fill="#fbbf24" />
+                                                            <circle cx="50" cy="15" r="8" fill="none" stroke="#0ea5e9" stroke-width="1" opacity="0.5"/>
+                                                            
+                                                            <path d="M50,25 L50,45" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="2,1" />
+                                                            <polygon points="47,42 53,42 50,48" fill="#0ea5e9" />
+                                                            
+                                                            <path d="M40,50 Q50,55 60,50 Q50,45 40,50 Z" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+                                                            <circle cx="50" cy="50" r="2.5" fill="#0ea5e9" />
+                                                            
+                                                            <circle cx="85" cy="40" r="4" fill="#f97316" />
+                                                            
+                                                            <text x="50" y="8" fill="#0ea5e9" font-size="5" font-weight="bold" text-anchor="middle">5000K+</text>
+                                                            <text x="85" y="32" fill="#f97316" font-size="5" font-weight="bold" text-anchor="middle">2700K</text>
+                                                            <text x="50" y="58" fill="#cbd5e1" font-size="5" font-family="sans-serif" text-anchor="middle">Sincronização Circadiana</text>
+                                                        </svg>
+                                                    </div>
+                                                    <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Human Centric Lighting</h4>
+                                                    <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">A Iluminação Centrada no Ser Humano adapta o espectro (CCT) à biologia. O sistema HCL ativa nosso espectrofotômetro e converte lúmens tradicionais em m-EDI (Melanopic Lux), validando normas como a WELL v2.</p>
                                                 </div>
                                             </label>
                                         </div>
