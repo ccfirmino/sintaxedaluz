@@ -906,14 +906,16 @@
                 lbl_add_room: "Add Room",
                 lbl_add_fixture: "New Fixture",
                 lbl_room_name: "Room Name",
-                lbl_compliance: "Compliance Status"
+                lbl_compliance: "Compliance Status",
+                lbl_source_type: "SPECTRUM / CCT",
+                lbl_melanopic: "MELANOPIC EDI (BIOLOGICAL)"
             }
         };
 
         // 2. GLOBAL STATE
         window.state = {
-            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.45 },
-            vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.45 },
+            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52 },
+            vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52 },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
@@ -2825,7 +2827,7 @@ window.toggleGridLevel = function(level) {
                     if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
                     drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
 
-                    // LUXSINTAX: Injeção de Melanopic EDI (Biologic Impact)
+                    // LUXSINTAX: HUD Melanópico (Impacto Biológico)
                     if (window.currentTool === 'ponto') {
                         const mEDI = Math.round(luxFloor * (s.mRatio || 0.52));
                         ctx.font = "bold 9px Manrope";
@@ -2835,12 +2837,12 @@ window.toggleGridLevel = function(level) {
                     }
                     
                     if (hEff > 0) { 
-                        const ix = xPos + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
+                        const ix = xPos + (hEff * scale) * Math.tan(tr); 
+                        ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
                         let valTextPlane = window.formatIllum(luxPlane);
                         if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD IES";
                         drawTextVal(ctx, valTextPlane, ix, py - 12);
 
-                        // HUD Biológico para Plano de Trabalho
                         if (window.currentTool === 'ponto') {
                             const mEDIPlane = Math.round(luxPlane * (s.mRatio || 0.52));
                             ctx.font = "bold 9px Manrope";
@@ -2848,11 +2850,6 @@ window.toggleGridLevel = function(level) {
                             ctx.textAlign = "center";
                             ctx.fillText(`${mEDIPlane} m-EDI`, ix, py + 12);
                         }
-                    } 
-                        const ix = xPos + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
-                        let valTextPlane = window.formatIllum(luxPlane);
-                        if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD IES";
-                        drawTextVal(ctx, valTextPlane, ix, py - 12); 
                     }
                 });
 
