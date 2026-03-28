@@ -3446,7 +3446,8 @@ window.toggleGridLevel = function(level) {
                 ctx.font = "900 10px Manrope";
                 ctx.fillText("ESPECTROFOTÔMETRO (HCL)", hclX + 15, hclY + 12);
 
-                const currentMRatio = (s.mRatio || 0.52).toString();
+                // LUXSINTAX: Fix de formatação (Garante que 1.1 se torne "1.10" para bater com o banco de dados HCL)
+                const currentMRatio = (s.mRatio || 0.52).toFixed(2);
                 let cctLabel = "3000K";
                 if(currentMRatio === "0.45") cctLabel = "2700K";
                 if(currentMRatio === "0.68") cctLabel = "4000K";
