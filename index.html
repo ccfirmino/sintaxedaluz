@@ -810,9 +810,12 @@
     
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-        const SUPABASE_URL = 'https://ozytwdhuxsdefnunzinm.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // LUXSINTAX: Busca segura de credenciais via Vercel Serverless API
+        const envResponse = await fetch('/api/get-env');
+        const env = await envResponse.json();
+        
+        const supabase = createClient(env.url, env.key);
 
         // --- THEME INITIALIZATION ---
         window.toggleTheme = function() {
