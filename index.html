@@ -295,6 +295,19 @@
             </div>
 
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
+            
+            <div class="mb-6 group bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                <label class="text-[9px] text-tech-cyan font-black uppercase tracking-widest block mb-2" data-i18n="lbl_source_type">ESPECTRO / CCT</label>
+                <select id="p-mRatio" onchange="window.state.ponto.mRatio = parseFloat(this.value); window.updateCalculations();" class="w-full bg-white dark:bg-slate-700 text-[10px] font-bold py-1.5 px-2 rounded border border-slate-200 dark:border-slate-600 outline-none">
+                    <option value="0.45">LED 2700K (M/P: 0.45)</option>
+                    <option value="0.52" selected>LED 3000K (M/P: 0.52)</option>
+                    <option value="0.68">LED 4000K (M/P: 0.68)</option>
+                    <option value="0.92">LED 5000K (M/P: 0.92)</option>
+                    <option value="1.10">LED 6500K (M/P: 1.10)</option>
+                </select>
+                <p class="text-[8px] text-slate-400 mt-2 italic font-medium">Fator M/P baseado em Lark Spectral (Espectros Típicos).</p>
+            </div>
+
             <div id="p-tilt-mode-group" class="mb-6 group" style="display: none;">
                 <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-2 block">CRUZAMENTO DE FACHOS (ARRAY)</label>
                 <div class="flex gap-4 p-1">
@@ -818,9 +831,48 @@
                 lbl_add_room: "Adicionar Ambiente",
                 lbl_add_fixture: "Nova Luminária",
                 lbl_room_name: "Nome do Ambiente",
-                lbl_compliance: "Status de Conformidade"
+                lbl_compliance: "Status de Conformidade",
+                lbl_source_type: "ESPECTRO / CCT",
+                lbl_melanopic: "MELANOPIC EDI (BIOLÓGICO)"
             },
             en: {
+                nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
+                calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES / LDT", lbl_ies_upload: "UPLOAD .IES / .LDT", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
+                lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
+                lbl_room_w: "ROOM WIDTH (X)", lbl_room_l: "ROOM LENGTH (Y)", lbl_grid_sug: "SUGGESTED GRID", lbl_grid_unit: "FIXTURES", lbl_grid_desc: "Autonomous distribution aiming for 25% beam overlap on the projected light spot.",
+                hdr_results: "Real-Time Results", hdr_query: "Query Center", query_subtitle: "Quick access to standards and technical references.",
+                tab_interiors: "Interiors (ISO/IES)", tab_roadway: "Roadway (IES/NBR)", filter_all: "All Categories", col_cat: "Category", col_room: "Room / Task",
+                road_params: "Roadway Parameters (M Class)", lbl_speed: "Speed (km/h)", lbl_volume: "Traffic Volume", lbl_separation: "Traffic Separation", lbl_density: "Intersection Density", lbl_complexity: "Complexity / Guidance", lbl_ambient: "Ambient Luminance",
+                road_rec_class: "Recommended Class", road_lmed: "Avg Luminance (Lmed)", road_ref_m1: "Reference: M1 (2.0)", road_emed: "Avg Illuminance (Emed)", road_approx: "Approx. for Standard Asphalt", road_u0: "Overall Uniformity (U0)", road_ti: "Max Glare (TI)",
+                leed_calc_title: "Budget Calculator (LPD)", leed_select_target: "Select Certification Target", leed_reduction: "Applied Reduction", leed_area: "Project Area (m²)", leed_type: "Typology", leed_allowance: "ALLOWED LOAD",
+                leed_eq_1: "<strong class=\"text-starlight font-black\">Control:</strong> Individual for 90% of occupants.", leed_eq_2: "<strong class=\"text-starlight font-black\">Quality:</strong> CRI > 80, Life > 24kh, High reflectance.", leed_ss_1: "Mandatory <strong class=\"text-starlight font-black\">BUG Rating</strong> (Backlight-Uplight-Glare) requirement according to Zone (LZ0 to LZ4).",
+                well_sim_title: "Lighting Credits Simulator", well_concept: "Concept: LIGHT (WELL v2)", well_est_pts: "Estimated Points", well_contrib: "Certification Contribution",
+                well_l01: "Access to daylight and views.", well_req: "Mandatory", well_l02: "Adequate illuminance levels.", well_l03: "Melanopic Lux > 240 (Workstations).", well_l04: "UGR < 16 / Solar glare management.", well_l07: "CRI > 90, R9 > 50, Flicker < 90Hz.", well_l08: "Zoning and intensity control.",
+                about_title: "ABOUT", about_text: "LuxSintax was born with a clear commitment: to transform agility into the Lighting Designer's greatest ally. In a market where time is scarce, we designed an ecosystem that eliminates friction between creative conception and technical validation.<br><br>More than a point-by-point calculator, we are a productivity hub. We integrate agile calculation tools with an intelligent standards search engine (NBR ISO/CIE 8995-1 / IESNA / NBR 5101), allowing you to validate illuminance levels and normative compliance in seconds.<br><br><strong>Technical Note:</strong> Based on the principles of trigonometry and classical photometry (Cosine Cubed Law), this tool offers mathematical precision for preliminary studies. We emphasize that the results are theoretical decision-support simulations and do not replace the complex global calculation (radiosity) of a final executive project signed by a qualified professional.",
+                card_1_title: "ABSOLUTE INTENSITY", card_1_desc: "Converts relative photometric data to absolute intensity (Candelas).", card_2_title: "COSINE CUBED LAW", card_2_desc: "Variation of the Inverse Square Law for horizontal surfaces.", card_3_title: "BEAM GEOMETRY", card_3_desc: "Trigonometric calculation of the projected light spot diameter.", card_4_title: "LUMEN METHOD", card_4_desc: "Mathematical calculation to determine fixture quantity and average illuminance.",
+                footer_terms: "Terms of Responsibility", terms_title: "Terms of Responsibility and Use", terms_accept: "I Read, Understood and Accept the Risks",
+                nav_profile: "PROFILE", nav_logout: "LOGOUT", profile_title: "Account Settings", profile_email: "Registered E-mail", profile_new_pass: "New Password", profile_confirm_pass: "Confirm New Password", profile_save: "Update Password", msg_pass_success: "Password updated successfully!", msg_pass_mismatch: "Passwords do not match.", profile_help: "<i class=\"fas fa-envelope\"></i> Help and Support",
+                auth_forgot: "Forgot password?", auth_forgot_desc: "Enter your email to receive a recovery link.", auth_send_link: "Send Link", auth_back_login: "Back to Login", msg_reset_sent: "Recovery link sent to your email!", msg_recovery_prompt: "Recovery session active. Please set your new password now.",
+                search_placeholder: "Search room or task...",
+                lbl_lumen_mode: "LUMEN METHOD (SMART)", lbl_target_lux: "TARGET ILLUMINANCE (EM)", lbl_fixture_flux: "FIXTURE FLUX (LM)", lbl_util_factor: "UTILIZATION FACTOR (U)", lbl_maint_factor: "MAINTENANCE FACTOR (FM)",
+                lbl_frame_w: "Frame Width", lbl_frame_h: "Frame Height", lbl_qty: "Qty.",
+                auth_signup_free: "SIGN UP FOR FREE", auth_tab_login: "Login", auth_tab_register: "Register",
+                auth_email: "E-mail", auth_pass: "Password", auth_name: "First Name", auth_surname: "Last Name", auth_corp_email: "Corporate E-mail",
+                auth_terms: "I agree to the terms of use.", auth_btn_login: "Access Platform", auth_btn_register: "Create Free Account",
+                btn_v_section: "Technical Section", btn_v_elevation: "Front Elevation", lbl_manual_source: "Manual Fixture", lbl_ies_file: "IES / LDT File",
+                lbl_power_w: "POWER (W)", lbl_false_color: "FALSE COLORS (HEATMAP)",
+                driver_mode: "Operation Mode", driver_power: "Unit Power (W)", driver_qty: "Length / Quantity", driver_current: "Current (mA)",
+                opt_cv: "Constant Voltage (CV - 12/24V)", opt_cc: "Constant Current (CC - mA)",
+                opt_util_70: "Light Colors / Open (0.70)", opt_util_60: "Standard / Medium (0.60)", opt_util_40: "Dark Colors / Closed (0.40)",
+                opt_maint_80: "Clean / New (0.80)", opt_maint_70: "Normal / Office (0.70)", opt_maint_60: "Dirty / Industrial (0.60)",
+                tab_leed_proj: "LEED<br>PROJECT (LPD)",
+                lbl_add_room: "Add Room",
+                lbl_add_fixture: "New Fixture",
+                lbl_room_name: "Room Name",
+                lbl_compliance: "Compliance Status",
+                lbl_source_type: "SPECTRUM / CCT",
+                lbl_melanopic: "MELANOPIC EDI (BIOLOGICAL)"
+            }
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
                 calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES / LDT", lbl_ies_upload: "UPLOAD .IES / .LDT", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
                 lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
@@ -860,8 +912,8 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
+            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.45 },
+            vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.45 },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
@@ -2772,8 +2824,31 @@ window.toggleGridLevel = function(level) {
                     let valText = window.formatIllum(luxFloor);
                     if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
                     drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
+
+                    // LUXSINTAX: Injeção de Melanopic EDI (Biologic Impact)
+                    if (window.currentTool === 'ponto') {
+                        const mEDI = Math.round(luxFloor * (s.mRatio || 0.52));
+                        ctx.font = "bold 9px Manrope";
+                        ctx.fillStyle = "#0284c7";
+                        ctx.textAlign = "center";
+                        ctx.fillText(`${mEDI} m-EDI`, hitXFloor, floorY + 12);
+                    }
                     
                     if (hEff > 0) { 
+                        const ix = xPos + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
+                        let valTextPlane = window.formatIllum(luxPlane);
+                        if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD IES";
+                        drawTextVal(ctx, valTextPlane, ix, py - 12);
+
+                        // HUD Biológico para Plano de Trabalho
+                        if (window.currentTool === 'ponto') {
+                            const mEDIPlane = Math.round(luxPlane * (s.mRatio || 0.52));
+                            ctx.font = "bold 9px Manrope";
+                            ctx.fillStyle = "#0284c7";
+                            ctx.textAlign = "center";
+                            ctx.fillText(`${mEDIPlane} m-EDI`, ix, py + 12);
+                        }
+                    } 
                         const ix = xPos + (hEff * scale) * Math.tan(tr); ctx.beginPath(); ctx.arc(ix, py, 3, 0, Math.PI * 2); ctx.fillStyle = "#d97706"; ctx.fill(); 
                         let valTextPlane = window.formatIllum(luxPlane);
                         if (window.calcMode === 'ies' && !s.iesData) valTextPlane = "LOAD IES";
