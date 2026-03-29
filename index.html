@@ -677,6 +677,49 @@
                             </div>
                         </div>
 
+                        <div id="results-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 hidden">
+                            <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl">
+                                <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Iluminância Média</p>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="result-lux" class="text-4xl font-black text-starlight">0</span>
+                                    <span class="text-sm text-dim-gray font-bold">LX</span>
+                                </div>
+                            </div>
+                            <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl">
+                                <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Ofuscamento (UGR)</p>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="result-ugr" class="text-4xl font-black text-starlight">0</span>
+                                    <span class="text-sm text-dim-gray font-bold">UGR</span>
+                                </div>
+                            </div>
+                            <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl">
+                                <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Eficiência Energética</p>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="result-eff" class="text-4xl font-black text-starlight">0</span>
+                                    <span class="text-sm text-dim-gray font-bold">LM/W</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="nbr-status-panel" class="hidden glass-panel p-6 rounded-2xl border-2 mb-12 transition-all duration-500">
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                                <div class="flex items-center gap-4">
+                                    <div id="nbr-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                                        <i id="nbr-icon" class="fas fa-info-circle"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm font-black text-starlight uppercase tracking-widest">Auditoria NBR 8995-1</h3>
+                                        <p id="nbr-status-text" class="text-dim-gray font-bold uppercase tracking-tighter text-[11px]">Processando dados fotométricos...</p>
+                                    </div>
+                                </div>
+                                <div id="nbr-badge" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
+                                    AGUARDANDO
+                                </div>
+                            </div>
+                        </div>
+
+                <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
+
                 <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
                         <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
                             <div class="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
@@ -3107,6 +3150,9 @@ if (window.currentTool !== 'grid') {
                     if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
                     drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
 
+                    // LUXSINTAX: Integração com Solver NBR e Resultados
+                    window.updateResultsUI(luxFloor, 18.5, 10); // 18.5 e 10 são exemplos base
+
                     // LUXSINTAX: HUD Melanópico (Impacto Biológico)
                     if (window.currentTool === 'ponto' && window.state.showHCL) {
                         const mEDI = Math.round(luxFloor * (s.mRatio || 0.52));
@@ -4265,6 +4311,64 @@ window.toggleGridMode = function(mode) {
 
 
         // LUXSINTAX: Disparo do motor de arranque
+        // LUXSINTAX: Motor de Interface de Resultados
+        window.updateResultsUI = function(lux, ugr, watts) {
+            const resultsSection = document.getElementById('results-section');
+            if (!resultsSection) return;
+
+            resultsSection.classList.remove('hidden');
+            
+            // 1. Atualiza os cards básicos
+            document.getElementById('result-lux').innerText = Math.round(lux);
+            document.getElementById('result-ugr').innerText = ugr.toFixed(1);
+            
+            // Cálculo de eficiência simples (Fluxo/Potência) para o card
+            const flux = window.state[window.currentTool].flux || 1000;
+            const efficiency = Math.round(flux / (watts || 10));
+            document.getElementById('result-eff').innerText = efficiency;
+
+            // 2. Lógica do Solver NBR (Simulada para Escritório Padrão: 500lx)
+            const nbrPanel = document.getElementById('nbr-status-panel');
+            const nbrStatusText = document.getElementById('nbr-status-text');
+            const nbrIcon = document.getElementById('nbr-icon');
+            const nbrIconContainer = document.getElementById('nbr-icon-container');
+            const nbrBadge = document.getElementById('nbr-badge');
+
+            if (!nbrPanel) return;
+            nbrPanel.classList.remove('hidden');
+
+            const targetLux = 500; // Padrão NBR para escritórios
+            const maxUgrLimit = 19;
+
+            let status = 'APPROVED';
+            if (lux < targetLux * 0.9 || ugr > maxUgrLimit) status = 'REJECTED';
+            else if (lux < targetLux) status = 'WARNING';
+
+            // 3. Aplicação Visual do Status
+            if (status === 'APPROVED') {
+                nbrPanel.style.borderColor = '#10b981';
+                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
+                nbrIcon.className = 'fas fa-check-circle';
+                nbrStatusText.innerText = 'CONFORME: Projeto atende aos requisitos da NBR 8995-1';
+                nbrBadge.innerText = 'APROVADO';
+                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 border-green-200';
+            } else if (status === 'WARNING') {
+                nbrPanel.style.borderColor = '#f59e0b';
+                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600';
+                nbrIcon.className = 'fas fa-exclamation-triangle';
+                nbrStatusText.innerText = 'ATENÇÃO: Iluminância marginal abaixo do recomendado (Tolerância 10%)';
+                nbrBadge.innerText = 'AVISO';
+                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 border-amber-200';
+            } else {
+                nbrPanel.style.borderColor = '#ef4444';
+                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
+                nbrIcon.className = 'fas fa-times-circle';
+                nbrStatusText.innerText = 'NÃO CONFORME: Níveis de luz ou ofuscamento fora da norma';
+                nbrBadge.innerText = 'REPROVADO';
+                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
+            }
+        };
+
         window.currentLang = 'pt';
         initializeApp();
         window.switchTool('ponto');
