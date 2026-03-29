@@ -1986,6 +1986,15 @@ window.handleGenerateReport = async () => {
                 
         window.updateCalcMode = function(mode) {
             window.calcMode = mode;
+            
+            // LUXSINTAX: Sincronização inteligente dos rádio botões (Evita conflitos entre as abas)
+            document.querySelectorAll('input[type="radio"][name="calc_mode"]').forEach(r => {
+                r.checked = (r.value === mode);
+            });
+            document.querySelectorAll('input[type="radio"][name="grid_mode_sel"]').forEach(r => {
+                r.checked = (mode === 'ies') ? (r.value === 'ies') : (r.value === 'direct');
+            });
+
             document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
             document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
@@ -4218,8 +4227,10 @@ window.toggleGridMode = function(mode) {
 
 
         // LUXSINTAX: Disparo do motor de arranque
+        window.currentLang = 'pt';
         initializeApp();
         window.switchTool('ponto');
+        window.updateCalcMode('direct'); // <--- Força o destravamento matemático da interface
     </script>
 </body>
 </html>
