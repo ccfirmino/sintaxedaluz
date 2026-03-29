@@ -139,7 +139,10 @@
         html.dark .text-slate-500 { color: #cbd5e1; }
         html.dark .text-slate-400 { color: #64748b; }
         html.dark input[type=range]::-webkit-slider-runnable-track { background: #334155; }
-    </style>
+/* LUXSINTAX: Aumentar textos das Caixas Explicativas (Tooltips) */
+        .group-hover\:visible h4 { font-size: 13px !important; margin-bottom: 8px !important; }
+        .group-hover\:visible p { font-size: 11px !important; color: #cbd5e1 !important; line-height: 1.6 !important; }    
+</style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-white transition-colors duration-300">
 
@@ -464,7 +467,7 @@
                                 </svg>
                             </div>
                             <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Coeficiente de Utilização (U)</h4>
-                            <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Representa a porcentagem de lúmens que efetivamente chega ao plano de trabalho. Depende das cores do ambiente (índices de refletância do teto, parede e piso) e da proporção da sala (Índice do Recinto).</p>
+                            <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium" data-i18n="card_u_desc">Representa a porcentagem de lúmens que efetivamente chega ao plano de trabalho. Depende das cores do ambiente (índices de refletância do teto, parede e piso) e da proporção da sala (Índice do Recinto).</p>
                         </div>
                     </label>
                     <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
@@ -493,7 +496,7 @@
                                 </svg>
                             </div>
                             <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Depreciação e Poeira (FM)</h4>
-                            <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Margem de segurança exigida por norma. Compensa a perda de luz ao longo dos anos causada pela degradação do chip LED (ex: L70/L80) e acúmulo de sujeira nas lentes e superfícies do ambiente.</p>
+                            <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium" data-i18n="card_fm_desc">Margem de segurança exigida por norma. Compensa a perda de luz ao longo dos anos causada pela degradação do chip LED (ex: L70/L80) e acúmulo de sujeira nas lentes e superfícies do ambiente.</p>
                         </div>
                     </label>
                     <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
@@ -580,7 +583,7 @@
                                                         </svg>
                                                     </div>
                                                     <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Ofuscamento Direto</h4>
-                                                    <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Luz emitida acima de 65º em relação à vertical (nadir) entra diretamente no campo visual do observador, causando desconforto severo e perda de acuidade (UGR alto).</p>
+                                                    <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium" data-i18n="card_glare_desc">Luz emitida acima de 65º em relação à vertical (nadir) entra diretamente no campo visual do observador, causando desconforto severo e perda de acuidade (UGR alto).</p>
                                                 </div>
                                             </label>
                                         </div>
@@ -627,6 +630,16 @@
                                     
 
                                     <div class="relative flex-grow w-full">
+                                        <div id="grid-hud-overlay" class="absolute top-4 left-4 z-40 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl p-4 w-52 hidden transition-all duration-300">
+                                            <h4 class="text-luminous-gold font-black text-[10px] tracking-widest uppercase mb-2 border-b border-slate-200 dark:border-slate-700 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                            <div class="space-y-2">
+                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Em (LP):</span><span id="hud-em-lp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">U (LP):</span><span id="hud-u-lp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Em (HP):</span><span id="hud-em-hp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">U (HP):</span><span id="hud-u-hp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                            </div>
+                                        </div>
                                         <div id="stage-2d" class="absolute inset-0 w-full h-full z-10 block">
                                             <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                             <canvas id="beamCanvas" class="absolute inset-0 w-full h-full block"></canvas>
@@ -834,15 +847,7 @@
                     <h2 class="text-3xl text-starlight font-black tracking-widest mb-6 uppercase" data-i18n="about_title">SOBRE</h2>
                     <p class="text-sm text-slate-600 font-medium max-w-6xl mx-auto leading-relaxed text-justify" data-i18n="about_text">O LuxSintax nasce com um compromisso claro: transformar a agilidade na maior aliada do Lighting Designer. Em um mercado onde o tempo é escasso, projetamos um ecossistema que elimina a fricção entre a concepção criativa e a validação técnica.<br><br>Mais do que uma calculadora ponto a ponto, somos um hub de produtividade. Integramos ferramentas de cálculo ágeis com um motor de busca inteligente de normas (NBR ISO/CIE 8995-1 / NBR 5101:2024), permitindo que você valide níveis de iluminância e conformidade normativa em segundos.<br><br><strong>Nota Técnica:</strong> Fundamentada nos princípios da trigonometria e da fotometria clássica (Lei do Cosseno Cúbico), esta ferramenta oferece precisão matemática para estudos preliminares. Ressaltamos que os resultados são simulações teóricas de apoio à decisão e não substituem o cálculo complexo global (radiosidade) de um projeto executivo final assinado por profissional habilitado.</p>
                 </div>
-                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                     
-                     <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white">
-                         <div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="fas fa-calculator text-3xl"></i></div>
-                         <h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_1_title">INTENSIDADE ABSOLUTA</h3>
-                         <p class="text-slate-500 text-xs mb-4 font-semibold leading-relaxed min-h-[50px]" data-i18n="card_1_desc">Converte dados fotométricos relativos para intensidade absoluta (Candelas).</p>
-                         <div class="bg-slate-50 border border-slate-100 p-3 rounded-lg text-center shadow-sm transition-colors"><span class="text-xs sm:text-sm font-serif text-luminous-gold italic font-black whitespace-nowrap">I = (Φ · γ) / 1000</span></div>
-                     </div>
-
+                 
                      <div class="glass-panel p-6 rounded-2xl relative group hover:border-amber-300 transition-all h-full bg-white">
                          <div class="absolute top-0 right-0 p-4 opacity-10 text-luminous-gold"><i class="far fa-lightbulb text-3xl"></i></div>
                          <h3 class="text-starlight text-xs font-black mb-4 tracking-wider border-b border-amber-200 pb-2 inline-block" data-i18n="card_2_title">LEI DO COSSENO CÚBICO</h3>
@@ -1042,7 +1047,11 @@
                 lbl_room_name: "Nome do Ambiente",
                 lbl_compliance: "Status de Conformidade",
                 lbl_source_type: "ESPECTRO / CCT",
-                lbl_melanopic: "MELANOPIC EDI (BIOLÓGICO)"
+                lbl_melanopic: "MELANOPIC EDI (BIOLÓGICO)",
+                hud_grid_title: "SÍNTESE DA MALHA", hud_layout: "Arranjo:",
+                card_u_desc: "Representa a porcentagem de lúmens que chega ao plano. Depende das cores e Índice do Recinto.", 
+                card_fm_desc: "Margem de segurança exigida por norma. Compensa degradação do LED e acúmulo de sujeira.", 
+                card_glare_desc: "Luz acima de 65º em relação ao nadir entra direto no campo visual, causando UGR alto."
             },
             en: {
                 nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
@@ -1080,7 +1089,11 @@
                 lbl_room_name: "Room Name",
                 lbl_compliance: "Compliance Status",
                 lbl_source_type: "SPECTRUM / CCT",
-                lbl_melanopic: "MELANOPIC EDI (BIOLOGICAL)"
+                lbl_melanopic: "MELANOPIC EDI (BIOLOGICAL)",
+                hud_grid_title: "GRID SUMMARY", hud_layout: "Layout:",
+                card_u_desc: "Percentage of lumens that effectively reach the work plane. Depends on room colors and Index.", 
+                card_fm_desc: "Safety margin required by standard. Compensates for LED degradation and dirt accumulation.", 
+                card_glare_desc: "Light above 65º from nadir enters the visual field directly, causing severe discomfort (high UGR)."
             }
         };
 
@@ -1526,7 +1539,7 @@ window.Photometric3DEngine = {
             // Construção da Sala e Piso
             const floorGeo = new THREE.PlaneGeometry(state.roomW, state.roomL);
             const isDark = document.documentElement.classList.contains('dark');
-            const floorMat = new THREE.MeshPhongMaterial({ color: isDark ? 0x1e293b : 0xe2e8f0, side: THREE.DoubleSide });
+            const floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x1e293b : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
             const floorMesh = new THREE.Mesh(floorGeo, floorMat);
             floorMesh.rotation.x = -Math.PI / 2;
             this.solidGroup.add(floorMesh);
@@ -1611,7 +1624,7 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
             const wallGeo = new THREE.PlaneGeometry(wallWidth, h);
             const isDark = document.documentElement.classList.contains('dark');
             const wallMat = new THREE.MeshPhongMaterial({ 
-                color: isDark ? 0x1e293b : 0x94a3b8, // Base mais escura para a luz explodir na tela
+                color: isDark ? 0x171717 : 0xe5e5e5, // LUXSINTAX: Cor estritamente neutra para manter a luz dourada sem esverdear
                 side: THREE.DoubleSide,
                 shininess: 5
             });
@@ -1712,7 +1725,7 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             // LUXSINTAX: Chão físico para receber a luz se não houver IES
             const isDark = document.documentElement.classList.contains('dark');
             const floorGeo = new THREE.PlaneGeometry(10, 10);
-            const floorMat = new THREE.MeshPhongMaterial({ color: isDark ? 0x1e293b : 0xe2e8f0, side: THREE.DoubleSide });
+            const floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x1e293b : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
             const floorMesh = new THREE.Mesh(floorGeo, floorMat);
             floorMesh.rotation.x = -Math.PI / 2;
             this.solidGroup.add(floorMesh);
@@ -1725,16 +1738,12 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             if (mRatio < 0.5) lightColor = 0xf59e0b; 
             if (mRatio > 0.8) lightColor = 0xbae6fd; 
 
-            // LUXSINTAX: Restauração da Mancha de Luz (Pool of Light no piso)
             if (this.solidGroup.children.length > 0) {
                 const floor = this.solidGroup.children.find(child => child.geometry instanceof THREE.PlaneGeometry);
                 if (floor) {
-                    floor.material = new THREE.MeshPhongMaterial({ 
-                        color: isDark ? 0x111827 : 0xe2e8f0,
-                        side: THREE.DoubleSide,
-                        shininess: 90, 
-                        specular: lightColor, 
-                        reflectivity: 0.5
+                    floor.material = new THREE.MeshBasicMaterial({ 
+                        color: isDark ? 0x1e293b : 0xe2e8f0, 
+                        side: THREE.DoubleSide, depthWrite: true
                     });
                 }
             }
@@ -1997,6 +2006,10 @@ window.handleGenerateReport = async () => {
                 
                 document.getElementById('heatmap-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'grid');
                 document.getElementById('hcl-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'ponto' && toolId !== 'vertical');
+// LUXSINTAX: Auto-Reset das visualizações ao trocar de aba
+                if (toolId === 'ponto') window.setSurfaceMode('single');
+                if (toolId === 'vertical') window.toggleVerticalView('section');
+                if (toolId === 'grid') window.toggleGridMode('HP');
                 
                 const glareWrapper = document.getElementById('glare-toggle-wrapper');
                 if (glareWrapper) {
@@ -2489,6 +2502,9 @@ window.handleGenerateReport = async () => {
 
         // A sua função original pesada agora roda isolada por frame
         window.coreRenderEngine = function() {
+if (window.currentTool !== 'grid') {
+                document.getElementById('grid-hud-overlay')?.classList.add('hidden');
+            }
             const canvas = document.getElementById('beamCanvas');
             if (!canvas) return;
             const isDark = document.documentElement.classList.contains('dark');
@@ -2940,70 +2956,24 @@ window.handleGenerateReport = async () => {
                     drawDimLineVertical(ctx, offsetX + roomPxW + 25, cy1, cy2, window.formatDist(spacingY));
                 }
 
-                // --- DESENHAR HUD DE RESULTADOS NO CANVAS (FORA DA MÁSCARA) ---
-                const trueAvgLux_LP = Math.round(sumLux_LP / cellCount);
-                const uniformity_LP = trueAvgLux_LP > 0 ? (minLux_LP / trueAvgLux_LP).toFixed(2) : "0.00";
+                // --- ATUALIZAR HUD DE RESULTADOS (OVERLAY HTML PARA 2D E 3D) ---
+                const gridHud = document.getElementById('grid-hud-overlay');
+                if (gridHud) {
+                    gridHud.classList.remove('hidden');
+                    
+                    // LUXSINTAX: Recálculo Seguro das Variáveis da Malha
+                    const actualPieces = s.cols * s.rows;
+                    const trueAvgLux_LP = cellCount > 0 ? Math.round(sumLux_LP / cellCount) : 0;
+                    const trueAvgLux_HP = cellCount > 0 ? Math.round(sumLux_HP / cellCount) : 0;
+                    const uniformity_LP = trueAvgLux_LP > 0 ? (minLux_LP / trueAvgLux_LP).toFixed(2) : "0.00";
+                    const uniformity_HP = trueAvgLux_HP > 0 ? (minLux_HP / trueAvgLux_HP).toFixed(2) : "0.00";
 
-                const trueAvgLux_HP = Math.round(sumLux_HP / cellCount);
-                const uniformity_HP = trueAvgLux_HP > 0 ? (minLux_HP / trueAvgLux_HP).toFixed(2) : "0.00";
-                
-                const actualPieces = s.cols * s.rows;
-
-                const hudX = 20;
-                const hudY = 20;
-                const hudW = 180;
-                const hudH = 125;
-                
-                ctx.save();
-                
-                // Fundo Translúcido
-                ctx.fillStyle = isDark ? "rgba(30, 41, 59, 0.9)" : "rgba(255, 255, 255, 0.95)";
-                ctx.shadowColor = "rgba(0,0,0,0.1)";
-                ctx.shadowBlur = 10;
-                ctx.shadowOffsetY = 4;
-                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hudX, hudY, hudW, hudH, 12); ctx.fill(); } 
-                else { ctx.fillRect(hudX, hudY, hudW, hudH); }
-                ctx.shadowColor = "transparent";
-                
-                // Borda
-                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
-                ctx.lineWidth = 1;
-                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hudX, hudY, hudW, hudH, 12); ctx.stroke(); } 
-                else { ctx.strokeRect(hudX, hudY, hudW, hudH); }
-
-                // Textos
-                ctx.textAlign = "left";
-                ctx.textBaseline = "top";
-                
-                ctx.fillStyle = "#d97706";
-                ctx.font = "900 10px Manrope";
-                ctx.fillText("SÍNTESE DA MALHA", hudX + 15, hudY + 15);
-                
-                ctx.beginPath();
-                ctx.strokeStyle = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
-                ctx.moveTo(hudX + 15, hudY + 32);
-                ctx.lineTo(hudX + hudW - 15, hudY + 32);
-                ctx.stroke();
-
-                // Rótulos
-                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-                ctx.font = "bold 10px Manrope";
-                ctx.fillText("Arranjo:", hudX + 15, hudY + 42);
-                ctx.fillText("Em (LP):", hudX + 15, hudY + 58);
-                ctx.fillText("U (LP):", hudX + 15, hudY + 74);
-                ctx.fillText("Em (HP):", hudX + 15, hudY + 90);
-                ctx.fillText("U (HP):", hudX + 15, hudY + 106);
-
-                // Valores
-                ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
-                ctx.font = "900 11px Manrope";
-                ctx.fillText(`${s.cols} x ${s.rows} (${actualPieces} un)`, hudX + 90, hudY + 41);
-                ctx.fillText(`${trueAvgLux_LP} lx`, hudX + 90, hudY + 57);
-                ctx.fillText(`${uniformity_LP}`, hudX + 90, hudY + 73);
-                ctx.fillText(`${trueAvgLux_HP} lx`, hudX + 90, hudY + 89);
-                ctx.fillText(`${uniformity_HP}`, hudX + 90, hudY + 105);
-                
-                ctx.restore();
+                    document.getElementById('hud-layout').innerText = `${s.cols} x ${s.rows} (${actualPieces} un)`;
+                    document.getElementById('hud-em-lp').innerText = `${trueAvgLux_LP} lx`;
+                    document.getElementById('hud-u-lp').innerText = uniformity_LP;
+                    document.getElementById('hud-em-hp').innerText = `${trueAvgLux_HP} lx`;
+                    document.getElementById('hud-u-hp').innerText = uniformity_HP;
+                }
 
                 return; 
             }
