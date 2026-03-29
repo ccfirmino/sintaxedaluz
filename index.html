@@ -1440,14 +1440,11 @@ window.Photometric3DEngine = {
     renderPhotometricSolid: function(iesData, toolId = 'ponto', state = null) {
         if (!this.isInitialized) this.init();
         this.clearSolid();
-        if (!iesData || !iesData.hAngles || !iesData.vAngles || !iesData.candelas) return;
+        
+        // LUXSINTAX: Desacoplamos a obrigatoriedade do IES para o modo Vertical
+        const hasIes = iesData && iesData.hAngles && iesData.vAngles && iesData.candelas;
+        if (!hasIes && toolId !== 'vertical') return;
 
-        const baseHAngles = iesData.hAngles;
-        const vAngles = iesData.vAngles;
-        const baseMatrix = iesData.candelas;
-        const mult = iesData.multiplier;
-
-        // LUXSINTAX: Etiqueta HTML Flutuante para Anotação em 3D (Substitui texto dentro do WebGL)
         let overlay = document.getElementById('webgl-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -1455,51 +1452,58 @@ window.Photometric3DEngine = {
             overlay.className = 'absolute top-4 left-4 z-30 pointer-events-none transition-opacity';
             document.getElementById('stage-3d').appendChild(overlay);
         }
-        const dummyState = state || { beam: 90, iesData: iesData };
-        const beamObj = window.getEffectiveBeam(dummyState);
-        const textLabel = beamObj.isOval ? `${Math.round(beamObj.c0)}° x ${Math.round(beamObj.c90)}°` : `${Math.round(beamObj.c0)}°`;
-        overlay.innerHTML = `<div class="bg-slate-900/80 backdrop-blur border border-luminous-gold/50 text-luminous-gold px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest uppercase shadow-lg">Facho FWHM: ${textLabel}</div>`;
 
-        // LUXSINTAX: Matriz já chega normalizada do parser (37 planos, 0 a 360 de 10 em 10)
-        const hAngles = baseHAngles;
-        const matrix = baseMatrix;
-
-        let maxI = 0;
-        for (let h = 0; h < hAngles.length; h++) {
-            for (let v = 0; v < vAngles.length; v++) {
-                if (matrix[h][v] > maxI) maxI = matrix[h][v];
-            }
+        if (hasIes) {
+            const dummyState = state || { beam: 90, iesData: iesData };
+            const beamObj = window.getEffectiveBeam(dummyState);
+            const textLabel = beamObj.isOval ? `${Math.round(beamObj.c0)}° x ${Math.round(beamObj.c90)}°` : `${Math.round(beamObj.c0)}°`;
+            overlay.innerHTML = `<div class="bg-slate-900/80 backdrop-blur border border-luminous-gold/50 text-luminous-gold px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest uppercase shadow-lg">Facho FWHM: ${textLabel}</div>`;
+            overlay.style.display = 'block';
+        } else {
+            overlay.style.display = 'none';
         }
-        if (maxI === 0) return;
-        
-        // LUXSINTAX: Escalonamento Fixo Baseado no Pico Absoluto (Solução Anti-Explosão)
-        // Wall-washers quase não jogam luz para baixo. Tentar forçá-los a tocar no piso causava explosão matemática.
-        // Agora, o vetor mais intenso do sólido ocupará exatamente 80% da altura da sala, garantindo proporção impecável.
-        const scaleFactor = (state && state.height) ? (state.height * 0.8) / (maxI * mult) : 5 / (maxI * mult);
 
         const webGroup = new THREE.Group();
-        const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
+        
+        if (hasIes) {
+            const hAngles = iesData.hAngles;
+            const vAngles = iesData.vAngles;
+            const matrix = iesData.candelas;
+            const mult = iesData.multiplier;
 
-        for (let h = 0; h < hAngles.length; h++) {
-            const pts = [];
-            for (let v = 0; v < vAngles.length; v++) {
-                const intensity = matrix[h][v] * mult * scaleFactor;
-                const phi = (hAngles[h] * Math.PI) / 180; 
-                const theta = (vAngles[v] * Math.PI) / 180; 
-                pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(phi)));
-            }
-            webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
-        }
-
-        for (let v = 0; v < vAngles.length; v++) {
-            const pts = [];
+            let maxI = 0;
             for (let h = 0; h < hAngles.length; h++) {
-                const intensity = matrix[h][v] * mult * scaleFactor;
-                const phi = (hAngles[h] * Math.PI) / 180; 
-                const theta = (vAngles[v] * Math.PI) / 180; 
-                pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(phi)));
+                for (let v = 0; v < vAngles.length; v++) {
+                    if (matrix[h][v] > maxI) maxI = matrix[h][v];
+                }
             }
-            webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+            
+            if (maxI > 0) {
+                const scaleFactor = (state && state.height) ? (state.height * 0.8) / (maxI * mult) : 5 / (maxI * mult);
+                const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
+
+                for (let h = 0; h < hAngles.length; h++) {
+                    const pts = [];
+                    for (let v = 0; v < vAngles.length; v++) {
+                        const intensity = matrix[h][v] * mult * scaleFactor;
+                        const phi = (hAngles[h] * Math.PI) / 180; 
+                        const theta = (vAngles[v] * Math.PI) / 180; 
+                        pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(phi)));
+                    }
+                    webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+                }
+
+                for (let v = 0; v < vAngles.length; v++) {
+                    const pts = [];
+                    for (let h = 0; h < hAngles.length; h++) {
+                        const intensity = matrix[h][v] * mult * scaleFactor;
+                        const phi = (hAngles[h] * Math.PI) / 180; 
+                        const theta = (vAngles[v] * Math.PI) / 180; 
+                        pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(phi)));
+                    }
+                    webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+                }
+            }
         }
 
         this.solidGroup = new THREE.Group();
@@ -1606,7 +1610,11 @@ window.Photometric3DEngine = {
                 // B) A luz física projetando a mancha na parede
                 const spotLight = new THREE.SpotLight(lightColor, 2.5); // 2.5 é a intensidade
                 spotLight.position.set(0, h, posZ);
-                spotLight.angle = Math.PI / 4.5; // Abertura cônica da mancha
+                
+                // LUXSINTAX: A abertura do facho do menu controla o 3D!
+                let spotAngleRad = Math.PI / 4.5;
+                if (state.beam) spotAngleRad = (state.beam * Math.PI / 180) / 2;
+                spotLight.angle = spotAngleRad;
                 spotLight.penumbra = 0.8; // Transição suave (efeito esfumaçado wall-wash)
                 spotLight.distance = dist * 4; // Distância que a luz viaja
 
@@ -1915,7 +1923,8 @@ if (toolId === 'grid') {
             // Controlo de Visibilidade Contextual do Botão 3D
             const viewModeToggle = document.getElementById('view-mode-toggle');
             if (viewModeToggle) {
-                if (mode === 'ies' && window.state[window.currentTool]?.iesData) {
+                // LUXSINTAX: Sempre mostra o 3D no modo Vertical (para ver a parede). Nos outros modos, exige IES.
+                if (window.currentTool === 'vertical' || (mode === 'ies' && window.state[window.currentTool]?.iesData)) {
                     viewModeToggle.classList.remove('hidden');
                 } else {
                     viewModeToggle.classList.add('hidden');
@@ -2366,7 +2375,8 @@ window.toggleGridLevel = function(level) {
                         const stage3D = document.getElementById('stage-3d');
                         if (stage3D && !stage3D.classList.contains('hidden')) {
                             const tool = window.currentTool;
-                            if (window.Photometric3DEngine && window.state[tool].iesData) {
+                            // LUXSINTAX: Chama o motor 3D independentemente de ter IES (A parede 3D não precisa de IES)
+                            if (window.Photometric3DEngine) {
                                 window.Photometric3DEngine.renderPhotometricSolid(window.state[tool].iesData, tool, window.state[tool]);
                             }
                         }
