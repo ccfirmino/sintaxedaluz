@@ -4344,7 +4344,33 @@ window.toggleGridMode = function(mode) {
             if (lux < targetLux * 0.9 || ugr > maxUgrLimit) status = 'REJECTED';
             else if (lux < targetLux) status = 'WARNING';
 
+            // LUXSINTAX: Contextualização do Título conforme o Modo
+            const isPointMode = window.currentTool === 'ponto' || window.currentTool === 'vertical';
+            const contextTitle = isPointMode ? 'Validação de Tarefa (NBR)' : 'Auditoria de Ambiente (NBR)';
+
             // 3. Aplicação Visual do Status
+            if (status === 'APPROVED') {
+                nbrPanel.style.borderColor = '#10b981';
+                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
+                nbrIcon.className = 'fas fa-check-circle';
+                nbrStatusText.innerText = `${contextTitle}: Desempenho Conforme`;
+                nbrBadge.innerText = 'APROVADO';
+                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 border-green-200';
+            } else if (status === 'WARNING') {
+                nbrPanel.style.borderColor = '#f59e0b';
+                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600';
+                nbrIcon.className = 'fas fa-exclamation-triangle';
+                nbrStatusText.innerText = `${contextTitle}: Nível Marginal`;
+                nbrBadge.innerText = 'AVISO';
+                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 border-amber-200';
+            } else {
+                nbrPanel.style.borderColor = '#ef4444';
+                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
+                nbrIcon.className = 'fas fa-times-circle';
+                nbrStatusText.innerText = `${contextTitle}: Fora dos Requisitos`;
+                nbrBadge.innerText = 'REPROVADO';
+                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
+            }
             if (status === 'APPROVED') {
                 nbrPanel.style.borderColor = '#10b981';
                 nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
