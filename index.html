@@ -628,7 +628,7 @@
                                         
                                         <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-3 pointer-events-none">
                                             
-                                            <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto">
+                                            <div id="grid-hud-overlay" class="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 shadow-2xl rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto">
                                                 <h4 class="text-luminous-gold font-black text-[10px] tracking-widest uppercase mb-2 border-b border-slate-200 dark:border-slate-700 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
                                                 <div class="space-y-2">
                                                     <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
@@ -639,7 +639,7 @@
                                                 </div>
                                             </div>
 
-                                            <div id="photometric-dashboard" class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto">
+                                            <div id="photometric-dashboard" class="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 shadow-2xl rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto">
                                                 <h4 class="text-luminous-gold font-black text-[10px] tracking-widest uppercase mb-2 border-b border-slate-200 dark:border-slate-700 pb-2"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
                                                 <div class="truncate text-[9px] font-bold text-slate-400 mb-3" id="pd-filename">arquivo.ies</div>
                                                 <div class="space-y-2">
@@ -656,7 +656,7 @@
                                             <canvas id="beamCanvas" class="absolute inset-0 w-full h-full block"></canvas>
                                         </div>
                                         
-                                        <div id="stage-3d" class="absolute inset-0 w-full h-full z-20 hidden bg-slate-900">
+                                        <div id="stage-3d" class="absolute inset-0 w-full h-full z-20 hidden bg-slate-50 dark:bg-slate-900">
                                             <div id="webgl-container" class="w-full h-full cursor-move"></div>
                                         </div>
                                     </div>
@@ -1003,6 +1003,12 @@ Agora que o HTML está perfeito, precisamos garantir que a nova "HUD de Sumário
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('luxsintax_theme', isDark ? 'dark' : 'light');
+            
+            // LUXSINTAX: Vira a chave do 3D imediatamente ao clicar na Lua/Sol
+            if (window.Photometric3DEngine && window.Photometric3DEngine.scene) {
+                window.Photometric3DEngine.scene.background = new THREE.Color(isDark ? 0x0f172a : 0xf8fafc);
+            }
+            
             if (window.updateCalculations) window.updateCalculations();
         };
 
@@ -1472,6 +1478,11 @@ window.Photometric3DEngine = {
 
     renderPhotometricSolid: function(iesData, toolId = 'ponto', state = null) {
         if (!this.isInitialized) this.init();
+        
+        // LUXSINTAX: Sincroniza a cor do fundo 3D (Céu) com o Tema Claro/Escuro
+        const isDarkTheme = document.documentElement.classList.contains('dark');
+        if (this.scene) this.scene.background = new THREE.Color(isDarkTheme ? 0x0f172a : 0xf8fafc);
+
         this.clearSolid();
         
         // LUXSINTAX: Desacoplamos a obrigatoriedade do IES para TODAS as abas!
