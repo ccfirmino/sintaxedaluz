@@ -1439,9 +1439,9 @@ window.Photometric3DEngine = {
         if (!this.isInitialized) this.init();
         this.clearSolid();
         
-        // LUXSINTAX: Desacoplamos a obrigatoriedade do IES para Vertical E Grid
+        // LUXSINTAX: Desacoplamos a obrigatoriedade do IES para TODAS as abas!
+        // O 3D agora é um visualizador arquitetônico universal.
         const hasIes = iesData && iesData.hAngles && iesData.vAngles && iesData.candelas;
-        if (!hasIes && toolId !== 'vertical' && toolId !== 'grid') return;
 
         let overlay = document.getElementById('webgl-overlay');
         if (!overlay) {
@@ -1669,37 +1669,71 @@ window.Photometric3DEngine = {
             this.controls.target.set(dist, hq, 0);
 
         } else {
-            this._lastToolRendered = toolId; // Reseta a trava se for para outra aba
-            const mesh = webGroup.clone();
+            this._lastToolRendered = toolId; 
             const h = state ? state.height : 3;
             
             const tiltModeEl3D = document.querySelector('input[name="p_tilt_mode"]:checked');
             const tiltMode3D = tiltModeEl3D ? tiltModeEl3D.value : 'same';
-            // LUXSINTAX: Conversão rigorosa para Número para evitar rotações bizarras no sólido
             const baseTiltRad = (state && state.tilt ? Number(state.tilt) : 0) * Math.PI / 180;
+
+            const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x1e293b);
+            this.solidGroup.add(gridHelper);
+
+            // LUXSINTAX: Chão físico para receber a luz se não houver IES
+            const isDark = document.documentElement.classList.contains('dark');
+            const floorGeo = new THREE.PlaneGeometry(10, 10);
+            const floorMat = new THREE.MeshPhongMaterial({ color: isDark ? 0x1e293b : 0xe2e8f0, side: THREE.DoubleSide });
+            const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+            floorMesh.rotation.x = -Math.PI / 2;
+            this.solidGroup.add(floorMesh);
+
+            const fixGeo = new THREE.SphereGeometry(0.1, 16, 16);
+            const fixMat = new THREE.MeshBasicMaterial({ color: 0xd97706 });
+
+            const mRatio = state ? (state.mRatio || 0.52) : 0.52;
+            let lightColor = 0xffbf00; 
+            if (mRatio < 0.5) lightColor = 0xf59e0b; 
+            if (mRatio > 0.8) lightColor = 0xbae6fd; 
+
+            const drawSource = (posX, rotZ) => {
+                if (hasIes && webGroup.children.length > 0) {
+                    // IES Mode: desenha a malha aramada fotométrica transparente
+                    const mesh = webGroup.clone();
+                    mesh.position.set(posX, h, 0);
+                    mesh.rotation.z = rotZ; 
+                    this.solidGroup.add(mesh);
+                } else {
+                    // Manual Mode: bolinha dourada e luz física projetada no piso
+                    const fixMesh = new THREE.Mesh(fixGeo, fixMat);
+                    fixMesh.position.set(posX, h, 0);
+                    this.solidGroup.add(fixMesh);
+
+                    const spotLight = new THREE.SpotLight(lightColor, 4.0);
+                    spotLight.position.set(posX, h, 0);
+                    spotLight.angle = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
+                    spotLight.penumbra = 0.5;
+                    spotLight.distance = h * 3;
+                    
+                    const targetObj = new THREE.Object3D();
+                    const offset = h * Math.tan(-rotZ); // Inclinação baseada no Tilt
+                    targetObj.position.set(posX + offset, 0, 0);
+                    this.solidGroup.add(targetObj);
+                    spotLight.target = targetObj;
+                    
+                    this.solidGroup.add(spotLight);
+                }
+            };
 
             if (toolId === 'ponto' && state && state.viewMode === 'array') {
                 const hS = state.spacing / 2;
-                mesh.position.set(-hS, h, 0);
-                mesh.rotation.z = baseTiltRad; // LUXSINTAX: Rotação positiva joga o foco para a direita (Meio)
-                
-                const mesh2 = webGroup.clone();
-                mesh2.position.set(hS, h, 0);
-                mesh2.rotation.z = tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad; // - joga o foco para a esquerda
-                
-                this.solidGroup.add(mesh);
-                this.solidGroup.add(mesh2);
+                drawSource(-hS, baseTiltRad);
+                drawSource(hS, tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad);
             } else {
-                mesh.position.set(0, h, 0);
-                mesh.rotation.z = baseTiltRad;
-                this.solidGroup.add(mesh);
+                drawSource(0, baseTiltRad);
                 const axesHelper = new THREE.AxesHelper(2);
                 axesHelper.position.set(0, h, 0);
                 this.solidGroup.add(axesHelper);
             }
-
-            const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x1e293b);
-            this.solidGroup.add(gridHelper);
 
             this.camera.position.set(5, h + 2, 5);
             this.controls.target.set(0, h / 2, 0);
@@ -1909,21 +1943,9 @@ window.handleGenerateReport = async () => {
             document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
             document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
             
-            // Controlo de Visibilidade Contextual do Botão 3D genérico
-            const viewModeToggle = document.getElementById('view-mode-toggle');
-            if (viewModeToggle) {
-                // LUXSINTAX: Oculta o toggle genérico no modo Vertical (pois ele tem os seus próprios botões agora)
-                if (window.currentTool === 'vertical') {
-                    viewModeToggle.classList.add('hidden');
-                } else if (mode === 'ies' && window.state[window.currentTool]?.iesData) {
-                    viewModeToggle.classList.remove('hidden');
-                } else {
-                    viewModeToggle.classList.add('hidden');
-                    window.toggleRenderMode('2D'); // Força o retorno ao 2D
-                }
-            }
-            
-            // A Lógica de Bloqueio (Data Integrity) para Fluxo e Potência agora é tratada de forma elegante via classe .mode-standard-only no DOM.
+            // LUXSINTAX: A gestão dos botões 3D agora é autônoma por aba.
+            // Garantimos que a mudança de modo de cálculo atualize a renderização.
+            window.updateCalculations();
         };
         
         // LUXSINTAX: Botão Toggle (Corte vs Elevação)
