@@ -1532,6 +1532,105 @@ window.Photometric3DEngine = {
             this.camera.position.set(state.roomW * 1.2, state.height * 2.5, state.roomL * 1.2);
             this.controls.target.set(0, state.height / 2, 0);
 
+        } else if (toolId === 'vertical' && state) {
+            // LUXSINTAX: Modo 3D Vertical (Wall-Wash Realístico com Fontes Pontuais)
+            const h = state.height || 3;
+            const dist = state.dist || 1;
+            const hq = state.hq || 1.6;
+            const fW = state.frameW || 1.2;
+            const fH = state.frameH || 0.8;
+            const qty = state.qty || 1;
+            const spacing = state.spacing || 1.0;
+            
+            const baseTiltRad = (Number(state.tilt) || 0) * Math.PI / 180;
+            const wallWidth = Math.max(10, (qty * spacing) + fW + 4);
+
+            // 1. A Parede (Agora reage fisicamente à luz!)
+            const wallGeo = new THREE.PlaneGeometry(wallWidth, h);
+            const isDark = document.documentElement.classList.contains('dark');
+            const wallMat = new THREE.MeshPhongMaterial({ 
+                color: isDark ? 0x1e293b : 0x94a3b8, // Base mais escura para a luz explodir na tela
+                side: THREE.DoubleSide,
+                shininess: 5
+            });
+            const wallMesh = new THREE.Mesh(wallGeo, wallMat);
+            wallMesh.rotation.y = -Math.PI / 2;
+            wallMesh.position.set(dist, h / 2, 0);
+            this.solidGroup.add(wallMesh);
+
+            // Linha de Teto Dourada
+            const ceilGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(dist, h, -wallWidth/2),
+                new THREE.Vector3(dist, h, wallWidth/2)
+            ]);
+            const ceilLine = new THREE.Line(ceilGeo, new THREE.LineBasicMaterial({ color: 0xd97706, linewidth: 2 }));
+            this.solidGroup.add(ceilLine);
+
+            // 2. O Quadro (Picture Frame)
+            const frameGeo = new THREE.PlaneGeometry(fW, fH);
+            const frameEdges = new THREE.EdgesGeometry(frameGeo);
+            const frameMat = new THREE.LineBasicMaterial({ color: 0x06b6d4, linewidth: 2 });
+            const frameLines = new THREE.LineSegments(frameEdges, frameMat);
+            frameLines.rotation.y = -Math.PI / 2;
+            frameLines.position.set(dist - 0.01, hq, 0);
+            this.solidGroup.add(frameLines);
+            
+            // Vidro do Quadro 
+            const frameGlassMat = new THREE.MeshPhongMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.15, side: THREE.DoubleSide, shininess: 100 });
+            const frameGlass = new THREE.Mesh(frameGeo, frameGlassMat);
+            frameGlass.rotation.y = -Math.PI / 2;
+            frameGlass.position.set(dist - 0.01, hq, 0);
+            this.solidGroup.add(frameGlass);
+
+            // 3. Luminárias Pontuais e as MANCHAS DE LUZ (SpotLights)
+            const startZ = -((qty - 1) * spacing) / 2;
+            
+            // Define a temperatura da luz pela seleção do CCT (M/P)!
+            const mRatio = state.mRatio || 0.52;
+            let lightColor = 0xfff1e0; // Padrão 3000K
+            if (mRatio < 0.5) lightColor = 0xffdab3; // 2700K (Mais quente/laranja)
+            if (mRatio > 0.8) lightColor = 0xe2f1ff; // 5000K+ (Fria/azulada)
+
+            for (let i = 0; i < qty; i++) {
+                const posZ = startZ + (i * spacing);
+
+                // A) Sólido Fotométrico Wireframe
+                const mesh = webGroup.clone();
+                mesh.position.set(0, h, posZ);
+                mesh.rotation.z = baseTiltRad; 
+                this.solidGroup.add(mesh);
+
+                // B) O "Pulo do Gato": A luz física projetando a mancha na parede
+                const spotLight = new THREE.SpotLight(lightColor, 2.5); // 2.5 é a intensidade
+                spotLight.position.set(0, h, posZ);
+                spotLight.angle = Math.PI / 4.5; // Abertura cônica da mancha
+                spotLight.penumbra = 0.8; // Transição suave (efeito esfumaçado wall-wash)
+                spotLight.distance = dist * 4; // Distância que a luz viaja
+
+                // Apontamos a luz diretamente para o centro do quadro na parede
+                const targetObj = new THREE.Object3D();
+                targetObj.position.set(dist, hq, posZ);
+                this.solidGroup.add(targetObj);
+                spotLight.target = targetObj;
+
+                this.solidGroup.add(spotLight);
+            }
+
+            const roofGuideGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, h, -wallWidth/2),
+                new THREE.Vector3(0, h, wallWidth/2)
+            ]);
+            const roofGuide = new THREE.Line(roofGuideGeo, new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.2 }));
+            this.solidGroup.add(roofGuide);
+
+            // 4. Grid de Piso e Controle de Câmera
+            const gridHelper = new THREE.GridHelper(wallWidth, 20, 0x334155, isDark ? 0x1e293b : 0xe2e8f0);
+            gridHelper.position.set(dist/2, 0, 0);
+            this.solidGroup.add(gridHelper);
+
+            this.camera.position.set(-dist * 2.5, h * 1.2, dist * 3);
+            this.controls.target.set(dist, hq, 0);
+
         } else {
             const mesh = webGroup.clone();
             const h = state ? state.height : 3;
