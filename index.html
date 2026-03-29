@@ -143,12 +143,16 @@
         .group-hover\:visible h4 { font-size: 13px !important; margin-bottom: 8px !important; }
         .group-hover\:visible p { font-size: 11px !important; color: #cbd5e1 !important; line-height: 1.6 !important; }
 
-        /* LUXSINTAX: BLINDAGEM ABSOLUTA DAS HUDS */
-        .hud-panel { background-color: rgba(255, 255, 255, 0.95) !important; border: 2px solid #e2e8f0 !important; backdrop-filter: blur(10px); }
-        html.dark .hud-panel { background-color: rgba(51, 65, 85, 0.95) !important; border: 2px solid #d97706 !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; }
-        html.dark .hud-panel .hud-lbl { color: #e2e8f0 !important; }
-        html.dark .hud-panel .hud-val { color: #ffffff !important; }
-        html.dark .hud-panel .hud-unit { color: #94a3b8 !important; }
+        /* LUXSINTAX: BLINDAGEM ABSOLUTA DAS HUDS - MÁXIMO CONTRASTE (ACESSIBILIDADE) */
+        .hud-panel { background-color: #ffffff !important; border: 2px solid #cbd5e1 !important; box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; backdrop-filter: none !important; }
+        .hud-panel .hud-lbl { color: #475569 !important; font-weight: 900 !important; }
+        .hud-panel .hud-val { color: #000000 !important; font-weight: 900 !important; }
+        .hud-panel .hud-unit { color: #64748b !important; font-weight: 900 !important; }
+
+        html.dark .hud-panel { background-color: #000000 !important; border: 2px solid #d97706 !important; box-shadow: 0 20px 60px rgba(0,0,0,1.0) !important; }
+        html.dark .hud-panel .hud-lbl { color: #e2e8f0 !important; font-weight: 900 !important; }
+        html.dark .hud-panel .hud-val { color: #ffffff !important; font-weight: 900 !important; font-size: 15px !important; }
+        html.dark .hud-panel .hud-unit { color: #fbbf24 !important; font-weight: 900 !important; }
 </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-white transition-colors duration-300">
