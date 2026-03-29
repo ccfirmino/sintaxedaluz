@@ -519,8 +519,9 @@
                                         </div>
 
                                         <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" data-i18n="btn_v_section">Corte Técnico</button>
-                                            <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_elevation">Elevação Frontal</button>
+                                            <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Corte Técnico</button>
+                                            <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Elevação Frontal</button>
+                                            <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
                                         </div>
 
                                         <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
@@ -1589,36 +1590,29 @@ window.Photometric3DEngine = {
             // 3. Luminárias Pontuais e as MANCHAS DE LUZ (SpotLights)
             const startZ = -((qty - 1) * spacing) / 2;
             
-            // Define a temperatura da luz pela seleção do CCT (M/P)!
+            // LUXSINTAX: Cores hiper saturadas para lavar a parede escura (Amarelo mais forte)
             const mRatio = state.mRatio || 0.52;
-            let lightColor = 0xfff1e0; // Padrão 3000K
-            if (mRatio < 0.5) lightColor = 0xffdab3; // 2700K (Mais quente/laranja)
-            if (mRatio > 0.8) lightColor = 0xe2f1ff; // 5000K+ (Fria/azulada)
-
-            // Criamos uma pequena esfera dourada para representar a luminária fisicamente
-            const fixGeo = new THREE.SphereGeometry(0.06, 16, 16);
-            const fixMat = new THREE.MeshBasicMaterial({ color: 0xd97706 });
+            let lightColor = 0xffbf00; // Padrão 3000K (Amarelo puro e intenso)
+            if (mRatio < 0.5) lightColor = 0xf59e0b; // 2700K (Laranja intenso)
+            if (mRatio > 0.8) lightColor = 0xbae6fd; // 5000K+ (Ciano claro)
 
             for (let i = 0; i < qty; i++) {
                 const posZ = startZ + (i * spacing);
 
-                // A) Sólido Físico (Pequeno Spot no teto), SEM o Wireframe Fotométrico
                 const fixMesh = new THREE.Mesh(fixGeo, fixMat);
                 fixMesh.position.set(0, h, posZ);
                 this.solidGroup.add(fixMesh);
 
                 // B) A luz física projetando a mancha na parede
-                const spotLight = new THREE.SpotLight(lightColor, 2.5); // 2.5 é a intensidade
+                const spotLight = new THREE.SpotLight(lightColor, 8.0); // LUXSINTAX: Intensidade aumentada para 8.0 para acender a mancha amarela
                 spotLight.position.set(0, h, posZ);
                 
-                // LUXSINTAX: A abertura do facho do menu controla o 3D!
                 let spotAngleRad = Math.PI / 4.5;
                 if (state.beam) spotAngleRad = (state.beam * Math.PI / 180) / 2;
-                spotLight.angle = spotAngleRad;
-                spotLight.penumbra = 0.8; // Transição suave (efeito esfumaçado wall-wash)
-                spotLight.distance = dist * 4; // Distância que a luz viaja
+                spotLight.angle = spotAngleRad; 
+                spotLight.penumbra = 0.8; 
+                spotLight.distance = dist * 4; 
 
-                // Apontamos a luz diretamente para o centro do quadro na parede
                 const targetObj = new THREE.Object3D();
                 targetObj.position.set(dist, hq, posZ);
                 this.solidGroup.add(targetObj);
@@ -1634,15 +1628,20 @@ window.Photometric3DEngine = {
             const roofGuide = new THREE.Line(roofGuideGeo, new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.2 }));
             this.solidGroup.add(roofGuide);
 
-            // 4. Grid de Piso e Controle de Câmera
             const gridHelper = new THREE.GridHelper(wallWidth, 20, 0x334155, isDark ? 0x1e293b : 0xe2e8f0);
             gridHelper.position.set(dist/2, 0, 0);
             this.solidGroup.add(gridHelper);
 
-            this.camera.position.set(-dist * 2.5, h * 1.2, dist * 3);
+            // LUXSINTAX: Trava de Zoom! A câmera só é posicionada na primeira vez que entramos no modo.
+            if (this._lastToolRendered !== 'vertical') {
+                this.camera.position.set(-4, h * 1.2, 5); // Posição fixa de recuo
+                this._lastToolRendered = 'vertical';
+            }
+            // O target continua a acompanhar o quadro para mantê-lo centrado, mas a câmera não sofre "zoom" ao mexer na Distância.
             this.controls.target.set(dist, hq, 0);
 
         } else {
+            this._lastToolRendered = toolId; // Reseta a trava se for para outra aba
             const mesh = webGroup.clone();
             const h = state ? state.height : 3;
             
@@ -1920,15 +1919,17 @@ if (toolId === 'grid') {
             document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
             document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
             
-            // Controlo de Visibilidade Contextual do Botão 3D
+            // Controlo de Visibilidade Contextual do Botão 3D genérico
             const viewModeToggle = document.getElementById('view-mode-toggle');
             if (viewModeToggle) {
-                // LUXSINTAX: Sempre mostra o 3D no modo Vertical (para ver a parede). Nos outros modos, exige IES.
-                if (window.currentTool === 'vertical' || (mode === 'ies' && window.state[window.currentTool]?.iesData)) {
+                // LUXSINTAX: Oculta o toggle genérico no modo Vertical (pois ele tem os seus próprios botões agora)
+                if (window.currentTool === 'vertical') {
+                    viewModeToggle.classList.add('hidden');
+                } else if (mode === 'ies' && window.state[window.currentTool]?.iesData) {
                     viewModeToggle.classList.remove('hidden');
                 } else {
                     viewModeToggle.classList.add('hidden');
-                    window.toggleRenderMode('2D'); // Força o retorno ao 2D como proteção de estado
+                    window.toggleRenderMode('2D'); // Força o retorno ao 2D
                 }
             }
             
@@ -2029,18 +2030,23 @@ window.toggleGridLevel = function(level) {
             window.updateCalculations();
         };
         window.toggleVerticalView = function(mode) {
-            window.state.vertical.viewMode = mode;
             const btnS = document.getElementById('btn-v-section');
             const btnE = document.getElementById('btn-v-elevation');
+            const btn3D = document.getElementById('btn-v-3d');
             const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
             const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
             
-            if (mode === 'section') {
-                btnS.className = activeClass; 
-                btnE.className = inactiveClass;
+            if (mode === '3D') {
+                window.toggleRenderMode('3D');
+                if(btnS) btnS.className = inactiveClass;
+                if(btnE) btnE.className = inactiveClass;
+                if(btn3D) btn3D.className = activeClass;
             } else {
-                btnE.className = activeClass; 
-                btnS.className = inactiveClass;
+                window.toggleRenderMode('2D');
+                window.state.vertical.viewMode = mode;
+                if(btnS) btnS.className = mode === 'section' ? activeClass : inactiveClass;
+                if(btnE) btnE.className = mode === 'elevation' ? activeClass : inactiveClass;
+                if(btn3D) btn3D.className = inactiveClass;
             }
             window.updateCalculations();
         };
@@ -2427,11 +2433,11 @@ window.toggleGridLevel = function(level) {
                 boundsW = Math.max(boundsW, 3.0);
             } else if (window.currentTool === 'vertical') {
                 boundsH = Math.max(s.height, s.hq) * 1.2;
+                // LUXSINTAX: Zoom Lock! A largura do canvas fica cravada (mínimo de 10m) para não piscar/dar zoom in/out ao mexer na distância
                 if (s.viewMode === 'section' || !s.viewMode) {
-                    boundsW = Math.max(s.dist * 1.8, 3.5);
+                    boundsW = Math.max(10.0, s.height * 1.5); 
                 } else {
-                    // Calcula a largura total da parede baseada na quantidade de peças
-                    boundsW = Math.max((s.qty * s.spacing) + (s.frameW * 2), 4.0);
+                    boundsW = Math.max(10.0, (s.qty * s.spacing) + (s.frameW * 2) + 2.0);
                 }
             } else if (window.currentTool === 'homog') {
                 boundsH = s.height;
@@ -4115,6 +4121,7 @@ window.generateLeedReport = async () => {
 };
 
 window.setSurfaceMode = function(mode) {
+    window.toggleRenderMode('2D');
     window.state.ponto.viewMode = mode;
     const isSingle = mode === 'single';
     const btnS = document.getElementById('btn-surf-single');
