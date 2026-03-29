@@ -628,25 +628,25 @@
                                         
                                         <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-4 pointer-events-none">
                                             
-                                            <div id="grid-hud-overlay" class="bg-slate-900 border-2 border-slate-700 shadow-2xl rounded-xl p-5 w-64 hidden transition-all duration-300 pointer-events-auto">
-                                                <h4 class="text-luminous-gold font-black text-xs tracking-widest uppercase mb-3 border-b border-slate-700 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                            <div id="grid-hud-overlay" class="bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 shadow-2xl rounded-xl p-5 w-64 hidden transition-all duration-300 pointer-events-auto">
+                                                <h4 class="text-luminous-gold font-black text-xs tracking-widest uppercase mb-3 border-b border-slate-200 dark:border-slate-600 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
                                                 <div class="space-y-3">
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-sm font-black text-white">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold">Em (LP):</span><span id="hud-em-lp" class="text-sm font-black text-white">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold">U (LP):</span><span id="hud-u-lp" class="text-sm font-black text-white">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold">Em (HP):</span><span id="hud-em-hp" class="text-sm font-black text-white">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold">U (HP):</span><span id="hud-u-hp" class="text-sm font-black text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-sm font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Em (LP):</span><span id="hud-em-lp" class="text-sm font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">U (LP):</span><span id="hud-u-lp" class="text-sm font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Em (HP):</span><span id="hud-em-hp" class="text-sm font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">U (HP):</span><span id="hud-u-hp" class="text-sm font-black text-starlight dark:text-white">--</span></div>
                                                 </div>
                                             </div>
 
-                                            <div id="photometric-dashboard" class="bg-slate-900 border-2 border-slate-700 shadow-2xl rounded-xl p-5 w-64 hidden transition-all duration-300 pointer-events-auto">
-                                                <h4 class="text-luminous-gold font-black text-xs tracking-widest uppercase mb-2 border-b border-slate-700 pb-2"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
-                                                <div class="truncate text-[10px] font-bold text-slate-500 mb-4" id="pd-filename">arquivo.ies</div>
+                                            <div id="photometric-dashboard" class="bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 shadow-2xl rounded-xl p-5 w-64 hidden transition-all duration-300 pointer-events-auto">
+                                                <h4 class="text-luminous-gold font-black text-xs tracking-widest uppercase mb-2 border-b border-slate-200 dark:border-slate-600 pb-2"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
+                                                <div class="truncate text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-4" id="pd-filename">arquivo.ies</div>
                                                 <div class="space-y-3">
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold">Eficácia:</span><span class="text-sm font-black text-white"><span id="pd-efficacy">--</span> <span class="text-[10px] font-medium text-slate-500">lm/W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold">Potência:</span><span class="text-sm font-black text-white"><span id="pd-watts">--</span> <span class="text-[10px] font-medium text-slate-500">W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold">Fluxo:</span><span class="text-sm font-black text-white"><span id="pd-lumens">--</span> <span class="text-[10px] font-medium text-slate-500">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-400 font-bold">Uplight:</span><span class="text-sm font-black text-white"><span id="pd-uplight">--</span> <span class="text-[10px] font-medium text-slate-500">%</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Eficácia:</span><span class="text-sm font-black text-starlight dark:text-white"><span id="pd-efficacy">--</span> <span class="text-[10px] font-medium text-slate-400 dark:text-slate-500">lm/W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Potência:</span><span class="text-sm font-black text-starlight dark:text-white"><span id="pd-watts">--</span> <span class="text-[10px] font-medium text-slate-400 dark:text-slate-500">W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Fluxo:</span><span class="text-sm font-black text-starlight dark:text-white"><span id="pd-lumens">--</span> <span class="text-[10px] font-medium text-slate-400 dark:text-slate-500">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Uplight:</span><span class="text-sm font-black text-starlight dark:text-white"><span id="pd-uplight">--</span> <span class="text-[10px] font-medium text-slate-400 dark:text-slate-500">%</span></span></div>
                                                 </div>
                                             </div>
                                             
@@ -664,37 +664,6 @@
                                 </div>
                             </div>
                         </div>
-
----
-
-### Passo 2: Ligar o Motor de Inteligência do Sumário (JavaScript)
-Agora que o HTML está perfeito, precisamos garantir que a nova "HUD de Sumário Técnico" saiba quando ligar e desligar se mudarmos entre Ficha Técnica e Ficheiro IES.
-
-1. Desça até ao JavaScript, na função `window.updateCalcMode = function(mode) {` (por volta da linha **1350** do seu ficheiro).
-2. Substitua toda a função por este código:
-
-```javascript
-        window.updateCalcMode = function(mode) {
-            window.calcMode = mode;
-            
-            // LUXSINTAX: Sincronização inteligente dos rádio botões (Evita conflitos entre as abas)
-            document.querySelectorAll('input[type="radio"][name="calc_mode"]').forEach(r => {
-                r.checked = (r.value === mode);
-            });
-            document.querySelectorAll('input[type="radio"][name="grid_mode_sel"]').forEach(r => {
-                r.checked = (mode === 'ies') ? (r.value === 'ies') : (r.value === 'direct');
-            });
-
-            document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
-            document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
-            document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
-            document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
-            
-            // LUXSINTAX: Mostra o Sumário Técnico apenas quando no modo IES/Fotometria
-            if (window.updatePhotometricHUD) window.updatePhotometricHUD();
-            
-            window.updateCalculations();
-        };
 
                 <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
                         <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
@@ -1471,7 +1440,7 @@ window.Photometric3DEngine = {
         if (!overlay) {
             overlay = document.createElement('div');
             overlay.id = 'webgl-overlay';
-            overlay.className = 'absolute top-4 left-4 z-30 pointer-events-none transition-opacity';
+            overlay.className = 'absolute top-4 right-4 z-30 pointer-events-none transition-opacity';
             document.getElementById('stage-3d').appendChild(overlay);
         }
 
