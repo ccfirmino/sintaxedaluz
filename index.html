@@ -143,16 +143,17 @@
         .group-hover\:visible h4 { font-size: 13px !important; margin-bottom: 8px !important; }
         .group-hover\:visible p { font-size: 11px !important; color: #cbd5e1 !important; line-height: 1.6 !important; }
 
-        /* LUXSINTAX: BLINDAGEM ABSOLUTA DAS HUDS - MÁXIMO CONTRASTE (ACESSIBILIDADE) */
-        .hud-panel { background-color: #ffffff !important; border: 2px solid #cbd5e1 !important; box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; backdrop-filter: none !important; }
-        .hud-panel .hud-lbl { color: #475569 !important; font-weight: 900 !important; }
-        .hud-panel .hud-val { color: #000000 !important; font-weight: 900 !important; }
-        .hud-panel .hud-unit { color: #64748b !important; font-weight: 900 !important; }
-
-        html.dark .hud-panel { background-color: #000000 !important; border: 2px solid #d97706 !important; box-shadow: 0 20px 60px rgba(0,0,0,1.0) !important; }
-        html.dark .hud-panel .hud-lbl { color: #e2e8f0 !important; font-weight: 900 !important; }
-        html.dark .hud-panel .hud-val { color: #ffffff !important; font-weight: 900 !important; font-size: 15px !important; }
-        html.dark .hud-panel .hud-unit { color: #fbbf24 !important; font-weight: 900 !important; }
+        /* LUXSINTAX: HUD VISUAL DEFINITIVO (CORES DO PAINEL LATERAL) */
+        .hud-panel { 
+            background-color: #0f172a !important; /* Azul escuro idêntico ao painel */
+            border: 1px solid #334155 !important; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9) !important; 
+            backdrop-filter: none !important; 
+        }
+        .hud-panel h4 { color: #ffffff !important; border-bottom: 1px solid #1e293b !important; }
+        .hud-panel .hud-lbl { color: #94a3b8 !important; font-weight: 800 !important; }
+        .hud-panel .hud-val { color: #ffffff !important; font-weight: 900 !important; }
+        .hud-panel .hud-file { color: #64748b !important; font-weight: 900 !important; }
 </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-white transition-colors duration-300">
@@ -639,25 +640,25 @@
                                         
                                         <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-4 pointer-events-none">
                                             
-                                            <div id="grid-hud-overlay" class="rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto shadow-2xl" style="background-color: #0f172a !important; border: 1px solid #334155 !important;">
-                                                <h4 class="font-black text-[11px] tracking-widest uppercase mb-3 pb-2" style="color: #ffffff !important; border-bottom: 1px solid #1e293b !important;" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                            <div id="grid-hud-overlay" class="hud-panel rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto">
+                                                <h4 class="text-[11px] tracking-widest uppercase mb-3 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-[12px] font-black" style="color: #ffffff !important;">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;">Em (LP):</span><span id="hud-em-lp" class="text-[12px] font-black" style="color: #ffffff !important;">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;">U (LP):</span><span id="hud-u-lp" class="text-[12px] font-black" style="color: #ffffff !important;">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;">Em (HP):</span><span id="hud-em-hp" class="text-[12px] font-black" style="color: #ffffff !important;">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;">U (HP):</span><span id="hud-u-hp" class="text-[12px] font-black" style="color: #ffffff !important;">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-[12px] hud-val">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl">Em (LP):</span><span id="hud-em-lp" class="text-[12px] hud-val">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl">U (LP):</span><span id="hud-u-lp" class="text-[12px] hud-val">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl">Em (HP):</span><span id="hud-em-hp" class="text-[12px] hud-val">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl">U (HP):</span><span id="hud-u-hp" class="text-[12px] hud-val">--</span></div>
                                                 </div>
                                             </div>
 
-                                            <div id="photometric-dashboard" class="rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4 shadow-2xl" style="background-color: #0f172a !important; border: 1px solid #334155 !important;">
-                                                <h4 class="font-black text-[11px] tracking-widest uppercase mb-2 pb-2" style="color: #ffffff !important; border-bottom: 1px solid #1e293b !important;"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
-                                                <div class="truncate text-[10px] font-black mb-3" style="color: #64748b !important;" id="pd-filename">arquivo.ies</div>
+                                            <div id="photometric-dashboard" class="hud-panel rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4">
+                                                <h4 class="text-[11px] tracking-widest uppercase mb-2 pb-2"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
+                                                <div class="truncate text-[10px] hud-file mb-3" id="pd-filename">arquivo.ies</div>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;">Eficácia:</span><span class="text-[12px] font-black" style="color: #ffffff !important;"><span id="pd-efficacy">--</span> <span class="text-[9px] font-black" style="color: #ffffff !important;">lm/W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;">Potência:</span><span class="text-[12px] font-black" style="color: #ffffff !important;"><span id="pd-watts">--</span> <span class="text-[9px] font-black" style="color: #ffffff !important;">W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;">Fluxo:</span><span class="text-[12px] font-black" style="color: #ffffff !important;"><span id="pd-lumens">--</span> <span class="text-[9px] font-black" style="color: #ffffff !important;">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black" style="color: #94a3b8 !important;">Uplight:</span><span class="text-[12px] font-black" style="color: #ffffff !important;"><span id="pd-uplight">--</span> <span class="text-[9px] font-black" style="color: #ffffff !important;">%</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl">Eficácia:</span><span class="text-[12px] hud-val"><span id="pd-efficacy">--</span> <span class="text-[9px] hud-lbl">lm/W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl">Potência:</span><span class="text-[12px] hud-val"><span id="pd-watts">--</span> <span class="text-[9px] hud-lbl">W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl">Fluxo:</span><span class="text-[12px] hud-val"><span id="pd-lumens">--</span> <span class="text-[9px] hud-lbl">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] hud-lbl">Uplight:</span><span class="text-[12px] hud-val"><span id="pd-uplight">--</span> <span class="text-[9px] hud-lbl">%</span></span></div>
                                                 </div>
                                             </div>
                                             
