@@ -516,6 +516,7 @@
                                         <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                             <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Fonte Única</button>
                                             <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
+                                            <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
                                         </div>
 
                                         <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -590,14 +591,10 @@
                                             </label>
                                         </div>
 
-                                        <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleGridLevel('HP')" id="btn-gl-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Mesa (HP)</button>
-                                            <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Piso (LP)</button>
-                                        </div>
-
-                                        <div id="view-mode-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleRenderMode('2D')" id="btn-render-2d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Vista 2D</button>
-                                            <button onclick="window.toggleRenderMode('3D')" id="btn-render-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Sólido 3D</button>
+                                        <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                            <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Planta Baixa (Mesa)</button>
+                                            <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Planta Baixa (Piso)</button>
+                                            <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
                                         </div>
 
                                         <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -1509,9 +1506,21 @@ window.Photometric3DEngine = {
 
         this.solidGroup = new THREE.Group();
 
+        // LUXSINTAX: Liberta a aba Grid para desenhar 3D mesmo sem IES
+        const hasIes = iesData && iesData.hAngles && iesData.vAngles && iesData.candelas;
+        // Remova a trava do início da função se necessário: if (!hasIes && toolId !== 'vertical' && toolId !== 'grid') return;
+
         if (toolId === 'grid' && state) {
             const spacingX = state.roomW / state.cols;
             const spacingZ = state.roomL / state.rows; 
+
+            // Construção da Sala e Piso
+            const floorGeo = new THREE.PlaneGeometry(state.roomW, state.roomL);
+            const isDark = document.documentElement.classList.contains('dark');
+            const floorMat = new THREE.MeshPhongMaterial({ color: isDark ? 0x1e293b : 0xe2e8f0, side: THREE.DoubleSide });
+            const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+            floorMesh.rotation.x = -Math.PI / 2;
+            this.solidGroup.add(floorMesh);
 
             const roomGeo = new THREE.BoxGeometry(state.roomW, state.height, state.roomL);
             const roomEdges = new THREE.EdgesGeometry(roomGeo);
@@ -1520,17 +1529,41 @@ window.Photometric3DEngine = {
             roomMesh.position.set(0, state.height / 2, 0);
             this.solidGroup.add(roomMesh);
 
-            const gridHelper = new THREE.GridHelper(Math.max(state.roomW, state.roomL) * 1.5, 20, 0x334155, 0x1e293b);
-            this.solidGroup.add(gridHelper);
-
             const startX = -state.roomW / 2 + spacingX / 2;
             const startZ = -state.roomL / 2 + spacingZ / 2;
 
+            // Elementos genéricos para simulação manual
+            const fixGeo = new THREE.SphereGeometry(0.1, 16, 16);
+            const fixMat = new THREE.MeshBasicMaterial({ color: 0xd97706 });
+
             for (let i = 0; i < state.cols; i++) {
                 for (let j = 0; j < state.rows; j++) {
-                    const mesh = webGroup.clone();
-                    mesh.position.set(startX + i * spacingX, state.height, startZ + j * spacingZ);
-                    this.solidGroup.add(mesh);
+                    const posX = startX + i * spacingX;
+                    const posZ = startZ + j * spacingZ;
+
+                    if (hasIes && webGroup.children.length > 0) {
+                        const mesh = webGroup.clone();
+                        mesh.position.set(posX, state.height, posZ);
+                        this.solidGroup.add(mesh);
+                    } else {
+                        // LUXSINTAX: Cria spots virtuais iluminando o piso se o utilizador não tiver IES
+                        const fixMesh = new THREE.Mesh(fixGeo, fixMat);
+                        fixMesh.position.set(posX, state.height, posZ);
+                        this.solidGroup.add(fixMesh);
+                        
+                        const spotLight = new THREE.SpotLight(0xfff1e0, 1.5);
+                        spotLight.position.set(posX, state.height, posZ);
+                        spotLight.angle = (state.beam || 60) * Math.PI / 180 / 2;
+                        spotLight.penumbra = 0.5;
+                        spotLight.distance = state.height * 3;
+                        
+                        const targetObj = new THREE.Object3D();
+                        targetObj.position.set(posX, 0, posZ);
+                        this.solidGroup.add(targetObj);
+                        spotLight.target = targetObj;
+                        
+                        this.solidGroup.add(spotLight);
+                    }
                 }
             }
 
@@ -1937,7 +1970,7 @@ if (toolId === 'grid') {
         
         // LUXSINTAX: Botão Toggle (Corte vs Elevação)
         // LUXSINTAX: Botão Toggle (Piso vs Mesa no Método Lúmens)
-        window.state.showHCL = true; // Estado global para o espectro HCL
+        window.state.showHCL = false; // LUXSINTAX: HCL inicia desligado (clean UI)
 
         window.toggleHCL = function(isChecked) {
             window.state.showHCL = isChecked;
@@ -2431,12 +2464,12 @@ window.toggleGridLevel = function(level) {
                 }
                 boundsW = Math.max(boundsW, 3.0);
             } else if (window.currentTool === 'vertical') {
-                boundsH = Math.max(s.height, s.hq) * 1.2;
-                // LUXSINTAX: Zoom Lock! A largura do canvas fica cravada (mínimo de 10m) para não piscar/dar zoom in/out ao mexer na distância
+                boundsH = Math.max(s.height, s.hq + s.frameH/2) * 1.15; 
                 if (s.viewMode === 'section' || !s.viewMode) {
-                    boundsW = Math.max(10.0, s.height * 1.5); 
+                    boundsW = Math.max(10.0, s.height * 1.5); // Trava o zoom no Corte
                 } else {
-                    boundsW = Math.max(10.0, (s.qty * s.spacing) + (s.frameW * 2) + 2.0);
+                    // LUXSINTAX: Zoom Dinâmico na Elevação! Ocupa muito mais área da tela.
+                    boundsW = Math.max((s.qty * s.spacing) + (s.frameW * 2), 2.5);
                 }
             } else if (window.currentTool === 'homog') {
                 boundsH = s.height;
@@ -4120,29 +4153,55 @@ window.generateLeedReport = async () => {
 };
 
 window.setSurfaceMode = function(mode) {
-    window.toggleRenderMode('2D');
-    window.state.ponto.viewMode = mode;
-    const isSingle = mode === 'single';
     const btnS = document.getElementById('btn-surf-single');
     const btnA = document.getElementById('btn-surf-array');
-    if (btnS && btnA) {
-        btnS.className = isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
-        btnA.className = !isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+    const btn3D = document.getElementById('btn-surf-3d');
+    const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+    const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+
+    if (mode === '3D') {
+        window.toggleRenderMode('3D');
+        if(btnS) btnS.className = inact;
+        if(btnA) btnA.className = inact;
+        if(btn3D) btn3D.className = act;
+    } else {
+        window.toggleRenderMode('2D');
+        window.state.ponto.viewMode = mode;
+        if(btnS) btnS.className = mode === 'single' ? act : inact;
+        if(btnA) btnA.className = mode === 'array' ? act : inact;
+        if(btn3D) btn3D.className = inact;
     }
     
-    // Mostra/Oculta a Orientação dos Fachos
     const tiltModeGrp = document.getElementById('p-tilt-mode-group');
-    if (tiltModeGrp) {
-        tiltModeGrp.style.display = isSingle ? 'none' : 'block';
-    }
+    if (tiltModeGrp) tiltModeGrp.style.display = (mode === 'single' || mode === '3D') ? 'none' : 'block';
     
-    // LUXSINTAX: Mostra/Oculta a Distância Entre Fontes
     const spacingGrp = document.getElementById('group-spacing');
     if (spacingGrp) {
-        if (isSingle) spacingGrp.classList.add('hidden');
+        if (mode === 'single' || mode === '3D') spacingGrp.classList.add('hidden');
         else spacingGrp.classList.remove('hidden');
     }
+    window.updateCalculations();
+};
+
+window.toggleGridMode = function(mode) {
+    const btnHP = document.getElementById('btn-grid-hp');
+    const btnLP = document.getElementById('btn-grid-lp');
+    const btn3D = document.getElementById('btn-grid-3d');
+    const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+    const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
     
+    if (mode === '3D') {
+        window.toggleRenderMode('3D');
+        if(btnHP) btnHP.className = inact;
+        if(btnLP) btnLP.className = inact;
+        if(btn3D) btn3D.className = act;
+    } else {
+        window.toggleRenderMode('2D');
+        window.state.grid.viewLevel = mode;
+        if(btnHP) btnHP.className = mode === 'HP' ? act : inact;
+        if(btnLP) btnLP.className = mode === 'LP' ? act : inact;
+        if(btn3D) btn3D.className = inact;
+    }
     window.updateCalculations();
 };
 
