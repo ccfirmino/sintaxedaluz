@@ -1695,32 +1695,87 @@ window.Photometric3DEngine = {
             if (mRatio < 0.5) lightColor = 0xf59e0b; 
             if (mRatio > 0.8) lightColor = 0xbae6fd; 
 
-            const drawSource = (posX, rotZ) => {
-                if (hasIes && webGroup.children.length > 0) {
-                    // IES Mode: desenha a malha aramada fotométrica transparente
-                    const mesh = webGroup.clone();
-                    mesh.position.set(posX, h, 0);
-                    mesh.rotation.z = rotZ; 
-                    this.solidGroup.add(mesh);
-                } else {
-                    // Manual Mode: bolinha dourada e luz física projetada no piso
-                    const fixMesh = new THREE.Mesh(fixGeo, fixMat);
-                    fixMesh.position.set(posX, h, 0);
-                    this.solidGroup.add(fixMesh);
+            // LUXSINTAX: Motor Estético Premium para representação "Seductora" do LD
+            // Define o material do piso como polido e reflexivo (Estilo Caustics)
+            if (this.solidGroup.children.length > 0) {
+                const floor = this.solidGroup.children.find(child => child.geometry instanceof THREE.PlaneGeometry);
+                if (floor) {
+                    floor.material = new THREE.MeshPhongMaterial({ 
+                        color: isDark ? 0x111827 : 0xe2e8f0, // Slate-900 / Slate-200
+                        side: THREE.DoubleSide,
+                        shininess: 90, 
+                        specular: lightColor, 
+                        reflectivity: 0.5
+                    });
+                }
+            }
 
+            // Material para o Cone de Luz Volumétrico Translúcido
+            const coneMat = new THREE.MeshBasicMaterial({ 
+                color: lightColor, 
+                transparent: true, 
+                opacity: 0.05, // LUXSINTAX: Hiper translúcido
+                blending: THREE.AdditiveBlending, // LUXSINTAX: Soma as cores (efeito glowing)
+                side: THREE.DoubleSide,
+                depthWrite: false // Evita artefatos de renderização
+            });
+
+            // Textura sutil para imitar feixe interno da luminária dicroica/parabol no teto
+            const sourceLensMat = new THREE.MeshLambertMaterial({ color: lightColor, emissive: lightColor, emissiveIntensity: 2 });
+            const sourceLensGeo = new THREE.CircleGeometry(0.12, 16);
+
+            const drawSource = (posX, rotZ) => {
+                // LUXSINTAX: Contêiner para agrupar fonte, lente e cone para rotação unificada
+                const sourceGrp = new THREE.Group();
+                sourceGrp.position.set(posX, h, 0);
+                
+                // Aplica a inclinação (Tilt) diretamente ao contêiner
+                sourceGrp.rotation.z = rotZ; 
+                this.solidGroup.add(sourceGrp);
+
+                if (hasIes && webGroup.children.length > 0) {
+                    // --- MODO IES (Analítico Premium) ---
+                    const mesh = webGroup.clone();
+                    mesh.position.set(0, 0, 0); // Posição relativa ao contêiner
+                    sourceGrp.add(mesh);
+                } else {
+                    // --- MODO MANUAL (Arquitetônico Sedutor) ---
+                    // 1. A Bolinha Dourada (Físico)
+                    const fixMesh = new THREE.Mesh(fixGeo, fixMat);
+                    sourceGrp.add(fixMesh);
+
+                    // 2. A Lente Radiante no teto
+                    const lensMesh = new THREE.Mesh(sourceLensGeo, sourceLensMat);
+                    lensMesh.rotation.x = Math.PI / 2; // Face para baixo
+                    lensMesh.position.y = -0.01; // Sutilmente abaixo da bolinha
+                    sourceGrp.add(lensMesh);
+
+                    // 3. O Cone de Luz Volumétrico Translúcido
+                    const beamAngleRad = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
+                    const coneHeight = h + 1; // Estende sutilmente abaixo do piso
+                    const coneRadiusBase = Math.tan(beamAngleRad) * coneHeight;
+                    
+                    const coneGeo = new THREE.CylinderGeometry(0.12, coneRadiusBase, coneHeight, 32, 1, true); // Cone aberto
+                    // Ajusta a geometria para que o topo fique na origem (0,0,0) do contêiner
+                    coneGeo.translate(0, -coneHeight/2, 0); 
+                    
+                    const beamMesh = new THREE.Mesh(coneGeo, coneMat);
+                    sourceGrp.add(beamMesh);
+
+                    // 4. A Luz Física Real (Projectada no Piso Reflexivo)
                     const spotLight = new THREE.SpotLight(lightColor, 4.0);
-                    spotLight.position.set(posX, h, 0);
-                    spotLight.angle = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
+                    spotLight.position.set(0, 0, 0);
+                    spotLight.angle = beamAngleRad;
                     spotLight.penumbra = 0.5;
                     spotLight.distance = h * 3;
                     
+                    // O Alvo da Luz agora acompanha a inclinação do contêiner automaticamente
                     const targetObj = new THREE.Object3D();
-                    const offset = h * Math.tan(-rotZ); // Inclinação baseada no Tilt
-                    targetObj.position.set(posX + offset, 0, 0);
-                    this.solidGroup.add(targetObj);
+                    targetObj.position.set(0, -h, 0); // Fica diretamente no piso (relativo)
+                    sourceGrp.add(targetObj);
                     spotLight.target = targetObj;
                     
-                    this.solidGroup.add(spotLight);
+                    sourceGrp.add(spotLight);
                 }
             };
 
