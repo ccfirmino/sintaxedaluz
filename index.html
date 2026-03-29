@@ -1439,9 +1439,9 @@ window.Photometric3DEngine = {
         if (!this.isInitialized) this.init();
         this.clearSolid();
         
-        // LUXSINTAX: Desacoplamos a obrigatoriedade do IES para o modo Vertical
+        // LUXSINTAX: Desacoplamos a obrigatoriedade do IES para Vertical E Grid
         const hasIes = iesData && iesData.hAngles && iesData.vAngles && iesData.candelas;
-        if (!hasIes && toolId !== 'vertical') return;
+        if (!hasIes && toolId !== 'vertical' && toolId !== 'grid') return;
 
         let overlay = document.getElementById('webgl-overlay');
         if (!overlay) {
@@ -1505,10 +1505,6 @@ window.Photometric3DEngine = {
         }
 
         this.solidGroup = new THREE.Group();
-
-        // LUXSINTAX: Liberta a aba Grid para desenhar 3D mesmo sem IES
-        const hasIes = iesData && iesData.hAngles && iesData.vAngles && iesData.candelas;
-        // Remova a trava do início da função se necessário: if (!hasIes && toolId !== 'vertical' && toolId !== 'grid') return;
 
         if (toolId === 'grid' && state) {
             const spacingX = state.roomW / state.cols;
