@@ -3041,6 +3041,12 @@ if (window.currentTool !== 'grid') {
                     document.getElementById('hud-u-lp').innerText = uniformity_LP;
                     document.getElementById('hud-em-hp').innerText = `${trueAvgLux_HP} lx`;
                     document.getElementById('hud-u-hp').innerText = uniformity_HP;
+
+                    // LUXSINTAX: Sincronização em Tempo Real com os Cards e Solver NBR
+                    // Enviamos a média calculada pela matriz para a UI global
+                    const finalAvg = currentLevel === 'LP' ? trueAvgLux_LP : trueAvgLux_HP;
+                    const totalWatts = (s.watts || 30) * s.cols * s.rows;
+                    window.updateResultsUI(finalAvg, 18.5, totalWatts);
                 }
 
                 return; 
@@ -3151,7 +3157,8 @@ if (window.currentTool !== 'grid') {
                     drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
 
                     // LUXSINTAX: Integração com Solver NBR e Resultados
-                    window.updateResultsUI(luxFloor, 18.5, 10); // 18.5 e 10 são exemplos base
+                    // Usamos a potência real da luminária (s.watts) se disponível
+                    window.updateResultsUI(luxFloor, 18.5, (s.watts || 10));
 
                     // LUXSINTAX: HUD Melanópico (Impacto Biológico)
                     if (window.currentTool === 'ponto' && window.state.showHCL) {
@@ -4322,9 +4329,10 @@ window.toggleGridMode = function(mode) {
             document.getElementById('result-lux').innerText = Math.round(lux);
             document.getElementById('result-ugr').innerText = ugr.toFixed(1);
             
-            // Cálculo de eficiência simples (Fluxo/Potência) para o card
-            const flux = window.state[window.currentTool].flux || 1000;
-            const efficiency = Math.round(flux / (watts || 10));
+            // LUXSINTAX: Cálculo de Eficiência Sistémica (lm/W total do projeto)
+            const s = window.state[window.currentTool];
+            const totalFlux = window.currentTool === 'grid' ? (s.flux * s.cols * s.rows) : s.flux;
+            const efficiency = watts > 0 ? Math.round(totalFlux / watts) : 0;
             document.getElementById('result-eff').innerText = efficiency;
 
             // 2. Lógica do Solver NBR (Simulada para Escritório Padrão: 500lx)
