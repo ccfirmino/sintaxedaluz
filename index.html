@@ -1710,31 +1710,18 @@ window.Photometric3DEngine = {
     }
 };
 
-// LUXSINTAX: Função duplicada 'toggleRenderMode' removida para evitar colisão de estado (Lag de Renderização)
-
 window.toggleRenderMode = function(mode) {
     const stage2D = document.getElementById('stage-2d');
     const stage3D = document.getElementById('stage-3d');
-    const btn2D = document.getElementById('btn-render-2d');
-    const btn3D = document.getElementById('btn-render-3d');
-    
-    const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
-    const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+    if (!stage2D || !stage3D) return;
 
     if (mode === '3D') {
-            stage2D.classList.add('hidden');
-            stage3D.classList.remove('hidden');
-            btn3D.className = activeClass;
-            btn2D.className = inactiveClass;
-            
-            window.Photometric3DEngine.init();
-            window.updateCalculations();
-        } else {
+        stage2D.classList.add('hidden');
+        stage3D.classList.remove('hidden');
+        if (window.Photometric3DEngine) window.Photometric3DEngine.init();
+    } else {
         stage3D.classList.add('hidden');
         stage2D.classList.remove('hidden');
-        btn2D.className = activeClass;
-        btn3D.className = inactiveClass;
-        window.updateCalculations();
     }
 };
 
@@ -1856,11 +1843,10 @@ window.handleGenerateReport = async () => {
     const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Relatorio_LuxSintax_Grid.pdf'; link.click();
 };
         // --- CORE FUNCTIONS ---
+        // --- CORE FUNCTIONS ---
         window.switchTool = function(toolId) {
-            // 1. Restaura o estado da ferramenta atual (CRÍTICO PARA O CANVAS)
             window.currentTool = toolId;
 
-            // 2. Atualiza a UI dos botões de navegação no topo
             document.querySelectorAll('.mode-tab-btn').forEach(btn => {
                 btn.classList.remove('tab-active', 'text-luminous-gold');
                 btn.classList.add('tab-inactive');
@@ -1871,17 +1857,14 @@ window.handleGenerateReport = async () => {
                 activeBtn.classList.add('tab-active', 'text-luminous-gold');
             }
 
-            // 3. Controla a visibilidade dos blocos principais do sistema
             document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj');
             document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
             document.getElementById('leedProj-tool').classList.toggle('hidden', toolId !== 'leedProj');
             
-            // 4. Controla o seletor de modo (Intensidade/Fotometria/IES)
             const modeSelector = document.getElementById('calc-mode-selector');
             if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
 
             if (toolId !== 'query' && toolId !== 'leedProj') {
-                // Esconde todos os painéis de inputs e mostra apenas o ativo
                 ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
                     const el = document.getElementById(id); 
                     if(el) el.classList.add('hidden'); 
@@ -1889,54 +1872,33 @@ window.handleGenerateReport = async () => {
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
                 
-                // Controle dos Wrappers de Interface da Malha (Heatmap e Nível de Iluminância LP/HP)
-// Controle dos Wrappers de Interface da Malha e Botões
-const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
-const gridLevelToggle = document.getElementById('grid-level-toggle');
-const surfaceSelector = document.getElementById('surface-selector');
-const verticalSelector = document.getElementById('vertical-selector');
-const glareWrapper = document.getElementById('glare-toggle-wrapper');
-const hclWrapper = document.getElementById('hcl-toggle-wrapper');
-
-if (heatmapWrapper) heatmapWrapper.classList.toggle('hidden', toolId !== 'grid');
-if (gridLevelToggle) gridLevelToggle.classList.toggle('hidden', toolId !== 'grid');
-if (surfaceSelector) surfaceSelector.classList.toggle('hidden', toolId !== 'ponto');
-if (verticalSelector) verticalSelector.classList.toggle('hidden', toolId !== 'vertical');
-if (glareWrapper) glareWrapper.classList.toggle('hidden', (toolId !== 'vertical' && toolId !== 'ponto') || (toolId === 'vertical' && window.state.vertical.viewMode === 'elevation'));
-if (hclWrapper) hclWrapper.classList.toggle('hidden', toolId !== 'ponto' && toolId !== 'vertical');
-
-// Sincroniza o estado visual do botão ao trocar de abas
-const glareToggle = document.getElementById('v-glareZone');
-if (glareToggle && window.state[toolId] && window.state[toolId].showGlareZone !== undefined) {
-    glareToggle.checked = window.state[toolId].showGlareZone;
-    const bgToggle = document.getElementById('glare-toggle-bg');
-    const dotToggle = document.getElementById('glare-toggle-dot');
-    if (bgToggle && dotToggle) {
-        if (glareToggle.checked) {
-            bgToggle.classList.add('bg-red-500'); bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
-            dotToggle.classList.add('translate-x-3');
-        } else {
-            bgToggle.classList.remove('bg-red-500'); bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
-            dotToggle.classList.remove('translate-x-3');
-        }
-    }
-}
-
-if (toolId === 'grid') {
-                    const gridSel = document.querySelector('input[name="grid_mode_sel"]:checked');
-                    if (gridSel) window.updateCalcMode(gridSel.value);
-                } else if (toolId !== 'driver') {
-                    const globalSel = document.querySelector('input[name="calc_mode"]:checked');
-                    if (globalSel) window.updateCalcMode(globalSel.value);
-                }
+                // LUXSINTAX: Mostra os seletores de visão correspondentes à aba ativa
+                document.getElementById('surface-selector')?.classList.toggle('hidden', toolId !== 'ponto');
+                document.getElementById('vertical-selector')?.classList.toggle('hidden', toolId !== 'vertical');
+                document.getElementById('grid-selector')?.classList.toggle('hidden', toolId !== 'grid');
                 
-                // Dispara o motor de renderização do Canvas
+                document.getElementById('heatmap-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'grid');
+                document.getElementById('hcl-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'ponto' && toolId !== 'vertical');
+                
+                const glareWrapper = document.getElementById('glare-toggle-wrapper');
+                if (glareWrapper) {
+                    glareWrapper.classList.toggle('hidden', (toolId !== 'vertical' && toolId !== 'ponto') || (toolId === 'vertical' && window.state.vertical.viewMode === 'elevation'));
+                }
+
                 window.updateCalculations();
             } else if (toolId === 'query') {
                  window.switchQueryTab('nbr8995');
             } else if (toolId === 'leedProj') {
                  window.renderLeedProject();
             }
+        };
+                
+        window.updateCalcMode = function(mode) {
+            window.calcMode = mode;
+            document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
+            document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
+            document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
+            document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
         };
                 
                 
@@ -4152,7 +4114,7 @@ window.setSurfaceMode = function(mode) {
     const btnS = document.getElementById('btn-surf-single');
     const btnA = document.getElementById('btn-surf-array');
     const btn3D = document.getElementById('btn-surf-3d');
-    const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+    const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm";
     const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
 
     if (mode === '3D') {
@@ -4175,6 +4137,28 @@ window.setSurfaceMode = function(mode) {
     if (spacingGrp) {
         if (mode === 'single' || mode === '3D') spacingGrp.classList.add('hidden');
         else spacingGrp.classList.remove('hidden');
+    }
+    window.updateCalculations();
+};
+
+window.toggleGridMode = function(mode) {
+    const btnHP = document.getElementById('btn-grid-hp');
+    const btnLP = document.getElementById('btn-grid-lp');
+    const btn3D = document.getElementById('btn-grid-3d');
+    const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm";
+    const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+    
+    if (mode === '3D') {
+        window.toggleRenderMode('3D');
+        if(btnHP) btnHP.className = inact;
+        if(btnLP) btnLP.className = inact;
+        if(btn3D) btn3D.className = act;
+    } else {
+        window.toggleRenderMode('2D');
+        window.state.grid.viewLevel = mode;
+        if(btnHP) btnHP.className = mode === 'HP' ? act : inact;
+        if(btnLP) btnLP.className = mode === 'LP' ? act : inact;
+        if(btn3D) btn3D.className = inact;
     }
     window.updateCalculations();
 };
