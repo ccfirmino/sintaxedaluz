@@ -703,25 +703,25 @@
                             </div>
 
                             <div id="results-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full hidden animate-fade-in-up">
-                                <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl w-full">
-                                    <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Iluminância Média</p>
+                                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
+                                    <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Iluminância Média</p>
                                     <div class="flex items-baseline gap-2">
-                                        <span id="result-lux" class="text-4xl font-black text-starlight">0</span>
-                                        <span class="text-sm text-dim-gray font-bold">LX</span>
+                                        <span id="result-lux" class="text-4xl font-black text-starlight dark:text-white">0</span>
+                                        <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">LX</span>
                                     </div>
                                 </div>
-                                <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl w-full">
-                                    <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Ofuscamento (UGR)</p>
+                                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
+                                    <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Ofuscamento (UGR)</p>
                                     <div class="flex items-baseline gap-2">
-                                        <span id="result-ugr" class="text-4xl font-black text-starlight">0</span>
-                                        <span class="text-sm text-dim-gray font-bold">UGR</span>
+                                        <span id="result-ugr" class="text-4xl font-black text-starlight dark:text-white">0</span>
+                                        <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">UGR</span>
                                     </div>
                                 </div>
-                                <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl w-full">
-                                    <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Eficiência Energética</p>
+                                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
+                                    <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Eficiência Energética</p>
                                     <div class="flex items-baseline gap-2">
-                                        <span id="result-eff" class="text-4xl font-black text-starlight">0</span>
-                                        <span class="text-sm text-dim-gray font-bold">LM/W</span>
+                                        <span id="result-eff" class="text-4xl font-black text-starlight dark:text-white">0</span>
+                                        <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">LM/W</span>
                                     </div>
                                 </div>
                             </div>
@@ -3068,8 +3068,8 @@ if (window.currentTool !== 'grid') {
                     document.getElementById('hud-u-hp').innerText = uniformity_HP;
 
                     // LUXSINTAX: Sincronização em Tempo Real com os Cards e Solver NBR
-                    // A Norma NBR 8995-1 audita SEMPRE o Plano de Trabalho (HP), não o piso.
-                    const finalAvg = trueAvgLux_HP; 
+                    // O Solver agora obedece à escolha do projetista (Piso ou Plano de Trabalho)
+                    const finalAvg = currentLevel === 'LP' ? trueAvgLux_LP : trueAvgLux_HP; 
                     const totalWatts = (s.watts || 30) * s.cols * s.rows;
                     window.updateResultsUI(finalAvg, 18.5, totalWatts);
                 }
@@ -4385,7 +4385,13 @@ window.toggleGridMode = function(mode) {
 
             // LUXSINTAX: Contextualização do Título conforme o Modo
             const isPointMode = window.currentTool === 'ponto' || window.currentTool === 'vertical';
-            const contextTitle = isPointMode ? 'Validação de Tarefa (NBR)' : 'Auditoria de Ambiente (NBR)';
+            let contextTitle = 'Auditoria NBR';
+            if (isPointMode) {
+                contextTitle = 'Validação de Tarefa (NBR)';
+            } else {
+                const isFloor = window.state.grid && window.state.grid.viewLevel === 'LP';
+                contextTitle = isFloor ? 'Auditoria NBR (No Piso)' : 'Auditoria NBR (Plano Trab.)';
+            }
 
             // 3. Aplicação Visual do Status
             if (status === 'APPROVED') {
