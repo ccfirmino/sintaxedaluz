@@ -650,29 +650,33 @@
                                         </div>
                                     </div>
                                 </div>
-<div id="photometric-dashboard" class="hidden w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 transition-all duration-500 z-20 relative shadow-sm mt-4 rounded-xl">
-                                        <div class="flex justify-between items-center mb-3">
-                                            <h4 class="text-[10px] font-black tracking-widest text-luminous-gold uppercase"><i class="fas fa-microscope mr-1"></i> Sumário Técnico (IES/LDT)</h4>
-                                            <span id="pd-filename" class="text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded font-bold max-w-[200px] truncate">arquivo.ies</span>
+                                
+                                <div id="photometric-dashboard" class="hidden w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 transition-all duration-500 z-20 relative shadow-sm rounded-xl mt-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h4 class="text-[10px] font-black tracking-widest text-luminous-gold uppercase"><i class="fas fa-microscope mr-1"></i> Sumário Técnico (IES/LDT)</h4>
+                                        <span id="pd-filename" class="text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded font-bold max-w-[200px] truncate">arquivo.ies</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
+                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Eficácia</div>
+                                            <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-efficacy">--</span> <span class="text-[10px] font-medium text-slate-500">lm/W</span></div>
                                         </div>
-                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Eficácia</div>
-                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-efficacy">--</span> <span class="text-[10px] font-medium text-slate-500">lm/W</span></div>
-                                            </div>
-                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Potência (W)</div>
-                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-watts">--</span> <span class="text-[10px] font-medium text-slate-500">W</span></div>
-                                            </div>
-                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Fluxo Total</div>
-                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-lumens">--</span> <span class="text-[10px] font-medium text-slate-500">lm</span></div>
-                                            </div>
-                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Upward Light (ULR)</div>
-                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-uplight">--</span> <span class="text-[10px] font-medium text-slate-500">%</span></div>
-                                            </div>
+                                        <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
+                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Potência (W)</div>
+                                            <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-watts">--</span> <span class="text-[10px] font-medium text-slate-500">W</span></div>
                                         </div>
+                                        <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
+                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Fluxo Total</div>
+                                            <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-lumens">--</span> <span class="text-[10px] font-medium text-slate-500">lm</span></div>
+                                        </div>
+                                        <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
+                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Upward Light (ULR)</div>
+                                            <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-uplight">--</span> <span class="text-[10px] font-medium text-slate-500">%</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
                                     </div>
                             </div>
                         </div>
@@ -1703,9 +1707,9 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             gridHelper.position.set(dist/2, 0, 0);
             this.solidGroup.add(gridHelper);
 
-            // LUXSINTAX: Trava de Zoom! A câmera só é posicionada na primeira vez que entramos no modo.
+            // LUXSINTAX: Câmera Dinâmica (Acompanha a proximidade da parede para maior impacto)
             if (this._lastToolRendered !== 'vertical') {
-                this.camera.position.set(-4, h * 1.2, 5); // Posição fixa de recuo
+                this.camera.position.set(-dist * 1.5, h * 0.8, dist * 2.5); 
                 this._lastToolRendered = 'vertical';
             }
             // O target continua a acompanhar o quadro para mantê-lo centrado, mas a câmera não sofre "zoom" ao mexer na Distância.
@@ -2541,7 +2545,8 @@ if (window.currentTool !== 'grid') {
             } else if (window.currentTool === 'vertical') {
                 boundsH = Math.max(s.height, s.hq + s.frameH/2) * 1.15; 
                 if (s.viewMode === 'section' || !s.viewMode) {
-                    boundsW = Math.max(10.0, s.height * 1.5); // Trava o zoom no Corte
+                    // LUXSINTAX: Zoom Dramático! Foca apenas na distância da parede e altura.
+                    boundsW = Math.max(s.dist * 2.5, 3.5); 
                 } else {
                     // LUXSINTAX: Zoom Dinâmico na Elevação! Ocupa muito mais área da tela.
                     boundsW = Math.max((s.qty * s.spacing) + (s.frameW * 2), 2.5);
