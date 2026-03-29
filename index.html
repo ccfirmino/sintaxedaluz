@@ -639,25 +639,25 @@
                                         
                                         <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-4 pointer-events-none">
                                             
-                                            <div id="grid-hud-overlay" class="bg-white dark:bg-black border-4 border-slate-400 dark:border-white rounded-xl p-5 w-64 hidden transition-all duration-300 pointer-events-auto shadow-2xl">
-                                                <h4 class="text-black dark:text-white font-black text-sm tracking-widest uppercase mb-3 border-b-2 border-slate-300 dark:border-slate-700 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
-                                                <div class="space-y-3">
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-base font-black text-blue-700 dark:text-yellow-400">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black">Em (LP):</span><span id="hud-em-lp" class="text-base font-black text-blue-700 dark:text-yellow-400">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black">U (LP):</span><span id="hud-u-lp" class="text-base font-black text-blue-700 dark:text-yellow-400">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black">Em (HP):</span><span id="hud-em-hp" class="text-base font-black text-blue-700 dark:text-yellow-400">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black">U (HP):</span><span id="hud-u-hp" class="text-base font-black text-blue-700 dark:text-yellow-400">--</span></div>
+                                            <div id="grid-hud-overlay" class="bg-black border-2 border-slate-600 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto shadow-2xl">
+                                                <h4 class="text-white font-black text-[11px] tracking-widest uppercase mb-2 border-b border-slate-800 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                                <div class="space-y-2">
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-[12px] font-black text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black">Em (LP):</span><span id="hud-em-lp" class="text-[12px] font-black text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black">U (LP):</span><span id="hud-u-lp" class="text-[12px] font-black text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black">Em (HP):</span><span id="hud-em-hp" class="text-[12px] font-black text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black">U (HP):</span><span id="hud-u-hp" class="text-[12px] font-black text-white">--</span></div>
                                                 </div>
                                             </div>
 
-                                            <div id="photometric-dashboard" class="bg-white dark:bg-black border-4 border-slate-400 dark:border-white rounded-xl p-5 w-64 hidden transition-all duration-300 pointer-events-auto mt-4 shadow-2xl">
-                                                <h4 class="text-black dark:text-white font-black text-sm tracking-widest uppercase mb-2 border-b-2 border-slate-300 dark:border-slate-700 pb-2"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
-                                                <div class="truncate text-[11px] font-black text-slate-800 dark:text-slate-300 mb-4" id="pd-filename">arquivo.ies</div>
-                                                <div class="space-y-3">
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black">Eficácia:</span><span class="text-base font-black text-blue-700 dark:text-yellow-400"><span id="pd-efficacy">--</span> <span class="text-[11px] font-black text-black dark:text-white">lm/W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black">Potência:</span><span class="text-base font-black text-blue-700 dark:text-yellow-400"><span id="pd-watts">--</span> <span class="text-[11px] font-black text-black dark:text-white">W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black">Fluxo:</span><span class="text-base font-black text-blue-700 dark:text-yellow-400"><span id="pd-lumens">--</span> <span class="text-[11px] font-black text-black dark:text-white">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-[12px] text-black dark:text-white font-black">Uplight:</span><span class="text-base font-black text-blue-700 dark:text-yellow-400"><span id="pd-uplight">--</span> <span class="text-[11px] font-black text-black dark:text-white">%</span></span></div>
+                                            <div id="photometric-dashboard" class="bg-black border-2 border-slate-600 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4 shadow-2xl">
+                                                <h4 class="text-white font-black text-[11px] tracking-widest uppercase mb-2 border-b border-slate-800 pb-2"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
+                                                <div class="truncate text-[10px] font-black text-slate-400 mb-3" id="pd-filename">arquivo.ies</div>
+                                                <div class="space-y-2">
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black">Eficácia:</span><span class="text-[12px] font-black text-white"><span id="pd-efficacy">--</span> <span class="text-[9px] font-black text-white">lm/W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black">Potência:</span><span class="text-[12px] font-black text-white"><span id="pd-watts">--</span> <span class="text-[9px] font-black text-white">W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black">Fluxo:</span><span class="text-[12px] font-black text-white"><span id="pd-lumens">--</span> <span class="text-[9px] font-black text-white">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-white font-black">Uplight:</span><span class="text-[12px] font-black text-white"><span id="pd-uplight">--</span> <span class="text-[9px] font-black text-white">%</span></span></div>
                                                 </div>
                                             </div>
                                             
