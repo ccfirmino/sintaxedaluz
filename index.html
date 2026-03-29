@@ -677,6 +677,33 @@
                             </div>
                         </div>
 
+                        <div id="nbr-selector-section" class="col-span-12 mb-6 hidden animate-fade-in-up">
+                            <div class="glass-panel p-5 rounded-2xl border border-white/20 shadow-md flex flex-col md:flex-row items-center gap-4">
+                                <div class="flex-shrink-0">
+                                    <h3 class="text-[10px] font-black text-starlight uppercase tracking-widest flex items-center gap-2"><i class="fas fa-book text-luminous-gold"></i> Referência NBR 8995-1</h3>
+                                </div>
+                                <div class="flex-grow w-full md:w-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <select id="nbr-cat-select" onchange="window.updateNbrRooms()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[11px] text-starlight dark:text-slate-200 font-bold outline-none focus:border-luminous-gold transition-colors cursor-pointer">
+                                        <option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>
+                                    </select>
+                                    <select id="nbr-room-select" onchange="window.applyNbrRules()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[11px] text-starlight dark:text-slate-200 font-bold outline-none focus:border-luminous-gold transition-colors cursor-pointer" disabled>
+                                        <option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>
+                                    </select>
+                                </div>
+                                <div class="flex-shrink-0 flex items-center gap-4 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <div class="text-center">
+                                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Alvo (Em)</div>
+                                        <div id="nbr-target-lux-display" class="text-sm font-black text-luminous-gold">-- lx</div>
+                                    </div>
+                                    <div class="w-px h-6 bg-slate-300 dark:bg-slate-600"></div>
+                                    <div class="text-center">
+                                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">UGR Máx</div>
+                                        <div id="nbr-target-ugr-display" class="text-sm font-black text-luminous-gold">--</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="results-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 col-span-12 hidden animate-fade-in-up">
                     <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl w-full">
                         <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Iluminância Média</p>
@@ -717,8 +744,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
 
                 <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
                         <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
@@ -4325,6 +4350,11 @@ window.toggleGridMode = function(mode) {
 
             resultsSection.classList.remove('hidden');
             
+            const nbrSelector = document.getElementById('nbr-selector-section');
+            if (nbrSelector) nbrSelector.classList.remove('hidden');
+            
+            // LUXSINTAX: Cálculo de Eficiência Sistémica (lm/W total do projeto)
+            
             // 1. Atualiza os cards básicos
             document.getElementById('result-lux').innerText = Math.round(lux);
             document.getElementById('result-ugr').innerText = ugr.toFixed(1);
@@ -4335,7 +4365,7 @@ window.toggleGridMode = function(mode) {
             const efficiency = watts > 0 ? Math.round(totalFlux / watts) : 0;
             document.getElementById('result-eff').innerText = efficiency;
 
-            // 2. Lógica do Solver NBR (Simulada para Escritório Padrão: 500lx)
+            // 2. Lógica do Solver NBR (Agora Dinâmica via Seletor)
             const nbrPanel = document.getElementById('nbr-status-panel');
             const nbrStatusText = document.getElementById('nbr-status-text');
             const nbrIcon = document.getElementById('nbr-icon');
@@ -4345,8 +4375,9 @@ window.toggleGridMode = function(mode) {
             if (!nbrPanel) return;
             nbrPanel.classList.remove('hidden');
 
-            const targetLux = 500; // Padrão NBR para escritórios
-            const maxUgrLimit = 19;
+            // Busca os valores reais da norma selecionada (ou usa o padrão de 500lx/19 se não preenchido)
+            const targetLux = window.currentNbrTarget ? window.currentNbrTarget.lux : 500;
+            const maxUgrLimit = window.currentNbrTarget ? window.currentNbrTarget.ugr : 19;
 
             let status = 'APPROVED';
             if (lux < targetLux * 0.9 || ugr > maxUgrLimit) status = 'REJECTED';
@@ -4381,11 +4412,80 @@ window.toggleGridMode = function(mode) {
             }
         };
 
+        // LUXSINTAX: Lógica do Seletor de Normas NBR 8995-1
+        window.currentNbrTarget = { lux: 500, ugr: 19 }; 
+
+        window.initNbrSelector = function() {
+            const catSelect = document.getElementById('nbr-cat-select');
+            if (!catSelect || !window.normsDatabase) return;
+            
+            const uniqueCats = [...new Set(window.normsDatabase.map(n => n.cat))].sort();
+            
+            catSelect.innerHTML = '<option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>';
+            uniqueCats.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                catSelect.appendChild(opt);
+            });
+        };
+
+        window.updateNbrRooms = function() {
+            const catSelect = document.getElementById('nbr-cat-select');
+            const roomSelect = document.getElementById('nbr-room-select');
+            const selectedCat = catSelect.value;
+            
+            if (!selectedCat) return;
+
+            roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
+            roomSelect.disabled = false;
+
+            const rooms = window.normsDatabase.filter(n => n.cat === selectedCat);
+            rooms.forEach(n => {
+                const opt = document.createElement('option');
+                opt.value = n.room;
+                opt.dataset.lux = n.lux;
+                opt.dataset.ugr = n.ugr === '-' ? 99 : n.ugr; // 99 previne reprovação em locais sem UGR
+                opt.innerText = n.room;
+                roomSelect.appendChild(opt);
+            });
+        };
+
+        window.applyNbrRules = function() {
+            const roomSelect = document.getElementById('nbr-room-select');
+            const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+            
+            if (!selectedOption || !selectedOption.value) return;
+
+            const tLux = parseFloat(selectedOption.dataset.lux);
+            const tUgr = parseFloat(selectedOption.dataset.ugr);
+
+            // 1. Atualiza o Cérebro do Solver
+            window.currentNbrTarget = { lux: tLux, ugr: tUgr };
+
+            // 2. Atualiza os Painéis Visuais do Seletor
+            document.getElementById('nbr-target-lux-display').innerText = `${tLux} lx`;
+            document.getElementById('nbr-target-ugr-display').innerText = tUgr === 99 ? 'N/A' : tUgr;
+
+            // 3. Automação Inteligente: Atualiza o Slider "Alvo" no Modo Lúmens!
+            const gridTargetLuxInput = document.getElementById('g-targetLux');
+            const gridRangeTargetLux = document.getElementById('range-g-targetLux');
+            if (gridTargetLuxInput && gridRangeTargetLux && window.state && window.state.grid) {
+                gridTargetLuxInput.value = tLux;
+                gridRangeTargetLux.value = tLux;
+                window.state.grid.targetLux = tLux;
+            }
+
+            // 4. Força o recálculo do projeto com as novas regras
+            window.updateCalculations();
+        };
+
         window.currentLang = 'pt';
         initializeApp();
+        window.initNbrSelector(); // <--- Inicializa o banco de dados do Seletor
         window.switchTool('ponto');
-        window.updateCalculations(); // <--- Força a atualização inicial
-        window.updateCalcMode('direct'); // <--- Força o destravamento matemático da interface
+        window.updateCalculations(); 
+        window.updateCalcMode('direct');
     </script>
 </body>
 </html>
