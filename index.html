@@ -1695,17 +1695,15 @@ window.Photometric3DEngine = {
             if (mRatio < 0.5) lightColor = 0xf59e0b; 
             if (mRatio > 0.8) lightColor = 0xbae6fd; 
 
-            // LUXSINTAX: Motor Estético Premium para representação "Seductora" do LD
-            // Define o material do piso como polido e reflexivo (Estilo Caustics)
+            // LUXSINTAX: Limpeza Estética e Eliminação da Mancha de Luz no Piso
+            // Torna o piso um plano de cor neutra e sem reflexão de luz (Unlit Material)
             if (this.solidGroup.children.length > 0) {
                 const floor = this.solidGroup.children.find(child => child.geometry instanceof THREE.PlaneGeometry);
                 if (floor) {
-                    floor.material = new THREE.MeshPhongMaterial({ 
-                        color: isDark ? 0x111827 : 0xe2e8f0, // Slate-900 / Slate-200
+                    floor.material = new THREE.MeshBasicMaterial({ 
+                        color: isDark ? 0x1e293b : 0xe2e8f0, // LUXSINTAX: Cor base unlit (não reage à luz)
                         side: THREE.DoubleSide,
-                        shininess: 90, 
-                        specular: lightColor, 
-                        reflectivity: 0.5
+                        depthWrite: true
                     });
                 }
             }
