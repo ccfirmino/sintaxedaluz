@@ -3043,8 +3043,8 @@ if (window.currentTool !== 'grid') {
                     document.getElementById('hud-u-hp').innerText = uniformity_HP;
 
                     // LUXSINTAX: Sincronização em Tempo Real com os Cards e Solver NBR
-                    // Enviamos a média calculada pela matriz para a UI global
-                    const finalAvg = currentLevel === 'LP' ? trueAvgLux_LP : trueAvgLux_HP;
+                    // A Norma NBR 8995-1 audita SEMPRE o Plano de Trabalho (HP), não o piso.
+                    const finalAvg = trueAvgLux_HP; 
                     const totalWatts = (s.watts || 30) * s.cols * s.rows;
                     window.updateResultsUI(finalAvg, 18.5, totalWatts);
                 }
@@ -4368,7 +4368,7 @@ window.toggleGridMode = function(mode) {
                 nbrPanel.style.borderColor = '#f59e0b';
                 nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600';
                 nbrIcon.className = 'fas fa-exclamation-triangle';
-                nbrStatusText.innerText = `${contextTitle}: Nível Marginal`;
+                nbrStatusText.innerText = `${contextTitle}: Nível Marginal / Tolerável`;
                 nbrBadge.innerText = 'AVISO';
                 nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 border-amber-200';
             } else {
@@ -4376,28 +4376,6 @@ window.toggleGridMode = function(mode) {
                 nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
                 nbrIcon.className = 'fas fa-times-circle';
                 nbrStatusText.innerText = `${contextTitle}: Fora dos Requisitos`;
-                nbrBadge.innerText = 'REPROVADO';
-                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
-            }
-            if (status === 'APPROVED') {
-                nbrPanel.style.borderColor = '#10b981';
-                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
-                nbrIcon.className = 'fas fa-check-circle';
-                nbrStatusText.innerText = 'CONFORME: Projeto atende aos requisitos da NBR 8995-1';
-                nbrBadge.innerText = 'APROVADO';
-                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 border-green-200';
-            } else if (status === 'WARNING') {
-                nbrPanel.style.borderColor = '#f59e0b';
-                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600';
-                nbrIcon.className = 'fas fa-exclamation-triangle';
-                nbrStatusText.innerText = 'ATENÇÃO: Iluminância marginal abaixo do recomendado (Tolerância 10%)';
-                nbrBadge.innerText = 'AVISO';
-                nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 border-amber-200';
-            } else {
-                nbrPanel.style.borderColor = '#ef4444';
-                nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
-                nbrIcon.className = 'fas fa-times-circle';
-                nbrStatusText.innerText = 'NÃO CONFORME: Níveis de luz ou ofuscamento fora da norma';
                 nbrBadge.innerText = 'REPROVADO';
                 nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
             }
