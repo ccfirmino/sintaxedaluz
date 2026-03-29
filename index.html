@@ -535,7 +535,6 @@
                                     </div>
 
                                     <div class="flex flex-wrap justify-end items-center gap-4">
-                                        
                                         <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                             <label class="flex items-center gap-2 cursor-pointer group px-2">
                                                 <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">HEATMAP</span>
@@ -621,25 +620,37 @@
                                                 </div>
                                             </label>
                                         </div>
-
                                     </div>
                                 </div>
-                                
-                                <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
-                                    
-                                    
 
+                                <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
                                     <div class="relative flex-grow w-full">
-                                        <div id="grid-hud-overlay" class="absolute top-4 left-4 z-40 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl p-4 w-52 hidden transition-all duration-300">
-                                            <h4 class="text-luminous-gold font-black text-[10px] tracking-widest uppercase mb-2 border-b border-slate-200 dark:border-slate-700 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
-                                            <div class="space-y-2">
-                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
-                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Em (LP):</span><span id="hud-em-lp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
-                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">U (LP):</span><span id="hud-u-lp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
-                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Em (HP):</span><span id="hud-em-hp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
-                                                <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">U (HP):</span><span id="hud-u-hp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                        
+                                        <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-3 pointer-events-none">
+                                            
+                                            <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto">
+                                                <h4 class="text-luminous-gold font-black text-[10px] tracking-widest uppercase mb-2 border-b border-slate-200 dark:border-slate-700 pb-2" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                                <div class="space-y-2">
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Em (LP):</span><span id="hud-em-lp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">U (LP):</span><span id="hud-u-lp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Em (HP):</span><span id="hud-em-hp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">U (HP):</span><span id="hud-u-hp" class="text-[11px] font-black text-starlight dark:text-white">--</span></div>
+                                                </div>
+                                            </div>
+
+                                            <div id="photometric-dashboard" class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto">
+                                                <h4 class="text-luminous-gold font-black text-[10px] tracking-widest uppercase mb-2 border-b border-slate-200 dark:border-slate-700 pb-2"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
+                                                <div class="truncate text-[9px] font-bold text-slate-400 mb-3" id="pd-filename">arquivo.ies</div>
+                                                <div class="space-y-2">
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Eficácia:</span><span class="text-[11px] font-black text-starlight dark:text-white"><span id="pd-efficacy">--</span> <span class="text-[9px] font-medium text-slate-500">lm/W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Potência:</span><span class="text-[11px] font-black text-starlight dark:text-white"><span id="pd-watts">--</span> <span class="text-[9px] font-medium text-slate-500">W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Fluxo:</span><span class="text-[11px] font-black text-starlight dark:text-white"><span id="pd-lumens">--</span> <span class="text-[9px] font-medium text-slate-500">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 font-bold">Uplight:</span><span class="text-[11px] font-black text-starlight dark:text-white"><span id="pd-uplight">--</span> <span class="text-[9px] font-medium text-slate-500">%</span></span></div>
+                                                </div>
                                             </div>
                                         </div>
+
                                         <div id="stage-2d" class="absolute inset-0 w-full h-full z-10 block">
                                             <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                             <canvas id="beamCanvas" class="absolute inset-0 w-full h-full block"></canvas>
@@ -650,37 +661,40 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <div id="photometric-dashboard" class="hidden w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 transition-all duration-500 z-20 relative shadow-sm rounded-xl mt-4">
-                                    <div class="flex justify-between items-center mb-3">
-                                        <h4 class="text-[10px] font-black tracking-widest text-luminous-gold uppercase"><i class="fas fa-microscope mr-1"></i> Sumário Técnico (IES/LDT)</h4>
-                                        <span id="pd-filename" class="text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded font-bold max-w-[200px] truncate">arquivo.ies</span>
-                                    </div>
-                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Eficácia</div>
-                                            <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-efficacy">--</span> <span class="text-[10px] font-medium text-slate-500">lm/W</span></div>
-                                        </div>
-                                        <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Potência (W)</div>
-                                            <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-watts">--</span> <span class="text-[10px] font-medium text-slate-500">W</span></div>
-                                        </div>
-                                        <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Fluxo Total</div>
-                                            <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-lumens">--</span> <span class="text-[10px] font-medium text-slate-500">lm</span></div>
-                                        </div>
-                                        <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Upward Light (ULR)</div>
-                                            <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-uplight">--</span> <span class="text-[10px] font-medium text-slate-500">%</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                                    </div>
                             </div>
                         </div>
-                    </div>
+                        ```
+
+---
+
+### Passo 2: Ligar o Motor de Inteligência do Sumário (JavaScript)
+Agora que o HTML está perfeito, precisamos garantir que a nova "HUD de Sumário Técnico" saiba quando ligar e desligar se mudarmos entre Ficha Técnica e Ficheiro IES.
+
+1. Desça até ao JavaScript, na função `window.updateCalcMode = function(mode) {` (por volta da linha **1350** do seu ficheiro).
+2. Substitua toda a função por este código:
+
+```javascript
+        window.updateCalcMode = function(mode) {
+            window.calcMode = mode;
+            
+            // LUXSINTAX: Sincronização inteligente dos rádio botões (Evita conflitos entre as abas)
+            document.querySelectorAll('input[type="radio"][name="calc_mode"]').forEach(r => {
+                r.checked = (r.value === mode);
+            });
+            document.querySelectorAll('input[type="radio"][name="grid_mode_sel"]').forEach(r => {
+                r.checked = (mode === 'ies') ? (r.value === 'ies') : (r.value === 'direct');
+            });
+
+            document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
+            document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
+            document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
+            document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
+            
+            // LUXSINTAX: Mostra o Sumário Técnico apenas quando no modo IES/Fotometria
+            if (window.updatePhotometricHUD) window.updatePhotometricHUD();
+            
+            window.updateCalculations();
+        };
 
                 <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
                         <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
@@ -2014,6 +2028,8 @@ window.handleGenerateReport = async () => {
                 if (toolId === 'ponto') window.setSurfaceMode('single');
                 if (toolId === 'vertical') window.toggleVerticalView('section');
                 if (toolId === 'grid') window.toggleGridMode('HP');
+// LUXSINTAX: Atualiza a visibilidade da HUD ao trocar de aba
+                if (window.updatePhotometricHUD) window.updatePhotometricHUD();
                 
                 const glareWrapper = document.getElementById('glare-toggle-wrapper');
                 if (glareWrapper) {
@@ -2164,7 +2180,43 @@ window.handleGenerateReport = async () => {
         }
 
         // --- PHOTOMETRIC PARSER & LOGIC (IES + LDT) ---
-        window.handleIESUpload = function(input) {
+        // LUXSINTAX: Atualizador Inteligente da HUD Fotométrica
+        window.updatePhotometricHUD = function() {
+            const dash = document.getElementById('photometric-dashboard');
+            if (!dash) return;
+            const toolId = window.currentTool;
+            const state = window.state[toolId];
+            
+            // Só mostra a HUD se a ferramenta tiver dados IES carregados E estiver no modo Fotometria/IES
+            if (!state || !state.iesData || window.calcMode === 'direct') {
+                dash.classList.add('hidden');
+                return;
+            }
+            
+            dash.classList.remove('hidden');
+            document.getElementById('pd-filename').innerText = state.iesFileName || "arquivo.ies";
+            
+            const metrics = window.PhotometricAnalyzer.extractZonalMetrics(state.iesData);
+            document.getElementById('pd-uplight').innerText = metrics.uplightRatio.toFixed(1);
+            
+            let pWatts = state.iesData.wattage;
+            if (!pWatts) {
+                const wattInput = document.getElementById(toolId[0] + '-watts'); // Ex: g-watts
+                if (wattInput) pWatts = parseFloat(wattInput.value);
+            }
+            
+            document.getElementById('pd-watts').innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
+            
+            let targetFlux = state.iesData.totalFlux || state.flux || 0;
+            document.getElementById('pd-lumens').innerText = targetFlux > 0 ? Math.round(targetFlux) : 'N/D';
+            
+            if (pWatts > 0 && targetFlux > 0) {
+                document.getElementById('pd-efficacy').innerText = Math.round(targetFlux / pWatts);
+            } else {
+                document.getElementById('pd-efficacy').innerText = 'N/D';
+            }
+        };
+window.handleIESUpload = function(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const extension = file.name.split('.').pop().toLowerCase();
@@ -2249,30 +2301,8 @@ window.handleGenerateReport = async () => {
                              if(rangeFlux) rangeFlux.value = Math.round(targetFlux);
                         }
 
-                        // Alimentando o Dashboard Fotométrico (LuxSintax Engine)
-                        const dash = document.getElementById('photometric-dashboard');
-                        if (dash) {
-                            dash.classList.remove('hidden');
-                            document.getElementById('pd-filename').innerText = file.name;
-                            
-                            const metrics = window.PhotometricAnalyzer.extractZonalMetrics(parsed);
-                            document.getElementById('pd-uplight').innerText = metrics.uplightRatio.toFixed(1);
-                            
-                            // Tenta pegar a potência (IES) ou fallback para o input manual do sistema
-                            let pWatts = parsed.wattage;
-                            if (!pWatts && document.getElementById('g-watts')) {
-                                pWatts = parseFloat(document.getElementById('g-watts').value);
-                            }
-                            
-                            document.getElementById('pd-watts').innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
-                            document.getElementById('pd-lumens').innerText = targetFlux > 0 ? Math.round(targetFlux) : 'N/D';
-                            
-                            if (pWatts > 0 && targetFlux > 0) {
-                                document.getElementById('pd-efficacy').innerText = Math.round(targetFlux / pWatts);
-                            } else {
-                                document.getElementById('pd-efficacy').innerText = 'N/D';
-                            }
-                        }
+                        // LUXSINTAX: Aciona a HUD Fotométrica 
+                        window.updatePhotometricHUD();
                         
                         // Exibe o Toggle 3D e renderiza caso o modo 3D já esteja ativo
                         const toggleBtn = document.getElementById('view-mode-toggle');
