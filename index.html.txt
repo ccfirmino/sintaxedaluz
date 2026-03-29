@@ -2185,6 +2185,18 @@ window.handleGenerateReport = async () => {
             } else {
                 document.getElementById('pd-efficacy').innerText = 'N/D';
             }
+
+            // LUXSINTAX: Adiciona eficiência de facho na HUD para LuxFuturum
+            const moreMetrics = document.getElementById('pd-more-metrics');
+            if (!moreMetrics) {
+                const container = document.getElementById('photometric-dashboard').querySelector('.space-y-2');
+                const div = document.createElement('div');
+                div.id = 'pd-more-metrics';
+                div.className = 'flex justify-between items-center border-t border-white/10 pt-2 mt-2';
+                div.innerHTML = `<span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">Fluxo Útil (0-60°):</span><span id="pd-util" style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;">--</span>`;
+                container.appendChild(div);
+            }
+            document.getElementById('pd-util').innerText = metrics.fluxUtilization + '%';
         };
 window.handleIESUpload = function(input) {
             if (input.files && input.files[0]) {
@@ -2302,14 +2314,15 @@ window.handleIESUpload = function(input) {
         // Motor EULUMDAT (LDT) Universal de Alta Precisão
         
 
-        // Engine Analítico Fotométrico
+        // Engine Analítico Fotométrico de Alta Precisão (LuxSintax Pro)
         window.PhotometricAnalyzer = {
             extractZonalMetrics: function(data) {
-                // Cálculo aproximado de Uplight (Zonal Lumen Summary simplificado)
                 let totalCandelas = 0;
                 let upCandelas = 0;
+                let zone0_30 = 0; // Luz útil central
+                let zone0_60 = 0; // Luz de tarefa
                 
-                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0 };
+                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, beamEfficiency: 0 };
 
                 let maxI = 0;
                 for (let h = 0; h < data.hAngles.length; h++) {
@@ -2318,15 +2331,22 @@ window.handleIESUpload = function(input) {
                         if (intensity > maxI) maxI = intensity;
                         
                         totalCandelas += intensity;
-                        // Ângulos verticais > 90 graus representam luz emitida para cima (Uplight)
-                        if (data.vAngles[v] > 90) {
-                            upCandelas += intensity;
-                        }
+                        const angle = data.vAngles[v];
+                        if (angle > 90) upCandelas += intensity;
+                        if (angle <= 30) zone0_30 += intensity;
+                        if (angle <= 60) zone0_60 += intensity;
                     }
                 }
                 
                 const uplightRatio = totalCandelas > 0 ? (upCandelas / totalCandelas) * 100 : 0;
-                return { uplightRatio, maxCandela: maxI };
+                const fluxUtilization = totalCandelas > 0 ? (zone0_60 / totalCandelas) * 100 : 0;
+                
+                return { 
+                    uplightRatio, 
+                    maxCandela: maxI, 
+                    fluxUtilization: fluxUtilization.toFixed(1),
+                    beamEfficiency: totalCandelas > 0 ? ((totalCandelas / (data.totalFlux || totalCandelas)) * 100).toFixed(1) : 100
+                };
             }
         };
 
