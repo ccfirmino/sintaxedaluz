@@ -677,46 +677,46 @@
                             </div>
                         </div>
 
-                        <div id="results-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 hidden">
-                            <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl">
-                                <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Iluminância Média</p>
-                                <div class="flex items-baseline gap-2">
-                                    <span id="result-lux" class="text-4xl font-black text-starlight">0</span>
-                                    <span class="text-sm text-dim-gray font-bold">LX</span>
-                                </div>
-                            </div>
-                            <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl">
-                                <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Ofuscamento (UGR)</p>
-                                <div class="flex items-baseline gap-2">
-                                    <span id="result-ugr" class="text-4xl font-black text-starlight">0</span>
-                                    <span class="text-sm text-dim-gray font-bold">UGR</span>
-                                </div>
-                            </div>
-                            <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl">
-                                <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Eficiência Energética</p>
-                                <div class="flex items-baseline gap-2">
-                                    <span id="result-eff" class="text-4xl font-black text-starlight">0</span>
-                                    <span class="text-sm text-dim-gray font-bold">LM/W</span>
-                                </div>
-                            </div>
+                        <div id="results-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 col-span-12 hidden animate-fade-in-up">
+                    <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl w-full">
+                        <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Iluminância Média</p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="result-lux" class="text-4xl font-black text-starlight">0</span>
+                            <span class="text-sm text-dim-gray font-bold">LX</span>
                         </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl w-full">
+                        <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Ofuscamento (UGR)</p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="result-ugr" class="text-4xl font-black text-starlight">0</span>
+                            <span class="text-sm text-dim-gray font-bold">UGR</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl border border-white/20 shadow-xl w-full">
+                        <p class="text-[10px] uppercase tracking-wider text-muted-blue mb-2 font-black">Eficiência Energética</p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="result-eff" class="text-4xl font-black text-starlight">0</span>
+                            <span class="text-sm text-dim-gray font-bold">LM/W</span>
+                        </div>
+                    </div>
+                </div>
 
-                        <div id="nbr-status-panel" class="hidden glass-panel p-6 rounded-2xl border-2 mb-12 transition-all duration-500">
-                            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                                <div class="flex items-center gap-4">
-                                    <div id="nbr-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center text-xl">
-                                        <i id="nbr-icon" class="fas fa-info-circle"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-sm font-black text-starlight uppercase tracking-widest">Auditoria NBR 8995-1</h3>
-                                        <p id="nbr-status-text" class="text-dim-gray font-bold uppercase tracking-tighter text-[11px]">Processando dados fotométricos...</p>
-                                    </div>
-                                </div>
-                                <div id="nbr-badge" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
-                                    AGUARDANDO
-                                </div>
+                <div id="nbr-status-panel" class="hidden glass-panel p-6 rounded-2xl border-2 mb-12 transition-all duration-500 w-full col-span-12 animate-fade-in-up">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="flex items-center gap-4">
+                            <div id="nbr-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                                <i id="nbr-icon" class="fas fa-info-circle"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-black text-starlight uppercase tracking-widest">Auditoria NBR 8995-1</h3>
+                                <p id="nbr-status-text" class="text-dim-gray font-bold uppercase tracking-tighter text-[11px]">Processando dados fotométricos...</p>
                             </div>
                         </div>
+                        <div id="nbr-badge" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
+                            AGUARDANDO
+                        </div>
+                    </div>
+                </div>
 
                 <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
 
@@ -4372,6 +4372,7 @@ window.toggleGridMode = function(mode) {
         window.currentLang = 'pt';
         initializeApp();
         window.switchTool('ponto');
+        window.updateCalculations(); // <--- Força a atualização inicial
         window.updateCalcMode('direct'); // <--- Força o destravamento matemático da interface
     </script>
 </body>
