@@ -1510,6 +1510,15 @@ window.Photometric3DEngine = {
 
         this.solidGroup = new THREE.Group();
 
+        // LUXSINTAX: Reatividade Visual 3D (Vincula o Slider ao Brilho Físico e Volumétrico)
+        let visI = 3000;
+        if (state) {
+            if (window.calcMode === 'direct') visI = state.intensity || 3000;
+            else if (window.calcMode === 'photometric') visI = ((state.cdklm || 2000) * (state.flux || 1500)) / 1000;
+            else if (window.calcMode === 'ies' && hasIes) visI = iesData.candelas[0][0] * iesData.multiplier;
+        }
+        const luxFactor = Math.min(Math.max(visI / 4000, 0.1), 2.5); // Fator Multiplicador Global
+
         if (toolId === 'grid' && state) {
             const spacingX = state.roomW / state.cols;
             const spacingZ = state.roomL / state.rows; 
@@ -1551,7 +1560,8 @@ window.Photometric3DEngine = {
                         fixMesh.position.set(posX, state.height, posZ);
                         this.solidGroup.add(fixMesh);
                         
-                        const spotLight = new THREE.SpotLight(0xfff1e0, 1.5);
+                        const spotLight = new THREE.SpotLight(0xfff1e0, 1.5 * luxFactor);
+spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                         spotLight.position.set(posX, state.height, posZ);
                         spotLight.angle = (state.beam || 60) * Math.PI / 180 / 2;
                         spotLight.penumbra = 0.5;
@@ -1636,7 +1646,9 @@ window.Photometric3DEngine = {
                 this.solidGroup.add(fixMesh);
 
                 // B) A luz física projetando a mancha na parede
-                const spotLight = new THREE.SpotLight(lightColor, 8.0); // LUXSINTAX: Intensidade aumentada para 8.0 para acender a mancha amarela
+                const spotLight = new THREE.SpotLight(lightColor, 8.0 * luxFactor);
+spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
+ // LUXSINTAX: Intensidade aumentada para 8.0 para acender a mancha amarela
                 spotLight.position.set(0, h, posZ);
                 
                 let spotAngleRad = Math.PI / 4.5;
@@ -1716,10 +1728,10 @@ window.Photometric3DEngine = {
             const coneMat = new THREE.MeshBasicMaterial({ 
                 color: lightColor, 
                 transparent: true, 
-                opacity: 0.05, // LUXSINTAX: Hiper translúcido
-                blending: THREE.AdditiveBlending, // LUXSINTAX: Soma as cores (efeito glowing)
+                opacity: 0.05 * luxFactor, // LUXSINTAX: O cone reage à barra de intensidade
+                blending: THREE.AdditiveBlending, 
                 side: THREE.DoubleSide,
-                depthWrite: false // Evita artefatos de renderização
+                depthWrite: false 
             });
 
             // Textura sutil para imitar feixe interno da luminária dicroica/parabol no teto
@@ -1765,11 +1777,11 @@ window.Photometric3DEngine = {
                     sourceGrp.add(beamMesh);
 
                     // 4. A Luz Física Real (Projectada no Piso Reflexivo)
-                    const spotLight = new THREE.SpotLight(lightColor, 4.0);
+                    const spotLight = new THREE.SpotLight(lightColor, 4.0 * luxFactor); // LUXSINTAX: A luz física reage à barra
                     spotLight.position.set(0, 0, 0);
                     spotLight.angle = beamAngleRad;
                     spotLight.penumbra = 0.5;
-                    spotLight.distance = h * 3;
+                    spotLight.distance = h * 3 * Math.max(luxFactor, 1.0); // LUXSINTAX: A distância do foco aumenta com a intensidade
                     
                     // O Alvo da Luz agora acompanha a inclinação do contêiner automaticamente
                     const targetObj = new THREE.Object3D();
@@ -2286,9 +2298,22 @@ window.handleGenerateReport = async () => {
             }
         };
 
-        
-
-                
+        // LUXSINTAX: Motor de Cores Falsas (Prevenção de Crash Fatal no Método Lúmens)
+        window.FalseColorEngine = {
+            colorScale: [ {lux: 0, r: 0, g: 0, b: 128}, {lux: 100, r: 0, g: 0, b: 255}, {lux: 200, r: 0, g: 255, b: 255}, {lux: 300, r: 0, g: 255, b: 0}, {lux: 500, r: 255, g: 255, b: 0}, {lux: 750, r: 255, g: 128, b: 0}, {lux: 1000, r: 255, g: 0, b: 0}, {lux: 2000, r: 255, g: 255, b: 255} ],
+            getLuxColor: function(lux, alpha = 1.0) {
+                const s = this.colorScale;
+                if (lux <= s[0].lux) return `rgba(${s[0].r},${s[0].g},${s[0].b},${alpha})`;
+                if (lux >= s[s.length-1].lux) return `rgba(${s[s.length-1].r},${s[s.length-1].g},${s[s.length-1].b},${alpha})`;
+                for (let i = 0; i < s.length - 1; i++) {
+                    if (lux >= s[i].lux && lux <= s[i+1].lux) {
+                        const t = (lux - s[i].lux) / (s[i+1].lux - s[i].lux);
+                        return `rgba(${Math.round(s[i].r + t * (s[i+1].r - s[i].r))},${Math.round(s[i].g + t * (s[i+1].g - s[i].g))},${Math.round(s[i].b + t * (s[i+1].b - s[i].b))},${alpha})`;
+                    }
+                }
+                return `rgba(0,0,0,${alpha})`;
+            }
+        };                
 
         // LUXSINTAX: Motor de Interpolação Bilinear Fotométrica (Alta Precisão 3D)
         window.getIESIntensity = function(state, vAngleDeg, hAngleDeg = 0) {
@@ -3013,10 +3038,13 @@ window.handleGenerateReport = async () => {
                     const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
                     const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
                     
-                    // LUXSINTAX: Só desenha o triângulo genérico se NÃO for um IES
+                    // LUXSINTAX: Reatividade Visual 2D (O desenho reage à barra de intensidade)
                     if (window.calcMode !== 'ies') {
+                        const opBase = Math.min(0.8 * Math.max(I / 4000, 0.1), 1.0).toFixed(2); // Calcula a opacidade real baseada nos Candelas
                         ctx.save(); ctx.translate(xPos, sy);
-                        const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                        const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); 
+                        g.addColorStop(0, `rgba(251, 191, 36, ${opBase})`); 
+                        g.addColorStop(1, `rgba(251, 191, 36, 0)`);
                         ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore();
                     }
 
