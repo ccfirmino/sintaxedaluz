@@ -640,25 +640,25 @@
                                         
                                         <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-4 pointer-events-none">
                                             
-                                            <div id="grid-hud-overlay" class="rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto" style="background-color: #000000 !important; border: 2px solid #ffffff !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; backdrop-filter: none !important;">
-                                                <h4 class="tracking-widest uppercase mb-3 pb-2" style="font-size: 11px !important; color: #ffffff !important; font-weight: 900 !important; border-bottom: 1px solid #ffffff !important;" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                            <div id="grid-hud-overlay" class="rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl">
+                                                <h4 class="text-[11px] font-black text-starlight dark:text-white tracking-widest uppercase mb-3 pb-2 border-b border-slate-200 dark:border-slate-700" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;">--</span></div>
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">Em (LP):</span><span id="hud-em-lp" style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;">--</span></div>
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">U (LP):</span><span id="hud-u-lp" style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;">--</span></div>
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">Em (HP):</span><span id="hud-em-hp" style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;">--</span></div>
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">U (HP):</span><span id="hud-u-hp" style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Em (LP):</span><span id="hud-em-lp" class="text-xs font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">U (LP):</span><span id="hud-u-lp" class="text-xs font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Em (HP):</span><span id="hud-em-hp" class="text-xs font-black text-starlight dark:text-white">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">U (HP):</span><span id="hud-u-hp" class="text-xs font-black text-starlight dark:text-white">--</span></div>
                                                 </div>
                                             </div>
 
-                                            <div id="photometric-dashboard" class="rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4" style="background-color: #000000 !important; border: 2px solid #ffffff !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; backdrop-filter: none !important;">
-                                                <h4 class="tracking-widest uppercase mb-2 pb-2" style="font-size: 11px !important; color: #ffffff !important; font-weight: 900 !important; border-bottom: 1px solid #ffffff !important;"><i class="fas fa-microscope mr-1"></i> SUMÁRIO TÉCNICO</h4>
-                                                <div class="truncate mb-3" style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;" id="pd-filename">arquivo.ies</div>
+                                            <div id="photometric-dashboard" class="rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl">
+                                                <h4 class="text-[11px] font-black text-starlight dark:text-white tracking-widest uppercase mb-2 pb-2 border-b border-slate-200 dark:border-slate-700"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> SUMÁRIO TÉCNICO</h4>
+                                                <div class="truncate mb-3 text-[10px] font-bold text-slate-500 dark:text-slate-400" id="pd-filename">arquivo.ies</div>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">Eficácia:</span><span style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;"><span id="pd-efficacy">--</span> <span style="font-size: 9px !important; color: #ffffff !important; font-weight: bold !important;">lm/W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">Potência:</span><span style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;"><span id="pd-watts">--</span> <span style="font-size: 9px !important; color: #ffffff !important; font-weight: bold !important;">W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">Fluxo:</span><span style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;"><span id="pd-lumens">--</span> <span style="font-size: 9px !important; color: #ffffff !important; font-weight: bold !important;">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">Uplight:</span><span style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;"><span id="pd-uplight">--</span> <span style="font-size: 9px !important; color: #ffffff !important; font-weight: bold !important;">%</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Eficácia:</span><span class="text-xs font-black text-starlight dark:text-white"><span id="pd-efficacy">--</span> <span class="text-[9px] font-bold text-slate-400">lm/W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Potência:</span><span class="text-xs font-black text-starlight dark:text-white"><span id="pd-watts">--</span> <span class="text-[9px] font-bold text-slate-400">W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Fluxo:</span><span class="text-xs font-black text-starlight dark:text-white"><span id="pd-lumens">--</span> <span class="text-[9px] font-bold text-slate-400">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Uplight:</span><span class="text-xs font-black text-starlight dark:text-white"><span id="pd-uplight">--</span> <span class="text-[9px] font-bold text-slate-400">%</span></span></div>
                                                 </div>
                                             </div>
                                             
@@ -1647,9 +1647,12 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                         const coneGeo = new THREE.CylinderGeometry(0.1, coneR, coneH, 32, 1, true);
                         coneGeo.translate(0, -coneH/2, 0);
                         const coneMat = new THREE.MeshBasicMaterial({ 
-                            color: 0xfff1e0, transparent: true, opacity: 0.05 * luxFactor, 
-                            blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false 
-                        });
+                            color: 0xfbbf24, // Dourado
+                            transparent: true, 
+                            opacity: 0.12 * luxFactor, // Aumentado para visibilidade real
+                            side: THREE.DoubleSide, 
+                            depthWrite: false 
+                        }); // Removido AdditiveBlending para garantir destaque no fundo branco
                         const beamMesh = new THREE.Mesh(coneGeo, coneMat);
                         beamMesh.position.set(posX, state.height, posZ);
                         this.solidGroup.add(beamMesh);
@@ -1805,11 +1808,10 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             const coneMat = new THREE.MeshBasicMaterial({ 
                 color: lightColor, 
                 transparent: true, 
-                opacity: 0.05 * luxFactor, // LUXSINTAX: O cone reage à barra de intensidade
-                blending: THREE.AdditiveBlending, 
+                opacity: 0.12 * luxFactor, // LUXSINTAX: Aumentado para visibilidade real
                 side: THREE.DoubleSide,
                 depthWrite: false 
-            });
+            }); // Removido AdditiveBlending para garantir destaque no fundo branco
 
             // Textura sutil para imitar feixe interno da luminária dicroica/parabol no teto
             const sourceLensMat = new THREE.MeshLambertMaterial({ color: lightColor, emissive: lightColor, emissiveIntensity: 2 });
@@ -2257,8 +2259,8 @@ window.handleGenerateReport = async () => {
                 const container = document.getElementById('photometric-dashboard').querySelector('.space-y-2');
                 const div = document.createElement('div');
                 div.id = 'pd-more-metrics';
-                div.className = 'flex justify-between items-center border-t border-white/10 pt-2 mt-2';
-                div.innerHTML = `<span style="font-size: 10px !important; color: #ffffff !important; font-weight: bold !important;">Fluxo Útil (0-60°):</span><span id="pd-util" style="font-size: 12px !important; color: #ffffff !important; font-weight: 900 !important;">--</span>`;
+                div.className = 'flex justify-between items-center border-t border-slate-200 dark:border-slate-700 pt-2 mt-2';
+                div.innerHTML = `<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Fluxo Útil (0-60°):</span><span id="pd-util" class="text-xs font-black text-starlight dark:text-white">--</span>`;
                 container.appendChild(div);
             }
             document.getElementById('pd-util').innerText = metrics.fluxUtilization + '%';
