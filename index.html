@@ -315,11 +315,11 @@
                             <svg viewBox="0 0 100 60" class="w-full h-full">
                                 <line x1="10" y1="50" x2="90" y2="50" stroke="#475569" stroke-width="1"/>
                                 <path d="M20,50 Q 55,-10 90,50" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="2,2"/>
-                                <path d="M10,50 Q 35,-20 70,50" fill="rgba(6, 182, 212, 0.2)" stroke="#06b6d4" stroke-width="2"/>
-                                <line x1="35" y1="15" x2="35" y2="50" stroke="#06b6d4" stroke-width="1" stroke-dasharray="1,2"/>
-                                <text x="35" y="12" fill="#06b6d4" font-size="6" font-family="sans-serif" font-weight="bold" text-anchor="middle">480nm</text>
+                                <path d="M10,50 Q 35,-20 70,50" fill="rgba(6, 182, 212, 0.2)" stroke="#a855f7" stroke-width="2"/>
+                                <line x1="35" y1="15" x2="35" y2="50" stroke=""#a855f7" stroke-width="1" stroke-dasharray="1,2"/>
+                                <text x="35" y="12" fill="#a855f7" font-size="6" font-family="sans-serif" font-weight="bold" text-anchor="middle">480nm</text>
                                 <text x="60" y="15" fill="#fbbf24" font-size="5" font-family="sans-serif">Visão Fotópica</text>
-                                <text x="60" y="22" fill="#06b6d4" font-size="5" font-family="sans-serif">Ritmo Circadiano</text>
+                                <text x="60" y="22" fill="#a855f7" font-size="5" font-family="sans-serif">Ritmo Circadiano</text>
                             </svg>
                         </div>
                         <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Razão Melanópica (M/P)</h4>
@@ -377,11 +377,11 @@
                             <svg viewBox="0 0 100 60" class="w-full h-full">
                                 <line x1="10" y1="50" x2="90" y2="50" stroke="#475569" stroke-width="1"/>
                                 <path d="M20,50 Q 55,-10 90,50" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="2,2"/>
-                                <path d="M10,50 Q 35,-20 70,50" fill="rgba(6, 182, 212, 0.2)" stroke="#06b6d4" stroke-width="2"/>
-                                <line x1="35" y1="15" x2="35" y2="50" stroke="#06b6d4" stroke-width="1" stroke-dasharray="1,2"/>
-                                <text x="35" y="12" fill="#06b6d4" font-size="6" font-family="sans-serif" font-weight="bold" text-anchor="middle">480nm</text>
+                                <path d="M10,50 Q 35,-20 70,50" fill="rgba(6, 182, 212, 0.2)" stroke="#a855f7" stroke-width="2"/>
+                                <line x1="35" y1="15" x2="35" y2="50" stroke="#a855f7" stroke-width="1" stroke-dasharray="1,2"/>
+                                <text x="35" y="12" fill="#a855f7" font-size="6" font-family="sans-serif" font-weight="bold" text-anchor="middle">480nm</text>
                                 <text x="60" y="15" fill="#fbbf24" font-size="5" font-family="sans-serif">Visão Fotópica</text>
-                                <text x="60" y="22" fill="#06b6d4" font-size="5" font-family="sans-serif">Ritmo Circadiano</text>
+                                <text x="60" y="22" fill="#a855f7" font-size="5" font-family="sans-serif">Ritmo Circadiano</text>
                             </svg>
                         </div>
                         <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Razão Melanópica (M/P)</h4>
@@ -1573,6 +1573,20 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                         spotLight.target = targetObj;
                         
                         this.solidGroup.add(spotLight);
+
+                        // LUXSINTAX: Cone de Luz Translúcido no Método Lúmens
+                        const beamRadLumen = (state.beam || 60) * Math.PI / 180 / 2;
+                        const coneH = state.height;
+                        const coneR = Math.tan(beamRadLumen) * coneH;
+                        const coneGeo = new THREE.CylinderGeometry(0.1, coneR, coneH, 32, 1, true);
+                        coneGeo.translate(0, -coneH/2, 0);
+                        const coneMat = new THREE.MeshBasicMaterial({ 
+                            color: 0xfff1e0, transparent: true, opacity: 0.05 * luxFactor, 
+                            blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false 
+                        });
+                        const beamMesh = new THREE.Mesh(coneGeo, coneMat);
+                        beamMesh.position.set(posX, state.height, posZ);
+                        this.solidGroup.add(beamMesh);
                     }
                 }
             }
@@ -1646,7 +1660,7 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                 this.solidGroup.add(fixMesh);
 
                 // B) A luz física projetando a mancha na parede
-                const spotLight = new THREE.SpotLight(lightColor, 8.0 * luxFactor);
+                const spotLight = new THREE.SpotLight(0xffbf00, 8.0 * luxFactor); // LUXSINTAX: Forçado para dourado
 spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
  // LUXSINTAX: Intensidade aumentada para 8.0 para acender a mancha amarela
                 spotLight.position.set(0, h, posZ);
@@ -1711,15 +1725,16 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             if (mRatio < 0.5) lightColor = 0xf59e0b; 
             if (mRatio > 0.8) lightColor = 0xbae6fd; 
 
-            // LUXSINTAX: Limpeza Estética e Eliminação da Mancha de Luz no Piso
-            // Torna o piso um plano de cor neutra e sem reflexão de luz (Unlit Material)
+            // LUXSINTAX: Restauração da Mancha de Luz (Pool of Light no piso)
             if (this.solidGroup.children.length > 0) {
                 const floor = this.solidGroup.children.find(child => child.geometry instanceof THREE.PlaneGeometry);
                 if (floor) {
-                    floor.material = new THREE.MeshBasicMaterial({ 
-                        color: isDark ? 0x1e293b : 0xe2e8f0, // LUXSINTAX: Cor base unlit (não reage à luz)
+                    floor.material = new THREE.MeshPhongMaterial({ 
+                        color: isDark ? 0x111827 : 0xe2e8f0,
                         side: THREE.DoubleSide,
-                        depthWrite: true
+                        shininess: 90, 
+                        specular: lightColor, 
+                        reflectivity: 0.5
                     });
                 }
             }
@@ -1766,7 +1781,7 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
 
                     // 3. O Cone de Luz Volumétrico Translúcido
                     const beamAngleRad = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
-                    const coneHeight = h + 1; // Estende sutilmente abaixo do piso
+                    const coneHeight = h; // LUXSINTAX: Cone não atravessa o piso
                     const coneRadiusBase = Math.tan(beamAngleRad) * coneHeight;
                     
                     const coneGeo = new THREE.CylinderGeometry(0.12, coneRadiusBase, coneHeight, 32, 1, true); // Cone aberto
@@ -3101,7 +3116,7 @@ window.handleGenerateReport = async () => {
                     if (window.currentTool === 'ponto' && window.state.showHCL) {
                         const mEDI = Math.round(luxFloor * (s.mRatio || 0.52));
                         ctx.font = "bold 9px Manrope";
-                        ctx.fillStyle = "#06b6d4";
+                        ctx.fillStyle = "#a855f7";
                         ctx.textAlign = "center";
                         ctx.fillText(`${mEDI} m-EDI`, hitXFloor, floorY + 14);
                     }
@@ -3116,7 +3131,7 @@ window.handleGenerateReport = async () => {
                         if (window.currentTool === 'ponto' && window.state.showHCL) {
                             const mEDIPlane = Math.round(luxPlane * (s.mRatio || 0.52));
                             ctx.font = "bold 9px Manrope";
-                            ctx.fillStyle = "#06b6d4";
+                            ctx.fillStyle = "#a855f7";
                             ctx.textAlign = "center";
                             ctx.fillText(`${mEDIPlane} m-EDI`, ix, py + 14);
                         }
@@ -3313,7 +3328,7 @@ window.handleGenerateReport = async () => {
                             if (window.state.showHCL) {
                                 const mEDI_v = Math.round(ev * (s.mRatio || 0.52));
                                 ctx.font = "bold 9px Manrope";
-                                ctx.fillStyle = "#06b6d4";
+                                ctx.fillStyle = "#a855f7";
                                 ctx.textAlign = "center";
                                 ctx.fillText(`${mEDI_v} m-EDI`, wx - 45, hitY_px + 20);
                             }
@@ -3422,7 +3437,7 @@ window.handleGenerateReport = async () => {
                             if (window.state.showHCL) {
                                 const mEDI_wall = Math.round(ev * (s.mRatio || 0.52));
                                 ctx.font = "bold 9px Manrope";
-                                ctx.fillStyle = "#06b6d4";
+                                ctx.fillStyle = "#a855f7";
                                 ctx.textAlign = "center";
                                 ctx.fillText(`${mEDI_wall} m-EDI`, spotX, hitY_px_current + 12);
                             }
@@ -3645,7 +3660,7 @@ window.handleGenerateReport = async () => {
                 const spdData = window.HCLEngine.spds[currentMRatio] || window.HCLEngine.spds["0.52"];
                 
                 // Desenhar Curva Melanópica (Azul Cyan pontilhada)
-                drawSpectralCurve(window.HCLEngine.melanopic, "#06b6d4", 1.5, true);
+                drawSpectralCurve(window.HCLEngine.melanopic, "#a855f7", 1.5, true);
                 // Desenhar Curva Fotópica V(lambda) (Amarela pontilhada)
                 drawSpectralCurve(window.HCLEngine.photopic, "#fbbf24", 1.5, true);
                 // Desenhar Curva SPD do LED (Branca/Preta Sólida)
@@ -3660,7 +3675,7 @@ window.handleGenerateReport = async () => {
                 ctx.fillStyle = "#fbbf24";
                 ctx.fillText("--- V(λ) Visão Fotópica", hclX + 15, hclY + 138);
                 
-                ctx.fillStyle = "#06b6d4";
+                ctx.fillStyle = "#a855f7";
                 ctx.fillText("--- Curva Melanópica (ipRGC)", hclX + 125, hclY + 138);
 
                 ctx.restore();
