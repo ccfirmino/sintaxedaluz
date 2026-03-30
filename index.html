@@ -1006,8 +1006,8 @@
             try {
                 let env;
                 
-                // Deteta se está a correr no seu computador ou na Vercel
-                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                // Deteta se está a correr no seu computador, localmente ou na Vercel
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '' || window.location.protocol === 'file:') {
                     console.log("LuxSintax: Modo Local Detetado. Usando chaves de desenvolvimento.");
                     env = {
                         url: 'https://ozytwdhuxsdefnunzinm.supabase.co',
@@ -1443,11 +1443,9 @@ window.AuthManager = {
                 this.handleSessionUpdate(data.session);
             }
         } catch (err) {
-            console.error("[LuxSintax Auth] Falha na autenticação:", err.message);
-            alert("Erro de acesso: " + err.message);
-            // Limpeza preventiva em caso de falha obscura
-            this.logout();
-        }
+                    console.error("[LuxSintax Auth] Falha na autenticação:", err.message);
+                    alert("Erro de acesso: Usuário não encontrado ou senha incorreta. Se ainda não possui conta, clique na aba 'Cadastro'.");
+                }
     }
 };
 
