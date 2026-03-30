@@ -1420,17 +1420,26 @@ window.AuthManager = {
         location.reload(); 
     },
    handleLogin: async function() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        // LUXSINTAX: MODO VISITANTE / BYPASS DE DESENVOLVEDOR
+        // Se estiver no seu computador e clicar no botão com os campos vazios, ele entra na hora!
+        if (!email && (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+            console.warn("Bypass de Login Ativado!");
+            document.getElementById('user-name-display').innerText = "MODO TESTE";
+            this.unlockApp();
+            return;
+        }
+
         // LUXSINTAX: Impede o clique se o sistema ainda estiver a carregar as chaves
         if (!window.supabase) {
             alert("O sistema de segurança está a inicializar. Aguarde 2 segundos.");
             return;
         }
         
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        
         if (!email || !password) {
-            return alert("Por favor, preencha seu e-mail e senha.");
+            return alert("Por favor, preencha seu e-mail e senha. (Ou deixe em branco para entrar como Visitante no modo local)");
         }
 
         try {
@@ -1443,9 +1452,9 @@ window.AuthManager = {
                 this.handleSessionUpdate(data.session);
             }
         } catch (err) {
-                    console.error("[LuxSintax Auth] Falha na autenticação:", err.message);
-                    alert("Erro de acesso: Usuário não encontrado ou senha incorreta. Se ainda não possui conta, clique na aba 'Cadastro'.");
-                }
+            console.error("[LuxSintax Auth] Falha na autenticação:", err.message);
+            alert("Erro de acesso: Usuário não encontrado ou senha incorreta. Se ainda não possui conta, clique na aba 'Cadastro'.");
+        }
     }
 };
 
