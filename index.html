@@ -721,8 +721,42 @@
                                             <p id="nbr-status-text" class="text-slate-500 dark:text-slate-300 font-bold uppercase tracking-tighter text-[11px]">Processando dados fotométricos...</p>
                                         </div>
                                     </div>
-                                    <div id="nbr-badge" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
-                                        AGUARDANDO
+                                    <div class="flex flex-col items-end gap-2">
+                                        <div id="nbr-badge" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
+                                            AGUARDANDO
+                                        </div>
+                                        <button id="btn-export-report" onclick="window.openExportModal()" class="hidden flex items-center gap-2 px-3 py-1.5 bg-luminous-gold hover:bg-amber-500 text-slate-900 text-[10px] font-black rounded-lg transition-all shadow-lg uppercase tracking-tighter cursor-pointer">
+                                            <i class="fas fa-file-pdf"></i> Exportar Relatório
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="export-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-slate-900/80 backdrop-blur-sm transition-opacity">
+                                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-6 w-full max-w-md transform scale-95 transition-transform duration-300" id="export-modal-content">
+                                    <h3 class="text-lg font-black text-slate-900 dark:text-white mb-1">Estudo de Viabilidade</h3>
+                                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-6">Preencha os dados de identificação do projeto para o cabeçalho do PDF.</p>
+                                    
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Nome do Projeto</label>
+                                            <input type="text" id="pdf-project-name" placeholder="Ex: Edifício Corporate Square" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-bold outline-none focus:border-luminous-gold transition-colors">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Ambiente / Setor</label>
+                                            <input type="text" id="pdf-room-name" placeholder="Ex: Sala de Reuniões Presidencial" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-bold outline-none focus:border-luminous-gold transition-colors">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Responsável Técnico</label>
+                                            <input type="text" id="pdf-author-name" placeholder="Ex: Arq. João Silva" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-bold outline-none focus:border-luminous-gold transition-colors">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end gap-3 mt-8">
+                                        <button onclick="window.closeExportModal()" class="px-4 py-2 rounded-lg text-xs font-black text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors uppercase tracking-widest">Cancelar</button>
+                                        <button onclick="window.generateTechnicalReport()" id="btn-confirm-export" class="flex items-center gap-2 px-4 py-2 bg-luminous-gold hover:bg-amber-500 text-slate-900 text-xs font-black rounded-lg transition-all shadow-lg uppercase tracking-widest">
+                                            <i class="fas fa-file-pdf"></i> Gerar PDF
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -4328,6 +4362,227 @@ window.toggleGridMode = function(mode) {
 
 
         // LUXSINTAX: Disparo do motor de arranque
+        // LUXSINTAX: Motor de Geração de Relatório PDF Executivo
+        window.openExportModal = function() {
+            const modal = document.getElementById('export-modal');
+            const content = document.getElementById('export-modal-content');
+            if(modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }, 10);
+            }
+        };
+
+        window.closeExportModal = function() {
+            const modal = document.getElementById('export-modal');
+            const content = document.getElementById('export-modal-content');
+            if(content) {
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+                setTimeout(() => {
+                    if(modal) modal.classList.add('hidden');
+                }, 300);
+            }
+        };
+
+        window.generateTechnicalReport = async function() {
+            const btn = document.getElementById('btn-confirm-export');
+            if(btn) {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+                btn.disabled = true;
+            }
+
+            try {
+                if (typeof PDFLib === 'undefined') {
+                    alert('Biblioteca PDF-Lib não carregada. Atualize a página e tente novamente.');
+                    return;
+                }
+
+                const { PDFDocument, rgb, StandardFonts } = PDFLib;
+                const pdfDoc = await PDFDocument.create();
+                const page = pdfDoc.addPage([595.28, 841.89]); // A4
+                const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+                const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+                
+                // --- DADOS DO MODAL ---
+                const projName = document.getElementById('pdf-project-name').value || 'Projeto Não Especificado';
+                const roomName = document.getElementById('pdf-room-name').value || 'Ambiente Não Especificado';
+                const authorName = document.getElementById('pdf-author-name').value || 'Não Informado';
+                const dateStr = new Date().toLocaleDateString('pt-BR');
+
+                // --- DADOS DO SISTEMA ---
+                const s = window.state.grid;
+                if (!s) throw new Error("Malha não configurada.");
+
+                const catSelect = document.getElementById('nbr-cat-select');
+                const roomSelect = document.getElementById('nbr-room-select');
+                const cat = catSelect && catSelect.value ? catSelect.value : 'N/A';
+                const nbrRoom = roomSelect && roomSelect.value ? roomSelect.value : 'N/A';
+                
+                const targetLux = window.currentNbrTarget ? window.currentNbrTarget.lux : 500;
+                const targetUgr = window.currentNbrTarget ? window.currentNbrTarget.ugr : 19;
+                
+                const resultLux = document.getElementById('result-lux').innerText || '0';
+                const resultUgr = document.getElementById('result-ugr').innerText || '0';
+                const resultEff = document.getElementById('result-eff').innerText || '0';
+                
+                const statusTextObj = document.getElementById('nbr-status-text');
+                const statusText = statusTextObj ? statusTextObj.innerText : 'Desconhecido';
+                const isApproved = statusText.includes('Conforme');
+
+                // Cálculos de Densidade e Áreas (Métricas Críticas para o PDF)
+                const area = (s.roomW * s.roomL).toFixed(2);
+                const totalLums = s.cols * s.rows;
+                const totalWatts = (s.watts || 30) * totalLums;
+                const lpd = (totalWatts / area).toFixed(2);
+                
+                const luxPisoText = document.getElementById('hud-em-lp') ? document.getElementById('hud-em-lp').innerText : '--';
+                const uPisoText = document.getElementById('hud-u-lp') ? document.getElementById('hud-u-lp').innerText : '--';
+                const uMesaText = document.getElementById('hud-u-hp') ? document.getElementById('hud-u-hp').innerText : '--';
+
+                // --- CAPTURA DAS MALHAS NO CANVAS ---
+                const canvas = document.getElementById('beamCanvas');
+                const originalLevel = s.viewLevel || 'HP';
+                
+                // 1. Força o cálculo na MESA (HP) e "tira foto"
+                window.state.grid.viewLevel = 'HP';
+                window.updateCalculations();
+                await new Promise(r => setTimeout(r, 150));
+                const imgMesa = canvas.toDataURL('image/png');
+                
+                // 2. Força o cálculo no PISO (LP) e "tira foto"
+                window.state.grid.viewLevel = 'LP';
+                window.updateCalculations();
+                await new Promise(r => setTimeout(r, 150));
+                const imgPiso = canvas.toDataURL('image/png');
+                
+                // 3. Restaura ao estado que o usuário estava a visualizar
+                window.state.grid.viewLevel = originalLevel;
+                window.updateCalculations();
+
+                // --- DESENHO GRÁFICO DO PDF ---
+                const margin = 50;
+                let y = 800;
+
+                const colorDark = rgb(0.06, 0.09, 0.15); 
+                const colorGold = rgb(0.85, 0.47, 0.02); 
+                const colorGray = rgb(0.4, 0.45, 0.53);  
+
+                // Cabeçalho Premium
+                page.drawText('LUXSINTAX', { x: margin, y: y, size: 18, font: fontBold, color: colorGold });
+                page.drawText('ESTUDO DE VIABILIDADE TÉCNICA', { x: margin, y: y - 15, size: 10, font: fontBold, color: colorDark });
+                page.drawText(`Data: ${dateStr}`, { x: 450, y: y, size: 9, font: fontRegular, color: colorGray });
+                
+                y -= 40;
+                page.drawLine({ start: { x: margin, y }, end: { x: 545, y }, thickness: 1, color: rgb(0.88, 0.91, 0.94) });
+                y -= 25;
+
+                // 1. Bloco de Identificação
+                page.drawText('1. IDENTIFICAÇÃO DO PROJETO', { x: margin, y, size: 10, font: fontBold, color: colorDark });
+                y -= 15;
+                page.drawText(`Projeto: ${projName}`, { x: margin, y, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`Ambiente (Local): ${roomName}`, { x: margin, y - 15, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`Responsável Técnico: ${authorName}`, { x: margin, y - 30, size: 9, font: fontRegular, color: colorDark });
+                
+                y -= 65;
+
+                // 2. Parâmetros e Fonte
+                page.drawText('2. ESPECIFICAÇÕES DO AMBIENTE E DA FONTE', { x: margin, y, size: 10, font: fontBold, color: colorDark });
+                y -= 15;
+                page.drawText(`Dimensões: ${s.roomW}m x ${s.roomL}m (Área: ${area}m²)`, { x: margin, y, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`Plano de Trabalho (HP): ${s.hp}m`, { x: margin, y - 15, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`Fator de Manutenção (FM): ${s.fm} | Fator Utilização (U): ${s.u}`, { x: margin, y - 30, size: 9, font: fontRegular, color: colorDark });
+                
+                page.drawText(`Potência / Fluxo Unitário: ${s.watts || 30}W / ${s.flux || 3000}lm`, { x: 300, y, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`Altura da Fonte (H): ${s.height}m`, { x: 300, y - 15, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`Abertura do Facho: ${s.beam || 60}º`, { x: 300, y - 30, size: 9, font: fontRegular, color: colorDark });
+
+                y -= 65;
+
+                // 3. Síntese do Sistema (Valor Agregado)
+                page.drawText('3. SÍNTESE ENERGÉTICA E IMPACTO', { x: margin, y, size: 10, font: fontBold, color: colorDark });
+                y -= 15;
+                page.drawText(`Arranjo da Malha: ${s.cols} x ${s.rows} (${totalLums} un.)`, { x: margin, y, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`Carga Total Instalada: ${totalWatts} W`, { x: margin, y - 15, size: 9, font: fontRegular, color: colorDark });
+                
+                page.drawText(`Densidade de Potência (LPD): ${lpd} W/m²`, { x: 300, y, size: 9, font: fontBold, color: colorDark });
+                page.drawText(`Eficácia Global do Sistema: ${resultEff} lm/W`, { x: 300, y - 15, size: 9, font: fontRegular, color: colorDark });
+
+                y -= 45;
+
+                // 4. Auditoria NBR Explícita
+                page.drawText('4. AUDITORIA NORMATIVA (NBR 8995-1)', { x: margin, y, size: 10, font: fontBold, color: colorDark });
+                y -= 15;
+                page.drawText(`Referência: ${cat} - ${nbrRoom}`, { x: margin, y, size: 9, font: fontRegular, color: colorGray });
+                y -= 25;
+
+                page.drawText('Parâmetro Avaliado', { x: margin, y, size: 9, font: fontBold, color: colorDark });
+                page.drawText('Exigido (Norma)', { x: 250, y, size: 9, font: fontBold, color: colorDark });
+                page.drawText('Alcançado', { x: 350, y, size: 9, font: fontBold, color: colorDark });
+                page.drawText('Status', { x: 450, y, size: 9, font: fontBold, color: colorDark });
+                
+                y -= 20;
+                page.drawText('Iluminância Média (Em)', { x: margin, y, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`${targetLux} lx`, { x: 250, y, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`${resultLux} lx`, { x: 350, y, size: 9, font: fontBold, color: colorDark });
+                const okLux = parseFloat(resultLux) >= targetLux * 0.9;
+                page.drawText(okLux ? 'CONFORME' : 'NÃO CONFORME', { x: 450, y, size: 9, font: fontBold, color: okLux ? rgb(0.1, 0.7, 0.3) : rgb(0.9, 0.2, 0.2) });
+
+                y -= 15;
+                page.drawText('Ofuscamento (UGR Estimado)', { x: margin, y, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`≤ ${targetUgr}`, { x: 250, y, size: 9, font: fontRegular, color: colorDark });
+                page.drawText(`${resultUgr}`, { x: 350, y, size: 9, font: fontBold, color: colorDark });
+                const okUgr = parseFloat(resultUgr) <= targetUgr;
+                page.drawText(okUgr ? 'CONFORME' : 'NÃO CONFORME', { x: 450, y, size: 9, font: fontBold, color: okUgr ? rgb(0.1, 0.7, 0.3) : rgb(0.9, 0.2, 0.2) });
+
+                y -= 30;
+                page.drawText(`VEREDITO: ${statusText}`, { x: margin, y, size: 10, font: fontBold, color: isApproved ? rgb(0.1, 0.7, 0.3) : rgb(0.9, 0.2, 0.2) });
+
+                y -= 45;
+
+                // 5. Malhas Visuais Lado a Lado
+                page.drawText('5. MAPAS FOTOMÉTRICOS E UNIFORMIDADE', { x: margin, y, size: 10, font: fontBold, color: colorDark });
+                y -= 160; 
+                
+                const imgMesaEmbed = await pdfDoc.embedPng(imgMesa);
+                page.drawImage(imgMesaEmbed, { x: margin, y, width: 230, height: 140 });
+                page.drawText(`Plano de Trabalho (${s.hp}m)`, { x: margin, y - 15, size: 8, font: fontBold, color: colorDark });
+                page.drawText(`Uniformidade (U0): ${uMesaText}`, { x: margin, y - 25, size: 8, font: fontRegular, color: colorDark });
+
+                const imgPisoEmbed = await pdfDoc.embedPng(imgPiso);
+                page.drawImage(imgPisoEmbed, { x: 300, y, width: 230, height: 140 });
+                page.drawText(`Nível do Piso (0.00m)`, { x: 300, y - 15, size: 8, font: fontBold, color: colorDark });
+                page.drawText(`Média: ${luxPisoText} lx | Uniformidade (U0): ${uPisoText}`, { x: 300, y - 25, size: 8, font: fontRegular, color: colorDark });
+
+                // Blindagem (Disclaimer Executivo)
+                const disclaimer1 = "AVISO: ESTE DOCUMENTO É UM ESTUDO PRELIMINAR DE VIABILIDADE TÉCNICA E COMERCIAL.";
+                const disclaimer2 = "NÃO SUBSTITUI O PROJETO EXECUTIVO LUMINOTÉCNICO COM CÁLCULO DE RADIOSIDADE EM SOFTWARE ESPECÍFICO (EX: DIALUX).";
+                page.drawText(disclaimer1, { x: margin, y: 35, size: 7, font: fontBold, color: rgb(0.8, 0.2, 0.2) });
+                page.drawText(disclaimer2, { x: margin, y: 25, size: 7, font: fontRegular, color: colorGray });
+
+                // Finalização e Download
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `Estudo_Viabilidade_${projName.replace(/\s+/g, '_')}.pdf`;
+                link.click();
+                
+                window.closeExportModal();
+
+            } catch (error) {
+                console.error("Erro ao gerar PDF:", error);
+                alert("Ocorreu um erro ao gerar o relatório. Verifique o terminal.");
+            } finally {
+                if(btn) {
+                    btn.innerHTML = '<i class="fas fa-file-pdf"></i> Gerar PDF';
+                    btn.disabled = false;
+                }
+            }
+        };
+
         // LUXSINTAX: Motor Heurístico Dinâmico de UGR (CIE 117 Approximation)
         window.calculateDynamicUGR = function(s, avgLux) {
             const flux = s.flux || 3000;
@@ -4467,6 +4722,16 @@ window.toggleGridMode = function(mode) {
                 nbrStatusText.innerText = `${contextTitle}: Fora dos Requisitos${detailStr}`;
                 nbrBadge.innerText = 'REPROVADO';
                 nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
+            }
+
+            // LUXSINTAX: Exibe o botão de Exportar PDF apenas se estivermos no Método Lúmens
+            const btnExport = document.getElementById('btn-export-report');
+            if (btnExport) {
+                if (window.currentTool === 'grid') {
+                    btnExport.classList.remove('hidden');
+                } else {
+                    btnExport.classList.add('hidden');
+                }
             }
         };
 
