@@ -4320,30 +4320,49 @@ window.toggleGridMode = function(mode) {
 
 
         // LUXSINTAX: Disparo do motor de arranque
-        // LUXSINTAX: Motor Heurístico Dinâmico de UGR (Tempo Real)
+        // LUXSINTAX: Motor Heurístico Dinâmico de UGR (CIE 117 Approximation)
         window.calculateDynamicUGR = function(s, avgLux) {
             const flux = s.flux || 3000;
             const height = s.height || 3.0;
+            const beam = s.beam || 60; // Ângulo do facho
+            const roomX = s.roomW || 5.0; // Largura
+            const roomY = s.roomL || 5.0; // Comprimento
             const isIES = window.calcMode === 'ies';
             
-            // UGR Base (Luminária padrão de 3000lm a 3m entregando 500lx)
-            let ugr = 18.5;
+            const observerHeight = 1.2; // Altura do olho sentado (Norma)
+            const deltaH = height - observerHeight; // Distância vertical luminária-olho
             
-            // Fator 1: Fluxo Luminoso (Mais luz = mais ofuscamento direto)
-            ugr += (flux - 3000) * 0.0012;
-            
-            // Fator 2: Altura da Peça (Mais baixo e próximo aos olhos = maior ofuscamento)
-            ugr += (3.0 - height) * 2.2;
-            
-            // Fator 3: Iluminância Média (Maior brilho no ambiente reduz o contraste = menor UGR)
-            ugr -= (avgLux - 500) * 0.002;
+            // Se a luminária está abaixo do olho, não há ofuscamento
+            if (deltaH <= 0) return 10.0;
 
-            // Fator 4: Controle Óptico (Arquivos IES costumam ter controle de facho superior a lâmpadas cruas)
-            if (isIES && s.iesData) {
-                ugr -= 2.5; 
-            }
+            // UGR Base Ancorado
+            let ugr = 16.0;
+            
+            // Fator 1: Intensidade Luminousa baseada no Facho (Crucial)
+            // Fachos fechados (ex: 15deg) com alto fluxo = altíssima candela = muito ofuscamento
+            // Fachos abertos (ex: 120deg) = difusor leitoso = baixo ofuscamento
+            const beamFactor = (90 - beam) * 0.08;
+            ugr += beamFactor;
 
-            // Trava limites físicos realistas da engenharia (10 a 30)
+            // Fator 2: Fluxo Total da Fonte
+            ugr += (flux - 2000) * 0.0015;
+            
+            // Fator 3: Proximidade e Posição (Guth Index simplificado)
+            // Se o teto é baixo, ofusca mais. 
+            ugr += (2.5 - deltaH) * 2.5;
+
+            // Fator 4: Comprimento da Sala (Salas compridas = você vê a luminária lá no fundo no horizonte visual)
+            const maxRoomDim = Math.max(roomX, roomY);
+            ugr += (maxRoomDim - 5.0) * 0.3;
+            
+            // Fator 5: Adaptação Visual (Luminância de Fundo)
+            // Salas mais claras (avgLux alto) contraem a pupila e reduzem a percepção de ofuscamento
+            ugr -= (avgLux - 300) * 0.003;
+
+            // Fator 6: Arquivos Fotométricos reais (IES) geralmente possuem recuo de lente/aletas
+            if (isIES && s.iesData) ugr -= 2.0; 
+
+            // Hard limits da Norma CIE (O UGR tabular varia tipicamente de 10 a 30)
             if (ugr < 10) ugr = 10.0;
             if (ugr > 30) ugr = 30.0;
 
