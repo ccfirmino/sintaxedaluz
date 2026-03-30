@@ -1569,7 +1569,7 @@ window.Photometric3DEngine = {
             // Construção da Sala e Piso
             const floorGeo = new THREE.PlaneGeometry(state.roomW, state.roomL);
             const isDark = document.documentElement.classList.contains('dark');
-            const floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x1e293b : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
+            const floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x111827 : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
             const floorMesh = new THREE.Mesh(floorGeo, floorMat);
             floorMesh.rotation.x = -Math.PI / 2;
             this.solidGroup.add(floorMesh);
@@ -1732,7 +1732,7 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             const roofGuide = new THREE.Line(roofGuideGeo, new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.2 }));
             this.solidGroup.add(roofGuide);
 
-            const gridHelper = new THREE.GridHelper(wallWidth, 20, 0x334155, isDark ? 0x1e293b : 0xe2e8f0);
+            const gridHelper = new THREE.GridHelper(wallWidth, 20, 0x334155, isDark ? 0x111827 : 0xe2e8f0);
             gridHelper.position.set(dist/2, 0, 0);
             this.solidGroup.add(gridHelper);
 
@@ -1752,13 +1752,13 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             const tiltMode3D = tiltModeEl3D ? tiltModeEl3D.value : 'same';
             const baseTiltRad = (state && state.tilt ? Number(state.tilt) : 0) * Math.PI / 180;
 
-            const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x1e293b);
+            const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x111827);
             this.solidGroup.add(gridHelper);
 
             // LUXSINTAX: Chão físico para receber a luz se não houver IES
             const isDark = document.documentElement.classList.contains('dark');
             const floorGeo = new THREE.PlaneGeometry(10, 10);
-            const floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x1e293b : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
+            const floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x111827 : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
             const floorMesh = new THREE.Mesh(floorGeo, floorMat);
             floorMesh.rotation.x = -Math.PI / 2;
             this.solidGroup.add(floorMesh);
@@ -1775,7 +1775,7 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
                 const floor = this.solidGroup.children.find(child => child.geometry instanceof THREE.PlaneGeometry);
                 if (floor) {
                     floor.material = new THREE.MeshBasicMaterial({ 
-                        color: isDark ? 0x1e293b : 0xe2e8f0, 
+                        color: isDark ? 0x111827 : 0xe2e8f0, 
                         side: THREE.DoubleSide, depthWrite: true
                     });
                 }
@@ -2634,7 +2634,7 @@ if (window.currentTool !== 'grid') {
                 const recPower = totalPower * 1.20; // Margem de segurança de 20%
 
                 // Fundo do Dashboard
-                ctx.fillStyle = isDark ? "#1e293b" : "#f8fafc";
+                ctx.fillStyle = isDark ? "#111827" : "#f8fafc";
                 ctx.strokeStyle = cFloorLine; ctx.lineWidth = 1;
                 if (ctx.roundRect) {
                     ctx.beginPath(); ctx.roundRect(centerX - 220, ch/2 - 140, 440, 280, 16); ctx.fill(); ctx.stroke();
@@ -3392,7 +3392,7 @@ if (window.currentTool !== 'grid') {
                     const wallX = (cw - wallW) / 2;
                     
                     // Desenho da Parede (Background)
-                    ctx.fillStyle = isDark ? "#1e293b" : "#f1f5f9"; 
+                    ctx.fillStyle = isDark ? "#111827" : "#f1f5f9"; 
                     ctx.fillRect(wallX, 60, wallW, floorY - 60);
                     ctx.strokeStyle = cFloorLine; 
                     ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(cw, floorY); ctx.stroke();
