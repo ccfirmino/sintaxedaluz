@@ -3044,8 +3044,9 @@ if (window.currentTool !== 'grid') {
                     document.getElementById('hud-u-hp').innerText = uniformity_HP;
 
                     // LUXSINTAX: Sincronização Inteligente com os Cards e Solver NBR
+                    const dynamicUGR = window.calculateDynamicUGR ? window.calculateDynamicUGR(s, trueAvgLux_HP) : 18.5;
                     const totalWatts = (s.watts || 30) * s.cols * s.rows;
-                    window.updateResultsUI(trueAvgLux_HP, 18.5, totalWatts, trueAvgLux_LP);
+                    window.updateResultsUI(trueAvgLux_HP, dynamicUGR, totalWatts, trueAvgLux_LP);
                 }
 
                 return; 
@@ -3155,8 +3156,11 @@ if (window.currentTool !== 'grid') {
                     if (window.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
                     drawTextVal(ctx, valText, hitXFloor, floorY - 12); 
 
+                    // LUXSINTAX: Chamada do Motor Dinâmico de UGR
+                    const dynamicUGR = window.calculateDynamicUGR ? window.calculateDynamicUGR(s, luxPlane) : 18.5;
+
                     // LUXSINTAX: Integração Inteligente com Solver NBR (Passando LP e HP)
-                    window.updateResultsUI(luxPlane, 18.5, (s.watts || 10), luxFloor);
+                    window.updateResultsUI(luxPlane, dynamicUGR, (s.watts || 10), luxFloor);
 
                     // LUXSINTAX: HUD Melanópico (Impacto Biológico)
                     if (window.currentTool === 'ponto' && window.state.showHCL) {
@@ -4316,6 +4320,36 @@ window.toggleGridMode = function(mode) {
 
 
         // LUXSINTAX: Disparo do motor de arranque
+        // LUXSINTAX: Motor Heurístico Dinâmico de UGR (Tempo Real)
+        window.calculateDynamicUGR = function(s, avgLux) {
+            const flux = s.flux || 3000;
+            const height = s.height || 3.0;
+            const isIES = window.calcMode === 'ies';
+            
+            // UGR Base (Luminária padrão de 3000lm a 3m entregando 500lx)
+            let ugr = 18.5;
+            
+            // Fator 1: Fluxo Luminoso (Mais luz = mais ofuscamento direto)
+            ugr += (flux - 3000) * 0.0012;
+            
+            // Fator 2: Altura da Peça (Mais baixo e próximo aos olhos = maior ofuscamento)
+            ugr += (3.0 - height) * 2.2;
+            
+            // Fator 3: Iluminância Média (Maior brilho no ambiente reduz o contraste = menor UGR)
+            ugr -= (avgLux - 500) * 0.002;
+
+            // Fator 4: Controle Óptico (Arquivos IES costumam ter controle de facho superior a lâmpadas cruas)
+            if (isIES && s.iesData) {
+                ugr -= 2.5; 
+            }
+
+            // Trava limites físicos realistas da engenharia (10 a 30)
+            if (ugr < 10) ugr = 10.0;
+            if (ugr > 30) ugr = 30.0;
+
+            return ugr;
+        };
+
         // LUXSINTAX: Motor de Interface de Resultados com IA Normativa (Mesa vs Piso)
         window.updateResultsUI = function(luxHP, ugr, watts, luxLP = null) {
             const resultsSection = document.getElementById('results-section');
