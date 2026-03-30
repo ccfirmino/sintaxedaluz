@@ -1412,38 +1412,43 @@ window.AuthManager = {
    handleLogin: async function() {
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
-        
-        // LUXSINTAX: MODO VISITANTE / BYPASS DE DESENVOLVEDOR
-        // Se estiver no seu computador e clicar no botão com os campos vazios, ele entra na hora!
-        if (!email && (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-            console.warn("Bypass de Login Ativado!");
-            document.getElementById('user-name-display').innerText = "MODO TESTE";
-            this.unlockApp();
-            return;
-        }
+        const btn = document.querySelector('#form-login button');
 
-        // LUXSINTAX: Impede o clique se o sistema ainda estiver a carregar as chaves
         if (!window.supabase) {
-            alert("O sistema de segurança está a inicializar. Aguarde 2 segundos.");
-            return;
+            return alert("Conectando ao servidor seguro... Tente clicar novamente em 2 segundos.");
         }
         
         if (!email || !password) {
-            return alert("Por favor, preencha seu e-mail e senha. (Ou deixe em branco para entrar como Visitante no modo local)");
+            return alert("Por favor, preencha o seu e-mail e senha para entrar.");
         }
 
         try {
+            // Mostra que o sistema está a trabalhar
+            const originalText = btn.innerText;
+            btn.innerText = "VERIFICANDO CREDENCIAIS...";
+            btn.disabled = true;
+
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             
+            btn.innerText = originalText;
+            btn.disabled = false;
+
             if (error) throw error;
             
             if (data.session) {
-                console.info("[LuxSintax Auth] Login bem-sucedido. Sincronizando sessão...");
                 this.handleSessionUpdate(data.session);
             }
         } catch (err) {
-            console.error("[LuxSintax Auth] Falha na autenticação:", err.message);
-            alert("Erro de acesso: Usuário não encontrado ou senha incorreta. Se ainda não possui conta, clique na aba 'Cadastro'.");
+            btn.innerText = "Acessar Plataforma";
+            btn.disabled = false;
+            console.error("[LuxSintax Auth] Falha:", err);
+            
+            // Tratamento inteligente de erros para guiar o utilizador
+            let msg = "Usuário não encontrado ou senha incorreta. Clique na aba 'Cadastro' para criar sua conta.";
+            if (err.message.includes("Email not confirmed")) {
+                msg = "O seu e-mail ainda não foi confirmado! Por favor, verifique a sua caixa de entrada (ou Spam) e clique no link do Supabase.";
+            }
+            alert("ERRO DE LOGIN:\n" + msg + "\n\n(Detalhe técnico: " + err.message + ")");
         }
     }
 };
