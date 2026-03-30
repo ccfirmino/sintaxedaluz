@@ -99,8 +99,11 @@
         html.dark body { background: linear-gradient(180deg, #0f172a 0%, #020617 100%); color: #cbd5e1; }
         html.dark nav { background: rgba(15, 23, 42, 0.95); border-color: #1e293b; }
         html.dark .glass-panel { background: rgba(30, 41, 59, 0.85); border-color: rgba(255, 255, 255, 0.05); }
-        html.dark .text-starlight { color: #f8fafc; }
-        html.dark .text-dim-gray { color: #94a3b8; }
+        /* LUXSINTAX FIX: Blindagem Absoluta de Contraste UI (Anula falhas do Tailwind JIT) */
+        html.dark .text-starlight { color: #ffffff !important; }
+        html.dark .text-dim-gray { color: #cbd5e1 !important; }
+        html.dark .text-slate-500 { color: #cbd5e1 !important; }
+        html.dark .text-slate-400 { color: #94a3b8 !important; }
         html.dark .bg-white { background-color: #1e293b; }
         html.dark .border-slate-200 { border-color: #334155; }
         html.dark .border-slate-300 { border-color: #475569; }
@@ -4335,47 +4338,38 @@ window.toggleGridMode = function(mode) {
             if (!resultsSection) return;
 
             resultsSection.classList.remove('hidden');
-            
             const nbrSelector = document.getElementById('nbr-selector-section');
             if (nbrSelector) nbrSelector.classList.remove('hidden');
 
-            // Heurística de Detecção do Plano da Norma (A norma exige medição no Piso?)
             const catSelect = document.getElementById('nbr-cat-select');
             const roomSelect = document.getElementById('nbr-room-select');
             const cat = catSelect ? catSelect.value : '';
             const room = roomSelect ? roomSelect.value : '';
 
+            // Heurística de Piso (LP)
             const isFloorNorm = cat === 'Áreas de Tráfego' || 
-                                room.includes('Corredor') || 
-                                room.includes('Sagu') || 
-                                room.includes('Estacionamento') || 
-                                room.includes('Escada') || 
-                                room.includes('Foyer');
+                                (room && (room.includes('Corredor') || room.includes('Sagu') || room.includes('Estacionamento') || room.includes('Escada') || room.includes('Foyer')));
 
-            let finalLux = luxHP;
+            let finalLux = parseFloat(luxHP);
             let planeText = "Plano Trab.";
 
-            // O Solver sobrepõe a mesa e audita o piso se a norma exigir
+            // Força a adoção do Piso (LP) se a norma exigir ou se o botão da interface estiver pressionado
             if (isFloorNorm && luxLP !== null) {
-                finalLux = luxLP;
+                finalLux = parseFloat(luxLP);
                 planeText = "Piso";
             } else if (window.currentTool === 'grid' && window.state.grid && window.state.grid.viewLevel === 'LP') {
-                // Se o usuário explicitamente forçar a visualização no piso na UI da malha
-                finalLux = luxLP !== null ? luxLP : luxHP;
+                finalLux = luxLP !== null ? parseFloat(luxLP) : parseFloat(luxHP);
                 planeText = "Piso (Forçado)";
             }
-            
-            // 1. Atualiza os cards básicos
+
             document.getElementById('result-lux').innerText = Math.round(finalLux);
-            document.getElementById('result-ugr').innerText = ugr.toFixed(1);
+            document.getElementById('result-ugr').innerText = parseFloat(ugr).toFixed(1);
             
-            // LUXSINTAX: Cálculo de Eficiência Sistémica
             const s = window.state[window.currentTool];
             const totalFlux = window.currentTool === 'grid' ? (s.flux * s.cols * s.rows) : s.flux;
             const efficiency = watts > 0 ? Math.round(totalFlux / watts) : 0;
             document.getElementById('result-eff').innerText = efficiency;
 
-            // 2. Lógica do Solver NBR
             const nbrPanel = document.getElementById('nbr-status-panel');
             const nbrStatusText = document.getElementById('nbr-status-text');
             const nbrIcon = document.getElementById('nbr-icon');
@@ -4385,22 +4379,33 @@ window.toggleGridMode = function(mode) {
             if (!nbrPanel) return;
             nbrPanel.classList.remove('hidden');
 
-            const targetLux = window.currentNbrTarget ? window.currentNbrTarget.lux : 500;
-            const maxUgrLimit = window.currentNbrTarget ? window.currentNbrTarget.ugr : 19;
+            // Conversão numérica estrita para evitar erros de comparação de String
+            const targetLux = window.currentNbrTarget ? parseFloat(window.currentNbrTarget.lux) : 500;
+            const maxUgrLimit = window.currentNbrTarget ? parseFloat(window.currentNbrTarget.ugr) : 19;
+            const parsedUgr = parseFloat(ugr);
 
             let status = 'APPROVED';
-            if (finalLux < targetLux * 0.9 || ugr > maxUgrLimit) status = 'REJECTED';
-            else if (finalLux < targetLux) status = 'WARNING';
+            let detailStr = '';
+
+            // Lógica de Auditoria Implacável
+            if (Math.round(finalLux) < targetLux * 0.9) {
+                status = 'REJECTED';
+                detailStr = ' (LUX INSUFICIENTE)';
+            } else if (parsedUgr > maxUgrLimit) {
+                status = 'REJECTED';
+                detailStr = ' (OFUSCAMENTO ALTO)';
+            } else if (Math.round(finalLux) < targetLux) {
+                status = 'WARNING';
+            }
 
             const isPointMode = window.currentTool === 'ponto' || window.currentTool === 'vertical';
-            const contextTitle = isPointMode ? `Validação de Tarefa (${planeText})` : `Auditoria NBR (${planeText})`;
+            const contextTitle = isPointMode ? `Validação de Facho (${planeText})` : `Auditoria NBR (${planeText})`;
 
-            // 3. Aplicação Visual do Status
             if (status === 'APPROVED') {
                 nbrPanel.style.borderColor = '#10b981';
                 nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
                 nbrIcon.className = 'fas fa-check-circle';
-                nbrStatusText.innerText = `${contextTitle}: Desempenho Conforme`;
+                nbrStatusText.innerText = `${contextTitle}: Conforme a norma`;
                 nbrBadge.innerText = 'APROVADO';
                 nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 border-green-200';
             } else if (status === 'WARNING') {
@@ -4414,7 +4419,7 @@ window.toggleGridMode = function(mode) {
                 nbrPanel.style.borderColor = '#ef4444';
                 nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
                 nbrIcon.className = 'fas fa-times-circle';
-                nbrStatusText.innerText = `${contextTitle}: Fora dos Requisitos`;
+                nbrStatusText.innerText = `${contextTitle}: Fora dos Requisitos${detailStr}`;
                 nbrBadge.innerText = 'REPROVADO';
                 nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
             }
