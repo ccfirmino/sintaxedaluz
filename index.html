@@ -994,11 +994,12 @@
 
     <script src="js/engines/hcl.js"></script>
     <script src="js/engines/glare.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    <script>
+        const createClient = window.supabase.createClient;
         
-        // LUXSINTAX: Variável global do módulo para que todas as funções a vejam
+        // LUXSINTAX: Variável global da conexão
         let supabase;
 
         // LUXSINTAX: Inicialização Direta (Produção)
@@ -1298,162 +1299,124 @@
         };
 
         // --- AUTH MANAGER ---
-window.AuthManager = {
-    init: async function() {
-        // LUXSINTAX: Proteção contra tentativa de leitura antes do fetch terminar
-        if (!supabase) return; 
-        const { data: { session } } = await supabase.auth.getSession();
-        this.handleSessionUpdate(session);
-        
-        supabase.auth.onAuthStateChange((event, session) => {
-            this.handleSessionUpdate(session);
-            if (event === 'PASSWORD_RECOVERY') {
-                setTimeout(() => {
-                    alert(window.currentLang === 'en' ? window.i18n.en.msg_recovery_prompt : window.i18n.pt.msg_recovery_prompt);
-                    this.openProfile();
-                }, 500);
+        window.AuthManager = {
+            init: async function() {
+                if (!supabase) return; 
+                const { data: { session } } = await supabase.auth.getSession();
+                this.handleSessionUpdate(session);
+                
+                supabase.auth.onAuthStateChange((event, session) => {
+                    this.handleSessionUpdate(session);
+                });
+            },
+            handleSessionUpdate: function(session) {
+                if (session) {
+                    const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
+                    document.getElementById('user-name-display').innerText = name.toUpperCase();
+                    const emailDisplay = document.getElementById('profile-email-display');
+                    if (emailDisplay) emailDisplay.value = session.user.email;
+                    this.unlockApp();
+                } else { 
+                    this.lockApp(); 
+                }
+            },
+            lockApp: function() { 
+                document.getElementById('auth-modal').classList.remove('hidden'); 
+                document.getElementById('app-content').classList.add('app-locked'); 
+            },
+            unlockApp: function() { 
+                document.getElementById('auth-modal').classList.add('hidden'); 
+                document.getElementById('app-content').classList.remove('app-locked'); 
+                window.populateCategoryFilter();
+                window.filterNorms();
+                if (window.fetchUserLeedProjects) window.fetchUserLeedProjects();
+                setTimeout(() => window.updateCalculations(), 100); 
+            },
+            switchTab: function(tab) {
+                const loginForm = document.getElementById('form-login'); 
+                const regForm = document.getElementById('form-register');
+                const forgotForm = document.getElementById('form-forgot-password');
+                const authTabs = document.getElementById('auth-tabs');
+                const btnLogin = document.getElementById('tab-auth-login'); 
+                const btnReg = document.getElementById('tab-auth-register');
+                
+                authTabs.classList.remove('hidden');
+                forgotForm.classList.add('hidden');
+
+                if (tab === 'login') {
+                    loginForm.classList.remove('hidden'); regForm.classList.add('hidden');
+                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
+                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
+                } else {
+                    loginForm.classList.add('hidden'); regForm.classList.remove('hidden');
+                    btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
+                    btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
+                }
+            },
+            showForgotPassword: function() {
+                document.getElementById('form-login').classList.add('hidden');
+                document.getElementById('form-register').classList.add('hidden');
+                document.getElementById('auth-tabs').classList.add('hidden');
+                document.getElementById('form-forgot-password').classList.remove('hidden');
+            },
+            backToLogin: function() { this.switchTab('login'); },
+            handlePasswordResetRequest: async function() {
+                const email = document.getElementById('forgot-email').value;
+                if (!email) return alert("Por favor, insira um e-mail.");
+                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+                if (error) alert(error.message); else { alert("Link enviado!"); this.backToLogin(); }
+            },
+            handleRegister: async function() {
+                const email = document.getElementById('reg-email').value;
+                const password = document.getElementById('reg-password').value;
+                const firstName = document.getElementById('reg-name').value;
+                const lastName = document.getElementById('reg-surname').value;
+                if (!document.getElementById('reg-terms').checked) return alert("Aceite os termos.");
+                const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName, last_name: lastName } } });
+                if (error) alert(error.message); else if (data.session) this.unlockApp(); else alert("Cadastro feito. Verifique e-mail.");
+            },
+            logout: async function() { 
+                await supabase.auth.signOut(); 
+                for (let key in localStorage) { if (key.startsWith('sb-')) localStorage.removeItem(key); }
+                location.reload(); 
+            },
+            openProfile: function() { document.getElementById('profile-modal').classList.remove('hidden'); },
+            closeProfile: function() { document.getElementById('profile-modal').classList.add('hidden'); },
+            updatePassword: async function() {
+                const newPass = document.getElementById('profile-new-pass').value;
+                const confPass = document.getElementById('profile-confirm-pass').value;
+                if (newPass !== confPass) return alert("As senhas não coincidem.");
+                if (newPass.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+                const { error } = await supabase.auth.updateUser({ password: newPass });
+                if (error) alert("Erro: " + error.message); else { alert("Senha atualizada!"); this.closeProfile(); }
+            },
+            handleLogin: async function() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const btn = document.querySelector('#form-login button');
+
+                if (!window.supabase) return alert("Conectando ao servidor... Aguarde 2 segundos.");
+                if (!email || !password) return alert("Preencha o e-mail e a senha.");
+
+                try {
+                    const originalText = btn.innerText;
+                    btn.innerText = "VERIFICANDO...";
+                    btn.disabled = true;
+
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+
+                    if (error) throw error;
+                    if (data.session) this.handleSessionUpdate(data.session);
+                } catch (err) {
+                    btn.innerText = "Acessar Plataforma";
+                    btn.disabled = false;
+                    alert("Erro de Login: Usuário ou senha incorretos.");
+                }
             }
-        });
-    },
-    handleSessionUpdate: function(session) {
-        if (session) {
-            const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
-            document.getElementById('user-name-display').innerText = name.toUpperCase();
-            
-            const emailDisplay = document.getElementById('profile-email-display');
-            if (emailDisplay) emailDisplay.value = session.user.email;
-
-            this.unlockApp();
-        } else { 
-            this.lockApp(); 
-        }
-    },
-    lockApp: function() { 
-        document.getElementById('auth-modal').classList.remove('hidden'); 
-        document.getElementById('app-content').classList.add('app-locked'); 
-    },
-    unlockApp: function() { 
-        document.getElementById('auth-modal').classList.add('hidden'); 
-        document.getElementById('app-content').classList.remove('app-locked'); 
-        window.populateCategoryFilter();
-        window.filterNorms();
-        if (window.fetchUserLeedProjects) window.fetchUserLeedProjects();
-        setTimeout(() => window.updateCalculations(), 100); 
-    },
-    switchTab: function(tab) {
-        const loginForm = document.getElementById('form-login'); 
-        const regForm = document.getElementById('form-register');
-        const forgotForm = document.getElementById('form-forgot-password');
-        const authTabs = document.getElementById('auth-tabs');
-        
-        const btnLogin = document.getElementById('tab-auth-login'); 
-        const btnReg = document.getElementById('tab-auth-register');
-        
-        authTabs.classList.remove('hidden');
-        forgotForm.classList.add('hidden');
-
-        if (tab === 'login') {
-            loginForm.classList.remove('hidden'); regForm.classList.add('hidden');
-            btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
-            btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
-        } else {
-            loginForm.classList.add('hidden'); regForm.classList.remove('hidden');
-            btnReg.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-luminous-gold border-b-2 border-luminous-gold transition-all";
-            btnLogin.className = "flex-1 py-3 text-xs font-bold uppercase tracking-wider text-dim-gray hover:text-starlight transition-all";
-        }
-    },
-    showForgotPassword: function() {
-        document.getElementById('form-login').classList.add('hidden');
-        document.getElementById('form-register').classList.add('hidden');
-        document.getElementById('auth-tabs').classList.add('hidden');
-        document.getElementById('form-forgot-password').classList.remove('hidden');
-    },
-    backToLogin: function() {
-        this.switchTab('login');
-    },
-    handlePasswordResetRequest: async function() {
-        const email = document.getElementById('forgot-email').value;
-        if (!email) {
-            alert("Por favor, insira um e-mail.");
-            return;
-        }
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + window.location.pathname,
-        });
-        
-        if (error) {
-            alert(error.message);
-        } else {
-            alert(window.currentLang === 'en' ? window.i18n.en.msg_reset_sent : window.i18n.pt.msg_reset_sent);
-            this.backToLogin();
-        }
-    },
-    handleRegister: async function() {
-        const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-password').value;
-        const firstName = document.getElementById('reg-name').value;
-        const lastName = document.getElementById('reg-surname').value;
-        if (!document.getElementById('reg-terms').checked) return alert("Aceite os termos.");
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName, last_name: lastName } } });
-        if (error) alert(error.message); 
-        else if (data.session) this.unlockApp();
-        else alert("Cadastro feito. Verifique e-mail.");
-    },
-    logout: async function() { 
-        await supabase.auth.signOut(); 
-        // Garante a morte do cache sujo do GoTrue
-        for (let key in localStorage) {
-            if (key.startsWith('sb-')) {
-                localStorage.removeItem(key);
-            }
-        }
-        location.reload(); 
-    },
-   handleLogin: async function() {
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        const btn = document.querySelector('#form-login button');
-
-        if (!window.supabase) {
-            return alert("Conectando ao servidor seguro... Tente clicar novamente em 2 segundos.");
-        }
-        
-        if (!email || !password) {
-            return alert("Por favor, preencha o seu e-mail e senha para entrar.");
-        }
-
-        try {
-            // Mostra que o sistema está a trabalhar
-            const originalText = btn.innerText;
-            btn.innerText = "VERIFICANDO CREDENCIAIS...";
-            btn.disabled = true;
-
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            btn.innerText = originalText;
-            btn.disabled = false;
-
-            if (error) throw error;
-            
-            if (data.session) {
-                this.handleSessionUpdate(data.session);
-            }
-        } catch (err) {
-            btn.innerText = "Acessar Plataforma";
-            btn.disabled = false;
-            console.error("[LuxSintax Auth] Falha:", err);
-            
-            // Tratamento inteligente de erros para guiar o utilizador
-            let msg = "Usuário não encontrado ou senha incorreta. Clique na aba 'Cadastro' para criar sua conta.";
-            if (err.message.includes("Email not confirmed")) {
-                msg = "O seu e-mail ainda não foi confirmado! Por favor, verifique a sua caixa de entrada (ou Spam) e clique no link do Supabase.";
-            }
-            alert("ERRO DE LOGIN:\n" + msg + "\n\n(Detalhe técnico: " + err.message + ")");
-        }
-    }
-};
-
-
+        };
 
 
 // --- LUXSINTAX WEBGL ENGINE (SÓLIDO FOTOMÉTRICO 3D) ---
