@@ -142,19 +142,7 @@
 /* LUXSINTAX: Aumentar textos das Caixas Explicativas (Tooltips) */
         .group-hover\:visible h4 { font-size: 13px !important; margin-bottom: 8px !important; }
         .group-hover\:visible p { font-size: 11px !important; color: #cbd5e1 !important; line-height: 1.6 !important; }
-
-        /* LUXSINTAX: HUD ADAPTATIVO BLINDADO (LIGHT/DARK) */
-        .lux-hud-box { background: rgba(255,255,255,0.92) !important; border: 1px solid #e2e8f0 !important; }
-        .lux-hud-title { color: #0f172a !important; border-bottom-color: #e2e8f0 !important; }
-        .lux-hud-lbl { color: #64748b !important; }
-        .lux-hud-val { color: #0f172a !important; }
-        .lux-hud-border { border-top: 1px solid #e2e8f0 !important; }
-
-        html.dark .lux-hud-box { background: rgba(15,23,42,0.92) !important; border-color: #334155 !important; }
-        html.dark .lux-hud-title { color: #ffffff !important; border-bottom-color: #334155 !important; }
-        html.dark .lux-hud-lbl { color: #94a3b8 !important; }
-        html.dark .lux-hud-val { color: #ffffff !important; }
-        html.dark .lux-hud-border { border-top-color: #334155 !important; }
+        
 </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-white transition-colors duration-300">
@@ -641,25 +629,25 @@
                                         
                                         <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-4 pointer-events-none">
                                             
-                                            <div id="grid-hud-overlay" class="lux-hud-box rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto backdrop-blur-md shadow-xl">
-                                                <h4 class="lux-hud-title text-[11px] font-black tracking-widest uppercase mb-3 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                            <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto backdrop-blur-md shadow-xl">
+                                                <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-3 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold">Em (LP):</span><span id="hud-em-lp" class="lux-hud-val text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold">U (LP):</span><span id="hud-u-lp" class="lux-hud-val text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold">Em (HP):</span><span id="hud-em-hp" class="lux-hud-val text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold">U (HP):</span><span id="hud-u-hp" class="lux-hud-val text-xs font-black">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (LP):</span><span id="hud-em-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">U (LP):</span><span id="hud-u-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (HP):</span><span id="hud-em-hp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">U (HP):</span><span id="hud-u-hp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
                                                 </div>
                                             </div>
 
-                                            <div id="photometric-dashboard" class="lux-hud-box rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4 backdrop-blur-md shadow-xl">
-                                                <h4 class="lux-hud-title text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> SUMÁRIO TÉCNICO</h4>
-                                                <div class="lux-hud-lbl truncate mb-3 text-[10px] font-bold" id="pd-filename">arquivo.ies</div>
+                                            <div id="photometric-dashboard" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4 backdrop-blur-md shadow-xl">
+                                                <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> SUMÁRIO TÉCNICO</h4>
+                                                <div class="text-slate-500 dark:text-slate-400 truncate mb-3 text-[10px] font-bold" id="pd-filename">arquivo.ies</div>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold">Eficácia:</span><span class="lux-hud-val text-xs font-black"><span id="pd-efficacy">--</span> <span class="lux-hud-lbl text-[9px] font-bold">lm/W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold">Potência:</span><span class="lux-hud-val text-xs font-black"><span id="pd-watts">--</span> <span class="lux-hud-lbl text-[9px] font-bold">W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold">Fluxo:</span><span class="lux-hud-val text-xs font-black"><span id="pd-lumens">--</span> <span class="lux-hud-lbl text-[9px] font-bold">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="lux-hud-lbl text-[10px] font-bold">Uplight:</span><span class="lux-hud-val text-xs font-black"><span id="pd-uplight">--</span> <span class="lux-hud-lbl text-[9px] font-bold">%</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Eficácia:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-efficacy">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm/W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Uplight:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-uplight">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">%</span></span></div>
                                                 </div>
                                             </div>
                                             
@@ -2260,8 +2248,8 @@ window.handleGenerateReport = async () => {
                 const container = document.getElementById('photometric-dashboard').querySelector('.space-y-2');
                 const div = document.createElement('div');
                 div.id = 'pd-more-metrics';
-                div.className = 'lux-hud-border flex justify-between items-center pt-2 mt-2';
-                div.innerHTML = `<span class="lux-hud-lbl text-[10px] font-bold">Fluxo Útil (0-60°):</span><span id="pd-util" class="lux-hud-val text-xs font-black">--</span>`;
+                div.className = 'border-t border-slate-200 dark:border-slate-700 flex justify-between items-center pt-2 mt-2';
+                div.innerHTML = `<span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Útil (0-60°):</span><span id="pd-util" class="text-starlight dark:text-white text-xs font-black">--</span>`;
                 container.appendChild(div);
             }
             document.getElementById('pd-util').innerText = metrics.fluxUtilization + '%';
@@ -3069,7 +3057,8 @@ if (window.currentTool !== 'grid') {
 
                     // LUXSINTAX: Sincronização em Tempo Real com os Cards e Solver NBR
                     // O Solver agora obedece à escolha do projetista (Piso ou Plano de Trabalho)
-                    const finalAvg = currentLevel === 'LP' ? trueAvgLux_LP : trueAvgLux_HP; 
+                    const gridLevel = s.viewLevel || 'HP';
+                    const finalAvg = gridLevel === 'LP' ? trueAvgLux_LP : trueAvgLux_HP; 
                     const totalWatts = (s.watts || 30) * s.cols * s.rows;
                     window.updateResultsUI(finalAvg, 18.5, totalWatts);
                 }
