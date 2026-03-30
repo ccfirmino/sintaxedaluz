@@ -1419,7 +1419,7 @@ window.AuthManager = {
         }
         location.reload(); 
     },
-   login: async function() {
+   handleLogin: async function() {
         // LUXSINTAX: Impede o clique se o sistema ainda estiver a carregar as chaves
         if (!window.supabase) {
             alert("O sistema de segurança está a inicializar. Aguarde 2 segundos.");
