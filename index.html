@@ -123,7 +123,7 @@
         html.dark .mode-tab-btn:hover { background: #0f172a; border-color: #475569; }
         html.dark .tab-active { background-color: rgba(217, 119, 6, 0.1); border-color: #d97706 !important; }
         html.dark .tab-inactive { color: #94a3b8 !important; }
-        html.dark .canvas-container { background: #0f172a; border-color: #334155; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
+        html.dark .canvas-container { background: #111827 !important; border-color: #334155; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
         html.dark .leed-level-box, html.dark .well-toggle-group { background: #1e293b; border-color: #334155; }
         html.dark input[type=range]::-webkit-slider-runnable-track { background: #334155; }
 /* LUXSINTAX: Aumentar textos das Caixas Explicativas (Tooltips) */
@@ -1007,7 +1007,7 @@
             
             // LUXSINTAX: Vira a chave do 3D imediatamente ao clicar na Lua/Sol
             if (window.Photometric3DEngine && window.Photometric3DEngine.scene) {
-                window.Photometric3DEngine.scene.background = new THREE.Color(isDark ? 0x0f172a : 0xf8fafc);
+                window.Photometric3DEngine.scene.background = new THREE.Color(isDark ? 0x111827 : 0xf8fafc);
             }
             
             if (window.updateCalculations) window.updateCalculations();
@@ -1422,7 +1422,7 @@ window.Photometric3DEngine = {
         if (!container || typeof THREE === 'undefined') return;
 
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(document.documentElement.classList.contains('dark') ? 0x0f172a : 0x1e293b);
+        this.scene.background = new THREE.Color(document.documentElement.classList.contains('dark') ? 0x111827 : 0xf8fafc);
 
         const rect = container.getBoundingClientRect();
         this.camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 1000);
@@ -1482,7 +1482,7 @@ window.Photometric3DEngine = {
         
         // LUXSINTAX: Sincroniza a cor do fundo 3D (Céu) com o Tema Claro/Escuro
         const isDarkTheme = document.documentElement.classList.contains('dark');
-        if (this.scene) this.scene.background = new THREE.Color(isDarkTheme ? 0x0f172a : 0xf8fafc);
+        if (this.scene) this.scene.background = new THREE.Color(isDarkTheme ? 0x111827 : 0xf8fafc);
 
         this.clearSolid();
         
