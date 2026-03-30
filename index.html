@@ -1001,24 +1001,14 @@
         // LUXSINTAX: Variável global do módulo para que todas as funções a vejam
         let supabase;
 
-        // LUXSINTAX: Inicialização Inteligente (Local + Produção)
+        // LUXSINTAX: Inicialização Direta (Produção)
         async function initializeApp() {
             try {
-                let env;
-                
-                // Deteta se está a correr no seu computador, localmente ou na Vercel
-                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '' || window.location.protocol === 'file:') {
-                    console.log("LuxSintax: Modo Local Detetado. Usando chaves de desenvolvimento.");
-                    env = {
-                        url: 'https://ozytwdhuxsdefnunzinm.supabase.co',
-                        key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s'
-                    };
-                } else {
-                    // Na Vercel, busca as chaves escondidas no servidor
-                    const envResponse = await fetch('/api/get-env');
-                    if (!envResponse.ok) throw new Error("Erro ao buscar chaves na API");
-                    env = await envResponse.json();
-                }
+                // LUXSINTAX: Conectando diretamente para destravar o site em produção
+                const env = {
+                    url: 'https://ozytwdhuxsdefnunzinm.supabase.co',
+                    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s'
+                };
                 
                 // Inicializa o Supabase
                 supabase = createClient(env.url, env.key);
