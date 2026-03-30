@@ -679,11 +679,17 @@
                             </div>
 
                             <div id="results-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full hidden animate-fade-in-up">
-                                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
-                                    <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Iluminância Média</p>
+                                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full relative group cursor-help">
+                                    <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-56 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-[9px] p-2 rounded shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-bold">
+                                        Heurística instantânea de viabilidade baseada em CIE 117
+                                    </div>
+                                    <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black flex justify-between items-center">
+                                        Ofuscamento (UGR)
+                                        <span class="text-[8px] bg-slate-100 dark:bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded-sm tracking-normal font-bold">ESTIMADO</span>
+                                    </p>
                                     <div class="flex items-baseline gap-2">
-                                        <span id="result-lux" class="text-4xl font-black text-starlight dark:text-white">0</span>
-                                        <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">LX</span>
+                                        <span id="result-ugr" class="text-4xl font-black text-slate-900 dark:text-white">0</span>
+                                        <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">UGR</span>
                                     </div>
                                 </div>
                                 <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
