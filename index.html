@@ -2051,18 +2051,29 @@ window.handleGenerateReport = async () => {
     const imgP = await pdfDoc.embedPng(imgPiso);
     const imgM = await pdfDoc.embedPng(imgMesa);
     
-    const imgW = 230;
-    const imgH = 150;
+    // Algoritmo de Escalonamento Inteligente (Proporcional sem distorção)
+    const maxWidth = width - 100; // Margens seguras
+    const maxHeight = 150; // Limite vertical rígido para não quebrar a página
     
-    page.drawImage(imgP, { x: 50, y: cy - imgH, width: imgW, height: imgH });
-    page.drawRectangle({ x: 50, y: cy - imgH, width: imgW, height: imgH, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
-    page.drawText('VISÃO PISO (0.00m)', { x: 50, y: cy - imgH - 12, size: 7, font: fontBold });
+    const dimsP = imgP.scaleToFit(maxWidth, maxHeight);
+    const dimsM = imgM.scaleToFit(maxWidth, maxHeight);
     
-    page.drawImage(imgM, { x: 310, y: cy - imgH, width: imgW, height: imgH });
-    page.drawRectangle({ x: 310, y: cy - imgH, width: imgW, height: imgH, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
-    page.drawText(`VISÃO PLANO DE TRABALHO (${s.plane.toFixed(2)}m)`, { x: 310, y: cy - imgH - 12, size: 7, font: fontBold });
+    const xP = (width - dimsP.width) / 2; // Centraliza matematicamente no Eixo X
+    const xM = (width - dimsM.width) / 2;
     
-    cy -= (imgH + 45);
+    // Planta 1: Piso (Top)
+    page.drawImage(imgP, { x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height });
+    page.drawRectangle({ x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
+    page.drawText('VISÃO PISO (0.00m)', { x: xP, y: cy - dimsP.height - 12, size: 7, font: fontBold });
+    
+    cy -= (dimsP.height + 25);
+    
+    // Planta 2: Plano de Trabalho (Bottom)
+    page.drawImage(imgM, { x: xM, y: cy - dimsM.height, width: dimsM.width, height: dimsM.height });
+    page.drawRectangle({ x: xM, y: cy - dimsM.height, width: dimsM.width, height: dimsM.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
+    page.drawText(`VISÃO PLANO DE TRABALHO (${s.plane.toFixed(2)}m)`, { x: xM, y: cy - dimsM.height - 12, size: 7, font: fontBold });
+    
+    cy -= (dimsM.height + 35);
 
     // Bloco 4: Sumário e Compliance
     cy = drawSection('4. Síntese de Conformidade (NBR ISO/CIE 8995-1)', cy);
