@@ -98,6 +98,7 @@
         /* DARK MODE CSS INJECT - LUXSINTAX ARCHITECTURE */
         html.dark body { background: linear-gradient(180deg, #0f172a 0%, #020617 100%); color: #cbd5e1; }
         html.dark nav, html.dark footer { background: rgba(15, 23, 42, 0.95); border-color: #1e293b; }
+        html.dark .glass-panel { background: rgba(30, 41, 59, 0.95) !important; border-color: #334155 !important; }
         
         /* LUXSINTAX FIX: Blindagem Absoluta de Contraste UI */
         html.dark .text-starlight { color: #ffffff !important; }
@@ -610,7 +611,7 @@
                                     </div>
                                 </div>
 
-                                <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
+                                <div class="relative w-full flex-grow bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
                                     <div class="relative flex-grow w-full">
                                         
                                         <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-4 pointer-events-none">
