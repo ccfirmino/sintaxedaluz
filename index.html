@@ -2019,7 +2019,7 @@ window.handleGenerateReport = async () => {
     const drawSection = (title, y) => {
         page.drawRectangle({ x: 40, y: y - 5, width: width - 80, height: 20, color: window.PDFLib.rgb(0.95, 0.96, 0.98) });
         page.drawText(title.toUpperCase(), { x: 50, y: y, size: 9, font: fontBold, color: window.PDFLib.rgb(0.2, 0.3, 0.4) });
-        return y - 30;
+        return y - 20; // LUXSINTAX: Reduzido de -30 para -20 para otimizar a área útil das imagens
     };
 
     // Bloco 1: Arquitetura
@@ -2094,7 +2094,8 @@ window.handleGenerateReport = async () => {
 
     // Footer / Termo de Isenção
     const disclaimer = "AVISO LEGAL: Relatório técnico gerado pela suíte LuxSintax V26. Baseado em modelagem matemática e Método dos Lúmens clássico. Tratando-se de estudo paramétrico preliminar de apoio à decisão do Projetista, os resultados de iluminância e uniformidade podem variar in loco devido a interferências arquitetônicas e obstruções. Documento não substitui laudo ou projeto executivo global assinado.";
-    page.drawText(disclaimer, { x: 40, y: 30, size: 6, font: fontRegular, color: window.PDFLib.rgb(0.6, 0.6, 0.6), maxWidth: width - 80 });
+    // LUXSINTAX: Adicionado o parâmetro lineHeight para espremer as linhas do texto legal
+    page.drawText(disclaimer, { x: 40, y: 30, size: 6, font: fontRegular, color: window.PDFLib.rgb(0.6, 0.6, 0.6), maxWidth: width - 80, lineHeight: 7.5 });
 
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
@@ -3053,15 +3054,24 @@ if (window.currentTool !== 'grid') {
                     ctx.fillStyle = legGrad;
                     ctx.fillRect(legX, legY, legW, legH);
                     
-                    // Textos da legenda
+                    // Textos da legenda (Algoritmo Anti-Colisão)
                     ctx.fillStyle = isDark ? "#cbd5e1" : "#334155";
                     ctx.font = "bold 9px Manrope";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "top";
-                    scaleColors.forEach(c => {
+                    
+                    let lastTextPx = -999;
+                    scaleColors.forEach((c, index) => {
                         const px = legX + (c.lux / maxScaleLux) * legW;
-                        ctx.fillText(c.lux, px, legY + legH + 5);
+                        const textWidth = ctx.measureText(c.lux).width;
+                        
+                        // Oculta o valor se colidir com o texto anterior (margem de 8px), mas garante renderização do primeiro e último
+                        if (px - lastTextPx > (textWidth + 8) || index === 0 || index === scaleColors.length - 1) {
+                            ctx.fillText(c.lux, px, legY + legH + 5);
+                            lastTextPx = px;
+                        }
                     });
+                    
                     ctx.textAlign = "left";
                     ctx.fillStyle = "#d97706";
                     ctx.fillText("Lux", legX, legY - 14);
