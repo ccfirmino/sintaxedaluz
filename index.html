@@ -1948,9 +1948,14 @@ window.handleGenerateReport = async () => {
     if (!window.PDFLib) return alert('Inicializando Motor de PDF-Lib...');
     
     const s = window.state.grid;
-    // Captura as referências da NBR diretamente do solver de tela
-    const nbr = window.currentNbrTarget || { lux: 500, ugr: 19 };
-    const maxUgrLimit = nbr.ugr === 99 ? 'N/A' : nbr.ugr;
+    
+    // LUXSINTAX: Verifica se o usuário ativou a NBR explicitamente
+    const catSelect = document.getElementById('nbr-cat-select');
+    const roomSelect = document.getElementById('nbr-room-select');
+    const isNbrActive = catSelect && roomSelect && catSelect.value && roomSelect.value;
+    
+    // Se a NBR estiver ativa, usa a norma. Se não, usa o Alvo manual do slider
+    const targetLux = isNbrActive && window.currentNbrTarget ? window.currentNbrTarget.lux : s.targetLux;
     
     // Matemática Dinâmica
     const area = s.roomW * s.roomL;
@@ -1958,7 +1963,7 @@ window.handleGenerateReport = async () => {
     const totalWatts = totalFixtures * (s.watts || 30);
     const lpd = totalWatts / area;
     const avgLux = Math.round((totalFixtures * s.flux * s.utilFactor * s.maintFactor) / area);
-    const isOk = avgLux >= nbr.lux;
+    const isOk = avgLux >= targetLux;
     
     const effectiveBeamObj = window.getEffectiveBeam(s);
     const lumName = s.iesFileName || "Fonte Paramétrica Genérica";
@@ -2075,22 +2080,29 @@ window.handleGenerateReport = async () => {
     
     cy -= (dimsM.height + 35);
 
-    // Bloco 4: Sumário e Compliance
-    cy = drawSection('4. Síntese de Conformidade (NBR ISO/CIE 8995-1)', cy);
+    // Bloco 4: Sumário e Compliance (Dinâmico para NBR ou Estudo Livre)
+    const titleBloco4 = isNbrActive ? '4. Síntese de Conformidade (NBR ISO/CIE 8995-1)' : '4. Síntese de Resultados (Estudo Livre)';
+    cy = drawSection(titleBloco4, cy);
     
     const resBoxY = cy - 60;
     page.drawRectangle({ x: 40, y: resBoxY, width: width - 80, height: 70, color: isOk ? window.PDFLib.rgb(0.9, 0.98, 0.9) : window.PDFLib.rgb(0.98, 0.9, 0.9) });
 
     page.drawText('ILUMINÂNCIA (Em) CALCULADA:', { x: 60, y: cy - 15, size: 9, font: fontBold });
     page.drawText(`${avgLux} LUX`, { x: 60, y: cy - 35, size: 20, font: fontBold, color: isOk ? window.PDFLib.rgb(0.1, 0.5, 0.1) : window.PDFLib.rgb(0.7, 0.1, 0.1) });
-    page.drawText(`Alvo Exigido: ${nbr.lux} Lux`, { x: 60, y: cy - 47, size: 8, font: fontRegular, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
+    
+    const lblAlvo = isNbrActive ? `Alvo Exigido (NBR): ${targetLux} Lux` : `Alvo Desejado: ${targetLux} Lux`;
+    page.drawText(lblAlvo, { x: 60, y: cy - 47, size: 8, font: fontRegular, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
 
     page.drawText('EFICIÊNCIA ENERGÉTICA:', { x: 260, y: cy - 15, size: 8, font: fontBold });
     page.drawText(`Carga (Total): ${totalWatts.toFixed(1)} W`, { x: 260, y: cy - 30, size: 10, font: fontBold });
     page.drawText(`LPD: ${lpd.toFixed(2)} W/m²`, { x: 260, y: cy - 42, size: 9, font: fontRegular });
 
-    page.drawText('PARECER FINAL NBR:', { x: 440, y: cy - 15, size: 8, font: fontBold });
-    page.drawText(isOk ? 'APROVADO' : 'NÃO CONFORME', { x: 440, y: cy - 35, size: 12, font: fontBold, color: isOk ? window.PDFLib.rgb(0.1, 0.5, 0.1) : window.PDFLib.rgb(0.7, 0.1, 0.1) });
+    const lblParecer = isNbrActive ? 'PARECER FINAL NBR:' : 'STATUS DO ALVO:';
+    const txtParecerOk = isNbrActive ? 'APROVADO' : 'ATINGIDO';
+    const txtParecerFail = isNbrActive ? 'NÃO CONFORME' : 'ABAIXO DO ALVO';
+    
+    page.drawText(lblParecer, { x: 440, y: cy - 15, size: 8, font: fontBold });
+    page.drawText(isOk ? txtParecerOk : txtParecerFail, { x: 440, y: cy - 35, size: 12, font: fontBold, color: isOk ? window.PDFLib.rgb(0.1, 0.5, 0.1) : window.PDFLib.rgb(0.7, 0.1, 0.1) });
 
     // Footer / Termo de Isenção
     const disclaimer = "AVISO LEGAL: Relatório técnico gerado pela suíte LuxSintax V26. Baseado em modelagem matemática e Método dos Lúmens clássico. Tratando-se de estudo paramétrico preliminar de apoio à decisão do Projetista, os resultados de iluminância e uniformidade podem variar in loco devido a interferências arquitetônicas e obstruções. Documento não substitui laudo ou projeto executivo global assinado.";
