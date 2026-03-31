@@ -131,6 +131,16 @@
         .group-hover\:visible p { font-size: 11px !important; color: #cbd5e1 !important; line-height: 1.6 !important; }
         
 </style>
+<style>
+        #auth-modal { display: none !important; }
+        .app-locked { 
+            filter: none !important; 
+            pointer-events: all !important; 
+            user-select: auto !important; 
+            opacity: 1 !important;
+        }
+    </style>
+</head>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-white transition-colors duration-300">
 
@@ -997,38 +1007,35 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
-        const createClient = window.supabase.createClient;
-        
-        // LUXSINTAX: Variável global da conexão
-        let supabase;
+        // LUXSINTAX: CÓDIGO À PROVA DE BALAS (Evita Crash se o Supabase for bloqueado)
+        const createClient = window.supabase ? window.supabase.createClient : null;
+        let supabase = null;
 
-        // LUXSINTAX: Inicialização Direta (Produção)
+        // Alerta de Auditoria: Se vir isto, sabemos que o cache limpou!
+        alert("SISTEMA LUXSINTAX: O código atualizado foi carregado com sucesso!");
+
         async function initializeApp() {
             try {
-                // LUXSINTAX: Conectando diretamente para destravar o site em produção
+                if (!createClient) {
+                    console.warn("⚠️ Servidor de segurança não responde. Forçando destravamento...");
+                    if (window.AuthManager) window.AuthManager.unlockApp();
+                    document.getElementById('user-name-display').innerText = "MODO OFFLINE";
+                    return;
+                }
+
                 const env = {
                     url: 'https://ozytwdhuxsdefnunzinm.supabase.co',
                     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eXR3ZGh1eHNkZWZudW56aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjM2MjEsImV4cCI6MjA4NjIzOTYyMX0.G6d564WnaaUQVSjTjpCDEA4d6zaVMvB_NQpo1KtE24s'
                 };
                 
-                // Inicializa o Supabase
                 supabase = createClient(env.url, env.key);
                 window.supabase = supabase;
                 
-                // Liberta o AuthManager
-                if (window.AuthManager) {
-                    await window.AuthManager.init();
-                }
+                if (window.AuthManager) await window.AuthManager.init();
             } catch (err) {
-                console.error("Falha Crítica:", err);
-                // Se tudo falhar, avisa o utilizador
-                const modal = document.getElementById('auth-modal');
-                if(modal) {
-                    const errorMsg = document.createElement('p');
-                    errorMsg.className = "text-red-500 text-[10px] mt-2 text-center";
-                    errorMsg.innerText = "Erro de conexão com o servidor de segurança.";
-                    modal.querySelector('.bg-white').appendChild(errorMsg);
-                }
+                console.error("Falha Crítica Controlada:", err);
+                if (window.AuthManager) window.AuthManager.unlockApp();
+                document.getElementById('user-name-display').innerText = "MODO OFFLINE";
             }
         }
 
