@@ -3177,10 +3177,10 @@ if (window.currentTool !== 'grid') {
                     // LUXSINTAX: HUD Melanópico (Impacto Biológico)
                     if (window.currentTool === 'ponto' && window.state.showHCL) {
                         const mEDI = Math.round(luxFloor * (s.mRatio || 0.52));
-                        ctx.font = "bold 9px Manrope";
+                        ctx.font = "900 13px Manrope";
                         ctx.fillStyle = "#a855f7";
                         ctx.textAlign = "center";
-                        ctx.fillText(`${mEDI} m-EDI`, hitXFloor, floorY + 14);
+                        ctx.fillText(`${mEDI} m-EDI`, hitXFloor, floorY + 16);
                     }
                     
                     if (hEff > 0) { 
@@ -3192,10 +3192,10 @@ if (window.currentTool !== 'grid') {
 
                         if (window.currentTool === 'ponto' && window.state.showHCL) {
                             const mEDIPlane = Math.round(luxPlane * (s.mRatio || 0.52));
-                            ctx.font = "bold 9px Manrope";
+                            ctx.font = "900 13px Manrope";
                             ctx.fillStyle = "#a855f7";
                             ctx.textAlign = "center";
-                            ctx.fillText(`${mEDIPlane} m-EDI`, ix, py + 14);
+                            ctx.fillText(`${mEDIPlane} m-EDI`, ix, py + 16);
                         }
                     }
                 });
@@ -3389,10 +3389,10 @@ if (window.currentTool !== 'grid') {
                             // LUXSINTAX: HUD Melanópico na Parede (Corte)
                             if (window.state.showHCL) {
                                 const mEDI_v = Math.round(ev * (s.mRatio || 0.52));
-                                ctx.font = "bold 9px Manrope";
+                                ctx.font = "900 13px Manrope";
                                 ctx.fillStyle = "#a855f7";
                                 ctx.textAlign = "center";
-                                ctx.fillText(`${mEDI_v} m-EDI`, wx - 45, hitY_px + 20);
+                                ctx.fillText(`${mEDI_v} m-EDI`, wx - 45, hitY_px + 24);
                             }
 
                             if (hitY_px < floorY) drawDimLineVertical(ctx, wx + 45, hitY_px, floorY, `${window.formatDist(hitY_metric)}`);
@@ -3498,10 +3498,10 @@ if (window.currentTool !== 'grid') {
                             // LUXSINTAX: HUD Melanópico na Parede (Elevação)
                             if (window.state.showHCL) {
                                 const mEDI_wall = Math.round(ev * (s.mRatio || 0.52));
-                                ctx.font = "bold 9px Manrope";
+                                ctx.font = "900 13px Manrope";
                                 ctx.fillStyle = "#a855f7";
                                 ctx.textAlign = "center";
-                                ctx.fillText(`${mEDI_wall} m-EDI`, spotX, hitY_px_current + 12);
+                                ctx.fillText(`${mEDI_wall} m-EDI`, spotX, hitY_px_current + 18);
                             }
                         }
                     }
@@ -4337,11 +4337,13 @@ window.toggleGridMode = function(mode) {
             const resultsSection = document.getElementById('results-section');
             if (!resultsSection) return;
 
-            resultsSection.classList.remove('hidden');
             const nbrSelector = document.getElementById('nbr-selector-section');
-            if (nbrSelector) {
-                if (window.currentTool === 'grid') nbrSelector.classList.remove('hidden');
-                else nbrSelector.classList.add('hidden');
+            if (window.currentTool === 'grid') {
+                resultsSection.classList.remove('hidden');
+                if (nbrSelector) nbrSelector.classList.remove('hidden');
+            } else {
+                resultsSection.classList.add('hidden');
+                if (nbrSelector) nbrSelector.classList.add('hidden');
             }
 
             const catSelect = document.getElementById('nbr-cat-select');
