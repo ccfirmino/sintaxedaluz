@@ -1444,10 +1444,32 @@ window.AuthManager = {
                 }
             }
         }
-    };
-
-
-
+    },
+    openProfile: function() {
+        document.getElementById('profile-modal').classList.remove('hidden');
+    },
+    closeProfile: function() {
+        document.getElementById('profile-modal').classList.add('hidden');
+        document.getElementById('profile-new-pass').value = '';
+        document.getElementById('profile-confirm-pass').value = '';
+    },
+    updatePassword: async function() {
+        const newPass = document.getElementById('profile-new-pass').value;
+        const confirmPass = document.getElementById('profile-confirm-pass').value;
+        
+        if (!newPass) return alert("Por favor, digite a nova senha.");
+        if (newPass !== confirmPass) return alert(window.currentLang === 'en' ? window.i18n.en.msg_pass_mismatch : window.i18n.pt.msg_pass_mismatch);
+        
+        const { error } = await supabase.auth.updateUser({ password: newPass });
+        
+        if (error) {
+            alert("Erro ao atualizar senha: " + error.message);
+        } else {
+            alert(window.currentLang === 'en' ? window.i18n.en.msg_pass_success : window.i18n.pt.msg_pass_success);
+            this.closeProfile();
+        }
+    }
+};
 
 // --- LUXSINTAX WEBGL ENGINE (SÓLIDO FOTOMÉTRICO 3D) ---
 window.Photometric3DEngine = {
