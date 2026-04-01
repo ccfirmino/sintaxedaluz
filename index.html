@@ -2202,7 +2202,8 @@ window.handleGenerateReport = async () => {
         ctx.textBaseline = "top";
         
         scale.forEach((cObj, idx) => {
-            if ([0, 500, 1000, 2000].includes(cObj.lux) || idx === scale.length - 1) {
+            // Sincronizado com os marcadores da tela
+            if ([0, 100, 300, 500, 750].includes(cObj.lux) || idx === scale.length - 1) {
                 const x = 10 + (cObj.lux / maxLux) * (c.width - 20);
                 const label = idx === scale.length - 1 ? `${cObj.lux}+ Lux` : cObj.lux;
                 ctx.fillText(label, x, 35);
@@ -2339,21 +2340,23 @@ window.handleGenerateReport = async () => {
     const fontBold = await pdfDoc.embedFont(window.PDFLib.StandardFonts.HelveticaBold);
     const fontRegular = await pdfDoc.embedFont(window.PDFLib.StandardFonts.Helvetica);
 
-    page.drawRectangle({ x: 0, y: height - 60, width, height: 60, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
-    page.drawText('LUXSINTAX', { x: 40, y: height - 35, size: 16, color: window.PDFLib.rgb(1, 0.65, 0), font: fontBold });
-    page.drawText('| ESTUDO DE VIABILIDADE TÉCNICA v.2026', { x: 135, y: height - 35, size: 12, color: window.PDFLib.rgb(1, 1, 1), font: fontRegular });
+    // Rodateto mais estreito e elegante
+    page.drawRectangle({ x: 0, y: height - 45, width, height: 45, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
+    page.drawText('LUXSINTAX', { x: 40, y: height - 28, size: 14, color: window.PDFLib.rgb(1, 0.65, 0), font: fontBold });
+    page.drawText('| ESTUDO DE VIABILIDADE TÉCNICA v.2026', { x: 125, y: height - 28, size: 10, color: window.PDFLib.rgb(1, 1, 1), font: fontRegular });
 
-    page.drawText(`PROJETO: ${s.projectName.toUpperCase()}`, { x: 40, y: height - 90, size: 12, font: fontBold, color: window.PDFLib.rgb(0.1, 0.15, 0.2) });
-    page.drawText(`AMBIENTE: ${s.roomName.toUpperCase()}`, { x: 40, y: height - 105, size: 10, font: fontRegular, color: window.PDFLib.rgb(0.3, 0.3, 0.3) });
-    page.drawText(`RESPONSÁVEL: ${s.authorName.toUpperCase()}`, { x: width - 260, y: height - 90, size: 9, font: fontBold, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
-    page.drawText(`DATA: ${new Date().toLocaleDateString('pt-BR')}`, { x: width - 260, y: height - 105, size: 9, font: fontRegular, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
+    // Textos do cabeçalho menores e minimalistas
+    page.drawText(`PROJETO: ${s.projectName.toUpperCase()}`, { x: 40, y: height - 65, size: 9, font: fontBold, color: window.PDFLib.rgb(0.1, 0.15, 0.2) });
+    page.drawText(`AMBIENTE: ${s.roomName.toUpperCase()}`, { x: 40, y: height - 78, size: 8, font: fontRegular, color: window.PDFLib.rgb(0.3, 0.3, 0.3) });
+    page.drawText(`RESPONSÁVEL: ${s.authorName.toUpperCase()}`, { x: width - 260, y: height - 65, size: 8, font: fontBold, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
+    page.drawText(`DATA: ${new Date().toLocaleDateString('pt-BR')}`, { x: width - 260, y: height - 78, size: 8, font: fontRegular, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
 
-    let cy = height - 140;
+    let cy = height - 105; // Puxado para cima ganhando 35px preciosos
 
     const drawSection = (title, y) => {
-        page.drawRectangle({ x: 40, y: y - 5, width: width - 80, height: 20, color: window.PDFLib.rgb(0.95, 0.96, 0.98) });
-        page.drawText(title.toUpperCase(), { x: 50, y: y, size: 9, font: fontBold, color: window.PDFLib.rgb(0.2, 0.3, 0.4) });
-        return y - 20;
+        page.drawRectangle({ x: 40, y: y - 4, width: width - 80, height: 16, color: window.PDFLib.rgb(0.95, 0.96, 0.98) });
+        page.drawText(title.toUpperCase(), { x: 50, y: y, size: 8, font: fontBold, color: window.PDFLib.rgb(0.2, 0.3, 0.4) });
+        return y - 16;
     };
 
     cy = drawSection('1. Parâmetros do Ambiente', cy);
@@ -2364,23 +2367,23 @@ window.handleGenerateReport = async () => {
     ];
 
     gridRows.forEach(row => {
-        page.drawText(row[0], { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(row[1], { x: 140, y: cy, size: 8, font: fontRegular });
-        page.drawText(row[2], { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(row[3], { x: 440, y: cy, size: 8, font: fontRegular });
-        cy -= 15;
+        page.drawText(row[0], { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(row[1], { x: 140, y: cy, size: 7, font: fontRegular });
+        page.drawText(row[2], { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(row[3], { x: 440, y: cy, size: 7, font: fontRegular });
+        cy -= 12;
     });
 
-    cy -= 10;
+    cy -= 8;
     cy = drawSection('2. Especificações da Fonte Luminosa', cy);
-    page.drawText('Modelo (IES):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(lumName, { x: 140, y: cy, size: 8, font: fontRegular }); 
-    page.drawText('Temp. de Cor:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(s.cct ? `${s.cct} K` : 'Não informado', { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
-    page.drawText('Potência:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${pWatts.toFixed(1)} W`, { x: 140, y: cy, size: 8, font: fontRegular });
-    page.drawText('Abertura Facho:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(beamText, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
-    page.drawText('Fluxo Nominal:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(fNominal)} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
-    page.drawText('Eficácia Final:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${eff} lm/W`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
-    page.drawText('Fluxo Final:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(fFinal)} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
-    page.drawText('Uplight:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${upRatio.toFixed(1)} %`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 25;
+    page.drawText('Modelo (IES):', { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(lumName, { x: 140, y: cy, size: 7, font: fontRegular }); 
+    page.drawText('Temp. de Cor:', { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(s.cct ? `${s.cct} K` : 'Não informado', { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
+    page.drawText('Potência:', { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${pWatts.toFixed(1)} W`, { x: 140, y: cy, size: 7, font: fontRegular });
+    page.drawText('Abertura Facho:', { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(beamText, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
+    page.drawText('Fluxo Nominal:', { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${Math.round(fNominal)} lm`, { x: 140, y: cy, size: 7, font: fontRegular });
+    page.drawText('Eficácia Final:', { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(`${eff} lm/W`, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
+    page.drawText('Fluxo Final:', { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${Math.round(fFinal)} lm`, { x: 140, y: cy, size: 7, font: fontRegular });
+    page.drawText('Uplight:', { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(`${upRatio.toFixed(1)} %`, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 18;
 
-    cy = drawSection('3. Mapeamento Topográfico e Fotometria', cy);
+    cy = drawSection('3. Distribuição de Iluminância e Fotometria', cy);
     
     const imgT = await pdfDoc.embedPng(imgTopografia);
     const hasPolar = !!s.iesData;
@@ -2672,8 +2675,8 @@ window.handleGenerateReport = async () => {
                         
                         let ticksHTML = '';
                         scale.forEach((c, idx) => {
-                            // LUXSINTAX: Espaçamento UI Inteligente
-                            if ([0, 500, 1000, 2000].includes(c.lux) || idx === scale.length - 1) {
+                            // LUXSINTAX: Espaçamento UI Inteligente focado em NBR
+                            if ([0, 100, 300, 500, 750].includes(c.lux) || idx === scale.length - 1) {
                                 const leftPct = (c.lux / maxLux) * 100;
                                 let transform = 'translateX(-50%)';
                                 if (leftPct === 0) transform = 'translateX(0)';
@@ -2993,12 +2996,11 @@ window.handleIESUpload = function(input) {
                 {lux: 100, r: 0, g: 0, b: 255},      // Azul
                 {lux: 200, r: 0, g: 255, b: 255},    // Ciano
                 {lux: 300, r: 0, g: 255, b: 0},      // Verde
-                {lux: 500, r: 173, g: 255, b: 47},   // Verde-Limão
-                {lux: 750, r: 255, g: 255, b: 0},    // Amarelo
-                {lux: 1000, r: 255, g: 165, b: 0},   // Laranja
-                {lux: 1500, r: 255, g: 0, b: 0},     // Vermelho
-                {lux: 2000, r: 255, g: 0, b: 255},   // Magenta
-                {lux: 3000, r: 255, g: 255, b: 255}  // Branco (Teto 3000+)
+                {lux: 400, r: 173, g: 255, b: 47},   // Verde-Limão
+                {lux: 500, r: 255, g: 255, b: 0},    // Amarelo
+                {lux: 750, r: 255, g: 165, b: 0},    // Laranja
+                {lux: 900, r: 255, g: 0, b: 0},      // Vermelho
+                {lux: 1000, r: 255, g: 255, b: 255}  // Branco (Teto 1000+)
             ],
             getLuxColor: function(lux, alpha = 1.0) {
                 const s = this.colorScale;
