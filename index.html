@@ -1438,14 +1438,13 @@ window.AuthManager = {
                 } else {
                     alert("Erro de acesso: " + err.message);
                     // Força a limpeza do cache apenas se for um erro de corrupção de JWT
-                    if (err.message.toLowerCase().includes('session')) {
-                        this.logout();
+                            if (err.message.toLowerCase().includes('session')) {
+                                this.logout();
+                            }
+                        }
                     }
-                }
-            }
-        }
-    },
-    openProfile: function() {
+            },
+            openProfile: function() {
         document.getElementById('profile-modal').classList.remove('hidden');
     },
     closeProfile: function() {
