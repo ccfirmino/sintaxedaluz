@@ -2454,6 +2454,25 @@ window.handleIESUpload = function(input) {
 
                         // LUXSINTAX: Aciona a HUD Fotométrica 
                         window.updatePhotometricHUD();
+
+                        // LUXSINTAX: Sincronização Automática de LOR (Rendimento)
+                        // Extraímos as métricas calculadas pelo motor analítico para alimentar o Método dos Lúmens
+                        const metrics = window.PhotometricAnalyzer.extractZonalMetrics(parsed);
+                        if (metrics && metrics.beamEfficiency) {
+                            const lorValue = parseFloat(metrics.beamEfficiency);
+                            
+                            // Injeta no estado global da aba atual (ex: grid)
+                            window.state[targetKey].lor = lorValue;
+                            
+                            // Atualiza os elementos de interface (Input e Slider) se existirem
+                            const lorInput = document.getElementById(targetKey[0] + '-lor');
+                            if(lorInput) lorInput.value = lorValue;
+                            
+                            const rangeLor = document.getElementById('range-' + targetKey[0] + '-lor');
+                            if(rangeLor) rangeLor.value = lorValue;
+                            
+                            console.info(`[LuxSintax] LOR detectado automaticamente: ${lorValue}%`);
+                        }
                         
                         // Exibe o Toggle 3D e renderiza caso o modo 3D já esteja ativo
                         const toggleBtn = document.getElementById('view-mode-toggle');
