@@ -1950,44 +1950,60 @@ window.handleGenerateReport = async () => {
     
     const s = window.state.grid;
     
-    // LUXSINTAX: Verifica se o usuário ativou a NBR explicitamente
     const catSelect = document.getElementById('nbr-cat-select');
     const roomSelect = document.getElementById('nbr-room-select');
     const isNbrActive = catSelect && roomSelect && catSelect.value && roomSelect.value;
-    
-    // Se a NBR estiver ativa, usa a norma. Se não, usa o Alvo manual do slider
     const targetLux = isNbrActive && window.currentNbrTarget ? window.currentNbrTarget.lux : s.targetLux;
     
-    // Matemática Dinâmica
+    // 1. Coleta Exata dos Resultados Processados na UI (Evita dissonância Matemática)
+    const avgLux = parseInt(document.getElementById('result-lux').innerText) || 0;
+    const ugrStr = document.getElementById('result-ugr').innerText || "--";
+    const isOk = avgLux >= targetLux;
+    
     const area = s.roomW * s.roomL;
     const totalFixtures = s.cols * s.rows;
-    const totalWatts = totalFixtures * (s.watts || 30);
+    
+    // 2. Extração Completa das Especificações da Fotometria
+    let pWatts = s.watts || 30;
+    let fNominal = s.flux;
+    let fFinal = s.flux;
+    let upRatio = 0;
+    
+    if (s.iesData) {
+        const metrics = window.PhotometricAnalyzer.extractZonalMetrics(s.iesData);
+        fNominal = s.iesData.totalFlux || s.flux || 0;
+        fFinal = metrics.calculatedFlux;
+        pWatts = s.iesData.wattage || s.watts || 0;
+        upRatio = metrics.uplightRatio;
+    }
+    
+    const totalWatts = totalFixtures * pWatts;
     const lpd = totalWatts / area;
-    const avgLux = Math.round((totalFixtures * s.flux * s.utilFactor * s.maintFactor) / area);
-    const isOk = avgLux >= targetLux;
+    const eff = pWatts > 0 ? Math.round(fFinal / pWatts) : 0;
     
     const effectiveBeamObj = window.getEffectiveBeam(s);
     const lumName = s.iesFileName || "Fonte Paramétrica Genérica";
     const beamText = effectiveBeamObj.isOval ? `${Math.round(effectiveBeamObj.c0)}° x ${Math.round(effectiveBeamObj.c90)}°` : `${Math.round(effectiveBeamObj.c0)}°`;
 
-    // 1. Buffer de Captura Assíncrono (Trick para fotografar Mesa e Piso invisivelmente)
+    // 3. Lógica Normativa: Decisão Automática de qual plano fotografar (Piso ou Mesa)
+    const cat = catSelect ? catSelect.value : '';
+    const room = roomSelect ? roomSelect.value : '';
+    const isFloorNorm = cat === 'Áreas de Tráfego' || (room && (room.includes('Corredor') || room.includes('Sagu') || room.includes('Estacionamento') || room.includes('Escada') || room.includes('Foyer')));
+    const targetLevel = (isNbrActive && isFloorNorm) ? 'LP' : (s.viewLevel || 'HP');
+
+    // Buffer de Captura Assíncrono do Canvas
     const captureState = async (level) => {
         const oldLevel = s.viewLevel;
         const oldFC = s.falseColor;
         const oldIsolines = s.showIsolines;
-        
         s.viewLevel = level;
-        s.falseColor = true; // Força Cores Falsas para PDF Rico
-        s.showIsolines = true; // Força Isolinhas
+        s.falseColor = true; 
+        s.showIsolines = true; 
         window.coreRenderEngine();
-        
         return new Promise(resolve => {
             requestAnimationFrame(() => {
                 const dataUrl = document.getElementById('beamCanvas').toDataURL('image/png');
-                // Restaura estado original do usuário
-                s.viewLevel = oldLevel;
-                s.falseColor = oldFC;
-                s.showIsolines = oldIsolines;
+                s.viewLevel = oldLevel; s.falseColor = oldFC; s.showIsolines = oldIsolines;
                 window.coreRenderEngine();
                 resolve(dataUrl);
             });
@@ -1998,10 +2014,43 @@ window.handleGenerateReport = async () => {
     const originalBtnHTML = btn ? btn.innerHTML : null;
     if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GERANDO...';
 
-    const imgPiso = await captureState('LP');
-    const imgMesa = await captureState('HP');
+    // Captura apenas a malha referente ao plano de trabalho selecionado/exigido
+    const imgTopografia = await captureState(targetLevel);
 
-    // 2. Construção do Layout do Documento
+    // 4. Gerador Off-Screen da Curva Polar de Intensidade (C0/C180 - C90/C270)
+    const getPolarPNG = (iesData) => {
+        const c = document.createElement('canvas');
+        c.width = 400; c.height = 400; const ctx = c.getContext('2d');
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,400,400);
+        ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 1; ctx.beginPath();
+        ctx.arc(200, 200, 50, 0, Math.PI*2); ctx.arc(200, 200, 100, 0, Math.PI*2); ctx.arc(200, 200, 150, 0, Math.PI*2);
+        ctx.moveTo(200, 20); ctx.lineTo(200, 380); ctx.moveTo(20, 200); ctx.lineTo(380, 200); ctx.stroke();
+        
+        const { vAngles, candelas } = iesData;
+        let maxI = 1; candelas.forEach(r => { const m = Math.max(...r); if(m>maxI) maxI=m; });
+        
+        const drawH = (row, color, isRight) => {
+            ctx.beginPath(); ctx.moveTo(200, 200);
+            for(let i=0; i<vAngles.length; i++){
+                const ang = (isRight ? vAngles[i] : -vAngles[i]) * Math.PI/180;
+                const r = (row[i]/maxI) * 150;
+                ctx.lineTo(200 + r * Math.sin(ang), 200 + r * Math.cos(ang)); // Eixo Nadir (Baixo)
+            }
+            ctx.closePath(); ctx.fillStyle = color.replace('0.8', '0.15'); ctx.fill();
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+        };
+        
+        const r0 = candelas[0], r90 = candelas[9] || candelas[0];
+        const r180 = candelas[18] || candelas[0], r270 = candelas[27] || candelas[9] || candelas[0];
+        
+        if (JSON.stringify(r0) !== JSON.stringify(r90) || JSON.stringify(r180) !== JSON.stringify(r270)) {
+            drawH(r90, "rgba(2, 132, 199, 0.8)", false); drawH(r270, "rgba(2, 132, 199, 0.8)", true);
+        }
+        drawH(r0, "rgba(217, 119, 6, 0.8)", false); drawH(r180, "rgba(217, 119, 6, 0.8)", true);
+        
+        return c.toDataURL('image/png');
+    };
+
     const pdfDoc = await window.PDFLib.PDFDocument.create();
     const page = pdfDoc.addPage([595.28, 841.89]);
     const { width, height } = page.getSize();
@@ -2009,12 +2058,10 @@ window.handleGenerateReport = async () => {
     const fontBold = await pdfDoc.embedFont(window.PDFLib.StandardFonts.HelveticaBold);
     const fontRegular = await pdfDoc.embedFont(window.PDFLib.StandardFonts.Helvetica);
 
-    // Header Corporate (Branding)
     page.drawRectangle({ x: 0, y: height - 60, width, height: 60, color: window.PDFLib.rgb(0.06, 0.09, 0.16) });
     page.drawText('LUXSINTAX', { x: 40, y: height - 35, size: 16, color: window.PDFLib.rgb(1, 0.65, 0), font: fontBold });
     page.drawText('| ESTUDO DE VIABILIDADE TÉCNICA v.2026', { x: 135, y: height - 35, size: 12, color: window.PDFLib.rgb(1, 1, 1), font: fontRegular });
 
-    // Header do Projeto (Dados imputados pelo usuário)
     page.drawText(`PROJETO: ${s.projectName.toUpperCase()}`, { x: 40, y: height - 90, size: 12, font: fontBold, color: window.PDFLib.rgb(0.1, 0.15, 0.2) });
     page.drawText(`AMBIENTE: ${s.roomName.toUpperCase()}`, { x: 40, y: height - 105, size: 10, font: fontRegular, color: window.PDFLib.rgb(0.3, 0.3, 0.3) });
     page.drawText(`RESPONSÁVEL: ${s.authorName.toUpperCase()}`, { x: width - 260, y: height - 90, size: 9, font: fontBold, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
@@ -2025,7 +2072,7 @@ window.handleGenerateReport = async () => {
     const drawSection = (title, y) => {
         page.drawRectangle({ x: 40, y: y - 5, width: width - 80, height: 20, color: window.PDFLib.rgb(0.95, 0.96, 0.98) });
         page.drawText(title.toUpperCase(), { x: 50, y: y, size: 9, font: fontBold, color: window.PDFLib.rgb(0.2, 0.3, 0.4) });
-        return y - 20; // LUXSINTAX: Reduzido de -30 para -20 para otimizar a área útil das imagens
+        return y - 20;
     };
 
     // Bloco 1: Arquitetura
@@ -2042,46 +2089,47 @@ window.handleGenerateReport = async () => {
         cy -= 15;
     });
 
-    // Bloco 2: Fonte Luminosa
+    // Bloco 2: Especificações da Fonte Luminosa (Refinamento Técnico)
     cy -= 10;
     cy = drawSection('2. Especificações da Fonte Luminosa', cy);
     page.drawText('Modelo (IES):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(lumName, { x: 140, y: cy, size: 8, font: fontRegular }); cy -= 15;
-    page.drawText('Fluxo (Lúmens):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${s.flux} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
+    page.drawText('Potência:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${pWatts.toFixed(1)} W`, { x: 140, y: cy, size: 8, font: fontRegular });
     page.drawText('Abertura Facho:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(beamText, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
-    page.drawText('Consumo Fonte:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${s.watts} W`, { x: 140, y: cy, size: 8, font: fontRegular });
-    page.drawText('Eficácia Luminosa:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(s.flux/s.watts)} lm/W`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 25;
+    page.drawText('Fluxo Nominal:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(fNominal)} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
+    page.drawText('Eficácia Final:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${eff} lm/W`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
+    page.drawText('Fluxo Final:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(fFinal)} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
+    page.drawText('Uplight:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${upRatio.toFixed(1)} %`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 25;
 
-    // Bloco 3: Engenharia Visual (Screenshots)
-    cy = drawSection('3. Mapeamento Topográfico Luminotécnico', cy);
+    // Bloco 3: Engenharia Visual (Topografia Dinâmica + Polar Curve)
+    cy = drawSection('3. Mapeamento Topográfico e Fotometria', cy);
     
-    const imgP = await pdfDoc.embedPng(imgPiso);
-    const imgM = await pdfDoc.embedPng(imgMesa);
+    const imgT = await pdfDoc.embedPng(imgTopografia);
+    const hasPolar = !!s.iesData;
     
-    // Algoritmo de Escalonamento Inteligente (Proporcional sem distorção)
-    const maxWidth = width - 100; // Margens seguras
-    const maxHeight = 150; // Limite vertical rígido para não quebrar a página
+    const maxWidthTopo = hasPolar ? (width - 120) * 0.65 : (width - 80);
+    const dimsT = imgT.scaleToFit(maxWidthTopo, 170);
     
-    const dimsP = imgP.scaleToFit(maxWidth, maxHeight);
-    const dimsM = imgM.scaleToFit(maxWidth, maxHeight);
-    
-    const xP = (width - dimsP.width) / 2; // Centraliza matematicamente no Eixo X
-    const xM = (width - dimsM.width) / 2;
-    
-    // Planta 1: Piso (Top)
-    page.drawImage(imgP, { x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height });
-    page.drawRectangle({ x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
-    page.drawText('VISÃO PISO (0.00m)', { x: xP, y: cy - dimsP.height - 12, size: 7, font: fontBold });
-    
-    cy -= (dimsP.height + 25);
-    
-    // Planta 2: Plano de Trabalho (Bottom)
-    page.drawImage(imgM, { x: xM, y: cy - dimsM.height, width: dimsM.width, height: dimsM.height });
-    page.drawRectangle({ x: xM, y: cy - dimsM.height, width: dimsM.width, height: dimsM.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
-    page.drawText(`VISÃO PLANO DE TRABALHO (${s.plane.toFixed(2)}m)`, { x: xM, y: cy - dimsM.height - 12, size: 7, font: fontBold });
-    
-    cy -= (dimsM.height + 35);
+    const xT = 40;
+    page.drawImage(imgT, { x: xT, y: cy - dimsT.height, width: dimsT.width, height: dimsT.height });
+    page.drawRectangle({ x: xT, y: cy - dimsT.height, width: dimsT.width, height: dimsT.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
+    page.drawText(`PLANO AVALIADO: ${targetLevel === 'LP' ? 'PISO (0.00m)' : `MESA (${s.plane.toFixed(2)}m)`}`, { x: xT, y: cy - dimsT.height - 12, size: 7, font: fontBold });
 
-    // Bloco 4: Sumário e Compliance (Dinâmico para NBR ou Estudo Livre)
+    if (hasPolar) {
+        const polarPng = getPolarPNG(s.iesData);
+        const imgP = await pdfDoc.embedPng(polarPng);
+        const dimsP = imgP.scaleToFit((width - 120) * 0.35, 170);
+        const xP = 40 + dimsT.width + 20;
+        
+        page.drawImage(imgP, { x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height });
+        page.drawRectangle({ x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
+        page.drawText('CURVA POLAR (C0-C180 / C90-C270)', { x: xP, y: cy - dimsP.height - 12, size: 7, font: fontBold });
+        
+        cy -= (Math.max(dimsT.height, dimsP.height) + 35);
+    } else {
+        cy -= (dimsT.height + 35);
+    }
+
+    // Bloco 4: Sumário e Compliance
     const titleBloco4 = isNbrActive ? '4. Síntese de Conformidade (NBR ISO/CIE 8995-1)' : '4. Síntese de Resultados (Estudo Livre)';
     cy = drawSection(titleBloco4, cy);
     
@@ -2094,9 +2142,10 @@ window.handleGenerateReport = async () => {
     const lblAlvo = isNbrActive ? `Alvo Exigido (NBR): ${targetLux} Lux` : `Alvo Desejado: ${targetLux} Lux`;
     page.drawText(lblAlvo, { x: 60, y: cy - 47, size: 8, font: fontRegular, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
 
-    page.drawText('EFICIÊNCIA ENERGÉTICA:', { x: 260, y: cy - 15, size: 8, font: fontBold });
-    page.drawText(`Carga (Total): ${totalWatts.toFixed(1)} W`, { x: 260, y: cy - 30, size: 10, font: fontBold });
-    page.drawText(`LPD: ${lpd.toFixed(2)} W/m²`, { x: 260, y: cy - 42, size: 9, font: fontRegular });
+    page.drawText('EFICIÊNCIA ENERGÉTICA E UGR:', { x: 260, y: cy - 15, size: 8, font: fontBold });
+    page.drawText(`Carga (Total): ${totalWatts.toFixed(1)} W`, { x: 260, y: cy - 28, size: 9, font: fontBold });
+    page.drawText(`LPD: ${lpd.toFixed(2)} W/m²`, { x: 260, y: cy - 39, size: 8, font: fontRegular });
+    page.drawText(`UGR Máx (Aprox): ${ugrStr}`, { x: 260, y: cy - 50, size: 8, font: fontRegular });
 
     const lblParecer = isNbrActive ? 'PARECER FINAL NBR:' : 'STATUS DO ALVO:';
     const txtParecerOk = isNbrActive ? 'APROVADO' : 'ATINGIDO';
@@ -2105,16 +2154,13 @@ window.handleGenerateReport = async () => {
     page.drawText(lblParecer, { x: 440, y: cy - 15, size: 8, font: fontBold });
     page.drawText(isOk ? txtParecerOk : txtParecerFail, { x: 440, y: cy - 35, size: 12, font: fontBold, color: isOk ? window.PDFLib.rgb(0.1, 0.5, 0.1) : window.PDFLib.rgb(0.7, 0.1, 0.1) });
 
-    // Footer / Termo de Isenção
     const disclaimer = "AVISO LEGAL: Relatório técnico gerado pela suíte LuxSintax V26. Baseado em modelagem matemática e Método dos Lúmens clássico. Tratando-se de estudo paramétrico preliminar de apoio à decisão do Projetista, os resultados de iluminância e uniformidade podem variar in loco devido a interferências arquitetônicas e obstruções. Documento não substitui laudo ou projeto executivo global assinado.";
-    // LUXSINTAX: Adicionado o parâmetro lineHeight para espremer as linhas do texto legal
     page.drawText(disclaimer, { x: 40, y: 30, size: 6, font: fontRegular, color: window.PDFLib.rgb(0.6, 0.6, 0.6), maxWidth: width - 80, lineHeight: 7.5 });
 
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     const link = document.createElement('a');
     
-    // Nome do arquivo inteligente (Usa o nome do projeto formatado)
     const safeProjectName = s.projectName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
     link.download = `Estudo_LuxSintax_${safeProjectName}.pdf`;
     
