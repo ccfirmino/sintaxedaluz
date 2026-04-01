@@ -427,7 +427,7 @@
                 <div class="flex justify-between items-end mb-2"><label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500">
             </div>
 
-            <div id="grid-mode-manual" class="hidden mb-6 group pt-2 border-b border-slate-200 dark:border-slate-700 pb-4">
+            <div id="grid-mode-manual" class="hidden mb-6 group pt-2">
                 <label class="text-[10px] text-tech-cyan font-bold uppercase mb-4 block">Configuração de Malha</label>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="group">
@@ -451,7 +451,10 @@
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_plane">Plano (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="g-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-plane" min="0" max="5" step="0.05" value="0.75"></div>
             </div>
 
-            <div class="mode-standard-only mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
+            <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Abertura Facho</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Temp. de Cor</label><div class="flex items-baseline gap-1"><input type="number" id="g-cct" value="3000" min="2000" max="6500" step="100"><span class="text-[9px] text-slate-500 font-bold">K</span></div></div><input type="range" id="range-g-cct" min="2000" max="6500" step="100" value="3000"></div>
+            </div>
 
             <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_fixture_flux">Fluxo Lum.</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="25000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="25000" step="100" value="3000" class="transition-opacity"></div>
@@ -1187,7 +1190,7 @@
             ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
+            grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, cct: 3000, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
             leedProject: { 
                 name: "Novo Projeto LEED",
@@ -2333,7 +2336,8 @@ window.handleGenerateReport = async () => {
 
     cy -= 10;
     cy = drawSection('2. Especificações da Fonte Luminosa', cy);
-    page.drawText('Modelo (IES):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(lumName, { x: 140, y: cy, size: 8, font: fontRegular }); cy -= 15;
+    page.drawText('Modelo (IES):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(lumName, { x: 140, y: cy, size: 8, font: fontRegular }); 
+    page.drawText('Temp. de Cor:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${s.cct || 3000} K`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
     page.drawText('Potência:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${pWatts.toFixed(1)} W`, { x: 140, y: cy, size: 8, font: fontRegular });
     page.drawText('Abertura Facho:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(beamText, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
     page.drawText('Fluxo Nominal:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(fNominal)} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
@@ -4408,7 +4412,7 @@ function bind(id, key, param) {
 }
         
         // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
-        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'manualCols', 'manualRows', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'cct', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'manualCols', 'manualRows', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
