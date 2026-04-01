@@ -2177,6 +2177,42 @@ window.handleGenerateReport = async () => {
 
     const imgTopografia = await captureState(targetLevel);
 
+    // --- LUXSINTAX: GERADOR DE LEGENDA HEATMAP HD PARA PDF ---
+    const getLegendPNG = () => {
+        const c = document.createElement('canvas');
+        c.width = 600; c.height = 60; 
+        const ctx = c.getContext('2d');
+        
+        const scale = window.FalseColorEngine.colorScale;
+        const maxLux = scale[scale.length - 1].lux;
+        
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,c.width,c.height);
+        
+        const grad = ctx.createLinearGradient(10, 15, c.width - 10, 15);
+        scale.forEach(cObj => grad.addColorStop(cObj.lux / maxLux, `rgb(${cObj.r},${cObj.g},${cObj.b})`));
+        
+        ctx.fillStyle = grad;
+        ctx.fillRect(10, 10, c.width - 20, 20);
+        ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1;
+        ctx.strokeRect(10, 10, c.width - 20, 20);
+        
+        ctx.fillStyle = "#475569";
+        ctx.font = "bold 14px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        
+        scale.forEach((cObj, idx) => {
+            if ([0, 500, 1000, 2000].includes(cObj.lux) || idx === scale.length - 1) {
+                const x = 10 + (cObj.lux / maxLux) * (c.width - 20);
+                const label = idx === scale.length - 1 ? `${cObj.lux}+ Lux` : cObj.lux;
+                ctx.fillText(label, x, 35);
+                ctx.beginPath(); ctx.moveTo(x, 30); ctx.lineTo(x, 34); ctx.stroke();
+            }
+        });
+        
+        return c.toDataURL('image/png');
+    };
+
     // --- LUXSINTAX: NOVO GERADOR POLAR HD (QUALIDADE ENTERPRISE) ---
     const getPolarPNG = (iesData) => {
         const c = document.createElement('canvas');
@@ -2358,7 +2394,13 @@ window.handleGenerateReport = async () => {
     page.drawRectangle({ x: xT, y: cy - dimsT.height, width: dimsT.width, height: dimsT.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
     page.drawText(`PLANO AVALIADO: ${targetLevel === 'LP' ? 'PISO (0.00m)' : `MESA (${s.plane.toFixed(2)}m)`}`, { x: xT, y: cy - dimsT.height - 12, size: 7, font: fontBold });
 
-    cy -= (dimsT.height + 30);
+    // LUXSINTAX: Adiciona a Escala de Falsa Cor no PDF
+    const legendPng = getLegendPNG();
+    const imgLeg = await pdfDoc.embedPng(legendPng);
+    const dimsLeg = imgLeg.scaleToFit(dimsT.width, 30); // Mesma largura do mapa
+    page.drawImage(imgLeg, { x: xT, y: cy - dimsT.height - 45, width: dimsLeg.width, height: dimsLeg.height });
+
+    cy -= (dimsT.height + 65);
 
     if (hasPolar) {
         const polarPng = getPolarPNG(s.iesData);
@@ -2630,13 +2672,14 @@ window.handleGenerateReport = async () => {
                         
                         let ticksHTML = '';
                         scale.forEach((c, idx) => {
-                            // LUXSINTAX: Oculta o 300 para evitar sobreposição UI, mas renderiza as âncoras principais
-                            if ([0, 500, 1000, 2000, 3000].includes(c.lux) || idx === scale.length - 1) {
+                            // LUXSINTAX: Espaçamento UI Inteligente
+                            if ([0, 500, 1000, 2000].includes(c.lux) || idx === scale.length - 1) {
                                 const leftPct = (c.lux / maxLux) * 100;
                                 let transform = 'translateX(-50%)';
                                 if (leftPct === 0) transform = 'translateX(0)';
                                 if (leftPct === 100) transform = 'translateX(-100%)';
-                                ticksHTML += `<span class="absolute top-0 transition-colors dark:text-slate-300" style="left: ${leftPct}%; transform: ${transform};">${c.lux}</span>`;
+                                const label = idx === scale.length - 1 ? `${c.lux}+` : c.lux;
+                                ticksHTML += `<span class="absolute top-0 transition-colors dark:text-slate-300" style="left: ${leftPct}%; transform: ${transform};">${label}</span>`;
                             }
                         });
                         ticksContainer.innerHTML = ticksHTML;
@@ -2947,15 +2990,15 @@ window.handleIESUpload = function(input) {
             colorScale: [ 
                 {lux: 0, r: 0, g: 0, b: 0},          // Preto
                 {lux: 50, r: 0, g: 0, b: 128},       // Azul Escuro
-                {lux: 150, r: 0, g: 0, b: 255},      // Azul
-                {lux: 300, r: 0, g: 255, b: 255},    // Ciano
-                {lux: 500, r: 0, g: 255, b: 0},      // Verde
-                {lux: 750, r: 173, g: 255, b: 47},   // Verde-Limão (Transição)
-                {lux: 1000, r: 255, g: 255, b: 0},   // Amarelo
-                {lux: 1500, r: 255, g: 165, b: 0},   // Laranja
-                {lux: 2000, r: 255, g: 0, b: 0},     // Vermelho
-                {lux: 3000, r: 255, g: 0, b: 255},   // Magenta
-                {lux: 5000, r: 255, g: 255, b: 255}  // Branco
+                {lux: 100, r: 0, g: 0, b: 255},      // Azul
+                {lux: 200, r: 0, g: 255, b: 255},    // Ciano
+                {lux: 300, r: 0, g: 255, b: 0},      // Verde
+                {lux: 500, r: 173, g: 255, b: 47},   // Verde-Limão
+                {lux: 750, r: 255, g: 255, b: 0},    // Amarelo
+                {lux: 1000, r: 255, g: 165, b: 0},   // Laranja
+                {lux: 1500, r: 255, g: 0, b: 0},     // Vermelho
+                {lux: 2000, r: 255, g: 0, b: 255},   // Magenta
+                {lux: 3000, r: 255, g: 255, b: 255}  // Branco (Teto 3000+)
             ],
             getLuxColor: function(lux, alpha = 1.0) {
                 const s = this.colorScale;
