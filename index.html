@@ -2017,42 +2017,62 @@ window.handleGenerateReport = async () => {
         const c = document.createElement('canvas');
         const size = 800; c.width = size; c.height = size; 
         const ctx = c.getContext('2d');
-        const cx = size / 2; const cy = size / 2; const maxR = 280; // Margem de respiro ajustada
+        const cx = size / 2; const cy = size / 2; const maxR = 280; 
 
         ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,size,size);
         
+        // Normalização Rigorosa Fotométrica: cd/klm
+        const { vAngles, candelas } = iesData;
+        const nominalFlux = iesData.totalFlux || s.flux || 0;
+        const mult = iesData.multiplier || 1;
+        let isCdKlm = false;
+        
+        const plotData = [];
+        let maxPlotI = 1;
+        for (let h = 0; h < candelas.length; h++) {
+            plotData[h] = [];
+            for (let v = 0; v < vAngles.length; v++) {
+                let val = candelas[h][v] * mult; // Extrai Candela Absoluta
+                if (nominalFlux > 0) {
+                    val = (val / nominalFlux) * 1000; // Converte para cd/1000lm
+                    isCdKlm = true;
+                }
+                plotData[h][v] = val;
+                if (val > maxPlotI) maxPlotI = val;
+            }
+        }
+
         // Grid Radial Clássico
-        ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 2; // Espessura aumentada para redução
+        ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 2; 
         for(let a=0; a<360; a+=15) {
-            const rad = (a - 90) * Math.PI / 180;
+            const rad = a * Math.PI / 180;
             ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + maxR * Math.cos(rad), cy + maxR * Math.sin(rad)); ctx.stroke();
         }
 
+        // Auto-Escala Dinâmica de Candelas divisível por 4
+        const tickSteps = [10, 20, 25, 50, 100, 150, 200, 250, 300, 400, 500, 1000, 2000, 2500, 5000, 10000];
+        let step = tickSteps.find(st => (st * 4) >= maxPlotI * 1.05) || (Math.ceil(maxPlotI / 400) * 100);
+        let niceMax = step * 4;
         const steps = 4;
+
         for(let i=1; i<=steps; i++) {
             ctx.beginPath(); ctx.arc(cx, cy, (maxR / steps) * i, 0, Math.PI*2); ctx.stroke();
         }
 
-        // Distribuição Angular (FONTES MAIORES)
+        // Distribuição Angular (0º no Nadir, padrão DIALux)
         ctx.fillStyle = "#64748b"; ctx.font = "bold 22px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
         const angles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
         angles.forEach(ang => {
-            const radR = (ang + 90) * Math.PI / 180;
+            const radR = Math.PI/2 - (ang * Math.PI / 180);
+            const radL = Math.PI/2 + (ang * Math.PI / 180);
+            
             ctx.fillText(ang + "°", cx + (maxR + 35) * Math.cos(radR), cy + (maxR + 35) * Math.sin(radR));
             if (ang !== 0 && ang !== 180) {
-                const radL = (-ang + 90) * Math.PI / 180;
                 ctx.fillText(ang + "°", cx + (maxR + 35) * Math.cos(radL), cy + (maxR + 35) * Math.sin(radL));
             }
         });
 
-        // Auto-Escala Dinâmica de Candelas
-        const { vAngles, candelas } = iesData;
-        let maxI = 1; candelas.forEach(r => { const m = Math.max(...r); if(m>maxI) maxI=m; });
-        const magnitude = Math.pow(10, Math.floor(Math.log10(maxI)));
-        let niceMax = Math.ceil(maxI / magnitude) * magnitude;
-        if (niceMax < maxI * 1.05) niceMax += magnitude; 
-
-        // Escala de Candelas Central (FONTES MAIORES)
+        // Escala Central do Eixo Nadir
         ctx.fillStyle = "#0f172a"; ctx.font = "bold 20px Arial";
         for(let i=1; i<=steps; i++) {
             const val = Math.round((niceMax / steps) * i);
@@ -2064,36 +2084,37 @@ window.handleGenerateReport = async () => {
 
         // Plotador de Curvas Sólidas
         const drawCurve = (rowL, rowR, color) => {
-            ctx.beginPath(); ctx.moveTo(cx, cy);
+            ctx.beginPath(); 
+            ctx.moveTo(cx + (rowL[0]/niceMax)*maxR * Math.cos(Math.PI/2), cy + (rowL[0]/niceMax)*maxR * Math.sin(Math.PI/2));
             for(let i=0; i<vAngles.length; i++){
-                const ang = (-vAngles[i] + 90) * Math.PI/180;
                 const r = (rowL[i]/niceMax) * maxR;
-                ctx.lineTo(cx + r * Math.cos(ang), cy + r * Math.sin(ang));
+                const a = Math.PI/2 + (vAngles[i] * Math.PI/180);
+                ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
             }
             for(let i=vAngles.length-1; i>=0; i--){
-                const ang = (vAngles[i] + 90) * Math.PI/180;
                 const r = (rowR[i]/niceMax) * maxR;
-                ctx.lineTo(cx + r * Math.cos(ang), cy + r * Math.sin(ang));
+                const a = Math.PI/2 - (vAngles[i] * Math.PI/180);
+                ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
             }
             ctx.closePath();
-            ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.stroke(); // LINHAS ENCORPADAS
+            ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.stroke(); 
         };
 
-        const r0 = candelas[0], r90 = candelas[9] || candelas[0];
-        const r180 = candelas[18] || candelas[0], r270 = candelas[27] || candelas[9] || candelas[0];
+        const r0 = plotData[0], r90 = plotData[9] || plotData[0];
+        const r180 = plotData[18] || plotData[0], r270 = plotData[27] || plotData[9] || plotData[0];
 
         if (JSON.stringify(r0) !== JSON.stringify(r90) || JSON.stringify(r180) !== JSON.stringify(r270)) {
             drawCurve(r270, r90, "rgba(2, 132, 199, 1)"); 
         }
         drawCurve(r0, r180, "rgba(220, 38, 38, 1)"); 
 
-        // Legenda de Prancheta Técnica (FONTES MAIORES)
+        // Legenda de Prancheta Técnica
         ctx.fillStyle = "#0f172a"; ctx.textAlign = "left"; ctx.font = "bold 24px Arial";
-        ctx.fillText("cd / klm", 30, size - 30);
+        ctx.fillText(isCdKlm ? "cd / klm" : "cd", 30, size - 30);
         
         let effText = "η = 100%";
         if (iesData.lor) effText = `η = ${(iesData.lor * 100).toFixed(0)}%`;
-        else if (iesData.totalFlux && s.flux) effText = `η = ${((fFinal / fNominal)*100).toFixed(0)}%`;
+        else if (iesData.totalFlux && s.flux) effText = `η = ${((fFinal / nominalFlux)*100).toFixed(0)}%`;
         
         ctx.textAlign = "right";
         ctx.fillText(effText, size - 30, size - 30);
@@ -2162,7 +2183,7 @@ window.handleGenerateReport = async () => {
     const imgT = await pdfDoc.embedPng(imgTopografia);
     const hasPolar = !!s.iesData;
     
-    // LUXSINTAX: A Topografia Ocupa a Linha Inteira com Respiro Maior
+    // Topografia
     const maxWidthTopo = width - 80;
     const dimsT = imgT.scaleToFit(maxWidthTopo, 200); 
     
@@ -2177,13 +2198,18 @@ window.handleGenerateReport = async () => {
         const polarPng = getPolarPNG(s.iesData);
         const imgP = await pdfDoc.embedPng(polarPng);
         
-        // LUXSINTAX: Curva Polar Centralizada (Redimensionada para Evitar Colisão de Rodapé)
+        // Curva Polar Centralizada e deslocada levemente para a esquerda
         const dimsP = imgP.scaleToFit(maxWidthTopo, 140);
-        const xP = (width - dimsP.width) / 2;
+        const xP = (width - dimsP.width) / 2 - 30;
         
         page.drawImage(imgP, { x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height });
         page.drawRectangle({ x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
-        page.drawText('CURVA POLAR (C0-C180 / C90-C270)', { x: xP, y: cy - dimsP.height - 12, size: 7, font: fontBold });
+        
+        // LUXSINTAX: Texto movido para a LATERAL DIREITA da Curva
+        const textX = xP + dimsP.width + 15;
+        const textY = cy - (dimsP.height / 2);
+        page.drawText('CURVA POLAR', { x: textX, y: textY + 6, size: 8, font: fontBold, color: window.PDFLib.rgb(0.2, 0.3, 0.4) });
+        page.drawText('(C0-C180 / C90-C270)', { x: textX, y: textY - 6, size: 7, font: fontRegular, color: window.PDFLib.rgb(0.4, 0.4, 0.4) });
         
         cy -= (dimsP.height + 25);
     }
