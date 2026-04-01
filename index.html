@@ -1955,7 +1955,6 @@ window.handleGenerateReport = async () => {
     const isNbrActive = catSelect && roomSelect && catSelect.value && roomSelect.value;
     const targetLux = isNbrActive && window.currentNbrTarget ? window.currentNbrTarget.lux : s.targetLux;
     
-    // 1. Coleta Exata dos Resultados Processados na UI (Evita dissonância Matemática)
     const avgLux = parseInt(document.getElementById('result-lux').innerText) || 0;
     const ugrStr = document.getElementById('result-ugr').innerText || "--";
     const isOk = avgLux >= targetLux;
@@ -1963,7 +1962,6 @@ window.handleGenerateReport = async () => {
     const area = s.roomW * s.roomL;
     const totalFixtures = s.cols * s.rows;
     
-    // 2. Extração Completa das Especificações da Fotometria
     let pWatts = s.watts || 30;
     let fNominal = s.flux;
     let fFinal = s.flux;
@@ -1985,13 +1983,11 @@ window.handleGenerateReport = async () => {
     const lumName = s.iesFileName || "Fonte Paramétrica Genérica";
     const beamText = effectiveBeamObj.isOval ? `${Math.round(effectiveBeamObj.c0)}° x ${Math.round(effectiveBeamObj.c90)}°` : `${Math.round(effectiveBeamObj.c0)}°`;
 
-    // 3. Lógica Normativa: Decisão Automática de qual plano fotografar (Piso ou Mesa)
     const cat = catSelect ? catSelect.value : '';
     const room = roomSelect ? roomSelect.value : '';
     const isFloorNorm = cat === 'Áreas de Tráfego' || (room && (room.includes('Corredor') || room.includes('Sagu') || room.includes('Estacionamento') || room.includes('Escada') || room.includes('Foyer')));
     const targetLevel = (isNbrActive && isFloorNorm) ? 'LP' : (s.viewLevel || 'HP');
 
-    // Buffer de Captura Assíncrono do Canvas
     const captureState = async (level) => {
         const oldLevel = s.viewLevel;
         const oldFC = s.falseColor;
@@ -2014,40 +2010,102 @@ window.handleGenerateReport = async () => {
     const originalBtnHTML = btn ? btn.innerHTML : null;
     if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GERANDO...';
 
-    // Captura apenas a malha referente ao plano de trabalho selecionado/exigido
     const imgTopografia = await captureState(targetLevel);
 
-    // 4. Gerador Off-Screen da Curva Polar de Intensidade (C0/C180 - C90/C270)
+    // --- LUXSINTAX: NOVO GERADOR POLAR HD (QUALIDADE ENTERPRISE) ---
     const getPolarPNG = (iesData) => {
         const c = document.createElement('canvas');
-        c.width = 400; c.height = 400; const ctx = c.getContext('2d');
-        ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,400,400);
-        ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 1; ctx.beginPath();
-        ctx.arc(200, 200, 50, 0, Math.PI*2); ctx.arc(200, 200, 100, 0, Math.PI*2); ctx.arc(200, 200, 150, 0, Math.PI*2);
-        ctx.moveTo(200, 20); ctx.lineTo(200, 380); ctx.moveTo(20, 200); ctx.lineTo(380, 200); ctx.stroke();
+        const size = 800; c.width = size; c.height = size; 
+        const ctx = c.getContext('2d');
+        const cx = size / 2; const cy = size / 2; const maxR = 300;
+
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,size,size);
         
+        // Grid Radial Clássico
+        ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 1.5;
+        for(let a=0; a<360; a+=15) {
+            const rad = (a - 90) * Math.PI / 180;
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + maxR * Math.cos(rad), cy + maxR * Math.sin(rad)); ctx.stroke();
+        }
+
+        const steps = 4;
+        for(let i=1; i<=steps; i++) {
+            ctx.beginPath(); ctx.arc(cx, cy, (maxR / steps) * i, 0, Math.PI*2); ctx.stroke();
+        }
+
+        // Distribuição Angular
+        ctx.fillStyle = "#64748b"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        const angles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
+        angles.forEach(ang => {
+            const radR = (ang + 90) * Math.PI / 180;
+            ctx.fillText(ang + "°", cx + (maxR + 25) * Math.cos(radR), cy + (maxR + 25) * Math.sin(radR));
+            if (ang !== 0 && ang !== 180) {
+                const radL = (-ang + 90) * Math.PI / 180;
+                ctx.fillText(ang + "°", cx + (maxR + 25) * Math.cos(radL), cy + (maxR + 25) * Math.sin(radL));
+            }
+        });
+
+        // Auto-Escala Dinâmica de Candelas
         const { vAngles, candelas } = iesData;
         let maxI = 1; candelas.forEach(r => { const m = Math.max(...r); if(m>maxI) maxI=m; });
-        
-        const drawH = (row, color, isRight) => {
-            ctx.beginPath(); ctx.moveTo(200, 200);
+        const magnitude = Math.pow(10, Math.floor(Math.log10(maxI)));
+        let niceMax = Math.ceil(maxI / magnitude) * magnitude;
+        if (niceMax < maxI * 1.05) niceMax += magnitude; // Garante margem de respiro
+
+        ctx.fillStyle = "#0f172a"; ctx.font = "bold 13px Arial";
+        for(let i=1; i<=steps; i++) {
+            const val = Math.round((niceMax / steps) * i);
+            const r = (maxR / steps) * i;
+            const tw = ctx.measureText(val).width;
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(cx - tw/2 - 4, cy + r - 8, tw + 8, 16);
+            ctx.fillStyle = "#0f172a"; ctx.fillText(val, cx, cy + r);
+        }
+
+        // Plotador de Curvas Sólidas (Folds para C0 e C90)
+        const drawCurve = (rowL, rowR, color) => {
+            ctx.beginPath(); ctx.moveTo(cx, cy);
             for(let i=0; i<vAngles.length; i++){
-                const ang = (isRight ? vAngles[i] : -vAngles[i]) * Math.PI/180;
-                const r = (row[i]/maxI) * 150;
-                ctx.lineTo(200 + r * Math.sin(ang), 200 + r * Math.cos(ang)); // Eixo Nadir (Baixo)
+                const ang = (-vAngles[i] + 90) * Math.PI/180;
+                const r = (rowL[i]/niceMax) * maxR;
+                ctx.lineTo(cx + r * Math.cos(ang), cy + r * Math.sin(ang));
             }
-            ctx.closePath(); ctx.fillStyle = color.replace('0.8', '0.15'); ctx.fill();
-            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+            for(let i=vAngles.length-1; i>=0; i--){
+                const ang = (vAngles[i] + 90) * Math.PI/180;
+                const r = (rowR[i]/niceMax) * maxR;
+                ctx.lineTo(cx + r * Math.cos(ang), cy + r * Math.sin(ang));
+            }
+            ctx.closePath();
+            ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.stroke();
         };
-        
+
         const r0 = candelas[0], r90 = candelas[9] || candelas[0];
         const r180 = candelas[18] || candelas[0], r270 = candelas[27] || candelas[9] || candelas[0];
-        
+
         if (JSON.stringify(r0) !== JSON.stringify(r90) || JSON.stringify(r180) !== JSON.stringify(r270)) {
-            drawH(r90, "rgba(2, 132, 199, 0.8)", false); drawH(r270, "rgba(2, 132, 199, 0.8)", true);
+            drawCurve(r270, r90, "rgba(2, 132, 199, 1)"); // Azul para C90-C270
         }
-        drawH(r0, "rgba(217, 119, 6, 0.8)", false); drawH(r180, "rgba(217, 119, 6, 0.8)", true);
+        drawCurve(r0, r180, "rgba(220, 38, 38, 1)"); // Vermelho para C0-C180
+
+        // Legenda de Prancheta Técnica
+        ctx.fillStyle = "#0f172a"; ctx.textAlign = "left"; ctx.font = "bold 16px Arial";
+        ctx.fillText("cd / klm", 30, size - 30);
         
+        let effText = "η = 100%";
+        if (iesData.lor) effText = `η = ${(iesData.lor * 100).toFixed(0)}%`;
+        else if (iesData.totalFlux && s.flux) effText = `η = ${((fFinal / fNominal)*100).toFixed(0)}%`;
+        
+        ctx.textAlign = "right";
+        ctx.fillText(effText, size - 30, size - 30);
+
+        ctx.textAlign = "left";
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(220, 38, 38, 1)"; ctx.beginPath(); ctx.moveTo(120, size - 35); ctx.lineTo(160, size - 35); ctx.stroke();
+        ctx.fillStyle = "#64748b"; ctx.font = "14px Arial"; ctx.fillText("C0 - C180", 170, size - 30);
+
+        if (JSON.stringify(r0) !== JSON.stringify(r90) || JSON.stringify(r180) !== JSON.stringify(r270)) {
+            ctx.strokeStyle = "rgba(2, 132, 199, 1)"; ctx.beginPath(); ctx.moveTo(260, size - 35); ctx.lineTo(300, size - 35); ctx.stroke();
+            ctx.fillText("C90 - C270", 310, size - 30);
+        }
         return c.toDataURL('image/png');
     };
 
@@ -2075,7 +2133,6 @@ window.handleGenerateReport = async () => {
         return y - 20;
     };
 
-    // Bloco 1: Arquitetura
     cy = drawSection('1. Parâmetros do Ambiente', cy);
     const gridRows = [
         ['Dimensões:', `${s.roomW.toFixed(2)}m x ${s.roomL.toFixed(2)}m (Área: ${area.toFixed(2)}m²)`, 'Pé-direito (H):', `${s.height.toFixed(2)}m`],
@@ -2089,7 +2146,6 @@ window.handleGenerateReport = async () => {
         cy -= 15;
     });
 
-    // Bloco 2: Especificações da Fonte Luminosa (Refinamento Técnico)
     cy -= 10;
     cy = drawSection('2. Especificações da Fonte Luminosa', cy);
     page.drawText('Modelo (IES):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(lumName, { x: 140, y: cy, size: 8, font: fontRegular }); cy -= 15;
@@ -2100,36 +2156,37 @@ window.handleGenerateReport = async () => {
     page.drawText('Fluxo Final:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(fFinal)} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
     page.drawText('Uplight:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${upRatio.toFixed(1)} %`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 25;
 
-    // Bloco 3: Engenharia Visual (Topografia Dinâmica + Polar Curve)
     cy = drawSection('3. Mapeamento Topográfico e Fotometria', cy);
     
     const imgT = await pdfDoc.embedPng(imgTopografia);
     const hasPolar = !!s.iesData;
     
-    const maxWidthTopo = hasPolar ? (width - 120) * 0.65 : (width - 80);
-    const dimsT = imgT.scaleToFit(maxWidthTopo, 170);
+    // LUXSINTAX: A Topografia Ocupa a Linha Inteira com Respiro Maior
+    const maxWidthTopo = width - 80;
+    const dimsT = imgT.scaleToFit(maxWidthTopo, 200); 
     
-    const xT = 40;
+    const xT = (width - dimsT.width) / 2;
     page.drawImage(imgT, { x: xT, y: cy - dimsT.height, width: dimsT.width, height: dimsT.height });
     page.drawRectangle({ x: xT, y: cy - dimsT.height, width: dimsT.width, height: dimsT.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
     page.drawText(`PLANO AVALIADO: ${targetLevel === 'LP' ? 'PISO (0.00m)' : `MESA (${s.plane.toFixed(2)}m)`}`, { x: xT, y: cy - dimsT.height - 12, size: 7, font: fontBold });
 
+    cy -= (dimsT.height + 30);
+
     if (hasPolar) {
         const polarPng = getPolarPNG(s.iesData);
         const imgP = await pdfDoc.embedPng(polarPng);
-        const dimsP = imgP.scaleToFit((width - 120) * 0.35, 170);
-        const xP = 40 + dimsT.width + 20;
+        
+        // LUXSINTAX: Curva Polar Centralizada Isolada na Linha de Baixo
+        const dimsP = imgP.scaleToFit(maxWidthTopo, 210);
+        const xP = (width - dimsP.width) / 2;
         
         page.drawImage(imgP, { x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height });
         page.drawRectangle({ x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height, borderColor: window.PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
         page.drawText('CURVA POLAR (C0-C180 / C90-C270)', { x: xP, y: cy - dimsP.height - 12, size: 7, font: fontBold });
         
-        cy -= (Math.max(dimsT.height, dimsP.height) + 35);
-    } else {
-        cy -= (dimsT.height + 35);
+        cy -= (dimsP.height + 25);
     }
 
-    // Bloco 4: Sumário e Compliance
     const titleBloco4 = isNbrActive ? '4. Síntese de Conformidade (NBR ISO/CIE 8995-1)' : '4. Síntese de Resultados (Estudo Livre)';
     cy = drawSection(titleBloco4, cy);
     
