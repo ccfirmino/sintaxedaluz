@@ -1488,6 +1488,7 @@ window.Photometric3DEngine = {
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setSize(rect.width, rect.height);
         this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.localClippingEnabled = true; // LUXSINTAX: Habilita os cortes das paredes!
         container.appendChild(this.renderer.domElement);
 
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
@@ -1527,8 +1528,15 @@ window.Photometric3DEngine = {
             this.solidGroup.children.forEach(child => {
                 if (child.geometry) child.geometry.dispose();
                 if (child.material) {
-                    if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
-                    else child.material.dispose();
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(m => {
+                            if (m.map) m.map.dispose();
+                            m.dispose();
+                        });
+                    } else {
+                        if (child.material.map) child.material.map.dispose();
+                        child.material.dispose();
+                    }
                 }
             });
             this.solidGroup = null;
@@ -1623,14 +1631,113 @@ window.Photometric3DEngine = {
         if (toolId === 'grid' && state) {
             const spacingX = state.roomW / state.cols;
             const spacingZ = state.roomL / state.rows; 
-
-            // Construção da Sala e Piso
-            const floorGeo = new THREE.PlaneGeometry(state.roomW, state.roomL);
             const isDark = document.documentElement.classList.contains('dark');
-            const floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x111827 : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
+
+            // LUXSINTAX: Planos de Corte (Clipping) para confinar os fachos à geometria da sala
+            const clipPlanes = [
+                new THREE.Plane(new THREE.Vector3(1, 0, 0), state.roomW / 2),
+                new THREE.Plane(new THREE.Vector3(-1, 0, 0), state.roomW / 2),
+                new THREE.Plane(new THREE.Vector3(0, 0, 1), state.roomL / 2),
+                new THREE.Plane(new THREE.Vector3(0, 0, -1), state.roomL / 2),
+                new THREE.Plane(new THREE.Vector3(0, 1, 0), 0) // Limite do Piso
+            ];
+
+            // LUXSINTAX: Motor de Baking de Texturas (Heatmap 3D em Tempo Real)
+            const buildTexture = (w, h, isFloor, wallId) => {
+                const resX = 64; const resY = Math.max(16, Math.round(resX * (h/w)));
+                const cvs = document.createElement('canvas');
+                cvs.width = resX; cvs.height = resY;
+                const cx = cvs.getContext('2d');
+                
+                if (!state.falseColor) {
+                    cx.fillStyle = isDark ? '#111827' : '#e2e8f0';
+                    cx.fillRect(0, 0, resX, resY);
+                    return new THREE.CanvasTexture(cvs);
+                }
+
+                const fixtures = [];
+                const sX = -state.roomW / 2 + spacingX / 2;
+                const sZ = -state.roomL / 2 + spacingZ / 2;
+                for (let i = 0; i < state.cols; i++) {
+                    for (let j = 0; j < state.rows; j++) {
+                        fixtures.push({ x: sX + i * spacingX, z: sZ + j * spacingZ, y: state.height });
+                    }
+                }
+
+                const halfBeamRad = (state.beam || 60) * Math.PI / 180 / 2;
+                const n_power = (halfBeamRad > 0 && halfBeamRad < Math.PI / 2) ? Math.log(0.5) / Math.log(Math.cos(halfBeamRad)) : 1;
+                const maxI = (state.flux * (n_power + 1)) / (2 * Math.PI);
+                const ambientLux = ((state.flux * state.cols * state.rows * state.utilFactor * state.maintFactor) / (state.roomW * state.roomL)) * 0.08;
+
+                for (let ix = 0; ix < resX; ix++) {
+                    for (let iy = 0; iy < resY; iy++) {
+                        let px, py, pz;
+                        if (isFloor) {
+                            px = -state.roomW/2 + (ix/resX)*state.roomW; py = 0; pz = -state.roomL/2 + (iy/resY)*state.roomL;
+                        } else {
+                            py = state.height - (iy/resY)*state.height;
+                            if (wallId === 0) { px = -state.roomW/2 + (ix/resX)*state.roomW; pz = -state.roomL/2; }
+                            if (wallId === 1) { px = -state.roomW/2 + (ix/resX)*state.roomW; pz = state.roomL/2; }
+                            if (wallId === 2) { pz = -state.roomL/2 + (ix/resX)*state.roomL; px = -state.roomW/2; }
+                            if (wallId === 3) { pz = -state.roomL/2 + (ix/resX)*state.roomL; px = state.roomW/2; }
+                        }
+
+                        let totalLux = 0;
+                        for (const fix of fixtures) {
+                            const dx = px - fix.x, dy = py - fix.y, dz = pz - fix.z;
+                            const distSq = dx*dx + dy*dy + dz*dz;
+                            const dist = Math.sqrt(distSq);
+                            const cosTheta = Math.abs(dy) / dist;
+                            const angleRad = Math.acos(cosTheta);
+                            
+                            if (angleRad < Math.PI / 2) {
+                                const I = maxI * Math.pow(Math.cos(angleRad), n_power);
+                                const incidence = isFloor ? cosTheta : Math.sqrt(dx*dx + dz*dz)/dist;
+                                if (I > 0) totalLux += (I * incidence) / distSq;
+                            }
+                        }
+                        
+                        totalLux = Math.round(totalLux * state.maintFactor + ambientLux);
+                        cx.fillStyle = window.FalseColorEngine.getLuxColor(totalLux, 1.0);
+                        cx.fillRect(ix, iy, 1, 1);
+                    }
+                }
+                const tex = new THREE.CanvasTexture(cvs);
+                tex.minFilter = THREE.LinearFilter;
+                return tex;
+            };
+
+            // Construção do Piso Dinâmico
+            const floorGeo = new THREE.PlaneGeometry(state.roomW, state.roomL);
+            const floorMat = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.roomL, true, null), side: THREE.DoubleSide, depthWrite: true });
             const floorMesh = new THREE.Mesh(floorGeo, floorMat);
             floorMesh.rotation.x = -Math.PI / 2;
             this.solidGroup.add(floorMesh);
+
+            // Construção das 4 Paredes Dinâmicas
+            if (state.falseColor) {
+                const wallMat0 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.height, false, 0), side: THREE.DoubleSide });
+                const wallMesh0 = new THREE.Mesh(new THREE.PlaneGeometry(state.roomW, state.height), wallMat0);
+                wallMesh0.position.set(0, state.height/2, -state.roomL/2);
+                this.solidGroup.add(wallMesh0);
+
+                const wallMat1 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.height, false, 1), side: THREE.DoubleSide });
+                const wallMesh1 = new THREE.Mesh(new THREE.PlaneGeometry(state.roomW, state.height), wallMat1);
+                wallMesh1.position.set(0, state.height/2, state.roomL/2);
+                this.solidGroup.add(wallMesh1);
+
+                const wallMat2 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomL, state.height, false, 2), side: THREE.DoubleSide });
+                const wallMesh2 = new THREE.Mesh(new THREE.PlaneGeometry(state.roomL, state.height), wallMat2);
+                wallMesh2.rotation.y = Math.PI / 2;
+                wallMesh2.position.set(-state.roomW/2, state.height/2, 0);
+                this.solidGroup.add(wallMesh2);
+
+                const wallMat3 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomL, state.height, false, 3), side: THREE.DoubleSide });
+                const wallMesh3 = new THREE.Mesh(new THREE.PlaneGeometry(state.roomL, state.height), wallMat3);
+                wallMesh3.rotation.y = Math.PI / 2;
+                wallMesh3.position.set(state.roomW/2, state.height/2, 0);
+                this.solidGroup.add(wallMesh3);
+            }
 
             const roomGeo = new THREE.BoxGeometry(state.roomW, state.height, state.roomL);
             const roomEdges = new THREE.EdgesGeometry(roomGeo);
@@ -1686,7 +1793,8 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                             transparent: true, 
                             opacity: 0.12 * luxFactor, // Aumentado para visibilidade real
                             side: THREE.DoubleSide, 
-                            depthWrite: false 
+                            depthWrite: false,
+                            clippingPlanes: clipPlanes // LUXSINTAX: Corta o cone exatamente nas paredes!
                         }); // Removido AdditiveBlending para garantir destaque no fundo branco
                         const beamMesh = new THREE.Mesh(coneGeo, coneMat);
                         beamMesh.position.set(posX, state.height, posZ);
