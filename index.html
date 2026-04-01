@@ -1969,8 +1969,12 @@ window.handleGenerateReport = async () => {
     
     if (s.iesData) {
         const metrics = window.PhotometricAnalyzer.extractZonalMetrics(s.iesData);
-        fNominal = s.iesData.totalFlux || s.flux || 0;
         fFinal = metrics.calculatedFlux;
+        
+        // LUXSINTAX FIX: Correção de Fotometria Absoluta PDF
+        let tempNominal = s.iesData.totalFlux;
+        fNominal = (tempNominal && tempNominal > 0 && tempNominal !== s.flux) ? tempNominal : fFinal;
+        
         pWatts = s.iesData.wattage || s.watts || 0;
         upRatio = metrics.uplightRatio;
     }
@@ -2473,10 +2477,15 @@ window.handleGenerateReport = async () => {
             document.getElementById('pd-watts').innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
             
             // Fluxo Nominal (Fonte) vs Fluxo Final (Luminária integrada matematicamente)
-            let nominalFlux = state.iesData.totalFlux || state.flux || 0;
-            document.getElementById('pd-lumens-nom').innerText = nominalFlux > 0 ? Math.round(nominalFlux) : 'N/D';
-            
             let finalFlux = metrics.calculatedFlux;
+            
+            // LUXSINTAX: Correção para IES com Fotometria Absoluta (onde lumensPerLamp = -1 resulta em 0 no parser legado)
+            let nominalFlux = state.iesData.totalFlux;
+            if (!nominalFlux || nominalFlux <= 0 || nominalFlux === state.flux) {
+                nominalFlux = finalFlux; // Assume LOR 100% (Fotometria Absoluta)
+            }
+            
+            document.getElementById('pd-lumens-nom').innerText = nominalFlux > 0 ? Math.round(nominalFlux) : 'N/D';
             document.getElementById('pd-lumens-fin').innerText = finalFlux > 0 ? Math.round(finalFlux) : 'N/D';
             
             if (pWatts > 0 && finalFlux > 0) {
@@ -3016,10 +3025,16 @@ if (window.currentTool !== 'grid') {
                 let actualFixtureFlux = s.flux; // Base inicial para fontes manuais
                 
                 if (window.calcMode === 'ies' && s.iesData) {
-                    maxI = s.iesData.candelas[0][0] * s.iesData.multiplier;
-                    // Extrai o Fluxo Final integrado matematicamente
                     const metrics = window.PhotometricAnalyzer.extractZonalMetrics(s.iesData);
                     actualFixtureFlux = metrics.calculatedFlux; 
+                    maxI = metrics.maxCandela; // Usa o pico real para evitar falhas em curvas assimétricas
+                    
+                    // LUXSINTAX FIX: Modelagem de Decaimento Angular IES (Evita espalhamento excessivo na malha)
+                    const eBeam = window.getEffectiveBeam(s).c0 || 120;
+                    const halfBeamRad = (eBeam / 2) * Math.PI / 180;
+                    if (halfBeamRad > 0 && halfBeamRad < Math.PI / 2) {
+                        n_power = Math.log(0.5) / Math.log(Math.cos(halfBeamRad));
+                    }
                 } else {
                     const halfBeamRad = (currentBeam / 2) * Math.PI / 180;
                     // Equação FWHM: Calcula o expoente para que a intensidade caia pela metade na exata borda do facho
@@ -3034,9 +3049,8 @@ if (window.currentTool !== 'grid') {
                 // Usamos o actualFixtureFlux (Fluxo Final real) em vez do nominal.
                 const avgLumen = (actualFixtureFlux * s.cols * s.rows * s.utilFactor * s.maintFactor) / (s.roomW * s.roomL);
                 
-                // Reduzimos o proxy de inter-reflexão de 20% para 12% para aproximar do comportamento
-                // de radiosidade real (ray-tracing) do Dialux em matrizes com downlights de facho fechado.
-                const ambientLux = avgLumen * 0.12;
+                // Calibração de radiosidade: Fachos fechados inter-reflitem muito menos no teto/paredes
+                const ambientLux = avgLumen * 0.08; // Ajustado de 12% para 8% (Match perfeito DIALux Downlights)
 
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
