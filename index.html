@@ -428,7 +428,6 @@
             </div>
 
             <div id="grid-mode-manual" class="hidden mb-6 group pt-2">
-                <label class="text-[10px] text-tech-cyan font-bold uppercase mb-4 block">Configuração de Malha</label>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="group">
                         <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Colunas (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-manualCols" value="4" min="1" max="100" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div>
@@ -451,8 +450,8 @@
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_plane">Plano (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="g-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-plane" min="0" max="5" step="0.05" value="0.75"></div>
             </div>
 
-            <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Abertura Facho</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Abertura Facho</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Temp. de Cor</label><div class="flex items-baseline gap-1"><input type="number" id="g-cct" value="3000" min="2000" max="6500" step="100"><span class="text-[9px] text-slate-500 font-bold">K</span></div></div><input type="range" id="range-g-cct" min="2000" max="6500" step="100" value="3000"></div>
             </div>
 
@@ -2631,7 +2630,7 @@ window.handleGenerateReport = async () => {
                         
                         let ticksHTML = '';
                         scale.forEach((c, idx) => {
-                            if ([0, 300, 500, 1000, 2000].includes(c.lux) || idx === scale.length - 1) {
+                            if ([0, 300, 500, 1000, 2000, 3000].includes(c.lux) || idx === scale.length - 1) {
                                 const leftPct = (c.lux / maxLux) * 100;
                                 let transform = 'translateX(-50%)';
                                 if (leftPct === 0) transform = 'translateX(0)';
@@ -2795,10 +2794,20 @@ window.handleIESUpload = function(input) {
                         }
 
                         const targetKey = window.currentTool;
-                        window.state[targetKey].iesData = parsed;
-                        window.state[targetKey].iesFileName = file.name;
-                        
-                        let statusId = 'p-ies-status';
+                                window.state[targetKey].iesData = parsed;
+                                window.state[targetKey].iesFileName = file.name;
+
+                                // LUXSINTAX: Auto-Extração de CCT (Kelvin) via Regex
+                                const cctMatch = file.name.match(/(\d{3,4})K/i) || content.match(/(\d{3,4})K/i);
+                                if (cctMatch && targetKey === 'grid') {
+                                    window.state.grid.cct = parseInt(cctMatch[1]);
+                                    const cctInput = document.getElementById('g-cct');
+                                    const cctRange = document.getElementById('range-g-cct');
+                                    if (cctInput) cctInput.value = window.state.grid.cct;
+                                    if (cctRange) cctRange.value = window.state.grid.cct;
+                                }
+
+                                let statusId = 'p-ies-status';
                         if(window.currentTool === 'vertical') statusId = 'v-ies-status';
                         if(window.currentTool === 'homog') statusId = 'h-ies-status';
                         if(window.currentTool === 'grid') statusId = 'g-ies-status';
@@ -2934,7 +2943,7 @@ window.handleIESUpload = function(input) {
 
         // LUXSINTAX: Motor de Cores Falsas (Prevenção de Crash Fatal no Método Lúmens)
         window.FalseColorEngine = {
-            colorScale: [ {lux: 0, r: 0, g: 0, b: 128}, {lux: 100, r: 0, g: 0, b: 255}, {lux: 200, r: 0, g: 255, b: 255}, {lux: 300, r: 0, g: 255, b: 0}, {lux: 500, r: 255, g: 255, b: 0}, {lux: 750, r: 255, g: 128, b: 0}, {lux: 1000, r: 255, g: 0, b: 0}, {lux: 2000, r: 255, g: 255, b: 255} ],
+            colorScale: [ {lux: 0, r: 0, g: 0, b: 0}, {lux: 100, r: 0, g: 0, b: 255}, {lux: 300, r: 0, g: 255, b: 255}, {lux: 500, r: 0, g: 255, b: 0}, {lux: 1000, r: 255, g: 255, b: 0}, {lux: 2000, r: 255, g: 128, b: 0}, {lux: 3000, r: 255, g: 0, b: 0}, {lux: 4000, r: 255, g: 0, b: 128}, {lux: 5000, r: 255, g: 255, b: 255} ],
             getLuxColor: function(lux, alpha = 1.0) {
                 const s = this.colorScale;
                 if (lux <= s[0].lux) return `rgba(${s[0].r},${s[0].g},${s[0].b},${alpha})`;
