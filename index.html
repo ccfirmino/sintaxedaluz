@@ -428,10 +428,7 @@
             </div>
 
             <div class="space-y-6 mb-6">
-                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">FLUXO NOMINAL (LED)</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="25000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="25000" step="100" value="3000" class="transition-opacity"></div>
-                
-                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-tech-cyan font-bold whitespace-nowrap uppercase cursor-help" title="Light Output Ratio (Rendimento da Luminária)">RENDIMENTO (LOR)</label><div class="flex items-baseline gap-1"><input type="number" id="g-lor" value="100" min="10" max="150" step="0.1" class="transition-opacity"><span class="text-[9px] text-tech-cyan font-bold">%</span></div></div><input type="range" id="range-g-lor" min="10" max="150" step="0.1" value="100" class="transition-opacity"></div>
-
+                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="25000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="25000" step="100" value="3000" class="transition-opacity"></div>
                 <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_power_w">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30" class="transition-opacity"></div>
                 <div class="group pt-2"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500"></div>
             </div>
@@ -622,11 +619,11 @@
                                             <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto backdrop-blur-md shadow-xl">
                                                 <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-3 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Nominal:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-flux-nom">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Final:</span><span class="text-tech-green dark:text-green-400 text-xs font-black"><span id="pd-flux-fin">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Eficácia:</span><span class="text-tech-cyan text-xs font-black"><span id="pd-efficacy">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm/W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Uplight:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-uplight">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">%</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (LP):</span><span id="hud-em-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">U (LP):</span><span id="hud-u-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (HP):</span><span id="hud-em-hp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">U (HP):</span><span id="hud-u-hp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
                                                 </div>
                                             </div>
 
@@ -1158,7 +1155,7 @@
             ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, lor: 100, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
+            grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
             leedProject: { 
                 name: "Novo Projeto LEED",
@@ -1965,8 +1962,7 @@ window.handleGenerateReport = async () => {
     const totalFixtures = s.cols * s.rows;
     const totalWatts = totalFixtures * (s.watts || 30);
     const lpd = totalWatts / area;
-    const effectiveFlux = s.flux * ((s.lor !== undefined ? s.lor : 100) / 100);
-    const avgLux = Math.round((totalFixtures * effectiveFlux * s.utilFactor * s.maintFactor) / area);
+    const avgLux = Math.round((totalFixtures * s.flux * s.utilFactor * s.maintFactor) / area);
     const isOk = avgLux >= targetLux;
     
     const effectiveBeamObj = window.getEffectiveBeam(s);
@@ -2049,10 +2045,10 @@ window.handleGenerateReport = async () => {
     cy -= 10;
     cy = drawSection('2. Especificações da Fonte Luminosa', cy);
     page.drawText('Modelo (IES):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(lumName, { x: 140, y: cy, size: 8, font: fontRegular }); cy -= 15;
-    page.drawText('Fluxo (Efetivo):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(effectiveFlux)} lm (LOR: ${s.lor || 100}%)`, { x: 140, y: cy, size: 8, font: fontRegular });
+    page.drawText('Fluxo (Lúmens):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${s.flux} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
     page.drawText('Abertura Facho:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(beamText, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
     page.drawText('Consumo Fonte:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${s.watts} W`, { x: 140, y: cy, size: 8, font: fontRegular });
-    page.drawText('Eficácia Luminosa:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(effectiveFlux/s.watts)} lm/W`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 25;
+    page.drawText('Eficácia Luminosa:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(s.flux/s.watts)} lm/W`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 25;
 
     // Bloco 3: Engenharia Visual (Screenshots)
     cy = drawSection('3. Mapeamento Topográfico Luminotécnico', cy);
@@ -2344,25 +2340,15 @@ window.handleGenerateReport = async () => {
                 if (wattInput) pWatts = parseFloat(wattInput.value);
             }
             
-            const elWatts = document.getElementById('pd-watts');
-            if (elWatts) elWatts.innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
+            document.getElementById('pd-watts').innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
             
-            const nominalFlux = state.iesData.totalFlux || state.flux || 1000;
-            const elFluxNom = document.getElementById('pd-flux-nom');
-            if (elFluxNom) elFluxNom.innerText = Math.round(nominalFlux);
+            let targetFlux = state.iesData.totalFlux || state.flux || 0;
+            document.getElementById('pd-lumens').innerText = targetFlux > 0 ? Math.round(targetFlux) : 'N/D';
             
-            const lor = state.lor !== undefined ? state.lor : 100;
-            const finalFlux = Math.round(nominalFlux * (lor / 100));
-            const elFluxFin = document.getElementById('pd-flux-fin');
-            if (elFluxFin) elFluxFin.innerText = finalFlux;
-            
-            const elEfficacy = document.getElementById('pd-efficacy');
-            if (elEfficacy) {
-                if (pWatts > 0 && finalFlux > 0) {
-                    elEfficacy.innerText = Math.round(finalFlux / pWatts);
-                } else {
-                    elEfficacy.innerText = 'N/D';
-                }
+            if (pWatts > 0 && targetFlux > 0) {
+                document.getElementById('pd-efficacy').innerText = Math.round(targetFlux / pWatts);
+            } else {
+                document.getElementById('pd-efficacy').innerText = 'N/D';
             }
 
             // LUXSINTAX: Adiciona eficiência de facho na HUD para LuxFuturum
@@ -2464,33 +2450,6 @@ window.handleIESUpload = function(input) {
 
                         // LUXSINTAX: Aciona a HUD Fotométrica 
                         window.updatePhotometricHUD();
-
-                        // LUXSINTAX: Sincronização Automática com Rigor Matemático Zonal
-                        const metrics = window.PhotometricAnalyzer.extractZonalMetrics(parsed);
-                        
-                        if (metrics) {
-                            // 1. Força o Fluxo Nominal Efetivo no Estado e Interface
-                            const realFlux = metrics.effectiveFlux || parsed.totalFlux || 1000;
-                            window.state[targetKey].flux = realFlux;
-                            
-                            const fluxInput = document.getElementById(targetKey[0] + '-flux');
-                            if(fluxInput) fluxInput.value = realFlux;
-                            
-                            const rangeFlux = document.getElementById('range-' + targetKey[0] + '-flux');
-                            if(rangeFlux) rangeFlux.value = realFlux;
-
-                            // 2. Força o Rendimento (LOR) no Estado e Interface
-                            const lorValue = parseFloat(metrics.beamEfficiency) || 100;
-                            window.state[targetKey].lor = lorValue;
-                            
-                            const lorInput = document.getElementById(targetKey[0] + '-lor');
-                            if(lorInput) lorInput.value = lorValue;
-                            
-                            const rangeLor = document.getElementById('range-' + targetKey[0] + '-lor');
-                            if(rangeLor) rangeLor.value = lorValue;
-                            
-                            console.info(`[LuxSintax] Arquivo parseado: Fluxo Efetivo = ${realFlux}lm, LOR = ${lorValue}%`);
-                        }
                         
                         // Exibe o Toggle 3D e renderiza caso o modo 3D já esteja ativo
                         const toggleBtn = document.getElementById('view-mode-toggle');
@@ -2523,71 +2482,35 @@ window.handleIESUpload = function(input) {
         // Engine Analítico Fotométrico de Alta Precisão (LuxSintax Pro)
         window.PhotometricAnalyzer = {
             extractZonalMetrics: function(data) {
-                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, fluxUtilization: 0, beamEfficiency: 100, effectiveFlux: 1000 };
+                let totalCandelas = 0;
+                let upCandelas = 0;
+                let zone0_30 = 0; // Luz útil central
+                let zone0_60 = 0; // Luz de tarefa
+                
+                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, beamEfficiency: 0 };
 
                 let maxI = 0;
-                let meanCandelas = [];
-                
-                // 1. Curva Média de Elevação (Isola a assimetria azimutal)
-                for (let v = 0; v < data.vAngles.length; v++) {
-                    let sumI = 0;
-                    let countI = 0;
-                    for (let h = 0; h < data.hAngles.length; h++) {
-                        let intensity = data.candelas[h][v] * data.multiplier;
+                for (let h = 0; h < data.hAngles.length; h++) {
+                    for (let v = 0; v < data.vAngles.length; v++) {
+                        const intensity = data.candelas[h][v] * data.multiplier;
                         if (intensity > maxI) maxI = intensity;
                         
-                        // Ignora fechamento 360 se o 0 já foi contado para não enviesar a média
-                        if (h === data.hAngles.length - 1 && data.hAngles[h] === 360 && data.hAngles[0] === 0) continue;
-                        
-                        sumI += intensity;
-                        countI++;
+                        totalCandelas += intensity;
+                        const angle = data.vAngles[v];
+                        if (angle > 90) upCandelas += intensity;
+                        if (angle <= 30) zone0_30 += intensity;
+                        if (angle <= 60) zone0_60 += intensity;
                     }
-                    meanCandelas.push(countI > 0 ? sumI / countI : 0);
                 }
                 
-                let totalLumens = 0;
-                let upLumens = 0;
-                let zone0_60 = 0;
-                
-                // 2. Integração Zonal Exata (Método das faixas esféricas contíguas CIE)
-                for (let v = 0; v < data.vAngles.length; v++) {
-                    let theta = data.vAngles[v];
-                    let thetaLower = v === 0 ? theta : (data.vAngles[v-1] + theta) / 2;
-                    let thetaUpper = v === data.vAngles.length - 1 ? theta : (theta + data.vAngles[v+1]) / 2;
-                    
-                    let radL = thetaLower * Math.PI / 180;
-                    let radU = thetaUpper * Math.PI / 180;
-                    
-                    // LUXSINTAX: Proteção absoluta contra vetores IES invertidos
-                    let zonalConstant = 2 * Math.PI * Math.abs(Math.cos(radL) - Math.cos(radU));
-                    let lumens = meanCandelas[v] * zonalConstant;
-                    
-                    totalLumens += lumens;
-                    if (theta > 90) upLumens += lumens;
-                    if (theta <= 60) zone0_60 += lumens;
-                }
-                
-                let finalLor = data.lor !== undefined ? data.lor : (data.lightOutputRatio !== undefined ? data.lightOutputRatio : null);
-                let effectiveFlux = data.totalFlux;
-
-                // 3. Tratamento de Fotometria Absoluta (Lúmens Negativos ou Zero no IES)
-                if (data.isAbsolute || !effectiveFlux || effectiveFlux <= 0) {
-                    effectiveFlux = totalLumens; // Fluxo total é estritamente a integral calculada
-                    finalLor = 100; // Rendimento de saída da luminária é considerado absoluto (100%)
-                } else if (finalLor === null) {
-                    finalLor = (totalLumens / effectiveFlux) * 100;
-                }
-                
-                // Fallbacks de Segurança Operacional
-                if (isNaN(finalLor) || finalLor <= 0 || finalLor > 200) finalLor = 100;
-                if (isNaN(effectiveFlux) || effectiveFlux <= 0) effectiveFlux = 1000;
+                const uplightRatio = totalCandelas > 0 ? (upCandelas / totalCandelas) * 100 : 0;
+                const fluxUtilization = totalCandelas > 0 ? (zone0_60 / totalCandelas) * 100 : 0;
                 
                 return { 
-                    uplightRatio: totalLumens > 0 ? (upLumens / totalLumens) * 100 : 0, 
+                    uplightRatio, 
                     maxCandela: maxI, 
-                    fluxUtilization: totalLumens > 0 ? (zone0_60 / totalLumens) * 100 : 0,
-                    beamEfficiency: finalLor.toFixed(1),
-                    effectiveFlux: Math.round(effectiveFlux)
+                    fluxUtilization: fluxUtilization.toFixed(1),
+                    beamEfficiency: totalCandelas > 0 ? ((totalCandelas / (data.totalFlux || totalCandelas)) * 100).toFixed(1) : 100
                 };
             }
         };
@@ -2880,8 +2803,7 @@ if (window.currentTool !== 'grid') {
 
                 // 1. CÁLCULO OBRIGATÓRIO (MÉTODO DOS LÚMENS)
                 const area = s.roomW * s.roomL;
-                const effectiveFlux = s.flux * ((s.lor !== undefined ? s.lor : 100) / 100);
-                const targetN = (s.targetLux * area) / (effectiveFlux * s.utilFactor * s.maintFactor);
+                const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
                 const N = Math.max(1, Math.ceil(targetN));
                 
                 const ratio = s.roomW / s.roomL;
@@ -2956,11 +2878,11 @@ if (window.currentTool !== 'grid') {
                         n_power = Math.log(0.5) / Math.log(Math.cos(halfBeamRad));
                     }
                     // Fluxo = Integral da curva. Isolando Imax:
-                    maxI = (effectiveFlux * (n_power + 1)) / (2 * Math.PI);
+                    maxI = (s.flux * (n_power + 1)) / (2 * Math.PI);
                 }
 
                 // Adiciona Reflexão de Parede (Luz Indireta / Método da Cavidade)
-                const avgLumen = (effectiveFlux * s.cols * s.rows * s.utilFactor * s.maintFactor) / (s.roomW * s.roomL);
+                const avgLumen = (s.flux * s.cols * s.rows * s.utilFactor * s.maintFactor) / (s.roomW * s.roomL);
                 const ambientLux = avgLumen * 0.20; // 20% do total simula inter-reflexões
 
                 ctx.textAlign = "center";
@@ -2999,11 +2921,9 @@ if (window.currentTool !== 'grid') {
                             const angleRad_LP = Math.atan2(distPlane, hEff_LP);
                             let I_LP = 0;
                             if (window.calcMode === 'ies' && s.iesData) {
-                                let fluxScale = (s.iesData.totalFlux && s.iesData.totalFlux > 0) ? (s.flux / s.iesData.totalFlux) : 1;
-                                let lorScale = (s.lor !== undefined ? s.lor : 100) / 100;
-                                I_LP = window.getIESIntensity(s, angleRad_LP * 180 / Math.PI, azimuthDeg) * fluxScale * lorScale;
+                                I_LP = window.getIESIntensity(s, angleRad_LP * 180 / Math.PI, azimuthDeg);
                             } else if (angleRad_LP < Math.PI / 2) {
-                                I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power); // maxI já usa effectiveFlux
+                                I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power);
                             }
                             if (I_LP > 0) directLux_LP += (I_LP * Math.pow(Math.cos(angleRad_LP), 3)) / (hEff_LP * hEff_LP);
 
@@ -3012,14 +2932,10 @@ if (window.currentTool !== 'grid') {
                                 const angleRad_HP = Math.atan2(distPlane, hEff_HP);
                                 let I_HP = 0;
                                 if (window.calcMode === 'ies' && s.iesData) {
-                                    let fluxScale = (s.iesData.totalFlux && s.iesData.totalFlux > 0) ? (s.flux / s.iesData.totalFlux) : 1;
-                                    let lorScale = (s.lor !== undefined ? s.lor : 100) / 100;
-                                    I_HP = window.getIESIntensity(s, angleRad_HP * 180 / Math.PI, azimuthDeg) * fluxScale * lorScale;
+                                    I_HP = window.getIESIntensity(s, angleRad_HP * 180 / Math.PI, azimuthDeg);
                                 } else if (angleRad_HP < Math.PI / 2) {
                                     I_HP = maxI * Math.pow(Math.cos(angleRad_HP), n_power);
                                 }
-                                if (I_HP > 0) directLux_HP += (I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP);
-                            }
                                 if (I_HP > 0) directLux_HP += (I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP);
                             }
                         } // LUXSINTAX: Fechamento do loop das luminárias restaurado
@@ -4092,7 +4008,7 @@ function bind(id, key, param) {
 }
         
         // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
-        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'lor', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
@@ -4569,8 +4485,7 @@ window.toggleGridMode = function(mode) {
             document.getElementById('result-ugr').innerText = parseFloat(ugr).toFixed(1);
             
             const s = window.state[window.currentTool];
-            const effFlux = window.currentTool === 'grid' ? (s.flux * ((s.lor !== undefined ? s.lor : 100) / 100)) : s.flux;
-            const totalFlux = window.currentTool === 'grid' ? (effFlux * s.cols * s.rows) : effFlux;
+            const totalFlux = window.currentTool === 'grid' ? (s.flux * s.cols * s.rows) : s.flux;
             const efficiency = watts > 0 ? Math.round(totalFlux / watts) : 0;
             document.getElementById('result-eff').innerText = efficiency;
 
