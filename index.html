@@ -622,11 +622,11 @@
                                             <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto backdrop-blur-md shadow-xl">
                                                 <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-3 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (LP):</span><span id="hud-em-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">U (LP):</span><span id="hud-u-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (HP):</span><span id="hud-em-hp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">U (HP):</span><span id="hud-u-hp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Nominal:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-flux-nom">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Final:</span><span class="text-tech-green dark:text-green-400 text-xs font-black"><span id="pd-flux-fin">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Eficácia:</span><span class="text-tech-cyan text-xs font-black"><span id="pd-efficacy">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm/W</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Uplight:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-uplight">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">%</span></span></div>
                                                 </div>
                                             </div>
 
@@ -2344,16 +2344,39 @@ window.handleGenerateReport = async () => {
                 if (wattInput) pWatts = parseFloat(wattInput.value);
             }
             
-            document.getElementById('pd-watts').innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
+            const elWatts = document.getElementById('pd-watts');
+            if (elWatts) elWatts.innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
             
-            let targetFlux = state.iesData.totalFlux || state.flux || 0;
-            document.getElementById('pd-lumens').innerText = targetFlux > 0 ? Math.round(targetFlux) : 'N/D';
+            const nominalFlux = state.iesData.totalFlux || state.flux || 1000;
+            const elFluxNom = document.getElementById('pd-flux-nom');
+            if (elFluxNom) elFluxNom.innerText = Math.round(nominalFlux);
             
-            if (pWatts > 0 && targetFlux > 0) {
-                document.getElementById('pd-efficacy').innerText = Math.round(targetFlux / pWatts);
-            } else {
-                document.getElementById('pd-efficacy').innerText = 'N/D';
+            const lor = state.lor !== undefined ? state.lor : 100;
+            const finalFlux = Math.round(nominalFlux * (lor / 100));
+            const elFluxFin = document.getElementById('pd-flux-fin');
+            if (elFluxFin) elFluxFin.innerText = finalFlux;
+            
+            const elEfficacy = document.getElementById('pd-efficacy');
+            if (elEfficacy) {
+                if (pWatts > 0 && finalFlux > 0) {
+                    elEfficacy.innerText = Math.round(finalFlux / pWatts);
+                } else {
+                    elEfficacy.innerText = 'N/D';
+                }
             }
+
+            // LUXSINTAX: Adiciona eficiência de facho na HUD para LuxFuturum
+            const moreMetrics = document.getElementById('pd-more-metrics');
+            if (!moreMetrics) {
+                const container = document.getElementById('photometric-dashboard').querySelector('.space-y-2');
+                const div = document.createElement('div');
+                div.id = 'pd-more-metrics';
+                div.className = 'border-t border-slate-200 dark:border-slate-700 flex justify-between items-center pt-2 mt-2';
+                div.innerHTML = `<span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Útil (0-60°):</span><span id="pd-util" class="text-starlight dark:text-white text-xs font-black">--</span>`;
+                container.appendChild(div);
+            }
+            document.getElementById('pd-util').innerText = metrics.fluxUtilization + '%';
+        };
 
             // LUXSINTAX: Adiciona eficiência de facho na HUD para LuxFuturum
             const moreMetrics = document.getElementById('pd-more-metrics');
@@ -2989,9 +3012,11 @@ if (window.currentTool !== 'grid') {
                             const angleRad_LP = Math.atan2(distPlane, hEff_LP);
                             let I_LP = 0;
                             if (window.calcMode === 'ies' && s.iesData) {
-                                I_LP = window.getIESIntensity(s, angleRad_LP * 180 / Math.PI, azimuthDeg);
+                                let fluxScale = (s.iesData.totalFlux && s.iesData.totalFlux > 0) ? (s.flux / s.iesData.totalFlux) : 1;
+                                let lorScale = (s.lor !== undefined ? s.lor : 100) / 100;
+                                I_LP = window.getIESIntensity(s, angleRad_LP * 180 / Math.PI, azimuthDeg) * fluxScale * lorScale;
                             } else if (angleRad_LP < Math.PI / 2) {
-                                I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power);
+                                I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power); // maxI já usa effectiveFlux
                             }
                             if (I_LP > 0) directLux_LP += (I_LP * Math.pow(Math.cos(angleRad_LP), 3)) / (hEff_LP * hEff_LP);
 
@@ -3000,7 +3025,9 @@ if (window.currentTool !== 'grid') {
                                 const angleRad_HP = Math.atan2(distPlane, hEff_HP);
                                 let I_HP = 0;
                                 if (window.calcMode === 'ies' && s.iesData) {
-                                    I_HP = window.getIESIntensity(s, angleRad_HP * 180 / Math.PI, azimuthDeg);
+                                    let fluxScale = (s.iesData.totalFlux && s.iesData.totalFlux > 0) ? (s.flux / s.iesData.totalFlux) : 1;
+                                    let lorScale = (s.lor !== undefined ? s.lor : 100) / 100;
+                                    I_HP = window.getIESIntensity(s, angleRad_HP * 180 / Math.PI, azimuthDeg) * fluxScale * lorScale;
                                 } else if (angleRad_HP < Math.PI / 2) {
                                     I_HP = maxI * Math.pow(Math.cos(angleRad_HP), n_power);
                                 }
