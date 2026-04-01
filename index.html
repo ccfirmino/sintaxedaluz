@@ -2377,19 +2377,6 @@ window.handleGenerateReport = async () => {
             }
             document.getElementById('pd-util').innerText = metrics.fluxUtilization + '%';
         };
-
-            // LUXSINTAX: Adiciona eficiência de facho na HUD para LuxFuturum
-            const moreMetrics = document.getElementById('pd-more-metrics');
-            if (!moreMetrics) {
-                const container = document.getElementById('photometric-dashboard').querySelector('.space-y-2');
-                const div = document.createElement('div');
-                div.id = 'pd-more-metrics';
-                div.className = 'border-t border-slate-200 dark:border-slate-700 flex justify-between items-center pt-2 mt-2';
-                div.innerHTML = `<span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Útil (0-60°):</span><span id="pd-util" class="text-starlight dark:text-white text-xs font-black">--</span>`;
-                container.appendChild(div);
-            }
-            document.getElementById('pd-util').innerText = metrics.fluxUtilization + '%';
-        };
 window.handleIESUpload = function(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
