@@ -2336,7 +2336,7 @@ window.handleGenerateReport = async () => {
     cy -= 10;
     cy = drawSection('2. Especificações da Fonte Luminosa', cy);
     page.drawText('Modelo (IES):', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(lumName, { x: 140, y: cy, size: 8, font: fontRegular }); 
-    page.drawText('Temp. de Cor:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(`${s.cct || 3000} K`, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
+    page.drawText('Temp. de Cor:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(s.cct ? `${s.cct} K` : 'Não informado', { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
     page.drawText('Potência:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${pWatts.toFixed(1)} W`, { x: 140, y: cy, size: 8, font: fontRegular });
     page.drawText('Abertura Facho:', { x: 340, y: cy, size: 8, font: fontBold }); page.drawText(beamText, { x: 440, y: cy, size: 8, font: fontRegular }); cy -= 15;
     page.drawText('Fluxo Nominal:', { x: 50, y: cy, size: 8, font: fontBold }); page.drawText(`${Math.round(fNominal)} lm`, { x: 140, y: cy, size: 8, font: fontRegular });
@@ -2630,7 +2630,8 @@ window.handleGenerateReport = async () => {
                         
                         let ticksHTML = '';
                         scale.forEach((c, idx) => {
-                            if ([0, 300, 500, 1000, 2000, 3000].includes(c.lux) || idx === scale.length - 1) {
+                            // LUXSINTAX: Oculta o 300 para evitar sobreposição UI, mas renderiza as âncoras principais
+                            if ([0, 500, 1000, 2000, 3000].includes(c.lux) || idx === scale.length - 1) {
                                 const leftPct = (c.lux / maxLux) * 100;
                                 let transform = 'translateX(-50%)';
                                 if (leftPct === 0) transform = 'translateX(0)';
@@ -2799,12 +2800,12 @@ window.handleIESUpload = function(input) {
 
                                 // LUXSINTAX: Auto-Extração de CCT (Kelvin) via Regex
                                 const cctMatch = file.name.match(/(\d{3,4})K/i) || content.match(/(\d{3,4})K/i);
-                                if (cctMatch && targetKey === 'grid') {
-                                    window.state.grid.cct = parseInt(cctMatch[1]);
+                                if (targetKey === 'grid') {
+                                    window.state.grid.cct = cctMatch ? parseInt(cctMatch[1]) : null;
                                     const cctInput = document.getElementById('g-cct');
                                     const cctRange = document.getElementById('range-g-cct');
-                                    if (cctInput) cctInput.value = window.state.grid.cct;
-                                    if (cctRange) cctRange.value = window.state.grid.cct;
+                                    if (cctInput) cctInput.value = window.state.grid.cct || '';
+                                    if (cctRange) cctRange.value = window.state.grid.cct || 3000;
                                 }
 
                                 let statusId = 'p-ies-status';
@@ -2943,7 +2944,19 @@ window.handleIESUpload = function(input) {
 
         // LUXSINTAX: Motor de Cores Falsas (Prevenção de Crash Fatal no Método Lúmens)
         window.FalseColorEngine = {
-            colorScale: [ {lux: 0, r: 0, g: 0, b: 0}, {lux: 100, r: 0, g: 0, b: 255}, {lux: 300, r: 0, g: 255, b: 255}, {lux: 500, r: 0, g: 255, b: 0}, {lux: 1000, r: 255, g: 255, b: 0}, {lux: 2000, r: 255, g: 128, b: 0}, {lux: 3000, r: 255, g: 0, b: 0}, {lux: 4000, r: 255, g: 0, b: 128}, {lux: 5000, r: 255, g: 255, b: 255} ],
+            colorScale: [ 
+                {lux: 0, r: 0, g: 0, b: 0},          // Preto
+                {lux: 50, r: 0, g: 0, b: 128},       // Azul Escuro
+                {lux: 150, r: 0, g: 0, b: 255},      // Azul
+                {lux: 300, r: 0, g: 255, b: 255},    // Ciano
+                {lux: 500, r: 0, g: 255, b: 0},      // Verde
+                {lux: 750, r: 173, g: 255, b: 47},   // Verde-Limão (Transição)
+                {lux: 1000, r: 255, g: 255, b: 0},   // Amarelo
+                {lux: 1500, r: 255, g: 165, b: 0},   // Laranja
+                {lux: 2000, r: 255, g: 0, b: 0},     // Vermelho
+                {lux: 3000, r: 255, g: 0, b: 255},   // Magenta
+                {lux: 5000, r: 255, g: 255, b: 255}  // Branco
+            ],
             getLuxColor: function(lux, alpha = 1.0) {
                 const s = this.colorScale;
                 if (lux <= s[0].lux) return `rgba(${s[0].r},${s[0].g},${s[0].b},${alpha})`;
