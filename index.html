@@ -235,9 +235,9 @@
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-50"></div>
             <div class="max-w-[1800px] mx-auto flex flex-col items-center">
                 <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
+                    <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-layer-group text-lg mb-1"></i><span data-i18n="tab_horiz">PONTO A PONTO<br>HORIZONTAL</span></button>
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">PONTO A PONTO<br>VERTICAL</span></button>
-                    <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     
                     <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap ml-auto">
                         <i class="fas fa-microchip text-lg mb-1"></i>
@@ -257,11 +257,10 @@
                         <div class="md:col-span-4 lg:col-span-3 flex flex-col gap-6">
     <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
         <div class="mb-4">
-            <h3 class="text-md text-starlight mb-4 font-black whitespace-nowrap text-center" data-i18n="calc_params">Parâmetros da Fonte</h3>
-            <div id="calc-mode-selector" class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6 mt-4 transition-opacity duration-300">
-                <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
-                <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
-                <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">IES / LDT</span></label>
+            <div id="calc-mode-selector" class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
+                <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">INTENSIDADE</button>
+                <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">FOTOMETRIA</button>
+                <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">IES / LDT</button>
             </div>
         </div>
         
@@ -406,9 +405,14 @@
         </div>
         
         <div id="inputs-grid" class="hidden">
-            <div class="flex flex-row items-center justify-center gap-6 p-1 mb-6">
-                <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="direct" checked onchange="window.updateCalcMode('direct')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_manual_source">Ficha Técnica</span></label>
-                <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="ies" onchange="window.updateCalcMode('ies')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_ies_file">IES / LDT</span></label>
+            <div class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-4 w-full">
+                <button onclick="window.setGridCalcMethod('target')" id="btn-grid-target" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm"><i class="fas fa-bullseye mr-1"></i> Alvo Lux</button>
+                <button onclick="window.setGridCalcMethod('manual')" id="btn-grid-manual" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all"><i class="fas fa-th mr-1"></i> Malha Manual</button>
+            </div>
+
+            <div class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
+                <button onclick="window.updateCalcMode('direct')" id="btn-grid-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Ficha Técnica</button>
+                <button onclick="window.updateCalcMode('ies')" id="btn-grid-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">IES / LDT</button>
             </div>
 
             <div class="mode-ies-group hidden space-y-6 mb-6">
@@ -430,7 +434,23 @@
             <div class="space-y-6 mb-6">
                 <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="25000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="25000" step="100" value="3000" class="transition-opacity"></div>
                 <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_power_w">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30" class="transition-opacity"></div>
-                <div class="group pt-2"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500"></div>
+                
+                <div id="grid-mode-target" class="group pt-2 border-t border-slate-200 dark:border-slate-700 mt-4">
+                    <div class="flex justify-between items-end mb-2 mt-4"><label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500"></div>
+
+                <div id="grid-mode-manual" class="hidden group pt-4 border-t border-slate-200 dark:border-slate-700 mt-4">
+                    <label class="text-[10px] text-tech-cyan font-bold uppercase mb-4 block">Configuração de Malha</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Colunas (X)</label><input type="number" id="g-manualCols" value="4" min="1" max="100" step="1" class="w-12 text-center text-[10px]"></div>
+                            <input type="range" id="range-g-manualCols" min="1" max="50" step="1" value="4">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Linhas (Y)</label><input type="number" id="g-manualRows" value="3" min="1" max="100" step="1" class="w-12 text-center text-[10px]"></div>
+                            <input type="range" id="range-g-manualRows" min="1" max="50" step="1" value="3">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_w">LARGURA DO AMB. (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
@@ -1156,7 +1176,7 @@
             ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
-            grid: { height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
+            grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
             leedProject: { 
                 name: "Novo Projeto LEED",
@@ -2442,16 +2462,54 @@ window.handleGenerateReport = async () => {
             }
         };
                 
+        window.setGridCalcMethod = function(method) {
+            window.state.grid.calcMethod = method;
+            const btnTarget = document.getElementById('btn-grid-target');
+            const btnManual = document.getElementById('btn-grid-manual');
+            const act = "flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm";
+            const inact = "flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+            
+            if (btnTarget) btnTarget.className = method === 'target' ? act : inact;
+            if (btnManual) btnManual.className = method === 'manual' ? act : inact;
+
+            document.getElementById('grid-mode-target').classList.toggle('hidden', method !== 'target');
+            document.getElementById('grid-mode-manual').classList.toggle('hidden', method !== 'manual');
+
+            // LUXSINTAX: Herança Inteligente
+            if (method === 'manual') {
+                document.getElementById('g-manualCols').value = window.state.grid.cols || 4;
+                document.getElementById('range-g-manualCols').value = window.state.grid.cols || 4;
+                window.state.grid.manualCols = window.state.grid.cols || 4;
+                
+                document.getElementById('g-manualRows').value = window.state.grid.rows || 3;
+                document.getElementById('range-g-manualRows').value = window.state.grid.rows || 3;
+                window.state.grid.manualRows = window.state.grid.rows || 3;
+            }
+
+            window.updateCalculations();
+        };
+
         window.updateCalcMode = function(mode) {
             window.calcMode = mode;
             
-            // LUXSINTAX: Sincronização inteligente dos rádio botões (Evita conflitos entre as abas)
-            document.querySelectorAll('input[type="radio"][name="calc_mode"]').forEach(r => {
-                r.checked = (r.value === mode);
+            // LUXSINTAX: Atualização dos Segmented Controls de Fonte
+            const act = "flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm";
+            const inact = "flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+            
+            ['direct', 'photo', 'ies'].forEach(id => {
+                const btn = document.getElementById('btn-mode-' + id);
+                if (btn) btn.className = inact;
             });
-            document.querySelectorAll('input[type="radio"][name="grid_mode_sel"]').forEach(r => {
-                r.checked = (mode === 'ies') ? (r.value === 'ies') : (r.value === 'direct');
+            const btnPonto = document.getElementById(mode === 'photometric' ? 'btn-mode-photo' : (mode === 'ies' ? 'btn-mode-ies' : 'btn-mode-direct'));
+            if(btnPonto) btnPonto.className = act;
+
+            ['direct', 'ies'].forEach(id => {
+                const btn = document.getElementById('btn-grid-' + id);
+                if (btn) btn.className = inact;
             });
+            const gridId = mode === 'ies' ? 'btn-grid-ies' : 'btn-grid-direct';
+            const btnGrid = document.getElementById(gridId);
+            if(btnGrid) btnGrid.className = act;
 
             document.querySelectorAll('.mode-direct-group').forEach(el => el.classList.toggle('hidden', mode !== 'direct'));
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
@@ -3107,27 +3165,38 @@ if (window.currentTool !== 'grid') {
                 const gridDisplay = document.getElementById('grid-suggestion-display');
                 const gridDesc = document.getElementById('grid-desc-display');
 
-                // 1. CÁLCULO OBRIGATÓRIO (MÉTODO DOS LÚMENS)
+                // 1. CÁLCULO OBRIGATÓRIO (MÉTODO DOS LÚMENS OU MALHA MANUAL)
                 const area = s.roomW * s.roomL;
-                const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
-                const N = Math.max(1, Math.ceil(targetN));
                 
-                const ratio = s.roomW / s.roomL;
-                let calcCols = Math.round(Math.sqrt(N * ratio));
-                let calcRows = Math.round(Math.sqrt(N / ratio));
-                
-                calcCols = Math.max(1, calcCols);
-                calcRows = Math.max(1, calcRows);
-                
-                while (calcCols * calcRows < N) {
-                    if ((calcCols / calcRows) < ratio) {
-                        calcCols++;
-                    } else {
-                        calcRows++;
+                if (s.calcMethod === 'manual') {
+                    // Modo Manual: O usuário define a matriz diretamente
+                    s.cols = Math.max(1, parseInt(s.manualCols) || 4);
+                    s.rows = Math.max(1, parseInt(s.manualRows) || 3);
+                    
+                    // O alvo (targetLux) passa a ser dinamicamente calculado para a UI de feedback não surtar
+                    s.targetLux = Math.round((s.cols * s.rows * s.flux * s.utilFactor * s.maintFactor) / area);
+                } else {
+                    // Modo Alvo: O sistema calcula a matriz para atingir os Lux
+                    const targetN = (s.targetLux * area) / (s.flux * s.utilFactor * s.maintFactor);
+                    const N = Math.max(1, Math.ceil(targetN));
+                    
+                    const ratio = s.roomW / s.roomL;
+                    let calcCols = Math.round(Math.sqrt(N * ratio));
+                    let calcRows = Math.round(Math.sqrt(N / ratio));
+                    
+                    calcCols = Math.max(1, calcCols);
+                    calcRows = Math.max(1, calcRows);
+                    
+                    while (calcCols * calcRows < N) {
+                        if ((calcCols / calcRows) < ratio) {
+                            calcCols++;
+                        } else {
+                            calcRows++;
+                        }
                     }
+                    s.cols = calcCols;
+                    s.rows = calcRows;
                 }
-                s.cols = calcCols;
-                s.rows = calcRows;
                 
                 
 
@@ -4336,7 +4405,7 @@ function bind(id, key, param) {
 }
         
         // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
-        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'manualCols', 'manualRows', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
@@ -4952,7 +5021,7 @@ window.toggleGridMode = function(mode) {
         window.currentLang = 'pt';
         initializeApp();
         window.initNbrSelector(); // <--- Inicializa o banco de dados do Seletor
-        window.switchTool('ponto');
+        window.switchTool('grid'); // LUXSINTAX: Inicia pelo Método Lúmens
         window.updateCalculations(); 
         window.updateCalcMode('direct');
     </script>
