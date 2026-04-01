@@ -2505,35 +2505,80 @@ window.handleIESUpload = function(input) {
         // Engine Analítico Fotométrico de Alta Precisão (LuxSintax Pro)
         window.PhotometricAnalyzer = {
             extractZonalMetrics: function(data) {
-                let totalCandelas = 0;
-                let upCandelas = 0;
-                let zone0_30 = 0; // Luz útil central
-                let zone0_60 = 0; // Luz de tarefa
+                let totalLumens = 0;
+                let upLumens = 0;
+                let zone0_60 = 0;
                 
-                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, beamEfficiency: 0 };
+                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, beamEfficiency: 100 };
 
                 let maxI = 0;
+                
+                // LUXSINTAX: Detecção de Simetria Azimutal
+                let maxAzimuth = Math.max(...data.hAngles);
+                let hSymmetry = 1;
+                if (maxAzimuth <= 90) hSymmetry = 4;
+                else if (maxAzimuth <= 180) hSymmetry = 2;
+                else if (data.hAngles.length === 1) hSymmetry = 360;
+
                 for (let h = 0; h < data.hAngles.length; h++) {
+                    let deltaH = 1;
+                    if (data.hAngles.length > 1) {
+                        if (h === 0) deltaH = (data.hAngles[1] - data.hAngles[0]) / 2;
+                        else if (h === data.hAngles.length - 1) deltaH = (data.hAngles[h] - data.hAngles[h-1]) / 2;
+                        else deltaH = (data.hAngles[h+1] - data.hAngles[h-1]) / 2;
+                    } else {
+                        deltaH = 1; // Já tratado pelo hSymmetry
+                    }
+
                     for (let v = 0; v < data.vAngles.length; v++) {
                         const intensity = data.candelas[h][v] * data.multiplier;
                         if (intensity > maxI) maxI = intensity;
                         
-                        totalCandelas += intensity;
-                        const angle = data.vAngles[v];
-                        if (angle > 90) upCandelas += intensity;
-                        if (angle <= 30) zone0_30 += intensity;
-                        if (angle <= 60) zone0_60 += intensity;
+                        let vAngle = data.vAngles[v];
+                        let deltaV = 0;
+                        if (data.vAngles.length > 1) {
+                            if (v === 0) deltaV = (data.vAngles[1] - data.vAngles[0]) / 2;
+                            else if (v === data.vAngles.length - 1) deltaV = (data.vAngles[v] - data.vAngles[v-1]) / 2;
+                            else deltaV = (data.vAngles[v+1] - data.vAngles[v-1]) / 2;
+                        }
+                        
+                        // Integração do Ângulo Sólido (Zonal Lumen)
+                        const vRad1 = (vAngle - deltaV) * Math.PI / 180;
+                        const vRad2 = (vAngle + deltaV) * Math.PI / 180;
+                        const zonalConstant = 2 * Math.PI * Math.abs(Math.cos(vRad1) - Math.cos(vRad2)) * (deltaH / 360) * hSymmetry;
+                        
+                        const lumen = intensity * zonalConstant;
+                        
+                        totalLumens += lumen;
+                        if (vAngle > 90) upLumens += lumen;
+                        if (vAngle <= 60) zone0_60 += lumen;
                     }
                 }
                 
-                const uplightRatio = totalCandelas > 0 ? (upCandelas / totalCandelas) * 100 : 0;
-                const fluxUtilization = totalCandelas > 0 ? (zone0_60 / totalCandelas) * 100 : 0;
+                const uplightRatio = totalLumens > 0 ? (upLumens / totalLumens) * 100 : 0;
+                const fluxUtilization = totalLumens > 0 ? (zone0_60 / totalLumens) * 100 : 0;
+                
+                // Prioridade 1: LOR nativo retornado pela API. Prioridade 2: Calculado por integração
+                let finalLor = data.lor !== undefined ? data.lor : (data.lightOutputRatio !== undefined ? data.lightOutputRatio : null);
+                
+                if (finalLor === null) {
+                    if (data.totalFlux && data.totalFlux > 0) {
+                        finalLor = (totalLumens / data.totalFlux) * 100;
+                    } else {
+                        finalLor = 100; // Fallback
+                    }
+                }
+                
+                // Blindagem de Segurança (Impede aberrações matemáticas como 18000%)
+                if (isNaN(finalLor) || finalLor <= 0 || finalLor > 200) {
+                    finalLor = 100;
+                }
                 
                 return { 
                     uplightRatio, 
                     maxCandela: maxI, 
                     fluxUtilization: fluxUtilization.toFixed(1),
-                    beamEfficiency: totalCandelas > 0 ? ((totalCandelas / (data.totalFlux || totalCandelas)) * 100).toFixed(1) : 100
+                    beamEfficiency: finalLor.toFixed(1)
                 };
             }
         };
