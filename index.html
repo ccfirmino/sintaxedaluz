@@ -1971,9 +1971,8 @@ window.handleGenerateReport = async () => {
         const metrics = window.PhotometricAnalyzer.extractZonalMetrics(s.iesData);
         fFinal = metrics.calculatedFlux;
         
-        // LUXSINTAX FIX: Correção de Fotometria Absoluta PDF
-        let tempNominal = s.iesData.totalFlux;
-        fNominal = (tempNominal && tempNominal > 0 && tempNominal !== s.flux) ? tempNominal : fFinal;
+        // LUXSINTAX FIX: Integridade restaurada no Relatório
+        fNominal = (s.iesData.totalFlux && s.iesData.totalFlux > 0) ? s.iesData.totalFlux : fFinal;
         
         pWatts = s.iesData.wattage || s.watts || 0;
         upRatio = metrics.uplightRatio;
@@ -2479,10 +2478,10 @@ window.handleGenerateReport = async () => {
             // Fluxo Nominal (Fonte) vs Fluxo Final (Luminária integrada matematicamente)
             let finalFlux = metrics.calculatedFlux;
             
-            // LUXSINTAX: Correção para IES com Fotometria Absoluta (onde lumensPerLamp = -1 resulta em 0 no parser legado)
+            // LUXSINTAX FIX: Restauração da estabilidade LDT/IES
             let nominalFlux = state.iesData.totalFlux;
-            if (!nominalFlux || nominalFlux <= 0 || nominalFlux === state.flux) {
-                nominalFlux = finalFlux; // Assume LOR 100% (Fotometria Absoluta)
+            if (!nominalFlux || nominalFlux <= 0) {
+                nominalFlux = finalFlux; // Assume LOR 100% (Fotometria Absoluta) se não declarado
             }
             
             document.getElementById('pd-lumens-nom').innerText = nominalFlux > 0 ? Math.round(nominalFlux) : 'N/D';
@@ -2531,6 +2530,30 @@ window.handleIESUpload = function(input) {
                     }
                     
                     if (parsed && !parsed.error) {
+                        // LUXSINTAX FIX: Leitura Nativa Segura do Fluxo Nominal IES (Bypass de bugs em Parsers EULUMDAT na nuvem)
+                        if (extension === 'ies') {
+                            const lines = content.split('\n');
+                            for (let i = 0; i < lines.length; i++) {
+                                if (lines[i].startsWith('TILT=')) {
+                                    for (let j = i + 1; j < i + 5; j++) {
+                                        const l = lines[j] ? lines[j].trim() : '';
+                                        if (l !== '') {
+                                            const parts = l.split(/\s+/);
+                                            if (parts.length >= 3) {
+                                                const nLamps = parseFloat(parts[0]);
+                                                const lmpFlux = parseFloat(parts[1]);
+                                                if (!isNaN(nLamps) && !isNaN(lmpFlux) && lmpFlux > 0) {
+                                                    parsed.totalFlux = nLamps * lmpFlux;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
                         const targetKey = window.currentTool;
                         window.state[targetKey].iesData = parsed;
                         window.state[targetKey].iesFileName = file.name;
@@ -3076,36 +3099,45 @@ if (window.currentTool !== 'grid') {
                         let directLux_LP = 0;
                         let directLux_HP = 0;
 
-                        for (const fix of fixtures) {
-                            const dx = ptX - fix.x;
-                            const dy = ptY - fix.y;
-                            const distPlane = Math.sqrt(dx*dx + dy*dy);
-                            
-                            // LUXSINTAX: Cálculo Vetorial Completo (Nadir + Azimuth para IES Assimétricos)
-                            const azimuthDeg = (Math.atan2(dy, dx) * 180 / Math.PI) + 90; // Alinha C0 com Eixo Y
+                        // LUXSINTAX FIX: Multi-Sampling Vetorial (Anti-Aliasing) para evitar 
+                        // picos matemáticos irreais (inflação de lux) em fachos muito fechados.
+                        const offsets = [-0.125, 0.125];
+                        for (let ox of offsets) {
+                            for (let oy of offsets) {
+                                const subX = ptX + ox;
+                                const subY = ptY + oy;
 
-                            // Nível do Piso (LP)
-                            const angleRad_LP = Math.atan2(distPlane, hEff_LP);
-                            let I_LP = 0;
-                            if (window.calcMode === 'ies' && s.iesData) {
-                                I_LP = window.getIESIntensity(s, angleRad_LP * 180 / Math.PI, azimuthDeg);
-                            } else if (angleRad_LP < Math.PI / 2) {
-                                I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power);
-                            }
-                            if (I_LP > 0) directLux_LP += (I_LP * Math.pow(Math.cos(angleRad_LP), 3)) / (hEff_LP * hEff_LP);
+                                for (const fix of fixtures) {
+                                    const dx = subX - fix.x;
+                                    const dy = subY - fix.y;
+                                    const distPlane = Math.sqrt(dx*dx + dy*dy);
+                                    
+                                    const azimuthDeg = (Math.atan2(dy, dx) * 180 / Math.PI) + 90; 
 
-                            // Plano de Trabalho (HP)
-                            if (hEff_HP > 0) {
-                                const angleRad_HP = Math.atan2(distPlane, hEff_HP);
-                                let I_HP = 0;
-                                if (window.calcMode === 'ies' && s.iesData) {
-                                    I_HP = window.getIESIntensity(s, angleRad_HP * 180 / Math.PI, azimuthDeg);
-                                } else if (angleRad_HP < Math.PI / 2) {
-                                    I_HP = maxI * Math.pow(Math.cos(angleRad_HP), n_power);
+                                    // Nível do Piso (LP)
+                                    const angleRad_LP = Math.atan2(distPlane, hEff_LP);
+                                    let I_LP = 0;
+                                    if (window.calcMode === 'ies' && s.iesData) {
+                                        I_LP = window.getIESIntensity(s, angleRad_LP * 180 / Math.PI, azimuthDeg);
+                                    } else if (angleRad_LP < Math.PI / 2) {
+                                        I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power);
+                                    }
+                                    if (I_LP > 0) directLux_LP += ((I_LP * Math.pow(Math.cos(angleRad_LP), 3)) / (hEff_LP * hEff_LP)) / 4;
+
+                                    // Plano de Trabalho (HP)
+                                    if (hEff_HP > 0) {
+                                        const angleRad_HP = Math.atan2(distPlane, hEff_HP);
+                                        let I_HP = 0;
+                                        if (window.calcMode === 'ies' && s.iesData) {
+                                            I_HP = window.getIESIntensity(s, angleRad_HP * 180 / Math.PI, azimuthDeg);
+                                        } else if (angleRad_HP < Math.PI / 2) {
+                                            I_HP = maxI * Math.pow(Math.cos(angleRad_HP), n_power);
+                                        }
+                                        if (I_HP > 0) directLux_HP += ((I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP)) / 4;
+                                    }
                                 }
-                                if (I_HP > 0) directLux_HP += (I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP);
                             }
-                        } // LUXSINTAX: Fechamento do loop das luminárias restaurado
+                        } // Fim do Multi-Sampling
 
                         const totalLux_LP = Math.round(directLux_LP * s.maintFactor + ambientLux);
                         const totalLux_HP = hEff_HP > 0 ? Math.round(directLux_HP * s.maintFactor + ambientLux) : 0;
