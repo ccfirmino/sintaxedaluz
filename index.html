@@ -2455,23 +2455,31 @@ window.handleIESUpload = function(input) {
                         // LUXSINTAX: Aciona a HUD Fotométrica 
                         window.updatePhotometricHUD();
 
-                        // LUXSINTAX: Sincronização Automática de LOR (Rendimento)
-                        // Extraímos as métricas calculadas pelo motor analítico para alimentar o Método dos Lúmens
+                        // LUXSINTAX: Sincronização Automática com Rigor Matemático Zonal
                         const metrics = window.PhotometricAnalyzer.extractZonalMetrics(parsed);
-                        if (metrics && metrics.beamEfficiency) {
-                            const lorValue = parseFloat(metrics.beamEfficiency);
+                        
+                        if (metrics) {
+                            // 1. Força o Fluxo Nominal Efetivo no Estado e Interface
+                            const realFlux = metrics.effectiveFlux || parsed.totalFlux || 1000;
+                            window.state[targetKey].flux = realFlux;
                             
-                            // Injeta no estado global da aba atual (ex: grid)
+                            const fluxInput = document.getElementById(targetKey[0] + '-flux');
+                            if(fluxInput) fluxInput.value = realFlux;
+                            
+                            const rangeFlux = document.getElementById('range-' + targetKey[0] + '-flux');
+                            if(rangeFlux) rangeFlux.value = realFlux;
+
+                            // 2. Força o Rendimento (LOR) no Estado e Interface
+                            const lorValue = parseFloat(metrics.beamEfficiency) || 100;
                             window.state[targetKey].lor = lorValue;
                             
-                            // Atualiza os elementos de interface (Input e Slider) se existirem
                             const lorInput = document.getElementById(targetKey[0] + '-lor');
                             if(lorInput) lorInput.value = lorValue;
                             
                             const rangeLor = document.getElementById('range-' + targetKey[0] + '-lor');
                             if(rangeLor) rangeLor.value = lorValue;
                             
-                            console.info(`[LuxSintax] LOR detectado automaticamente: ${lorValue}%`);
+                            console.info(`[LuxSintax] Arquivo parseado: Fluxo Efetivo = ${realFlux}lm, LOR = ${lorValue}%`);
                         }
                         
                         // Exibe o Toggle 3D e renderiza caso o modo 3D já esteja ativo
@@ -2505,80 +2513,70 @@ window.handleIESUpload = function(input) {
         // Engine Analítico Fotométrico de Alta Precisão (LuxSintax Pro)
         window.PhotometricAnalyzer = {
             extractZonalMetrics: function(data) {
+                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, fluxUtilization: 0, beamEfficiency: 100, effectiveFlux: 1000 };
+
+                let maxI = 0;
+                let meanCandelas = [];
+                
+                // 1. Curva Média de Elevação (Isola a assimetria azimutal)
+                for (let v = 0; v < data.vAngles.length; v++) {
+                    let sumI = 0;
+                    let countI = 0;
+                    for (let h = 0; h < data.hAngles.length; h++) {
+                        let intensity = data.candelas[h][v] * data.multiplier;
+                        if (intensity > maxI) maxI = intensity;
+                        
+                        // Ignora fechamento 360 se o 0 já foi contado para não enviesar a média
+                        if (h === data.hAngles.length - 1 && data.hAngles[h] === 360 && data.hAngles[0] === 0) continue;
+                        
+                        sumI += intensity;
+                        countI++;
+                    }
+                    meanCandelas.push(countI > 0 ? sumI / countI : 0);
+                }
+                
                 let totalLumens = 0;
                 let upLumens = 0;
                 let zone0_60 = 0;
                 
-                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, beamEfficiency: 100 };
-
-                let maxI = 0;
-                
-                // LUXSINTAX: Detecção de Simetria Azimutal
-                let maxAzimuth = Math.max(...data.hAngles);
-                let hSymmetry = 1;
-                if (maxAzimuth <= 90) hSymmetry = 4;
-                else if (maxAzimuth <= 180) hSymmetry = 2;
-                else if (data.hAngles.length === 1) hSymmetry = 360;
-
-                for (let h = 0; h < data.hAngles.length; h++) {
-                    let deltaH = 1;
-                    if (data.hAngles.length > 1) {
-                        if (h === 0) deltaH = (data.hAngles[1] - data.hAngles[0]) / 2;
-                        else if (h === data.hAngles.length - 1) deltaH = (data.hAngles[h] - data.hAngles[h-1]) / 2;
-                        else deltaH = (data.hAngles[h+1] - data.hAngles[h-1]) / 2;
-                    } else {
-                        deltaH = 1; // Já tratado pelo hSymmetry
-                    }
-
-                    for (let v = 0; v < data.vAngles.length; v++) {
-                        const intensity = data.candelas[h][v] * data.multiplier;
-                        if (intensity > maxI) maxI = intensity;
-                        
-                        let vAngle = data.vAngles[v];
-                        let deltaV = 0;
-                        if (data.vAngles.length > 1) {
-                            if (v === 0) deltaV = (data.vAngles[1] - data.vAngles[0]) / 2;
-                            else if (v === data.vAngles.length - 1) deltaV = (data.vAngles[v] - data.vAngles[v-1]) / 2;
-                            else deltaV = (data.vAngles[v+1] - data.vAngles[v-1]) / 2;
-                        }
-                        
-                        // Integração do Ângulo Sólido (Zonal Lumen)
-                        const vRad1 = (vAngle - deltaV) * Math.PI / 180;
-                        const vRad2 = (vAngle + deltaV) * Math.PI / 180;
-                        const zonalConstant = 2 * Math.PI * Math.abs(Math.cos(vRad1) - Math.cos(vRad2)) * (deltaH / 360) * hSymmetry;
-                        
-                        const lumen = intensity * zonalConstant;
-                        
-                        totalLumens += lumen;
-                        if (vAngle > 90) upLumens += lumen;
-                        if (vAngle <= 60) zone0_60 += lumen;
-                    }
+                // 2. Integração Zonal Exata (Método das faixas esféricas contíguas CIE)
+                for (let v = 0; v < data.vAngles.length; v++) {
+                    let theta = data.vAngles[v];
+                    let thetaLower = v === 0 ? theta : (data.vAngles[v-1] + theta) / 2;
+                    let thetaUpper = v === data.vAngles.length - 1 ? theta : (theta + data.vAngles[v+1]) / 2;
+                    
+                    let radL = thetaLower * Math.PI / 180;
+                    let radU = thetaUpper * Math.PI / 180;
+                    
+                    let zonalConstant = 2 * Math.PI * (Math.cos(radL) - Math.cos(radU));
+                    let lumens = meanCandelas[v] * zonalConstant;
+                    
+                    totalLumens += lumens;
+                    if (theta > 90) upLumens += lumens;
+                    if (theta <= 60) zone0_60 += lumens;
                 }
                 
-                const uplightRatio = totalLumens > 0 ? (upLumens / totalLumens) * 100 : 0;
-                const fluxUtilization = totalLumens > 0 ? (zone0_60 / totalLumens) * 100 : 0;
-                
-                // Prioridade 1: LOR nativo retornado pela API. Prioridade 2: Calculado por integração
                 let finalLor = data.lor !== undefined ? data.lor : (data.lightOutputRatio !== undefined ? data.lightOutputRatio : null);
-                
-                if (finalLor === null) {
-                    if (data.totalFlux && data.totalFlux > 0) {
-                        finalLor = (totalLumens / data.totalFlux) * 100;
-                    } else {
-                        finalLor = 100; // Fallback
-                    }
+                let effectiveFlux = data.totalFlux;
+
+                // 3. Tratamento de Fotometria Absoluta (Lúmens Negativos ou Zero no IES)
+                if (data.isAbsolute || !effectiveFlux || effectiveFlux <= 0) {
+                    effectiveFlux = totalLumens; // Fluxo total é estritamente a integral calculada
+                    finalLor = 100; // Rendimento de saída da luminária é considerado absoluto (100%)
+                } else if (finalLor === null) {
+                    finalLor = (totalLumens / effectiveFlux) * 100;
                 }
                 
-                // Blindagem de Segurança (Impede aberrações matemáticas como 18000%)
-                if (isNaN(finalLor) || finalLor <= 0 || finalLor > 200) {
-                    finalLor = 100;
-                }
+                // Fallbacks de Segurança Operacional
+                if (isNaN(finalLor) || finalLor <= 0 || finalLor > 200) finalLor = 100;
+                if (isNaN(effectiveFlux) || effectiveFlux <= 0) effectiveFlux = 1000;
                 
                 return { 
-                    uplightRatio, 
+                    uplightRatio: totalLumens > 0 ? (upLumens / totalLumens) * 100 : 0, 
                     maxCandela: maxI, 
-                    fluxUtilization: fluxUtilization.toFixed(1),
-                    beamEfficiency: finalLor.toFixed(1)
+                    fluxUtilization: totalLumens > 0 ? (zone0_60 / totalLumens) * 100 : 0,
+                    beamEfficiency: finalLor.toFixed(1),
+                    effectiveFlux: Math.round(effectiveFlux)
                 };
             }
         };
