@@ -3020,6 +3020,8 @@ if (window.currentTool !== 'grid') {
                                 }
                                 if (I_HP > 0) directLux_HP += (I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP);
                             }
+                                if (I_HP > 0) directLux_HP += (I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP);
+                            }
                         } // LUXSINTAX: Fechamento do loop das luminárias restaurado
 
                         const totalLux_LP = Math.round(directLux_LP * s.maintFactor + ambientLux);
