@@ -2017,12 +2017,12 @@ window.handleGenerateReport = async () => {
         const c = document.createElement('canvas');
         const size = 800; c.width = size; c.height = size; 
         const ctx = c.getContext('2d');
-        const cx = size / 2; const cy = size / 2; const maxR = 300;
+        const cx = size / 2; const cy = size / 2; const maxR = 280; // Margem de respiro ajustada
 
         ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,size,size);
         
         // Grid Radial Clássico
-        ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 2; // Espessura aumentada para redução
         for(let a=0; a<360; a+=15) {
             const rad = (a - 90) * Math.PI / 180;
             ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + maxR * Math.cos(rad), cy + maxR * Math.sin(rad)); ctx.stroke();
@@ -2033,15 +2033,15 @@ window.handleGenerateReport = async () => {
             ctx.beginPath(); ctx.arc(cx, cy, (maxR / steps) * i, 0, Math.PI*2); ctx.stroke();
         }
 
-        // Distribuição Angular
-        ctx.fillStyle = "#64748b"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        // Distribuição Angular (FONTES MAIORES)
+        ctx.fillStyle = "#64748b"; ctx.font = "bold 22px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
         const angles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
         angles.forEach(ang => {
             const radR = (ang + 90) * Math.PI / 180;
-            ctx.fillText(ang + "°", cx + (maxR + 25) * Math.cos(radR), cy + (maxR + 25) * Math.sin(radR));
+            ctx.fillText(ang + "°", cx + (maxR + 35) * Math.cos(radR), cy + (maxR + 35) * Math.sin(radR));
             if (ang !== 0 && ang !== 180) {
                 const radL = (-ang + 90) * Math.PI / 180;
-                ctx.fillText(ang + "°", cx + (maxR + 25) * Math.cos(radL), cy + (maxR + 25) * Math.sin(radL));
+                ctx.fillText(ang + "°", cx + (maxR + 35) * Math.cos(radL), cy + (maxR + 35) * Math.sin(radL));
             }
         });
 
@@ -2050,18 +2050,19 @@ window.handleGenerateReport = async () => {
         let maxI = 1; candelas.forEach(r => { const m = Math.max(...r); if(m>maxI) maxI=m; });
         const magnitude = Math.pow(10, Math.floor(Math.log10(maxI)));
         let niceMax = Math.ceil(maxI / magnitude) * magnitude;
-        if (niceMax < maxI * 1.05) niceMax += magnitude; // Garante margem de respiro
+        if (niceMax < maxI * 1.05) niceMax += magnitude; 
 
-        ctx.fillStyle = "#0f172a"; ctx.font = "bold 13px Arial";
+        // Escala de Candelas Central (FONTES MAIORES)
+        ctx.fillStyle = "#0f172a"; ctx.font = "bold 20px Arial";
         for(let i=1; i<=steps; i++) {
             const val = Math.round((niceMax / steps) * i);
             const r = (maxR / steps) * i;
             const tw = ctx.measureText(val).width;
-            ctx.fillStyle = "#ffffff"; ctx.fillRect(cx - tw/2 - 4, cy + r - 8, tw + 8, 16);
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(cx - tw/2 - 6, cy + r - 12, tw + 12, 24);
             ctx.fillStyle = "#0f172a"; ctx.fillText(val, cx, cy + r);
         }
 
-        // Plotador de Curvas Sólidas (Folds para C0 e C90)
+        // Plotador de Curvas Sólidas
         const drawCurve = (rowL, rowR, color) => {
             ctx.beginPath(); ctx.moveTo(cx, cy);
             for(let i=0; i<vAngles.length; i++){
@@ -2075,19 +2076,19 @@ window.handleGenerateReport = async () => {
                 ctx.lineTo(cx + r * Math.cos(ang), cy + r * Math.sin(ang));
             }
             ctx.closePath();
-            ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.stroke();
+            ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.stroke(); // LINHAS ENCORPADAS
         };
 
         const r0 = candelas[0], r90 = candelas[9] || candelas[0];
         const r180 = candelas[18] || candelas[0], r270 = candelas[27] || candelas[9] || candelas[0];
 
         if (JSON.stringify(r0) !== JSON.stringify(r90) || JSON.stringify(r180) !== JSON.stringify(r270)) {
-            drawCurve(r270, r90, "rgba(2, 132, 199, 1)"); // Azul para C90-C270
+            drawCurve(r270, r90, "rgba(2, 132, 199, 1)"); 
         }
-        drawCurve(r0, r180, "rgba(220, 38, 38, 1)"); // Vermelho para C0-C180
+        drawCurve(r0, r180, "rgba(220, 38, 38, 1)"); 
 
-        // Legenda de Prancheta Técnica
-        ctx.fillStyle = "#0f172a"; ctx.textAlign = "left"; ctx.font = "bold 16px Arial";
+        // Legenda de Prancheta Técnica (FONTES MAIORES)
+        ctx.fillStyle = "#0f172a"; ctx.textAlign = "left"; ctx.font = "bold 24px Arial";
         ctx.fillText("cd / klm", 30, size - 30);
         
         let effText = "η = 100%";
@@ -2098,13 +2099,13 @@ window.handleGenerateReport = async () => {
         ctx.fillText(effText, size - 30, size - 30);
 
         ctx.textAlign = "left";
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "rgba(220, 38, 38, 1)"; ctx.beginPath(); ctx.moveTo(120, size - 35); ctx.lineTo(160, size - 35); ctx.stroke();
-        ctx.fillStyle = "#64748b"; ctx.font = "14px Arial"; ctx.fillText("C0 - C180", 170, size - 30);
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "rgba(220, 38, 38, 1)"; ctx.beginPath(); ctx.moveTo(150, size - 38); ctx.lineTo(200, size - 38); ctx.stroke();
+        ctx.fillStyle = "#64748b"; ctx.font = "22px Arial"; ctx.fillText("C0 - C180", 215, size - 30);
 
         if (JSON.stringify(r0) !== JSON.stringify(r90) || JSON.stringify(r180) !== JSON.stringify(r270)) {
-            ctx.strokeStyle = "rgba(2, 132, 199, 1)"; ctx.beginPath(); ctx.moveTo(260, size - 35); ctx.lineTo(300, size - 35); ctx.stroke();
-            ctx.fillText("C90 - C270", 310, size - 30);
+            ctx.strokeStyle = "rgba(2, 132, 199, 1)"; ctx.beginPath(); ctx.moveTo(350, size - 38); ctx.lineTo(400, size - 38); ctx.stroke();
+            ctx.fillText("C90 - C270", 415, size - 30);
         }
         return c.toDataURL('image/png');
     };
@@ -2176,8 +2177,8 @@ window.handleGenerateReport = async () => {
         const polarPng = getPolarPNG(s.iesData);
         const imgP = await pdfDoc.embedPng(polarPng);
         
-        // LUXSINTAX: Curva Polar Centralizada Isolada na Linha de Baixo
-        const dimsP = imgP.scaleToFit(maxWidthTopo, 210);
+        // LUXSINTAX: Curva Polar Centralizada (Redimensionada para Evitar Colisão de Rodapé)
+        const dimsP = imgP.scaleToFit(maxWidthTopo, 140);
         const xP = (width - dimsP.width) / 2;
         
         page.drawImage(imgP, { x: xP, y: cy - dimsP.height, width: dimsP.width, height: dimsP.height });
