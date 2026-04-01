@@ -661,6 +661,15 @@
                                             
                                         </div>
 
+                                        <div id="heatmap-legend-overlay" class="absolute bottom-6 right-6 z-40 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-72 md:w-96 hidden transition-all duration-300 backdrop-blur-md shadow-2xl pointer-events-auto">
+                                            <div class="flex justify-between items-center mb-3">
+                                                <span class="text-[10px] font-black uppercase tracking-widest text-luminous-gold">Escala de Iluminância (Lux)</span>
+                                            </div>
+                                            <div id="heatmap-gradient-bar" class="w-full h-3 rounded-full mb-2 border border-slate-200 dark:border-slate-700"></div>
+                                            <div id="heatmap-ticks" class="relative w-full h-4 text-[9px] font-bold text-slate-500 dark:text-slate-400">
+                                                </div>
+                                        </div>
+
                                         <div id="stage-2d" class="absolute inset-0 w-full h-full z-10 block">
                                             <div class="absolute inset-0 opacity-40 dark:opacity-5 pointer-events-none" style="background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
                                             <canvas id="beamCanvas" class="absolute inset-0 w-full h-full block"></canvas>
@@ -2449,6 +2458,11 @@ window.handleGenerateReport = async () => {
 // LUXSINTAX: Atualiza a visibilidade da HUD ao trocar de aba
                 if (window.updatePhotometricHUD) window.updatePhotometricHUD();
                 
+                const legendOverlay = document.getElementById('heatmap-legend-overlay');
+                if (legendOverlay) {
+                    legendOverlay.classList.toggle('hidden', toolId !== 'grid' || !window.state.grid.falseColor);
+                }
+                
                 const glareWrapper = document.getElementById('glare-toggle-wrapper');
                 if (glareWrapper) {
                     glareWrapper.classList.toggle('hidden', (toolId !== 'vertical' && toolId !== 'ponto') || (toolId === 'vertical' && window.state.vertical.viewMode === 'elevation'));
@@ -2591,6 +2605,39 @@ window.handleGenerateReport = async () => {
                     bgToggle.classList.remove('bg-tech-cyan'); 
                     bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
                     dotToggle.classList.remove('translate-x-3');
+                }
+            }
+
+            // LUXSINTAX: Aciona a renderização e visibilidade do HUD Legenda
+            const legend = document.getElementById('heatmap-legend-overlay');
+            if (legend) {
+                if (isChecked && window.currentTool === 'grid') {
+                    legend.classList.remove('hidden');
+                    if (!legend.dataset.initialized) {
+                        const bar = document.getElementById('heatmap-gradient-bar');
+                        const ticksContainer = document.getElementById('heatmap-ticks');
+                        const scale = window.FalseColorEngine.colorScale;
+                        const maxLux = scale[scale.length - 1].lux;
+                        
+                        // Renderiza o gradiente CSS dinamicamente com base no motor matemático
+                        let stops = scale.map(c => `rgb(${c.r},${c.g},${c.b}) ${(c.lux / maxLux) * 100}%`).join(', ');
+                        bar.style.background = `linear-gradient(to right, ${stops})`;
+                        
+                        let ticksHTML = '';
+                        scale.forEach((c, idx) => {
+                            if ([0, 300, 500, 1000, 2000].includes(c.lux) || idx === scale.length - 1) {
+                                const leftPct = (c.lux / maxLux) * 100;
+                                let transform = 'translateX(-50%)';
+                                if (leftPct === 0) transform = 'translateX(0)';
+                                if (leftPct === 100) transform = 'translateX(-100%)';
+                                ticksHTML += `<span class="absolute top-0 transition-colors dark:text-slate-300" style="left: ${leftPct}%; transform: ${transform};">${c.lux}</span>`;
+                            }
+                        });
+                        ticksContainer.innerHTML = ticksHTML;
+                        legend.dataset.initialized = 'true';
+                    }
+                } else {
+                    legend.classList.add('hidden');
                 }
             }
             window.updateCalculations();
@@ -3438,53 +3485,7 @@ if (window.currentTool !== 'grid') {
                     }
                 }
 
-                // LEGENDA DE FALSA COR (HEATMAP)
-                if (s.falseColor) {
-                    const legW = 140;
-                    const legH = 12;
-                    const legX = offsetX + roomPxW - legW - 20;
-                    const legY = offsetY + roomPxH - legH - 25;
-                    
-                    // Fundo da legenda
-                    ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.9)";
-                    ctx.fillRect(legX - 15, legY - 20, legW + 30, legH + 40);
-                    ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
-                    ctx.strokeRect(legX - 15, legY - 20, legW + 30, legH + 40);
-                    
-                    // Gradiente
-                    const legGrad = ctx.createLinearGradient(legX, 0, legX + legW, 0);
-                    const scaleColors = window.FalseColorEngine.colorScale;
-                    const maxScaleLux = scaleColors[scaleColors.length - 1].lux;
-                    
-                    scaleColors.forEach(c => {
-                        legGrad.addColorStop(c.lux / maxScaleLux, `rgb(${c.r},${c.g},${c.b})`);
-                    });
-                    
-                    ctx.fillStyle = legGrad;
-                    ctx.fillRect(legX, legY, legW, legH);
-                    
-                    // Textos da legenda (Algoritmo Anti-Colisão)
-                    ctx.fillStyle = isDark ? "#cbd5e1" : "#334155";
-                    ctx.font = "bold 9px Manrope";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "top";
-                    
-                    let lastTextPx = -999;
-                    scaleColors.forEach((c, index) => {
-                        const px = legX + (c.lux / maxScaleLux) * legW;
-                        const textWidth = ctx.measureText(c.lux).width;
-                        
-                        // Oculta o valor se colidir com o texto anterior (margem de 8px), mas garante renderização do primeiro e último
-                        if (px - lastTextPx > (textWidth + 8) || index === 0 || index === scaleColors.length - 1) {
-                            ctx.fillText(c.lux, px, legY + legH + 5);
-                            lastTextPx = px;
-                        }
-                    });
-                    
-                    ctx.textAlign = "left";
-                    ctx.fillStyle = "#d97706";
-                    ctx.fillText("Lux", legX, legY - 14);
-                }
+                // LUXSINTAX: A Legenda de Falsa Cor foi migrada para o Componente HUD HTML
                 // 3. ANIMAÇÃO DO BOTÃO FOGGLE
                 const bgToggle = document.getElementById('fc-toggle-bg');
                 const dotToggle = document.getElementById('fc-toggle-dot');
