@@ -631,9 +631,10 @@
                                                 <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> SUMÁRIO TÉCNICO</h4>
                                                 <div class="text-slate-500 dark:text-slate-400 truncate mb-3 text-[10px] font-bold" id="pd-filename">arquivo.ies</div>
                                                 <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Eficácia:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-efficacy">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm/W</span></span></div>
                                                     <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Nominal:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens-nom">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Final:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens-fin">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
+                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Eficácia:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-efficacy">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm/W</span></span></div>
                                                     <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Uplight:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-uplight">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">%</span></span></div>
                                                 </div>
                                             </div>
@@ -2332,7 +2333,6 @@ window.handleGenerateReport = async () => {
             document.getElementById('pd-filename').innerText = state.iesFileName || "arquivo.ies";
             
             const metrics = window.PhotometricAnalyzer.extractZonalMetrics(state.iesData);
-            document.getElementById('pd-uplight').innerText = metrics.uplightRatio.toFixed(1);
             
             let pWatts = state.iesData.wattage;
             if (!pWatts) {
@@ -2342,26 +2342,25 @@ window.handleGenerateReport = async () => {
             
             document.getElementById('pd-watts').innerText = pWatts ? pWatts.toFixed(1) : 'N/D';
             
-            let targetFlux = state.iesData.totalFlux || state.flux || 0;
-            document.getElementById('pd-lumens').innerText = targetFlux > 0 ? Math.round(targetFlux) : 'N/D';
+            // Fluxo Nominal (Fonte) vs Fluxo Final (Luminária integrada matematicamente)
+            let nominalFlux = state.iesData.totalFlux || state.flux || 0;
+            document.getElementById('pd-lumens-nom').innerText = nominalFlux > 0 ? Math.round(nominalFlux) : 'N/D';
             
-            if (pWatts > 0 && targetFlux > 0) {
-                document.getElementById('pd-efficacy').innerText = Math.round(targetFlux / pWatts);
+            let finalFlux = metrics.calculatedFlux;
+            document.getElementById('pd-lumens-fin').innerText = finalFlux > 0 ? Math.round(finalFlux) : 'N/D';
+            
+            if (pWatts > 0 && finalFlux > 0) {
+                // Eficácia corporativa é sempre baseada no Output Final, não no bare-lamp
+                document.getElementById('pd-efficacy').innerText = Math.round(finalFlux / pWatts);
             } else {
                 document.getElementById('pd-efficacy').innerText = 'N/D';
             }
 
-            // LUXSINTAX: Adiciona eficiência de facho na HUD para LuxFuturum
+            document.getElementById('pd-uplight').innerText = metrics.uplightRatio.toFixed(1);
+            
+            // Remove injeção de "Fluxo Útil (%)" legada
             const moreMetrics = document.getElementById('pd-more-metrics');
-            if (!moreMetrics) {
-                const container = document.getElementById('photometric-dashboard').querySelector('.space-y-2');
-                const div = document.createElement('div');
-                div.id = 'pd-more-metrics';
-                div.className = 'border-t border-slate-200 dark:border-slate-700 flex justify-between items-center pt-2 mt-2';
-                div.innerHTML = `<span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Útil (0-60°):</span><span id="pd-util" class="text-starlight dark:text-white text-xs font-black">--</span>`;
-                container.appendChild(div);
-            }
-            document.getElementById('pd-util').innerText = metrics.fluxUtilization + '%';
+            if (moreMetrics) moreMetrics.remove();
         };
 window.handleIESUpload = function(input) {
             if (input.files && input.files[0]) {
@@ -2482,35 +2481,51 @@ window.handleIESUpload = function(input) {
         // Engine Analítico Fotométrico de Alta Precisão (LuxSintax Pro)
         window.PhotometricAnalyzer = {
             extractZonalMetrics: function(data) {
-                let totalCandelas = 0;
-                let upCandelas = 0;
-                let zone0_30 = 0; // Luz útil central
-                let zone0_60 = 0; // Luz de tarefa
-                
-                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, beamEfficiency: 0 };
+                if (!data || !data.vAngles || !data.candelas) return { uplightRatio: 0, maxCandela: 0, calculatedFlux: 0 };
 
                 let maxI = 0;
-                for (let h = 0; h < data.hAngles.length; h++) {
-                    for (let v = 0; v < data.vAngles.length; v++) {
+                const numV = data.vAngles.length;
+                const numH = data.hAngles.length;
+                const avgPolar = new Array(numV).fill(0);
+
+                // 1. Encontra a Curva Polar Média (Simetrização para Integração)
+                for (let v = 0; v < numV; v++) {
+                    let sumI = 0;
+                    for (let h = 0; h < numH; h++) {
                         const intensity = data.candelas[h][v] * data.multiplier;
                         if (intensity > maxI) maxI = intensity;
-                        
-                        totalCandelas += intensity;
-                        const angle = data.vAngles[v];
-                        if (angle > 90) upCandelas += intensity;
-                        if (angle <= 30) zone0_30 += intensity;
-                        if (angle <= 60) zone0_60 += intensity;
+                        sumI += intensity;
+                    }
+                    avgPolar[v] = sumI / numH;
+                }
+
+                // 2. Integração por Ângulo Sólido (Cálculo do Fluxo Final Absoluto)
+                let absoluteFlux = 0;
+                let upFlux = 0;
+
+                for (let v = 1; v < numV; v++) {
+                    const v1 = data.vAngles[v-1] * Math.PI / 180;
+                    const v2 = data.vAngles[v] * Math.PI / 180;
+                    
+                    const I1 = avgPolar[v-1];
+                    const I2 = avgPolar[v];
+                    const I_avg = (I1 + I2) / 2;
+                    
+                    // Fórmula: Phi = 2 * PI * I_avg * (cos(v1) - cos(v2))
+                    const zonalFlux = 2 * Math.PI * I_avg * (Math.cos(v1) - Math.cos(v2));
+                    absoluteFlux += zonalFlux;
+
+                    if (data.vAngles[v] > 90) {
+                        upFlux += zonalFlux;
                     }
                 }
-                
-                const uplightRatio = totalCandelas > 0 ? (upCandelas / totalCandelas) * 100 : 0;
-                const fluxUtilization = totalCandelas > 0 ? (zone0_60 / totalCandelas) * 100 : 0;
+
+                const uplightRatio = absoluteFlux > 0 ? (upFlux / absoluteFlux) * 100 : 0;
                 
                 return { 
                     uplightRatio, 
                     maxCandela: maxI, 
-                    fluxUtilization: fluxUtilization.toFixed(1),
-                    beamEfficiency: totalCandelas > 0 ? ((totalCandelas / (data.totalFlux || totalCandelas)) * 100).toFixed(1) : 100
+                    calculatedFlux: absoluteFlux // Retorna o fluxo luminotécnico real processado
                 };
             }
         };
@@ -2868,9 +2883,13 @@ if (window.currentTool !== 'grid') {
                 // Extrai Intensidade Máxima e Cria Curva Fotométrica Perfeita
                 let maxI = 0;
                 let n_power = 1;
+                let actualFixtureFlux = s.flux; // Base inicial para fontes manuais
                 
                 if (window.calcMode === 'ies' && s.iesData) {
                     maxI = s.iesData.candelas[0][0] * s.iesData.multiplier;
+                    // Extrai o Fluxo Final integrado matematicamente
+                    const metrics = window.PhotometricAnalyzer.extractZonalMetrics(s.iesData);
+                    actualFixtureFlux = metrics.calculatedFlux; 
                 } else {
                     const halfBeamRad = (currentBeam / 2) * Math.PI / 180;
                     // Equação FWHM: Calcula o expoente para que a intensidade caia pela metade na exata borda do facho
@@ -2878,12 +2897,16 @@ if (window.currentTool !== 'grid') {
                         n_power = Math.log(0.5) / Math.log(Math.cos(halfBeamRad));
                     }
                     // Fluxo = Integral da curva. Isolando Imax:
-                    maxI = (s.flux * (n_power + 1)) / (2 * Math.PI);
+                    maxI = (actualFixtureFlux * (n_power + 1)) / (2 * Math.PI);
                 }
 
                 // Adiciona Reflexão de Parede (Luz Indireta / Método da Cavidade)
-                const avgLumen = (s.flux * s.cols * s.rows * s.utilFactor * s.maintFactor) / (s.roomW * s.roomL);
-                const ambientLux = avgLumen * 0.20; // 20% do total simula inter-reflexões
+                // Usamos o actualFixtureFlux (Fluxo Final real) em vez do nominal.
+                const avgLumen = (actualFixtureFlux * s.cols * s.rows * s.utilFactor * s.maintFactor) / (s.roomW * s.roomL);
+                
+                // Reduzimos o proxy de inter-reflexão de 20% para 12% para aproximar do comportamento
+                // de radiosidade real (ray-tracing) do Dialux em matrizes com downlights de facho fechado.
+                const ambientLux = avgLumen * 0.12;
 
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
