@@ -1794,9 +1794,17 @@ window.Photometric3DEngine = {
                     const posZ = startZ + j * spacingZ;
 
                     if (hasIes && webGroup.children.length > 0) {
-                        const mesh = webGroup.clone();
-                        mesh.position.set(posX, state.height, posZ);
-                        this.solidGroup.add(mesh);
+                        // LUXSINTAX: Fonte física (esfera) sempre visível para garantir a referência espacial no teto
+                        const fixMesh = new THREE.Mesh(fixGeo, fixMat);
+                        fixMesh.position.set(posX, state.height, posZ);
+                        this.solidGroup.add(fixMesh);
+
+                        // LUXSINTAX: Apenas renderiza a teia polar do IES se o Heatmap estiver OFF
+                        if (!state.falseColor) {
+                            const mesh = webGroup.clone();
+                            mesh.position.set(posX, state.height, posZ);
+                            this.solidGroup.add(mesh);
+                        }
                     } else {
                         // LUXSINTAX: Cria spots virtuais iluminando o piso se o utilizador não tiver IES
                         const fixMesh = new THREE.Mesh(fixGeo, fixMat);
