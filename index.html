@@ -1676,7 +1676,7 @@ window.Photometric3DEngine = {
             ];
 
             // LUXSINTAX: Motor de Baking de Texturas (Heatmap 3D em Tempo Real)
-            const buildTexture = (w, h, isFloor, wallId) => {
+            const buildTexture = (w, h, planeType, wallId) => {
                 const resX = 64; const resY = Math.max(16, Math.round(resX * (h/w)));
                 const cvs = document.createElement('canvas');
                 cvs.width = resX; cvs.height = resY;
@@ -1700,14 +1700,18 @@ window.Photometric3DEngine = {
                 const halfBeamRad = (state.beam || 60) * Math.PI / 180 / 2;
                 const n_power = (halfBeamRad > 0 && halfBeamRad < Math.PI / 2) ? Math.log(0.5) / Math.log(Math.cos(halfBeamRad)) : 1;
                 const maxI = (state.flux * (n_power + 1)) / (2 * Math.PI);
+                
+                // LUXSINTAX: Cálculo da luz ambiente/indireta que atingirá o teto e as paredes
                 const ambientLux = ((state.flux * state.cols * state.rows * state.utilFactor * state.maintFactor) / (state.roomW * state.roomL)) * 0.08;
 
                 for (let ix = 0; ix < resX; ix++) {
                     for (let iy = 0; iy < resY; iy++) {
                         let px, py, pz;
-                        if (isFloor) {
+                        if (planeType === 0) { // Piso
                             px = -state.roomW/2 + (ix/resX)*state.roomW; py = 0; pz = -state.roomL/2 + (iy/resY)*state.roomL;
-                        } else {
+                        } else if (planeType === 2) { // Teto
+                            px = -state.roomW/2 + (ix/resX)*state.roomW; py = state.height; pz = -state.roomL/2 + (iy/resY)*state.roomL;
+                        } else { // Paredes (planeType === 1)
                             py = state.height - (iy/resY)*state.height;
                             if (wallId === 0) { px = -state.roomW/2 + (ix/resX)*state.roomW; pz = -state.roomL/2; }
                             if (wallId === 1) { px = -state.roomW/2 + (ix/resX)*state.roomW; pz = state.roomL/2; }
@@ -1720,12 +1724,15 @@ window.Photometric3DEngine = {
                             const dx = px - fix.x, dy = py - fix.y, dz = pz - fix.z;
                             const distSq = dx*dx + dy*dy + dz*dz;
                             const dist = Math.sqrt(distSq);
-                            const cosTheta = Math.abs(dy) / dist;
-                            const angleRad = Math.acos(cosTheta);
                             
-                            if (angleRad < Math.PI / 2) {
+                            // Previne divisão por zero se o pixel coincidir com a luminária no teto
+                            const cosTheta = dist > 0 ? Math.abs(dy) / dist : 1;
+                            const angleRad = dist > 0 ? Math.acos(cosTheta) : 0;
+                            
+                            // Se for teto (planeType === 2), a luz direta descendente é zero. Mostramos apenas o indireto (ambientLux).
+                            if (planeType !== 2 && angleRad < Math.PI / 2) {
                                 const I = maxI * Math.pow(Math.cos(angleRad), n_power);
-                                const incidence = isFloor ? cosTheta : Math.sqrt(dx*dx + dz*dz)/dist;
+                                const incidence = (planeType === 0) ? cosTheta : Math.sqrt(dx*dx + dz*dz)/dist;
                                 if (I > 0) totalLux += (I * incidence) / distSq;
                             }
                         }
@@ -1742,32 +1749,39 @@ window.Photometric3DEngine = {
 
             // Construção do Piso Dinâmico
             const floorGeo = new THREE.PlaneGeometry(state.roomW, state.roomL);
-            const floorMat = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.roomL, true, null), side: THREE.DoubleSide, depthWrite: true });
+            const floorMat = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.roomL, 0, null), side: THREE.DoubleSide, depthWrite: true });
             const floorMesh = new THREE.Mesh(floorGeo, floorMat);
             floorMesh.rotation.x = -Math.PI / 2;
             this.solidGroup.add(floorMesh);
 
-            // Construção das 4 Paredes Dinâmicas (Com Ocultação Dinâmica via Backface Culling)
+            // Construção das 4 Paredes e Teto Dinâmicos (Com Ocultação Dinâmica via Backface Culling)
             if (state.falseColor) {
+                // LUXSINTAX: Teto Dinâmico - Visível apenas quando a câmera entra na sala olhando para cima!
+                const ceilMat = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.roomL, 2, null), side: THREE.FrontSide });
+                const ceilMesh = new THREE.Mesh(new THREE.PlaneGeometry(state.roomW, state.roomL), ceilMat);
+                ceilMesh.rotation.x = Math.PI / 2; // Aponta para BAIXO (Dentro da sala)
+                ceilMesh.position.set(0, state.height, 0);
+                this.solidGroup.add(ceilMesh);
+
                 // LUXSINTAX: O uso de THREE.FrontSide com rotações apontando para dentro cria o efeito "Caixa Aberta" dinâmico.
-                const wallMat0 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.height, false, 0), side: THREE.FrontSide });
+                const wallMat0 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.height, 1, 0), side: THREE.FrontSide });
                 const wallMesh0 = new THREE.Mesh(new THREE.PlaneGeometry(state.roomW, state.height), wallMat0);
                 wallMesh0.position.set(0, state.height/2, -state.roomL/2); // Já aponta para +Z (Dentro)
                 this.solidGroup.add(wallMesh0);
 
-                const wallMat1 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.height, false, 1), side: THREE.FrontSide });
+                const wallMat1 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomW, state.height, 1, 1), side: THREE.FrontSide });
                 const wallMesh1 = new THREE.Mesh(new THREE.PlaneGeometry(state.roomW, state.height), wallMat1);
                 wallMesh1.rotation.y = Math.PI; // Invertido para apontar para -Z (Dentro)
                 wallMesh1.position.set(0, state.height/2, state.roomL/2);
                 this.solidGroup.add(wallMesh1);
 
-                const wallMat2 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomL, state.height, false, 2), side: THREE.FrontSide });
+                const wallMat2 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomL, state.height, 1, 2), side: THREE.FrontSide });
                 const wallMesh2 = new THREE.Mesh(new THREE.PlaneGeometry(state.roomL, state.height), wallMat2);
                 wallMesh2.rotation.y = Math.PI / 2; // Aponta para +X (Dentro)
                 wallMesh2.position.set(-state.roomW/2, state.height/2, 0);
                 this.solidGroup.add(wallMesh2);
 
-                const wallMat3 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomL, state.height, false, 3), side: THREE.FrontSide });
+                const wallMat3 = new THREE.MeshBasicMaterial({ map: buildTexture(state.roomL, state.height, 1, 3), side: THREE.FrontSide });
                 const wallMesh3 = new THREE.Mesh(new THREE.PlaneGeometry(state.roomL, state.height), wallMat3);
                 wallMesh3.rotation.y = -Math.PI / 2; // Invertido para apontar para -X (Dentro)
                 wallMesh3.position.set(state.roomW/2, state.height/2, 0);
