@@ -2568,6 +2568,29 @@ window.handleGenerateReport = async () => {
         window.updateCalcMode = function(mode) {
             window.calcMode = mode;
             
+            // LUXSINTAX: Memory Management (State Reset)
+            // Ao abandonar o modo IES, purgamos a matriz fotométrica da memória
+            // Isso previne que a Exportação PDF ou o Motor 3D usem "dados fantasmas"
+            if (mode !== 'ies' && window.currentTool && window.state[window.currentTool]) {
+                window.state[window.currentTool].iesData = null;
+                window.state[window.currentTool].iesFileName = null;
+                
+                // Reseta o nó do DOM (Input File)
+                const fileInput = document.getElementById(window.currentTool[0] + '-ies-input');
+                if (fileInput) fileInput.value = '';
+                
+                // Restaura o Label de Status Visual
+                const statusEl = document.getElementById(window.currentTool[0] + '-ies-status');
+                if (statusEl) {
+                    statusEl.innerText = "Nenhum arquivo carregado.";
+                    statusEl.classList.remove('text-luminous-gold', 'text-red-500');
+                    statusEl.classList.add('text-dim-gray');
+                }
+                
+                // Força o despawn da HUD Fotométrica (Sumário Técnico)
+                if (window.updatePhotometricHUD) window.updatePhotometricHUD();
+            }
+
             // LUXSINTAX: Atualização dos Segmented Controls de Fonte
             const act = "flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm";
             const inact = "flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
