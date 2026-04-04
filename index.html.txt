@@ -5400,10 +5400,215 @@ window.toggleGridMode = function(mode) {
             window.updateCalculations();
         };
 
+        // =====================================================================
+        // LUXSINTAX OVERRIDE ENGINE: SOBRESCREVE DUPLICATAS E CORRIGE BUGS DE UI
+        // =====================================================================
+        
+        window.toggleHeatmap = function(isChecked) {
+            if(window.currentTool === 'grid') window.state.grid.falseColor = isChecked;
+            if(window.currentTool === 'ponto') window.state.ponto.falseColor = isChecked;
+            if(window.currentTool === 'vertical') window.state.vertical.falseColor = isChecked;
+            
+            const bgToggle = document.getElementById('fc-toggle-bg');
+            const dotToggle = document.getElementById('fc-toggle-dot');
+            if (bgToggle && dotToggle) {
+                if (isChecked) {
+                    bgToggle.classList.add('bg-tech-cyan'); 
+                    bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.add('translate-x-3');
+                } else {
+                    bgToggle.classList.remove('bg-tech-cyan'); 
+                    bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.remove('translate-x-3');
+                }
+            }
+
+            const legend = document.getElementById('heatmap-legend-overlay');
+            if (legend) {
+                const is3DActive = !document.getElementById('stage-3d').classList.contains('hidden');
+                const isValidGrid = isChecked && window.currentTool === 'grid';
+                const isValidPonto = isChecked && window.currentTool === 'ponto' && is3DActive;
+                const isValidVert = isChecked && window.currentTool === 'vertical' && is3DActive;
+
+                if (isValidGrid || isValidPonto || isValidVert) {
+                    legend.classList.remove('hidden');
+                    if (!legend.dataset.initialized) {
+                        const bar = document.getElementById('heatmap-gradient-bar');
+                        const ticksContainer = document.getElementById('heatmap-ticks');
+                        const scale = window.FalseColorEngine.colorScale;
+                        const maxLux = scale[scale.length - 1].lux;
+                        
+                        let stops = scale.map(c => `rgb(${c.r},${c.g},${c.b}) ${(c.lux / maxLux) * 100}%`).join(', ');
+                        bar.style.background = `linear-gradient(to right, ${stops})`;
+                        
+                        let ticksHTML = '';
+                        scale.forEach((c, idx) => {
+                            if ([0, 100, 300, 500, 750].includes(c.lux) || idx === scale.length - 1) {
+                                const leftPct = (c.lux / maxLux) * 100;
+                                let transform = 'translateX(-50%)';
+                                if (leftPct === 0) transform = 'translateX(0)';
+                                if (leftPct === 100) transform = 'translateX(-100%)';
+                                const label = idx === scale.length - 1 ? `${c.lux}+` : c.lux;
+                                ticksHTML += `<span class="absolute top-0 transition-colors dark:text-slate-300" style="left: ${leftPct}%; transform: ${transform};">${label}</span>`;
+                            }
+                        });
+                        ticksContainer.innerHTML = ticksHTML;
+                        legend.dataset.initialized = 'true';
+                    }
+                } else {
+                    legend.classList.add('hidden');
+                }
+            }
+            window.updateCalculations();
+        };
+
+        window.setSurfaceMode = function(mode) {
+            const btnS = document.getElementById('btn-surf-single');
+            const btnA = document.getElementById('btn-surf-array');
+            const btn3D = document.getElementById('btn-surf-3d');
+            const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm";
+            const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+
+            if (mode === '3D') {
+                window.toggleRenderMode('3D');
+                if(btnS) btnS.className = inact;
+                if(btnA) btnA.className = inact;
+                if(btn3D) btn3D.className = act;
+            } else {
+                window.toggleRenderMode('2D');
+                window.state.ponto.viewMode = mode;
+                if(btnS) btnS.className = mode === 'single' ? act : inact;
+                if(btnA) btnA.className = mode === 'array' ? act : inact;
+                if(btn3D) btn3D.className = inact;
+            }
+            
+            const isArray = (mode === 'array') || (mode === '3D' && window.state.ponto.viewMode === 'array');
+            
+            const tiltModeGrp = document.getElementById('p-tilt-mode-group');
+            if (tiltModeGrp) tiltModeGrp.style.display = isArray ? 'block' : 'none';
+            
+            const spacingGrp = document.getElementById('group-spacing');
+            if (spacingGrp) {
+                if (isArray) spacingGrp.classList.remove('hidden');
+                else spacingGrp.classList.add('hidden');
+            }
+
+            const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
+            if (heatmapWrapper && window.currentTool === 'ponto') {
+                heatmapWrapper.classList.toggle('hidden', mode !== '3D');
+            }
+
+            if (window.toggleHeatmap) window.toggleHeatmap(window.state.ponto.falseColor);
+
+            window.updateCalculations();
+        };
+
+        window.toggleVerticalView = function(mode) {
+            const btnS = document.getElementById('btn-v-section');
+            const btnE = document.getElementById('btn-v-elevation');
+            const btn3D = document.getElementById('btn-v-3d');
+            const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
+            const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+            
+            if (mode === '3D') {
+                window.toggleRenderMode('3D');
+                if(btnS) btnS.className = inactiveClass;
+                if(btnE) btnE.className = inactiveClass;
+                if(btn3D) btn3D.className = activeClass;
+            } else {
+                window.toggleRenderMode('2D');
+                window.state.vertical.viewMode = mode;
+                if(btnS) btnS.className = mode === 'section' ? activeClass : inactiveClass;
+                if(btnE) btnE.className = mode === 'elevation' ? activeClass : inactiveClass;
+                if(btn3D) btn3D.className = inactiveClass;
+            }
+
+            const elevationGroups = document.getElementById('v-elevation-groups');
+            // Mostra os parâmetros de matriz se for Elevação OU Perspectiva 3D
+            const isElevation = (mode === 'elevation') || (mode === '3D');
+            if (elevationGroups) elevationGroups.style.display = isElevation ? 'block' : 'none';
+
+            const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
+            if (heatmapWrapper && window.currentTool === 'vertical') {
+                heatmapWrapper.classList.toggle('hidden', mode !== '3D');
+            }
+
+            if (window.toggleHeatmap) window.toggleHeatmap(window.state.vertical.falseColor);
+
+            window.updateCalculations();
+        };
+
+        window.switchTool = function(toolId) {
+            window.currentTool = toolId;
+
+            document.querySelectorAll('.mode-tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-luminous-gold');
+                btn.classList.add('tab-inactive');
+            });
+            const activeBtn = document.getElementById('tab-' + toolId);
+            if (activeBtn) {
+                activeBtn.classList.remove('tab-inactive');
+                activeBtn.classList.add('tab-active', 'text-luminous-gold');
+            }
+
+            document.getElementById('visual-tools').classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj');
+            document.getElementById('query-tool').classList.toggle('hidden', toolId !== 'query');
+            document.getElementById('leedProj-tool').classList.toggle('hidden', toolId !== 'leedProj');
+            
+            const modeSelector = document.getElementById('calc-mode-selector');
+            if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
+
+            if (toolId !== 'query' && toolId !== 'leedProj') {
+                ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
+                    const el = document.getElementById(id); 
+                    if(el) el.classList.add('hidden'); 
+                });
+                const selectedInput = document.getElementById('inputs-' + toolId);
+                if (selectedInput) selectedInput.classList.remove('hidden');
+                
+                document.getElementById('surface-selector')?.classList.toggle('hidden', toolId !== 'ponto');
+                document.getElementById('vertical-selector')?.classList.toggle('hidden', toolId !== 'vertical');
+                document.getElementById('grid-selector')?.classList.toggle('hidden', toolId !== 'grid');
+                
+                document.getElementById('heatmap-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'grid');
+                document.getElementById('hcl-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'ponto' && toolId !== 'vertical');
+
+                if (toolId === 'ponto') window.setSurfaceMode('single');
+                if (toolId === 'vertical') window.toggleVerticalView('section');
+                if (toolId === 'grid') window.toggleGridMode('HP');
+
+                if (window.updatePhotometricHUD) window.updatePhotometricHUD();
+                
+                const legendOverlay = document.getElementById('heatmap-legend-overlay');
+                if (legendOverlay) {
+                    const is3DActive = !document.getElementById('stage-3d').classList.contains('hidden');
+                    const isGridHeatmap = toolId === 'grid' && window.state.grid.falseColor;
+                    const isPontoHeatmap = toolId === 'ponto' && window.state.ponto.falseColor && is3DActive;
+                    const isVertHeatmap = toolId === 'vertical' && window.state.vertical.falseColor && is3DActive;
+                    legendOverlay.classList.toggle('hidden', !(isGridHeatmap || isPontoHeatmap || isVertHeatmap));
+                }
+                
+                const glareWrapper = document.getElementById('glare-toggle-wrapper');
+                if (glareWrapper) {
+                    glareWrapper.classList.toggle('hidden', (toolId !== 'vertical' && toolId !== 'ponto') || (toolId === 'vertical' && window.state.vertical.viewMode === 'elevation'));
+                }
+
+                window.updateCalculations();
+            } else if (toolId === 'query') {
+                 window.switchQueryTab('nbr8995');
+            } else if (toolId === 'leedProj') {
+                 window.renderLeedProject();
+            }
+        };
+
+        // =====================================================================
+        // INICIALIZAÇÃO DO SISTEMA
+        // =====================================================================
+
         window.currentLang = 'pt';
         initializeApp();
-        window.initNbrSelector(); // <--- Inicializa o banco de dados do Seletor
-        window.switchTool('grid'); // LUXSINTAX: Inicia pelo Método Lúmens
+        window.initNbrSelector(); 
+        window.switchTool('grid'); 
         window.updateCalculations(); 
         window.updateCalcMode('direct');
     </script>
