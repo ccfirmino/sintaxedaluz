@@ -1644,13 +1644,14 @@ window.Photometric3DEngine = {
                 const scaleFactor = (state && state.height) ? (state.height * 0.8) / (maxI * mult) : 5 / (maxI * mult);
                 const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
 
+                // LUXSINTAX: Inversão de Phi (-phi) para forçar o wireframe a obedecer a orientação do Heatmap 3D
                 for (let h = 0; h < hAngles.length; h++) {
                     const pts = [];
                     for (let v = 0; v < vAngles.length; v++) {
                         const intensity = matrix[h][v] * mult * scaleFactor;
                         const phi = (hAngles[h] * Math.PI) / 180; 
                         const theta = (vAngles[v] * Math.PI) / 180; 
-                        pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(phi)));
+                        pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(-phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(-phi)));
                     }
                     webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
                 }
@@ -1661,7 +1662,7 @@ window.Photometric3DEngine = {
                         const intensity = matrix[h][v] * mult * scaleFactor;
                         const phi = (hAngles[h] * Math.PI) / 180; 
                         const theta = (vAngles[v] * Math.PI) / 180; 
-                        pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(phi)));
+                        pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(-phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(-phi)));
                     }
                     webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
                 }
