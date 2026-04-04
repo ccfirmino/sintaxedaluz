@@ -2733,10 +2733,11 @@ window.handleGenerateReport = async () => {
                 // LUXSINTAX: Autoriza a Legenda Heatmap para a Malha e para os modos Ponto a Ponto (Apenas 3D)
                 const legendOverlay = document.getElementById('heatmap-legend-overlay');
                 if (legendOverlay) {
-                    const isGridHeatmap = toolId === 'grid' && window.state.grid.falseColor;
-                    const isPontoHeatmap = toolId === 'ponto' && window.state.ponto.falseColor && window.state.ponto.viewMode === '3D';
-                    const isVertHeatmap = toolId === 'vertical' && window.state.vertical.falseColor && window.state.vertical.viewMode === '3D';
-                    legendOverlay.classList.toggle('hidden', !(isGridHeatmap || isPontoHeatmap || isVertHeatmap));
+                    const is3DActive = !document.getElementById('stage-3d').classList.contains('hidden');
+                const isGridHeatmap = toolId === 'grid' && window.state.grid.falseColor;
+                const isPontoHeatmap = toolId === 'ponto' && window.state.ponto.falseColor && is3DActive;
+                const isVertHeatmap = toolId === 'vertical' && window.state.vertical.falseColor && is3DActive;
+                legendOverlay.classList.toggle('hidden', !(isGridHeatmap || isPontoHeatmap || isVertHeatmap));
                 }
                 
                 const glareWrapper = document.getElementById('glare-toggle-wrapper');
@@ -2925,9 +2926,10 @@ window.handleGenerateReport = async () => {
             // LUXSINTAX: Aciona a renderização e visibilidade do HUD Legenda
             const legend = document.getElementById('heatmap-legend-overlay');
             if (legend) {
+                const is3DActive = !document.getElementById('stage-3d').classList.contains('hidden');
                 const isValidGrid = isChecked && window.currentTool === 'grid';
-                const isValidPonto = isChecked && window.currentTool === 'ponto' && window.state.ponto.viewMode === '3D';
-                const isValidVert = isChecked && window.currentTool === 'vertical' && window.state.vertical.viewMode === '3D';
+                const isValidPonto = isChecked && window.currentTool === 'ponto' && is3DActive;
+                const isValidVert = isChecked && window.currentTool === 'vertical' && is3DActive;
                 
                 if (isValidGrid || isValidPonto || isValidVert) {
                     legend.classList.remove('hidden');
@@ -2983,9 +2985,10 @@ window.handleGenerateReport = async () => {
                 if(btn3D) btn3D.className = inactiveClass;
             }
 
-            // LUXSINTAX: Ocultar/Exibir Controles Exclusivos da Elevação Frontal
+            // LUXSINTAX: Ocultar/Exibir Controles Exclusivos da Elevação Frontal (Preservar no 3D)
             const elevationGroups = document.getElementById('v-elevation-groups');
-            if (elevationGroups) elevationGroups.style.display = (mode === 'elevation') ? 'block' : 'none';
+            const isElevation = (mode === 'elevation') || (mode === '3D' && window.state.vertical.viewMode === 'elevation');
+            if (elevationGroups) elevationGroups.style.display = isElevation ? 'block' : 'none';
 
             // LUXSINTAX: Toggle do Heatmap no 3D
             const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
@@ -5174,13 +5177,15 @@ window.setSurfaceMode = function(mode) {
             if(btn3D) btn3D.className = inact;
         }
         
+        const isArray = (mode === 'array') || (mode === '3D' && window.state.ponto.viewMode === 'array');
+        
         const tiltModeGrp = document.getElementById('p-tilt-mode-group');
-        if (tiltModeGrp) tiltModeGrp.style.display = (mode === 'single' || mode === '3D') ? 'none' : 'block';
+        if (tiltModeGrp) tiltModeGrp.style.display = isArray ? 'block' : 'none';
         
         const spacingGrp = document.getElementById('group-spacing');
         if (spacingGrp) {
-            if (mode === 'single' || mode === '3D') spacingGrp.classList.add('hidden');
-            else spacingGrp.classList.remove('hidden');
+            if (isArray) spacingGrp.classList.remove('hidden');
+            else spacingGrp.classList.add('hidden');
         }
 
         // LUXSINTAX: Heatmap Toggle visível apenas no 3D para Ponto a Ponto
