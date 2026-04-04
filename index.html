@@ -352,6 +352,7 @@
                 <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
             </div>
             <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label id="lbl-v-tilt" class="text-[10px] text-slate-500 font-bold whitespace-nowrap transition-colors"><span data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</span> <span id="warn-v-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-2 animate-pulse border border-red-200 dark:border-red-800">⚠️ MAX 30º</span></label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase">ROTAÇÃO AZIMUTAL (SPIN)</label><div class="flex items-baseline gap-1"><input type="number" id="v-spin" value="0" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-spin" min="0" max="360" step="15" value="0"></div>
             <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
             <div class="mode-photo-group hidden space-y-6 mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-v-flux" min="0" max="10000" step="10" value="1500"></div>
@@ -1186,8 +1187,8 @@
 
         // 2. GLOBAL STATE
         window.state = {
-            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
-            vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
+            ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, spin: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
+            vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, spin: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false },
             homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
             grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, cct: 3000, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
             driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
@@ -1980,10 +1981,86 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x111827);
             this.solidGroup.add(gridHelper);
 
-            // LUXSINTAX: Chão físico para receber a luz se não houver IES
             const isDark = document.documentElement.classList.contains('dark');
-            const floorGeo = new THREE.PlaneGeometry(10, 10);
-            const floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x111827 : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
+            const floorSize = 10;
+            let floorMat;
+
+            // LUXSINTAX: Construção Dinâmica do Heatmap 3D para Ponto a Ponto
+            if (state && state.falseColor) {
+                const resX = 64; const resY = 64;
+                const cvs = document.createElement('canvas');
+                cvs.width = resX; cvs.height = resY;
+                const cx = cvs.getContext('2d');
+                
+                const tiltMode3D = document.querySelector('input[name="p_tilt_mode"]:checked')?.value || 'same';
+                const baseTiltRad = (state.tilt || 0) * Math.PI / 180;
+                const hS = (state.spacing || 2) / 2;
+                const h = state.height || 3;
+                
+                const fixtures = [];
+                if (toolId === 'ponto' && state.viewMode === 'array') {
+                    fixtures.push({ x: -hS, y: h, tilt: baseTiltRad });
+                    fixtures.push({ x: hS, y: h, tilt: tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad });
+                } else {
+                    fixtures.push({ x: 0, y: h, tilt: baseTiltRad });
+                }
+
+                let n_power = 1;
+                let maxI = 0;
+                let isIesActive = window.calcMode === 'ies' && hasIes;
+
+                if (!isIesActive) {
+                    const currentBeam = state.beam || 30;
+                    const halfBeamRad = (currentBeam / 2) * Math.PI / 180;
+                    if (halfBeamRad > 0 && halfBeamRad < Math.PI / 2) {
+                        n_power = Math.log(0.5) / Math.log(Math.cos(halfBeamRad));
+                    }
+                    const actualFlux = state.flux || 1500;
+                    maxI = (actualFlux * (n_power + 1)) / (2 * Math.PI);
+                }
+
+                for (let ix = 0; ix < resX; ix++) {
+                    for (let iy = 0; iy < resY; iy++) {
+                        const px = -floorSize/2 + (ix/resX)*floorSize;
+                        const pz = -floorSize/2 + (iy/resY)*floorSize;
+                        let totalLux = 0;
+
+                        for (const fix of fixtures) {
+                            const dx = px - fix.x;
+                            const dy = 0 - fix.y;
+                            const dz = pz - 0; 
+                            const distSq = dx*dx + dy*dy + dz*dz;
+                            const dist = Math.sqrt(distSq);
+                            
+                            const cosTheta = dist > 0 ? Math.abs(dy) / dist : 1;
+                            const angleToNadir = dist > 0 ? Math.acos(cosTheta) : 0;
+                            
+                            const projectedX = dx * Math.cos(-fix.tilt) - dy * Math.sin(-fix.tilt);
+                            const projectedY = dx * Math.sin(-fix.tilt) + dy * Math.cos(-fix.tilt);
+                            const effectiveAngleRad = Math.acos(Math.abs(projectedY) / dist);
+                            const azimuthDeg = (Math.atan2(dz, projectedX) * 180 / Math.PI) + 90;
+
+                            let I = 0;
+                            if (isIesActive) {
+                                I = window.getIESIntensity(state, effectiveAngleRad * 180 / Math.PI, azimuthDeg + (state.spin || 0));
+                            } else if (effectiveAngleRad < Math.PI / 2) {
+                                I = maxI * Math.pow(Math.cos(effectiveAngleRad), n_power);
+                            }
+                            
+                            if (I > 0) totalLux += (I * cosTheta) / distSq;
+                        }
+                        cx.fillStyle = window.FalseColorEngine.getLuxColor(Math.round(totalLux), 1.0);
+                        cx.fillRect(ix, iy, 1, 1);
+                    }
+                }
+                const tex = new THREE.CanvasTexture(cvs);
+                tex.minFilter = THREE.LinearFilter;
+                floorMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide, depthWrite: true });
+            } else {
+                floorMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x111827 : 0xe2e8f0, side: THREE.DoubleSide, depthWrite: true });
+            }
+
+            const floorGeo = new THREE.PlaneGeometry(floorSize, floorSize);
             const floorMesh = new THREE.Mesh(floorGeo, floorMat);
             floorMesh.rotation.x = -Math.PI / 2;
             this.solidGroup.add(floorMesh);
@@ -1995,16 +2072,8 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
             let lightColor = 0xffbf00; 
             if (mRatio < 0.5) lightColor = 0xf59e0b; 
             if (mRatio > 0.8) lightColor = 0xbae6fd; 
-
-            if (this.solidGroup.children.length > 0) {
-                const floor = this.solidGroup.children.find(child => child.geometry instanceof THREE.PlaneGeometry);
-                if (floor) {
-                    floor.material = new THREE.MeshBasicMaterial({ 
-                        color: isDark ? 0x111827 : 0xe2e8f0, 
-                        side: THREE.DoubleSide, depthWrite: true
-                    });
-                }
-            }
+            
+            // LUXSINTAX: Removido override estático de cor do chão, permitindo que a textura prevaleça.
 
             // Material para o Cone de Luz Volumétrico Translúcido
             const coneMat = new THREE.MeshBasicMaterial({ 
@@ -2024,15 +2093,23 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
                 const sourceGrp = new THREE.Group();
                 sourceGrp.position.set(posX, h, 0);
                 
-                // Aplica a inclinação (Tilt) diretamente ao contêiner
+                // Aplica a inclinação (Tilt) e a Rotação (Spin) diretamente ao contêiner
                 sourceGrp.rotation.z = rotZ; 
+                sourceGrp.rotation.y = (state && state.spin ? state.spin : 0) * Math.PI / 180;
                 this.solidGroup.add(sourceGrp);
 
                 if (hasIes && webGroup.children.length > 0) {
                     // --- MODO IES (Analítico Premium) ---
-                    const mesh = webGroup.clone();
-                    mesh.position.set(0, 0, 0); // Posição relativa ao contêiner
-                    sourceGrp.add(mesh);
+                    // Bolinha Física para referência espacial (Sempre visível)
+                    const fixMesh = new THREE.Mesh(fixGeo, fixMat);
+                    sourceGrp.add(fixMesh);
+                    
+                    // Oculta a teia se o Heatmap estiver ativo para não poluir
+                    if (!(state && state.falseColor)) {
+                        const mesh = webGroup.clone();
+                        mesh.position.set(0, 0, 0); // Posição relativa ao contêiner
+                        sourceGrp.add(mesh);
+                    }
                 } else {
                     // --- MODO MANUAL (Arquitetônico Sedutor) ---
                     // 1. A Bolinha Dourada (Físico)
@@ -2045,17 +2122,19 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
                     lensMesh.position.y = -0.01; // Sutilmente abaixo da bolinha
                     sourceGrp.add(lensMesh);
 
-                    // 3. O Cone de Luz Volumétrico Translúcido
-                    const beamAngleRad = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
-                    const coneHeight = h; // LUXSINTAX: Cone não atravessa o piso
-                    const coneRadiusBase = Math.tan(beamAngleRad) * coneHeight;
-                    
-                    const coneGeo = new THREE.CylinderGeometry(0.12, coneRadiusBase, coneHeight, 32, 1, true); // Cone aberto
-                    // Ajusta a geometria para que o topo fique na origem (0,0,0) do contêiner
-                    coneGeo.translate(0, -coneHeight/2, 0); 
-                    
-                    const beamMesh = new THREE.Mesh(coneGeo, coneMat);
-                    sourceGrp.add(beamMesh);
+                    // 3. O Cone de Luz Volumétrico Translúcido (Oculto se o Heatmap estiver ligado)
+                    if (!(state && state.falseColor)) {
+                        const beamAngleRad = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
+                        const coneHeight = h; // LUXSINTAX: Cone não atravessa o piso
+                        const coneRadiusBase = Math.tan(beamAngleRad) * coneHeight;
+                        
+                        const coneGeo = new THREE.CylinderGeometry(0.12, coneRadiusBase, coneHeight, 32, 1, true); // Cone aberto
+                        // Ajusta a geometria para que o topo fique na origem (0,0,0) do contêiner
+                        coneGeo.translate(0, -coneHeight/2, 0); 
+                        
+                        const beamMesh = new THREE.Mesh(coneGeo, coneMat);
+                        sourceGrp.add(beamMesh);
+                    }
 
                     // 4. A Luz Física Real (Projectada no Piso Reflexivo)
                     const spotLight = new THREE.SpotLight(lightColor, 4.0 * luxFactor); // LUXSINTAX: A luz física reage à barra
@@ -2095,19 +2174,32 @@ spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
 };
 
 window.toggleRenderMode = function(mode) {
-    const stage2D = document.getElementById('stage-2d');
-    const stage3D = document.getElementById('stage-3d');
-    if (!stage2D || !stage3D) return;
+        const stage2D = document.getElementById('stage-2d');
+        const stage3D = document.getElementById('stage-3d');
+        if (!stage2D || !stage3D) return;
 
-    if (mode === '3D') {
-        stage2D.classList.add('hidden');
-        stage3D.classList.remove('hidden');
-        if (window.Photometric3DEngine) window.Photometric3DEngine.init();
-    } else {
-        stage3D.classList.add('hidden');
-        stage2D.classList.remove('hidden');
-    }
-};
+        const glareWrapper = document.getElementById('glare-toggle-wrapper');
+        const hclWrapper = document.getElementById('hcl-toggle-wrapper');
+
+        if (mode === '3D') {
+            stage2D.classList.add('hidden');
+            stage3D.classList.remove('hidden');
+            // LUXSINTAX: UI Sensível ao Contexto - Esconde análises 2D complexas no 3D
+            if (glareWrapper) glareWrapper.classList.add('hidden');
+            if (hclWrapper) hclWrapper.classList.add('hidden');
+            if (window.Photometric3DEngine) window.Photometric3DEngine.init();
+        } else {
+            stage3D.classList.add('hidden');
+            stage2D.classList.remove('hidden');
+            // LUXSINTAX: Restaura os toggles baseado na ferramenta 2D ativa
+            if (window.currentTool === 'vertical' || window.currentTool === 'ponto') {
+                if (hclWrapper) hclWrapper.classList.remove('hidden');
+                if (glareWrapper && !(window.currentTool === 'vertical' && window.state.vertical.viewMode === 'elevation')) {
+                    glareWrapper.classList.remove('hidden');
+                }
+            }
+        }
+    };
 
 window.BimIfcAdapter = {
     mapGridToBim: (gridState) => {
@@ -2525,6 +2617,7 @@ window.handleGenerateReport = async () => {
                 document.getElementById('vertical-selector')?.classList.toggle('hidden', toolId !== 'vertical');
                 document.getElementById('grid-selector')?.classList.toggle('hidden', toolId !== 'grid');
                 
+                // Inicialmente escondido no Ponto, liberado apenas pelo setSurfaceMode('3D')
                 document.getElementById('heatmap-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'grid');
                 document.getElementById('hcl-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'ponto' && toolId !== 'vertical');
 // LUXSINTAX: Auto-Reset das visualizações ao trocar de aba
@@ -2692,7 +2785,8 @@ window.handleGenerateReport = async () => {
 
         // LUXSINTAX: Controle Robusto do Heatmap (Desacoplado do Canvas)
         window.toggleHeatmap = function(isChecked) {
-            window.state.grid.falseColor = isChecked;
+            if(window.currentTool === 'grid') window.state.grid.falseColor = isChecked;
+            if(window.currentTool === 'ponto') window.state.ponto.falseColor = isChecked;
             const bgToggle = document.getElementById('fc-toggle-bg');
             const dotToggle = document.getElementById('fc-toggle-dot');
             if (bgToggle && dotToggle) {
@@ -2710,7 +2804,7 @@ window.handleGenerateReport = async () => {
             // LUXSINTAX: Aciona a renderização e visibilidade do HUD Legenda
             const legend = document.getElementById('heatmap-legend-overlay');
             if (legend) {
-                if (isChecked && window.currentTool === 'grid') {
+                if (isChecked && (window.currentTool === 'grid' || window.currentTool === 'ponto')) {
                     legend.classList.remove('hidden');
                     if (!legend.dataset.initialized) {
                         const bar = document.getElementById('heatmap-gradient-bar');
@@ -3899,7 +3993,7 @@ if (window.currentTool !== 'grid') {
             }
             else if (window.currentTool === 'vertical') {
                 const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
-                let I_v = (window.calcMode === 'ies') ? window.getIESIntensity(s, s.tilt) : getIntensity(s);
+                let I_v = (window.calcMode === 'ies') ? window.getIESIntensity(s, s.tilt, s.spin || 0) : getIntensity(s);
                 let ev = (s.tilt > 0) ? (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist) : 0;
                 let hitY_metric = s.height - (s.dist / Math.tan(tr));
                 let hitY_px = floorY - (hitY_metric * scale);
@@ -4167,6 +4261,9 @@ if (window.currentTool !== 'grid') {
             } // <--- ESTA É A CHAVE MÁGICA QUE FALTAVA!
             
             if (window.calcMode === 'ies' && s.iesData) {
+                // LUXSINTAX: Ocultar Curva Polar na Elevação Frontal (Preservar a pureza visual da mancha)
+                if (window.currentTool === 'vertical' && s.viewMode === 'elevation') return;
+
                 const { vAngles, candelas } = s.iesData;
                 
                 // Matriz já está normalizada e simétrica (Índices fixos: 0=C0, 9=C90, 18=C180, 27=C270)
@@ -4528,7 +4625,7 @@ function bind(id, key, param) {
 }
         
         // LUXSINTAX: Injeção Completa das novas variáveis na Binding Array
-        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'cct', 'tilt', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'manualCols', 'manualRows', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
+        ['ponto', 'vertical', 'homog', 'grid'].forEach(key => { ['intensity', 'height', 'beam', 'cct', 'tilt', 'spin', 'plane', 'dist', 'spacing', 'flux', 'cdklm', 'hq', 'roomW', 'roomL', 'targetLux', 'manualCols', 'manualRows', 'utilFactor', 'maintFactor', 'frameW', 'frameH', 'qty', 'watts'].forEach(param => { bind(`${key[0]}-${param}`, key, param); bind(`range-${key[0]}-${param}`, key, param); }); });
 bind('dr-power', 'driver', 'power'); bind('range-dr-power', 'driver', 'power');
         bind('dr-qty', 'driver', 'qty'); bind('range-dr-qty', 'driver', 'qty');
         bind('dr-current', 'driver', 'current');
@@ -4911,35 +5008,42 @@ window.generateLeedReport = async () => {
 };
 
 window.setSurfaceMode = function(mode) {
-    const btnS = document.getElementById('btn-surf-single');
-    const btnA = document.getElementById('btn-surf-array');
-    const btn3D = document.getElementById('btn-surf-3d');
-    const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm";
-    const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+        const btnS = document.getElementById('btn-surf-single');
+        const btnA = document.getElementById('btn-surf-array');
+        const btn3D = document.getElementById('btn-surf-3d');
+        const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm";
+        const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
 
-    if (mode === '3D') {
-        window.toggleRenderMode('3D');
-        if(btnS) btnS.className = inact;
-        if(btnA) btnA.className = inact;
-        if(btn3D) btn3D.className = act;
-    } else {
-        window.toggleRenderMode('2D');
-        window.state.ponto.viewMode = mode;
-        if(btnS) btnS.className = mode === 'single' ? act : inact;
-        if(btnA) btnA.className = mode === 'array' ? act : inact;
-        if(btn3D) btn3D.className = inact;
-    }
-    
-    const tiltModeGrp = document.getElementById('p-tilt-mode-group');
-    if (tiltModeGrp) tiltModeGrp.style.display = (mode === 'single' || mode === '3D') ? 'none' : 'block';
-    
-    const spacingGrp = document.getElementById('group-spacing');
-    if (spacingGrp) {
-        if (mode === 'single' || mode === '3D') spacingGrp.classList.add('hidden');
-        else spacingGrp.classList.remove('hidden');
-    }
-    window.updateCalculations();
-};
+        if (mode === '3D') {
+            window.toggleRenderMode('3D');
+            if(btnS) btnS.className = inact;
+            if(btnA) btnA.className = inact;
+            if(btn3D) btn3D.className = act;
+        } else {
+            window.toggleRenderMode('2D');
+            window.state.ponto.viewMode = mode;
+            if(btnS) btnS.className = mode === 'single' ? act : inact;
+            if(btnA) btnA.className = mode === 'array' ? act : inact;
+            if(btn3D) btn3D.className = inact;
+        }
+        
+        const tiltModeGrp = document.getElementById('p-tilt-mode-group');
+        if (tiltModeGrp) tiltModeGrp.style.display = (mode === 'single' || mode === '3D') ? 'none' : 'block';
+        
+        const spacingGrp = document.getElementById('group-spacing');
+        if (spacingGrp) {
+            if (mode === 'single' || mode === '3D') spacingGrp.classList.add('hidden');
+            else spacingGrp.classList.remove('hidden');
+        }
+
+        // LUXSINTAX: Heatmap Toggle visível apenas no 3D para Ponto a Ponto
+        const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
+        if (heatmapWrapper && window.currentTool === 'ponto') {
+            heatmapWrapper.classList.toggle('hidden', mode !== '3D');
+        }
+
+        window.updateCalculations();
+    };
 
 window.toggleGridMode = function(mode) {
     const btnHP = document.getElementById('btn-grid-hp');
