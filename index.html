@@ -1666,6 +1666,12 @@ window.Photometric3DEngine = {
                     webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
                 }
             }
+            
+            // LUXSINTAX FIX: Sincronização do Sólido 3D com o Raycaster do Heatmap
+            // O motor matemático de radiosidade calcula o Azimute com um offset de +90º (Math.atan2 + 90).
+            // Rotacionamos a matriz raiz da teia polar em +90º no eixo Y (Math.PI / 2) para que
+            // a geometria 3D (visual) reflita a exata distribuição assimetrica que atinge a superfície simulada.
+            webGroup.rotation.y = Math.PI / 2;
         }
 
         this.solidGroup = new THREE.Group();
