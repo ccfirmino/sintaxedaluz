@@ -349,19 +349,21 @@
 
             <div class="mb-4 group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">Eixo Quadro (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0.5" max="10" step="0.1" value="1.6"></div>
             
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_frame_w">Largura Quadro</label><div class="flex items-baseline gap-1"><input type="number" id="v-frameW" value="1.2" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-frameW" min="0.1" max="10" step="0.1" value="1.2"></div>
-                <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_frame_h">Altura Quadro</label><div class="flex items-baseline gap-1"><input type="number" id="v-frameH" value="0.8" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-frameH" min="0.1" max="10" step="0.1" value="0.8"></div>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_qty">Qtd. Peças</label><div class="flex items-baseline gap-1"><input type="number" id="v-qty" value="1" min="1" max="20" step="1"></div></div><input type="range" id="range-v-qty" min="1" max="20" step="1" value="1"></div>
-                <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_spacing">Entre Peças</label><div class="flex items-baseline gap-1"><input type="number" id="v-spacing" value="1.0" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-spacing" min="0.1" max="10" step="0.1" value="1.0"></div>
+            <div id="v-elevation-groups" style="display: none;">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_frame_w">Largura Quadro</label><div class="flex items-baseline gap-1"><input type="number" id="v-frameW" value="1.2" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-frameW" min="0.1" max="10" step="0.1" value="1.2"></div>
+                    <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_frame_h">Altura Quadro</label><div class="flex items-baseline gap-1"><input type="number" id="v-frameH" value="0.8" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-frameH" min="0.1" max="10" step="0.1" value="0.8"></div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_qty">Qtd. Peças</label><div class="flex items-baseline gap-1"><input type="number" id="v-qty" value="1" min="1" max="20" step="1"></div></div><input type="range" id="range-v-qty" min="1" max="20" step="1" value="1"></div>
+                    <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_spacing">Entre Peças</label><div class="flex items-baseline gap-1"><input type="number" id="v-spacing" value="1.0" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-spacing" min="0.1" max="10" step="0.1" value="1.0"></div>
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-2"><label id="lbl-v-tilt" class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase transition-colors"><span data-i18n="lbl_tilt">Tilt</span> <span id="warn-v-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-1 animate-pulse border border-red-200 dark:border-red-800">⚠️</span></label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Spin (Azimute)</label><div class="flex items-baseline gap-1"><input type="number" id="v-spin" value="0" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-spin" min="0" max="360" step="15" value="0"></div>
+                <div class="mode-ies-group hidden group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Spin (Azimute)</label><div class="flex items-baseline gap-1"><input type="number" id="v-spin" value="0" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-spin" min="0" max="360" step="15" value="0"></div>
             </div>
 
             <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
@@ -441,7 +443,7 @@
             </div>
 
             <div id="grid-mode-target" class="mb-6 group pt-2">
-                <div class="flex justify-between items-end mb-2"><label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500">
+                <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500">
             </div>
 
             <div id="grid-mode-manual" class="hidden mb-6 group pt-2">
@@ -1883,26 +1885,98 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
             this.controls.target.set(0, state.height / 2, 0);
 
         } else if (toolId === 'vertical' && state) {
-            // LUXSINTAX: Modo 3D Vertical (Wall-Wash Realístico com Fontes Pontuais)
-            const h = state.height || 3;
-            const dist = state.dist || 1;
-            const hq = state.hq || 1.6;
-            const fW = state.frameW || 1.2;
-            const fH = state.frameH || 0.8;
-            const qty = state.qty || 1;
-            const spacing = state.spacing || 1.0;
-            
-            const baseTiltRad = (Number(state.tilt) || 0) * Math.PI / 180;
-            const wallWidth = Math.max(10, (qty * spacing) + fW + 4);
+                // LUXSINTAX: Modo 3D Vertical (Wall-Wash Realístico com Fontes Pontuais)
+                const h = state.height || 3;
+                const dist = state.dist || 1;
+                const hq = state.hq || 1.6;
+                const fW = state.frameW || 1.2;
+                const fH = state.frameH || 0.8;
+                const qty = state.qty || 1;
+                const spacing = state.spacing || 1.0;
+                
+                const baseTiltRad = (Number(state.tilt) || 0) * Math.PI / 180;
+                const wallWidth = Math.max(10, (qty * spacing) + fW + 4);
 
-            // 1. A Parede (Agora reage fisicamente à luz!)
-            const wallGeo = new THREE.PlaneGeometry(wallWidth, h);
-            const isDark = document.documentElement.classList.contains('dark');
-            const wallMat = new THREE.MeshPhongMaterial({ 
-                color: isDark ? 0x171717 : 0xe5e5e5, // LUXSINTAX: Cor estritamente neutra para manter a luz dourada sem esverdear
-                side: THREE.DoubleSide,
-                shininess: 5
-            });
+                // 1. A Parede (Agora reage fisicamente à luz!)
+                const wallGeo = new THREE.PlaneGeometry(wallWidth, h);
+                const isDark = document.documentElement.classList.contains('dark');
+                
+                let wallMat;
+                if (state.falseColor) {
+                    const resX = 64; const resY = 64;
+                    const cvs = document.createElement('canvas');
+                    cvs.width = resX; cvs.height = resY;
+                    const cx = cvs.getContext('2d');
+
+                    let n_power = 1;
+                    let maxI = 0;
+                    let isIesActive = window.calcMode === 'ies' && hasIes;
+
+                    if (!isIesActive) {
+                        const currentBeam = state.beam || 30;
+                        const halfBeamRad = (currentBeam / 2) * Math.PI / 180;
+                        if (halfBeamRad > 0 && halfBeamRad < Math.PI / 2) {
+                            n_power = Math.log(0.5) / Math.log(Math.cos(halfBeamRad));
+                        }
+                        const actualFlux = state.flux || 1500;
+                        maxI = (actualFlux * (n_power + 1)) / (2 * Math.PI);
+                    }
+
+                    const startZ = -((qty - 1) * spacing) / 2;
+                    const fixtures = [];
+                    for (let i = 0; i < qty; i++) {
+                        fixtures.push({ x: 0, y: h, z: startZ + (i * spacing), tilt: baseTiltRad, spin: (state.spin || 0) * Math.PI / 180 });
+                    }
+
+                    for (let ix = 0; ix < resX; ix++) {
+                        for (let iy = 0; iy < resY; iy++) {
+                            const py = h - (iy/resY)*h;
+                            const pz = -wallWidth/2 + (ix/resX)*wallWidth;
+                            const px = dist;
+
+                            let totalLux = 0;
+                            for (const fix of fixtures) {
+                                const dx = px - fix.x;
+                                const dy = py - fix.y;
+                                const dz = pz - fix.z;
+                                const distSq = dx*dx + dy*dy + dz*dz;
+                                const distance = Math.sqrt(distSq);
+
+                                const vx1 = dx * Math.cos(-fix.tilt) - dy * Math.sin(-fix.tilt);
+                                const vy1 = dx * Math.sin(-fix.tilt) + dy * Math.cos(-fix.tilt);
+                                const vz1 = dz;
+
+                                const vx2 = vx1 * Math.cos(-fix.spin) + vz1 * Math.sin(-fix.spin);
+                                const vy2 = vy1;
+                                const vz2 = -vx1 * Math.sin(-fix.spin) + vz1 * Math.cos(-fix.spin);
+
+                                const angleRad = distance > 0 ? Math.acos(Math.abs(vy2) / distance) : 0;
+                                const azimuthDeg = (Math.atan2(vz2, vx2) * 180 / Math.PI) + 90;
+
+                                let I = 0;
+                                if (isIesActive) {
+                                    I = window.getIESIntensity(state, angleRad * 180 / Math.PI, azimuthDeg);
+                                } else if (angleRad < Math.PI / 2) {
+                                    I = maxI * Math.pow(Math.cos(angleRad), n_power);
+                                }
+                                
+                                const incidence = distance > 0 ? dx / distance : 0;
+                                if (I > 0 && incidence > 0) totalLux += (I * incidence) / distSq;
+                            }
+                            cx.fillStyle = window.FalseColorEngine.getLuxColor(Math.round(totalLux), 1.0);
+                            cx.fillRect(ix, iy, 1, 1);
+                        }
+                    }
+                    const tex = new THREE.CanvasTexture(cvs);
+                    tex.minFilter = THREE.LinearFilter;
+                    wallMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+                } else {
+                    wallMat = new THREE.MeshPhongMaterial({ 
+                        color: isDark ? 0x171717 : 0xe5e5e5, // LUXSINTAX: Cor estritamente neutra
+                        side: THREE.DoubleSide,
+                        shininess: 5
+                    });
+                }
             const wallMesh = new THREE.Mesh(wallGeo, wallMat);
             wallMesh.rotation.y = -Math.PI / 2;
             wallMesh.position.set(dist, h / 2, 0);
@@ -2655,12 +2729,13 @@ window.handleGenerateReport = async () => {
 // LUXSINTAX: Atualiza a visibilidade da HUD ao trocar de aba
                 if (window.updatePhotometricHUD) window.updatePhotometricHUD();
                 
-                // LUXSINTAX: Autoriza a Legenda Heatmap para a Malha e para o Ponto a Ponto
+                // LUXSINTAX: Autoriza a Legenda Heatmap para a Malha e para os modos Ponto a Ponto (Apenas 3D)
                 const legendOverlay = document.getElementById('heatmap-legend-overlay');
                 if (legendOverlay) {
                     const isGridHeatmap = toolId === 'grid' && window.state.grid.falseColor;
-                    const isPontoHeatmap = toolId === 'ponto' && window.state.ponto.falseColor;
-                    legendOverlay.classList.toggle('hidden', !(isGridHeatmap || isPontoHeatmap));
+                    const isPontoHeatmap = toolId === 'ponto' && window.state.ponto.falseColor && window.state.ponto.viewMode === '3D';
+                    const isVertHeatmap = toolId === 'vertical' && window.state.vertical.falseColor && window.state.vertical.viewMode === '3D';
+                    legendOverlay.classList.toggle('hidden', !(isGridHeatmap || isPontoHeatmap || isVertHeatmap));
                 }
                 
                 const glareWrapper = document.getElementById('glare-toggle-wrapper');
@@ -2831,6 +2906,7 @@ window.handleGenerateReport = async () => {
         window.toggleHeatmap = function(isChecked) {
             if(window.currentTool === 'grid') window.state.grid.falseColor = isChecked;
             if(window.currentTool === 'ponto') window.state.ponto.falseColor = isChecked;
+            if(window.currentTool === 'vertical') window.state.vertical.falseColor = isChecked;
             const bgToggle = document.getElementById('fc-toggle-bg');
             const dotToggle = document.getElementById('fc-toggle-dot');
             if (bgToggle && dotToggle) {
@@ -2848,7 +2924,11 @@ window.handleGenerateReport = async () => {
             // LUXSINTAX: Aciona a renderização e visibilidade do HUD Legenda
             const legend = document.getElementById('heatmap-legend-overlay');
             if (legend) {
-                if (isChecked && (window.currentTool === 'grid' || window.currentTool === 'ponto')) {
+                const isValidGrid = isChecked && window.currentTool === 'grid';
+                const isValidPonto = isChecked && window.currentTool === 'ponto' && window.state.ponto.viewMode === '3D';
+                const isValidVert = isChecked && window.currentTool === 'vertical' && window.state.vertical.viewMode === '3D';
+                
+                if (isValidGrid || isValidPonto || isValidVert) {
                     legend.classList.remove('hidden');
                     if (!legend.dataset.initialized) {
                         const bar = document.getElementById('heatmap-gradient-bar');
@@ -2901,6 +2981,20 @@ window.handleGenerateReport = async () => {
                 if(btnE) btnE.className = mode === 'elevation' ? activeClass : inactiveClass;
                 if(btn3D) btn3D.className = inactiveClass;
             }
+
+            // LUXSINTAX: Ocultar/Exibir Controles Exclusivos da Elevação Frontal
+            const elevationGroups = document.getElementById('v-elevation-groups');
+            if (elevationGroups) elevationGroups.style.display = (mode === 'elevation') ? 'block' : 'none';
+
+            // LUXSINTAX: Toggle do Heatmap no 3D
+            const heatmapWrapper = document.getElementById('heatmap-toggle-wrapper');
+            if (heatmapWrapper && window.currentTool === 'vertical') {
+                heatmapWrapper.classList.toggle('hidden', mode !== '3D');
+            }
+
+            // Garante que a UI da Legenda acompanha a troca
+            if (window.toggleHeatmap) window.toggleHeatmap(window.state.vertical.falseColor);
+
             window.updateCalculations();
         };
 
@@ -3884,9 +3978,9 @@ if (window.currentTool !== 'grid') {
                     const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
                     const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
                     
-                    // LUXSINTAX: Reatividade Visual 2D (O desenho reage à barra de intensidade)
+                    // LUXSINTAX: Reatividade Visual 2D (Estética arquitetônica fixa para Intensidade e Fotometria)
                     if (window.calcMode !== 'ies') {
-                        const opBase = Math.min(0.8 * Math.max(I / 4000, 0.1), 1.0).toFixed(2); // Calcula a opacidade real baseada nos Candelas
+                        const opBase = 0.6; // Opacidade padronizada para garantir o rigor estético entre modos
                         ctx.save(); ctx.translate(xPos, sy);
                         const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); 
                         g.addColorStop(0, `rgba(251, 191, 36, ${opBase})`); 
@@ -5085,6 +5179,9 @@ window.setSurfaceMode = function(mode) {
         if (heatmapWrapper && window.currentTool === 'ponto') {
             heatmapWrapper.classList.toggle('hidden', mode !== '3D');
         }
+
+        // Garante que a UI da Legenda acompanha a troca
+        if (window.toggleHeatmap) window.toggleHeatmap(window.state.ponto.falseColor);
 
         window.updateCalculations();
     };
