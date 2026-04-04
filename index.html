@@ -583,6 +583,15 @@
                                                     <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
                                                 </div>
                                             </label>
+                                            <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
+                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
+                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">CURVA POLAR</span>
+                                                <div class="relative">
+                                                    <input type="checkbox" id="g-polar" onchange="window.togglePolar(this.checked)" checked class="sr-only">
+                                                    <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="polar-toggle-dot"></div>
+                                                </div>
+                                            </label>
                                         </div>
 
                                         <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
@@ -1728,7 +1737,9 @@ window.Photometric3DEngine = {
                 // LUXSINTAX: Cálculo da luz ambiente/indireta que atingirá o teto e as paredes
                 const ambientLux = ((state.flux * state.cols * state.rows * state.utilFactor * state.maintFactor) / (state.roomW * state.roomL)) * 0.08;
 
+                const luxMatrix = [];
                 for (let ix = 0; ix < resX; ix++) {
+                    luxMatrix[ix] = [];
                     for (let iy = 0; iy < resY; iy++) {
                         let px, py, pz;
                         if (planeType === 0) { // Piso
@@ -1762,10 +1773,12 @@ window.Photometric3DEngine = {
                         }
                         
                         totalLux = Math.round(totalLux * state.maintFactor + ambientLux);
+                        luxMatrix[ix][iy] = totalLux;
                         cx.fillStyle = window.FalseColorEngine.getLuxColor(totalLux, 1.0);
                         cx.fillRect(ix, iy, 1, 1);
                     }
                 }
+                if (window.state.showIsolines !== false) window.drawIsolinesOnCanvas(cx, luxMatrix, resX, resY);
                 const tex = new THREE.CanvasTexture(cvs);
                 tex.minFilter = THREE.LinearFilter;
                 return tex;
@@ -1837,8 +1850,8 @@ window.Photometric3DEngine = {
                         fixMesh.position.set(posX, state.height, posZ);
                         this.solidGroup.add(fixMesh);
 
-                        // LUXSINTAX: Apenas renderiza a teia polar do IES se o Heatmap estiver OFF
-                        if (!state.falseColor) {
+                        // LUXSINTAX: Apenas renderiza a teia polar do IES se a Curva Polar estiver ON
+                        if (window.state.showPolar !== false) {
                             const mesh = webGroup.clone();
                             mesh.position.set(posX, state.height, posZ);
                             this.solidGroup.add(mesh);
@@ -1863,9 +1876,9 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                         
                         this.solidGroup.add(spotLight);
 
-                        // LUXSINTAX: Cone de Luz Translúcido no Método Lúmens (Oculto se Heatmap Ativo para não lavar cores)
-                        if (!state.falseColor) {
-                            const beamRadLumen = (state.beam || 60) * Math.PI / 180 / 2;
+                        // LUXSINTAX: Cone de Luz Translúcido no Método Lúmens (Oculto se Curva Polar OFF)
+                    if (window.state.showPolar !== false) {
+                        const beamRadLumen = (state.beam || 60) * Math.PI / 180 / 2;
                             const coneH = state.height;
                             const coneR = Math.tan(beamRadLumen) * coneH;
                             const coneGeo = new THREE.CylinderGeometry(0.1, coneR, coneH, 32, 1, true);
@@ -1928,14 +1941,16 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                     }
 
                     const startZ = -((qty - 1) * spacing) / 2;
-                    const fixtures = [];
-                    for (let i = 0; i < qty; i++) {
-                        fixtures.push({ x: 0, y: h, z: startZ + (i * spacing), tilt: baseTiltRad, spin: (state.spin || 0) * Math.PI / 180 });
-                    }
+                const fixtures = [];
+                for (let i = 0; i < qty; i++) {
+                    fixtures.push({ x: 0, y: h, z: startZ + (i * spacing), tilt: baseTiltRad, spin: (state.spin || 0) * Math.PI / 180 });
+                }
 
-                    for (let ix = 0; ix < resX; ix++) {
-                        for (let iy = 0; iy < resY; iy++) {
-                            const py = h - (iy/resY)*h;
+                const luxMatrix = [];
+                for (let ix = 0; ix < resX; ix++) {
+                    luxMatrix[ix] = [];
+                    for (let iy = 0; iy < resY; iy++) {
+                        const py = h - (iy/resY)*h;
                             const pz = -wallWidth/2 + (ix/resX)*wallWidth;
                             const px = dist;
 
@@ -1966,13 +1981,15 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                                 }
                                 
                                 const incidence = distance > 0 ? dx / distance : 0;
-                                if (I > 0 && incidence > 0) totalLux += (I * incidence) / distSq;
-                            }
-                            cx.fillStyle = window.FalseColorEngine.getLuxColor(Math.round(totalLux), 1.0);
-                            cx.fillRect(ix, iy, 1, 1);
+                            if (I > 0 && incidence > 0) totalLux += (I * incidence) / distSq;
                         }
+                        luxMatrix[ix][iy] = totalLux;
+                        cx.fillStyle = window.FalseColorEngine.getLuxColor(Math.round(totalLux), 1.0);
+                        cx.fillRect(ix, iy, 1, 1);
                     }
-                    const tex = new THREE.CanvasTexture(cvs);
+                }
+                if (window.state.showIsolines !== false) window.drawIsolinesOnCanvas(cx, luxMatrix, resX, resY);
+                const tex = new THREE.CanvasTexture(cvs);
                     tex.minFilter = THREE.LinearFilter;
                     wallMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
                 } else {
@@ -2129,7 +2146,9 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                     maxI = (actualFlux * (n_power + 1)) / (2 * Math.PI);
                 }
 
+                const luxMatrix = [];
                 for (let ix = 0; ix < resX; ix++) {
+                    luxMatrix[ix] = [];
                     for (let iy = 0; iy < resY; iy++) {
                         const px = -floorSize/2 + (ix/resX)*floorSize;
                         const pz = -floorSize/2 + (iy/resY)*floorSize;
@@ -2159,10 +2178,12 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                             
                             if (I > 0) totalLux += (I * cosTheta) / distSq;
                         }
+                        luxMatrix[ix][iy] = totalLux;
                         cx.fillStyle = window.FalseColorEngine.getLuxColor(Math.round(totalLux), 1.0);
                         cx.fillRect(ix, iy, 1, 1);
                     }
                 }
+                if (window.state.showIsolines !== false) window.drawIsolinesOnCanvas(cx, luxMatrix, resX, resY);
                 const tex = new THREE.CanvasTexture(cvs);
                 tex.minFilter = THREE.LinearFilter;
                 floorMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide, depthWrite: true });
@@ -2215,7 +2236,7 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                     const fixMesh = new THREE.Mesh(fixGeo, fixMat);
                     tiltGrp.add(fixMesh); // Bolinha ancorada no pescoço (não rotaciona no próprio eixo)
                     
-                    if (!(state && state.falseColor)) {
+                    if (window.state.showPolar !== false) {
                         const mesh = webGroup.clone();
                         spinGrp.add(mesh); // A Teia entra no SpinGrp: gira e DEPOIS é inclinada. Perfect Match!
                     }
@@ -2231,7 +2252,7 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
 
                     const beamAngleRad = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
 
-                    if (!(state && state.falseColor)) {
+                    if (window.state.showPolar !== false) {
                         const coneHeight = h; 
                         const coneRadiusBase = Math.tan(beamAngleRad) * coneHeight;
                         const coneGeo = new THREE.CylinderGeometry(0.12, coneRadiusBase, coneHeight, 32, 1, true); 
@@ -3782,7 +3803,7 @@ if (window.currentTool !== 'grid') {
                 
 
                 // LUXSINTAX: MOTOR DE ISOLINHAS (TOPOGRAFIA LUMINOTÉCNICA)
-                if (s.showIsolines !== false) {
+                if (window.state.showIsolines !== false) {
                     // Níveis normativos padronizados para o desenho das curvas
                     const thresholds = [100, 200, 300, 500, 750, 1000, 1500, 2000];
                     ctx.lineWidth = 1.5;
@@ -5604,6 +5625,94 @@ window.toggleGridMode = function(mode) {
         // =====================================================================
         // INICIALIZAÇÃO DO SISTEMA
         // =====================================================================
+
+        // =====================================================================
+        // LUXSINTAX: ESTADO GLOBAL E MOTOR MATEMÁTICO DE ISOLINHAS E CURVAS
+        // =====================================================================
+        window.state.showIsolines = true;
+        window.state.showPolar = true;
+
+        window.toggleIsolines = function(isChecked) {
+            window.state.showIsolines = isChecked;
+            const bgToggle = document.getElementById('iso-toggle-bg');
+            const dotToggle = document.getElementById('iso-toggle-dot');
+            if (bgToggle && dotToggle) {
+                if (isChecked) {
+                    bgToggle.classList.add('bg-tech-cyan'); 
+                    bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.add('translate-x-3');
+                } else {
+                    bgToggle.classList.remove('bg-tech-cyan'); 
+                    bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.remove('translate-x-3');
+                }
+            }
+            window.updateCalculations();
+        };
+
+        window.togglePolar = function(isChecked) {
+            window.state.showPolar = isChecked;
+            const bgToggle = document.getElementById('polar-toggle-bg');
+            const dotToggle = document.getElementById('polar-toggle-dot');
+            if (bgToggle && dotToggle) {
+                if (isChecked) {
+                    bgToggle.classList.add('bg-luminous-gold'); 
+                    bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.add('translate-x-3');
+                } else {
+                    bgToggle.classList.remove('bg-luminous-gold'); 
+                    bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.remove('translate-x-3');
+                }
+            }
+            window.updateCalculations();
+        };
+
+        window.drawIsolinesOnCanvas = function(cx, luxMatrix, resX, resY) {
+            const thresholds = [100, 200, 300, 500, 750, 1000, 1500, 2000];
+            cx.lineWidth = 1;
+            cx.lineJoin = "round";
+            const getLerp = (v1, v2, vThresh) => (v1 === v2) ? 0.5 : (vThresh - v1) / (v2 - v1);
+
+            for (let t = 0; t < thresholds.length; t++) {
+                const threshold = thresholds[t];
+                cx.beginPath();
+                cx.strokeStyle = window.FalseColorEngine.getLuxColor(threshold, 0.95);
+                for (let i = 0; i < resX - 1; i++) {
+                    for (let j = 0; j < resY - 1; j++) {
+                        const vTL = luxMatrix[i][j];
+                        const vTR = luxMatrix[i+1][j];
+                        const vBL = luxMatrix[i][j+1];
+                        const vBR = luxMatrix[i+1][j+1];
+
+                        let st = 0;
+                        if (vTL >= threshold) st |= 8;
+                        if (vTR >= threshold) st |= 4;
+                        if (vBR >= threshold) st |= 2;
+                        if (vBL >= threshold) st |= 1;
+
+                        if (st === 0 || st === 15) continue;
+
+                        const pTop = { x: i + getLerp(vTL, vTR, threshold), y: j };
+                        const pBottom = { x: i + getLerp(vBL, vBR, threshold), y: j + 1 };
+                        const pLeft = { x: i, y: j + getLerp(vTL, vBL, threshold) };
+                        const pRight = { x: i + 1, y: j + getLerp(vTR, vBR, threshold) };
+
+                        switch (st) {
+                            case 1: case 14: cx.moveTo(pLeft.x, pLeft.y); cx.lineTo(pBottom.x, pBottom.y); break;
+                            case 2: case 13: cx.moveTo(pBottom.x, pBottom.y); cx.lineTo(pRight.x, pRight.y); break;
+                            case 3: case 12: cx.moveTo(pLeft.x, pLeft.y); cx.lineTo(pRight.x, pRight.y); break;
+                            case 4: case 11: cx.moveTo(pTop.x, pTop.y); cx.lineTo(pRight.x, pRight.y); break;
+                            case 5: cx.moveTo(pLeft.x, pLeft.y); cx.lineTo(pTop.x, pTop.y); cx.moveTo(pBottom.x, pBottom.y); cx.lineTo(pRight.x, pRight.y); break;
+                            case 6: case 9: cx.moveTo(pTop.x, pTop.y); cx.lineTo(pBottom.x, pBottom.y); break;
+                            case 7: case 8: cx.moveTo(pLeft.x, pLeft.y); cx.lineTo(pTop.x, pTop.y); break;
+                            case 10: cx.moveTo(pTop.x, pTop.y); cx.lineTo(pRight.x, pRight.y); cx.moveTo(pBottom.x, pBottom.y); cx.lineTo(pLeft.x, pLeft.y); break;
+                        }
+                    }
+                }
+                cx.stroke();
+            }
+        };
 
         window.currentLang = 'pt';
         initializeApp();
