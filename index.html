@@ -272,21 +272,28 @@
                     <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                 </div>
             </div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
-            <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">DISTÂNCIA ENTRE FONTES (D)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
-            <div class="mode-standard-only">
-                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_height">Altura Fonte (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_plane">Plano (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
             </div>
             
-            <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
+            <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Distância Fontes (D)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
+
+            <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Facho</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
+            </div>
             
-            <div class="mode-photo-group hidden space-y-6 mb-6">
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
+            <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
+            
+            <div class="mode-photo-group hidden grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_flux">Fluxo Lum.</label><div class="flex items-baseline gap-1"><input type="number" id="p-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-p-flux" min="0" max="10000" step="10" value="1500"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_photo_val">Fotométrico</label><div class="flex items-baseline gap-1"><input type="number" id="p-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">C/K</span></div></div><input type="range" id="range-p-cdklm" min="0" max="10000" step="10" value="2000"></div>
             </div>
 
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label id="lbl-p-tilt" class="text-[10px] text-slate-500 font-bold whitespace-nowrap transition-colors"><span data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</span> <span id="warn-p-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-2 animate-pulse border border-red-200 dark:border-red-800">⚠️ MAX 30º</span></label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label id="lbl-p-tilt" class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase transition-colors"><span data-i18n="lbl_tilt">Tilt</span> <span id="warn-p-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-1 animate-pulse border border-red-200 dark:border-red-800">⚠️</span></label><div class="flex items-baseline gap-1"><input type="number" id="p-tilt" value="0" min="-90" max="90" step="1"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-tilt" min="-90" max="90" step="1" value="0"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Spin (Azimute)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spin" value="0" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-spin" min="0" max="360" step="15" value="0"></div>
+            </div>
             
             <div id="p-tilt-mode-group" class="mb-6 group" style="display: none;">
                 <label class="text-[10px] text-slate-500 font-bold whitespace-nowrap mb-2 block">CRUZAMENTO DE FACHOS (ARRAY)</label>
@@ -335,28 +342,37 @@
                     <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                 </div>
             </div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">EIXO DO QUADRO (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0.5" max="10" step="0.1" value="1.6"></div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_wall_dist">DISTÂNCIA DA PAREDE (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_height">Altura (H)</label><div class="flex items-baseline gap-1"><input type="number" id="v-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_wall_dist">Dist. Parede (D)</label><div class="flex items-baseline gap-1"><input type="number" id="v-dist" value="1.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-dist" min="0.5" max="10" step="0.1" value="1.0"></div>
+            </div>
+
+            <div class="mb-4 group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_hq">Eixo Quadro (hq)</label><div class="flex items-baseline gap-1"><input type="number" id="v-hq" value="1.6" min="0" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-hq" min="0.5" max="10" step="0.1" value="1.6"></div>
             
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_frame_w">Largura Quadro</label><div class="flex items-baseline gap-1"><input type="number" id="v-frameW" value="1.2" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-frameW" min="0.1" max="10" step="0.1" value="1.2"></div>
                 <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_frame_h">Altura Quadro</label><div class="flex items-baseline gap-1"><input type="number" id="v-frameH" value="0.8" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-frameH" min="0.1" max="10" step="0.1" value="0.8"></div>
             </div>
+            
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_qty">Qtd. Peças</label><div class="flex items-baseline gap-1"><input type="number" id="v-qty" value="1" min="1" max="20" step="1"></div></div><input type="range" id="range-v-qty" min="1" max="20" step="1" value="1"></div>
                 <div class="group"><div class="flex justify-between items-end mb-1"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_spacing">Entre Peças</label><div class="flex items-baseline gap-1"><input type="number" id="v-spacing" value="1.0" min="0.1" max="10" step="0.1"><span class="text-[8px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-v-spacing" min="0.1" max="10" step="0.1" value="1.0"></div>
             </div>
 
-            <div class="mode-standard-only">
-                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label id="lbl-v-tilt" class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase transition-colors"><span data-i18n="lbl_tilt">Tilt</span> <span id="warn-v-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-1 animate-pulse border border-red-200 dark:border-red-800">⚠️</span></label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Spin (Azimute)</label><div class="flex items-baseline gap-1"><input type="number" id="v-spin" value="0" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-spin" min="0" max="360" step="15" value="0"></div>
             </div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label id="lbl-v-tilt" class="text-[10px] text-slate-500 font-bold whitespace-nowrap transition-colors"><span data-i18n="lbl_tilt">ORIENTAÇÃO (TILT)</span> <span id="warn-v-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-2 animate-pulse border border-red-200 dark:border-red-800">⚠️ MAX 30º</span></label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase">ROTAÇÃO AZIMUTAL (SPIN)</label><div class="flex items-baseline gap-1"><input type="number" id="v-spin" value="0" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-spin" min="0" max="360" step="15" value="0"></div>
-            <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
-            <div class="mode-photo-group hidden space-y-6 mb-6">
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_flux">FLUXO LUMINOSO</label><div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-v-flux" min="0" max="10000" step="10" value="1500"></div>
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_photo_val">VALOR FOTOMÉTRICO</label><div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">CD/KLM</span></div></div><input type="range" id="range-v-cdklm" min="0" max="10000" step="10" value="2000"></div>
+
+            <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Facho</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+            </div>
+            
+            <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
+            
+            <div class="mode-photo-group hidden grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_flux">Fluxo Lum.</label><div class="flex items-baseline gap-1"><input type="number" id="v-flux" value="1500"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-v-flux" min="0" max="10000" step="10" value="1500"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_photo_val">Fotométrico</label><div class="flex items-baseline gap-1"><input type="number" id="v-cdklm" value="2000"><span class="text-[9px] text-slate-500 font-bold">C/K</span></div></div><input type="range" id="range-v-cdklm" min="0" max="10000" step="10" value="2000"></div>
             </div>
 
             <div class="mb-6 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
@@ -1927,21 +1943,33 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
             for (let i = 0; i < qty; i++) {
                 const posZ = startZ + (i * spacing);
 
-                const fixMesh = new THREE.Mesh(fixGeo, fixMat);
-                fixMesh.position.set(0, h, posZ);
-                this.solidGroup.add(fixMesh);
+                // LUXSINTAX: Agrupamento para aplicar SPIN (Azimute) e TILT na Teia Fotométrica
+                const sourceGrp = new THREE.Group();
+                sourceGrp.position.set(0, h, posZ);
+                
+                // Aplicamos as rotações no Grupo para rotacionar a volumetria do IES
+                sourceGrp.rotation.z = (state.tilt || 0) * Math.PI / 180;
+                sourceGrp.rotation.y = (state.spin || 0) * Math.PI / 180;
+                
+                this.solidGroup.add(sourceGrp);
 
-                // B) A luz física projetando a mancha na parede
-                const spotLight = new THREE.SpotLight(0xffbf00, 8.0 * luxFactor); // LUXSINTAX: Forçado para dourado
-spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
- // LUXSINTAX: Intensidade aumentada para 8.0 para acender a mancha amarela
-                spotLight.position.set(0, h, posZ);
+                const fixMesh = new THREE.Mesh(fixGeo, fixMat);
+                sourceGrp.add(fixMesh); // Adiciona a fonte física ao grupo rotacionado
+                
+                if (hasIes && webGroup.children.length > 0) {
+                    const mesh = webGroup.clone();
+                    sourceGrp.add(mesh); // Adiciona a Teia IES para visualizar o giro dinâmico!
+                }
+
+                // B) A luz física projetando a mancha de suporte na parede
+                const spotLight = new THREE.SpotLight(0xffbf00, 8.0 * luxFactor); 
+                spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
+                spotLight.position.set(0, h, posZ); // SpotLight base exige posição absoluta
                 
                 let spotAngleRad = Math.PI / 4.5;
                 if (state.beam) spotAngleRad = (state.beam * Math.PI / 180) / 2;
                 spotLight.angle = spotAngleRad; 
                 spotLight.penumbra = 0.8; 
-                spotLight.distance = dist * 4; 
 
                 const targetObj = new THREE.Object3D();
                 targetObj.position.set(dist, hq, posZ);
@@ -2627,9 +2655,12 @@ window.handleGenerateReport = async () => {
 // LUXSINTAX: Atualiza a visibilidade da HUD ao trocar de aba
                 if (window.updatePhotometricHUD) window.updatePhotometricHUD();
                 
+                // LUXSINTAX: Autoriza a Legenda Heatmap para a Malha e para o Ponto a Ponto
                 const legendOverlay = document.getElementById('heatmap-legend-overlay');
                 if (legendOverlay) {
-                    legendOverlay.classList.toggle('hidden', toolId !== 'grid' || !window.state.grid.falseColor);
+                    const isGridHeatmap = toolId === 'grid' && window.state.grid.falseColor;
+                    const isPontoHeatmap = toolId === 'ponto' && window.state.ponto.falseColor;
+                    legendOverlay.classList.toggle('hidden', !(isGridHeatmap || isPontoHeatmap));
                 }
                 
                 const glareWrapper = document.getElementById('glare-toggle-wrapper');
@@ -2721,6 +2752,19 @@ window.handleGenerateReport = async () => {
             document.querySelectorAll('.mode-photo-group').forEach(el => el.classList.toggle('hidden', mode !== 'photometric'));
             document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
             document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
+            
+            // LUXSINTAX: Oculta o botão 3D nos modos analíticos diretos para limpar a UI
+            const btnSurf3D = document.getElementById('btn-surf-3d');
+            if (btnSurf3D) btnSurf3D.style.display = mode === 'ies' ? 'block' : 'none';
+            const btnV3D = document.getElementById('btn-v-3d');
+            if (btnV3D) btnV3D.style.display = mode === 'ies' ? 'block' : 'none';
+            
+            // Força o retorno ao layout 2D caso o usuário mude o seletor estando dentro do 3D
+            if (mode !== 'ies') {
+                if (window.state.ponto && window.state.ponto.viewMode === '3D') window.setSurfaceMode('single');
+                if (window.state.vertical && window.state.vertical.viewMode === '3D') window.toggleVerticalView('section');
+            }
+
             window.updateCalculations();
         };
         
