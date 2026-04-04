@@ -279,7 +279,7 @@
             
             <div id="group-spacing" class="mb-6 group hidden"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Distância Fontes (D)</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
 
-            <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
+            <div class="mode-standard-only mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Facho</label><div class="flex items-baseline gap-1"><input type="number" id="p-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-p-beam" min="5" max="120" step="1" value="30"></div>
             </div>
             
@@ -2035,22 +2035,24 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
                     sourceGrp.add(mesh); // Adiciona a Teia IES para visualizar o giro dinâmico!
                 }
 
-                // B) A luz física projetando a mancha de suporte na parede
-                const spotLight = new THREE.SpotLight(0xffbf00, 8.0 * luxFactor); 
-                spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
-                spotLight.position.set(0, h, posZ); // SpotLight base exige posição absoluta
-                
-                let spotAngleRad = Math.PI / 4.5;
-                if (state.beam) spotAngleRad = (state.beam * Math.PI / 180) / 2;
-                spotLight.angle = spotAngleRad; 
-                spotLight.penumbra = 0.8; 
+                // B) A luz física projetando a mancha na parede (Oculta se for IES para não conflitar com a Teia/Heatmap)
+                if (!hasIes) {
+                    const spotLight = new THREE.SpotLight(0xffbf00, 8.0 * luxFactor); 
+                    spotLight.distance = dist * 4 * Math.max(luxFactor, 1.0);
+                    spotLight.position.set(0, h, posZ); 
+                    
+                    let spotAngleRad = Math.PI / 4.5;
+                    if (state.beam) spotAngleRad = (state.beam * Math.PI / 180) / 2;
+                    spotLight.angle = spotAngleRad; 
+                    spotLight.penumbra = 0.8; 
 
-                const targetObj = new THREE.Object3D();
-                targetObj.position.set(dist, hq, posZ);
-                this.solidGroup.add(targetObj);
-                spotLight.target = targetObj;
+                    const targetObj = new THREE.Object3D();
+                    targetObj.position.set(dist, hq, posZ);
+                    this.solidGroup.add(targetObj);
+                    spotLight.target = targetObj;
 
-                this.solidGroup.add(spotLight);
+                    this.solidGroup.add(spotLight);
+                }
             }
 
             const roofGuideGeo = new THREE.BufferGeometry().setFromPoints([
@@ -4155,11 +4157,13 @@ if (window.currentTool !== 'grid') {
                     ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.4)" : "rgba(100, 116, 139, 0.4)"; ctx.moveTo(0, hqY); ctx.lineTo(wx, hqY); ctx.stroke(); ctx.setLineDash([]);
                     ctx.fillStyle = cBaseText; ctx.font = "bold 13px Manrope"; ctx.textAlign = "left"; ctx.fillText(`hq: ${window.formatDist(s.hq)}`, 10, hqY - 8);
 
-                    // Faixa de Luz
-                    ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip();
-                    ctx.save(); ctx.translate(centerX, sy);
-                    const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
-                    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore();
+                    // LUXSINTAX: Faixa de Luz (Oculta no IES para mostrar apenas a Curva Polar limpa)
+                    if (window.calcMode !== 'ies') {
+                        ctx.save(); ctx.beginPath(); ctx.rect(0, -1000, wx, floorY + 1000); ctx.clip();
+                        ctx.save(); ctx.translate(centerX, sy);
+                        const g = ctx.createLinearGradient(0, 0, 0, floorY-sy); g.addColorStop(0, `rgba(251, 191, 36, 0.6)`); g.addColorStop(1, `rgba(251, 191, 36, 0)`);
+                        ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo((floorY-sy) * Math.tan(tr - br / 2), floorY-sy); ctx.lineTo((floorY-sy) * Math.tan(tr + br / 2), floorY-sy); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore();
+                    }
 
                     // LUXSINTAX: Visualizador de Glare Zone Otimizado (Darklight Cutoff)
                     if (s.showGlareZone) {
@@ -4399,16 +4403,21 @@ if (window.currentTool !== 'grid') {
             } // <--- ESTA É A CHAVE MÁGICA QUE FALTAVA!
             
             if (window.calcMode === 'ies' && s.iesData) {
-                // LUXSINTAX: Ocultar Curva Polar na Elevação Frontal (Preservar a pureza visual da mancha)
-                if (window.currentTool === 'vertical' && s.viewMode === 'elevation') return;
+                // LUXSINTAX: Ocultar Curva Polar na Elevação Frontal (Garante que o render NÃO seja abortado com 'return')
+                if (window.currentTool !== 'vertical' || s.viewMode !== 'elevation') {
+                    const { vAngles, candelas } = s.iesData;
+                    
+                    // LUXSINTAX: Aplica o Spin (Azimute) para orientar a curva corretamente (Espelhamento do C-Plane)
+                    const spinOffset = Math.round((s.spin || 0) / 10);
+                    const idxFront = (0 + spinOffset) % 36;
+                    const idxBack = (18 + spinOffset) % 36;
+                    const idxLeft = (27 + spinOffset) % 36;
+                    const idxRight = (9 + spinOffset) % 36;
 
-                const { vAngles, candelas } = s.iesData;
-                
-                // Matriz já está normalizada e simétrica (Índices fixos: 0=C0, 9=C90, 18=C180, 27=C270)
-                const rowC0 = candelas[0];
-                const rowC90 = candelas[9];
-                const rowC180 = candelas[18] || candelas[0];
-                const rowC270 = candelas[27] || candelas[9];
+                    const rowC0 = candelas[idxFront] || candelas[0];
+                    const rowC90 = candelas[idxRight] || candelas[9] || candelas[0];
+                    const rowC180 = candelas[idxBack] || candelas[18] || candelas[0];
+                    const rowC270 = candelas[idxLeft] || candelas[27] || candelas[9] || candelas[0];
 
                 let maxI = 0;
                 for(let r of candelas) { const m = Math.max(...r); if(m > maxI) maxI = m; }
@@ -4495,6 +4504,7 @@ if (window.currentTool !== 'grid') {
 
                     ctx.restore();
                 });
+                } // Fim do IF de proteção da Elevação (LUXSINTAX)
             }
 
             // LUXSINTAX: Renderização do Espectrofotômetro HCL
