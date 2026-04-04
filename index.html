@@ -363,11 +363,10 @@
 
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="group"><div class="flex justify-between items-end mb-2"><label id="lbl-v-tilt" class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase transition-colors"><span data-i18n="lbl_tilt">Tilt</span> <span id="warn-v-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-1 animate-pulse border border-red-200 dark:border-red-800">⚠️</span></label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
-                <div class="mode-ies-group hidden group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Spin (Azimute)</label><div class="flex items-baseline gap-1"><input type="number" id="v-spin" value="0" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-spin" min="0" max="360" step="15" value="0"></div>
-            </div>
-
-            <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
-                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Facho</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+                <div class="relative">
+                    <div class="mode-ies-group hidden group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Spin (Azimute)</label><div class="flex items-baseline gap-1"><input type="number" id="v-spin" value="0" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-spin" min="0" max="360" step="15" value="0"></div>
+                    <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Facho</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
+                </div>
             </div>
             
             <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
@@ -2017,22 +2016,23 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
             for (let i = 0; i < qty; i++) {
                 const posZ = startZ + (i * spacing);
 
-                // LUXSINTAX: Agrupamento para aplicar SPIN (Azimute) e TILT na Teia Fotométrica
-                const sourceGrp = new THREE.Group();
-                sourceGrp.position.set(0, h, posZ);
+                // LUXSINTAX: Aninhamento Hierárquico Vertical
+                const tiltGrp = new THREE.Group();
+                tiltGrp.position.set(0, h, posZ);
+                tiltGrp.rotation.z = (state.tilt || 0) * Math.PI / 180;
+
+                const spinGrp = new THREE.Group();
+                spinGrp.rotation.y = (state.spin || 0) * Math.PI / 180;
                 
-                // Aplicamos as rotações no Grupo para rotacionar a volumetria do IES
-                sourceGrp.rotation.z = (state.tilt || 0) * Math.PI / 180;
-                sourceGrp.rotation.y = (state.spin || 0) * Math.PI / 180;
-                
-                this.solidGroup.add(sourceGrp);
+                tiltGrp.add(spinGrp);
+                this.solidGroup.add(tiltGrp);
 
                 const fixMesh = new THREE.Mesh(fixGeo, fixMat);
-                sourceGrp.add(fixMesh); // Adiciona a fonte física ao grupo rotacionado
+                tiltGrp.add(fixMesh); 
                 
                 if (hasIes && webGroup.children.length > 0) {
                     const mesh = webGroup.clone();
-                    sourceGrp.add(mesh); // Adiciona a Teia IES para visualizar o giro dinâmico!
+                    spinGrp.add(mesh); // Renderiza a teia no sub-grupo alinhado
                 }
 
                 // B) A luz física projetando a mancha na parede (Oculta se for IES para não conflitar com a Teia/Heatmap)
@@ -2193,67 +2193,60 @@ spotLight.distance = state.height * 3 * Math.max(luxFactor, 1.0);
             const sourceLensGeo = new THREE.CircleGeometry(0.12, 16);
 
             const drawSource = (posX, rotZ) => {
-                // LUXSINTAX: Contêiner para agrupar fonte, lente e cone para rotação unificada
-                const sourceGrp = new THREE.Group();
-                sourceGrp.position.set(posX, h, 0);
+                // LUXSINTAX: Aninhamento Hierárquico para Ordem de Matriz Euler Correta (Z -> Y Intrínseco)
+                const tiltGrp = new THREE.Group();
+                tiltGrp.position.set(posX, h, 0);
+                tiltGrp.rotation.z = rotZ; // Tilt é aplicado no pescoço do suporte
+
+                const spinGrp = new THREE.Group();
+                spinGrp.rotation.y = (state && state.spin ? state.spin : 0) * Math.PI / 180; // Spin é aplicado localmente
                 
-                // Aplica a inclinação (Tilt) e a Rotação (Spin) diretamente ao contêiner
-                sourceGrp.rotation.z = rotZ; 
-                sourceGrp.rotation.y = (state && state.spin ? state.spin : 0) * Math.PI / 180;
-                this.solidGroup.add(sourceGrp);
+                tiltGrp.add(spinGrp);
+                this.solidGroup.add(tiltGrp);
 
                 if (hasIes && webGroup.children.length > 0) {
                     // --- MODO IES (Analítico Premium) ---
-                    // Bolinha Física para referência espacial (Sempre visível)
                     const fixMesh = new THREE.Mesh(fixGeo, fixMat);
-                    sourceGrp.add(fixMesh);
+                    tiltGrp.add(fixMesh); // Bolinha ancorada no pescoço (não rotaciona no próprio eixo)
                     
-                    // Oculta a teia se o Heatmap estiver ativo para não poluir
                     if (!(state && state.falseColor)) {
                         const mesh = webGroup.clone();
-                        mesh.position.set(0, 0, 0); // Posição relativa ao contêiner
-                        sourceGrp.add(mesh);
+                        spinGrp.add(mesh); // A Teia entra no SpinGrp: gira e DEPOIS é inclinada. Perfect Match!
                     }
                 } else {
                     // --- MODO MANUAL (Arquitetônico Sedutor) ---
-                    // 1. A Bolinha Dourada (Físico)
                     const fixMesh = new THREE.Mesh(fixGeo, fixMat);
-                    sourceGrp.add(fixMesh);
+                    tiltGrp.add(fixMesh);
 
-                    // 2. A Lente Radiante no teto
                     const lensMesh = new THREE.Mesh(sourceLensGeo, sourceLensMat);
-                    lensMesh.rotation.x = Math.PI / 2; // Face para baixo
-                    lensMesh.position.y = -0.01; // Sutilmente abaixo da bolinha
-                    sourceGrp.add(lensMesh);
+                    lensMesh.rotation.x = Math.PI / 2; 
+                    lensMesh.position.y = -0.01; 
+                    tiltGrp.add(lensMesh);
 
-                    // 3. O Cone de Luz Volumétrico Translúcido (Oculto se o Heatmap estiver ligado)
+                    const beamAngleRad = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
+
                     if (!(state && state.falseColor)) {
-                        const beamAngleRad = (state && state.beam ? state.beam : 30) * Math.PI / 180 / 2;
-                        const coneHeight = h; // LUXSINTAX: Cone não atravessa o piso
+                        const coneHeight = h; 
                         const coneRadiusBase = Math.tan(beamAngleRad) * coneHeight;
-                        
-                        const coneGeo = new THREE.CylinderGeometry(0.12, coneRadiusBase, coneHeight, 32, 1, true); // Cone aberto
-                        // Ajusta a geometria para que o topo fique na origem (0,0,0) do contêiner
+                        const coneGeo = new THREE.CylinderGeometry(0.12, coneRadiusBase, coneHeight, 32, 1, true); 
                         coneGeo.translate(0, -coneHeight/2, 0); 
                         
                         const beamMesh = new THREE.Mesh(coneGeo, coneMat);
-                        sourceGrp.add(beamMesh);
+                        tiltGrp.add(beamMesh);
                     }
 
-                    // 4. A Luz Física Real (Projectada no Piso Reflexivo)
-                    const spotLight = new THREE.SpotLight(lightColor, 4.0 * luxFactor); // LUXSINTAX: A luz física reage à barra
+                    const spotLight = new THREE.SpotLight(lightColor, 4.0 * luxFactor); 
                     spotLight.position.set(0, 0, 0);
                     spotLight.angle = beamAngleRad;
                     spotLight.penumbra = 0.5;
-                    spotLight.distance = h * 3 * Math.max(luxFactor, 1.0); // LUXSINTAX: A distância do foco aumenta com a intensidade
+                    spotLight.distance = h * 3 * Math.max(luxFactor, 1.0); 
                     
-                    // O Alvo da Luz agora acompanha a inclinação do contêiner automaticamente
                     const targetObj = new THREE.Object3D();
-                    targetObj.position.set(0, -h, 0); // Fica diretamente no piso (relativo)
-                    sourceGrp.add(targetObj);
+                    targetObj.position.set(0, -h, 0); 
+                    tiltGrp.add(targetObj);
                     spotLight.target = targetObj;
                     
-                    sourceGrp.add(spotLight);
+                    tiltGrp.add(spotLight);
                 }
             };
 
