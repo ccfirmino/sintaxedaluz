@@ -517,174 +517,81 @@
                         <option value="0.70" data-i18n="opt_maint_70">Normal / Escritório (0.70)</option>
                         <option value="0.60" data-i18n="opt_maint_60">Sujo / Industrial (0.60)</option>
                     </select>
+                </div> </div> </div> </div> </div> <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
+    <div class="glass-panel p-6 rounded-2xl flex flex-col relative w-full h-[75vh] min-h-[500px] max-h-[800px]">
+        
+        <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4 w-full">
+            
+            <div class="flex items-center gap-4">
+                <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm">Fonte Única</button>
+                    <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
+                    <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
+                </div>
+
+                <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm">Corte Técnico</button>
+                    <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Elevação Frontal</button>
+                    <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
+                </div>
+
+                <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Planta Baixa (Piso)</button>
+                    <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Planta Baixa (Mesa)</button>
+                    <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
                 </div>
             </div>
-        </div> </div> <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
-        <div class="glass-panel p-6 rounded-2xl flex flex-col relative w-full h-[75vh] min-h-[500px] max-h-[800px]">
-            <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4 w-full">
-                
-                <div class="flex items-center gap-4">
-                    <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Fonte Única</button>
-                        <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
-                        <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
-                    </div>
 
-                    <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Corte Técnico</button>
-                        <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Elevação Frontal</button>
-                        <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
-                    </div>
+            <div class="flex flex-wrap justify-end items-center gap-4">
+                <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <label id="iso-toggle-container" class="flex items-center gap-2 cursor-pointer group px-2">
+                        <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
+                        <div class="relative">
+                            <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
+                            <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
+                        </div>
+                    </label>
+                    
+                    <label id="polar-3d-toggle-container" class="hidden flex items-center gap-2 cursor-pointer group px-2">
+                        <span class="text-[9px] text-luminous-gold font-black uppercase tracking-wider">POLAR 3D</span>
+                        <div class="relative">
+                            <input type="checkbox" id="g-showPolar" onchange="window.togglePolar(this.checked)" checked class="sr-only">
+                            <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-toggle-bg"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="polar-toggle-dot"></div>
+                        </div>
+                    </label>
 
-                    <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Planta Baixa (Piso)</button>
-                        <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Planta Baixa (Mesa)</button>
-                        <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
-                    </div>
+                    <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
+                    
+                    <label class="flex items-center gap-2 cursor-pointer group px-2">
+                        <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">HEATMAP</span>
+                        <div class="relative">
+                            <input type="checkbox" id="g-falseColor" onchange="window.toggleHeatmap(this.checked)" class="sr-only">
+                            <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
+                        </div>
+                    </label>
                 </div>
 
-                <div class="flex flex-wrap justify-end items-center gap-4">
-                    <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <label id="iso-toggle-container" class="flex items-center gap-2 cursor-pointer group px-2">
-                            <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
-                            <div class="relative">
-                                <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
-                                <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
-                                <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
-                            </div>
-                        </label>
-                        
-                        <label id="polar-3d-toggle-container" class="hidden flex items-center gap-2 cursor-pointer group px-2">
-                            <span class="text-[9px] text-luminous-gold font-black uppercase tracking-wider">POLAR 3D</span>
-                            <div class="relative">
-                                <input type="checkbox" id="g-showPolar" onchange="window.togglePolar(this.checked)" checked class="sr-only">
-                                <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-toggle-bg"></div>
-                                <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="polar-toggle-dot"></div>
-                            </div>
-                        </label>
+                <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
+                    <label class="flex items-center gap-2 cursor-pointer relative group px-2">
+                        <span class="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider border-b border-dashed border-red-300 dark:border-red-700 pb-0.5">GLARE >65º</span>
+                        <div class="relative">
+                            <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
+                            <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="glare-toggle-bg"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="glare-toggle-dot"></div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
 
-                        <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
-                        
-                        <label class="flex items-center gap-2 cursor-pointer group px-2">
-                            <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">HEATMAP</span>
-                            <div class="relative">
-                                <input type="checkbox" id="g-falseColor" onchange="window.toggleHeatmap(this.checked)" class="sr-only">
-                                <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
-                                <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer relative group px-2">
-                                                <span class="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider border-b border-dashed border-red-300 dark:border-red-700 pb-0.5">GLARE >65º</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
-                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="glare-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="glare-toggle-dot"></div>
-                                                </div>
-                                                
-                                                <div class="absolute top-full right-0 mt-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] cursor-default pointer-events-none p-4">
-                                                    <div class="w-full h-24 mb-3 relative bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center">
-                                                        <svg viewBox="0 0 100 60" class="w-full h-full">
-                                                            <line x1="0" y1="5" x2="100" y2="5" stroke="#334155" stroke-width="2" />
-                                                            <line x1="50" y1="5" x2="50" y2="60" stroke="#64748b" stroke-width="1" stroke-dasharray="2,2" />
-                                                            <rect x="42" y="5" width="16" height="4" fill="#fbbf24" />
-                                                            <path d="M46,9 L25,60 L75,60 Z" fill="rgba(16, 185, 129, 0.1)" />
-                                                            <path d="M46,9 L0,60 L25,60 Z" fill="rgba(239, 68, 68, 0.2)" />
-                                                            <path d="M54,9 L100,60 L75,60 Z" fill="rgba(239, 68, 68, 0.2)" />
-                                                            <line x1="46" y1="9" x2="25" y2="60" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2,2" />
-                                                            <line x1="54" y1="9" x2="75" y2="60" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2,2" />
-                                                            <text x="55" y="45" fill="#ef4444" font-size="6" font-family="sans-serif" font-weight="bold">65°</text>
-                                                            <path d="M50,35 A 25 25 0 0 1 65 50" fill="none" stroke="#ef4444" stroke-width="1" />
-                                                            <circle cx="85" cy="45" r="4" fill="#cbd5e1" />
-                                                            <circle cx="85" cy="45" r="1.5" fill="#0f172a" />
-                                                        </svg>
-                                                    </div>
-                                                    <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Ofuscamento Direto</h4>
-                                                    <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium" data-i18n="card_glare_desc">Luz emitida acima de 65º em relação à vertical (nadir) entra diretamente no campo visual do observador, causando desconforto severo e perda de acuidade (UGR alto).</p>
-                                                </div>
-                                            </label>
-                                        </div>
-
-                                        <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-purple-50 p-1.5 rounded-lg dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer relative group px-2">
-                                                <span class="text-[9px] text-purple-600 dark:text-purple-400 font-black uppercase tracking-wider border-b border-dashed border-purple-300 dark:border-purple-700 pb-0.5">m-EDI (HCL)</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="g-showHCL" onchange="window.toggleHCL(this.checked)" class="sr-only">
-                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="hcl-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="hcl-toggle-dot"></div>
-                                                </div>
-                                                
-                                                <div class="absolute top-full right-0 mt-3 w-72 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] cursor-default pointer-events-none p-4">
-                                                    <div class="w-full h-24 mb-3 relative bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center">
-                                                        <svg viewBox="0 0 100 50" class="w-full h-full">
-                                                            <rect x="10" y="10" width="22" height="30" rx="3" fill="#334155" />
-                                                            <text x="21" y="24" fill="#fbbf24" font-size="7" font-weight="bold" text-anchor="middle">LUX</text>
-                                                            <text x="21" y="33" fill="#94a3b8" font-size="4" text-anchor="middle">Visual</text>
-                                                            
-                                                            <text x="38" y="28" fill="#cbd5e1" font-size="8" font-weight="bold" text-anchor="middle">×</text>
-                                                            
-                                                            <rect x="44" y="15" width="16" height="20" rx="2" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="1"/>
-                                                            <text x="52" y="28" fill="#a855f7" font-size="6" font-weight="bold" text-anchor="middle">M/P</text>
-                                                            
-                                                            <text x="67" y="28" fill="#cbd5e1" font-size="8" font-weight="bold" text-anchor="middle">=</text>
-                                                            
-                                                            <rect x="73" y="10" width="22" height="30" rx="3" fill="#0f172a" stroke="#d8b4fe" stroke-width="1.5"/>
-                                                            <text x="84" y="24" fill="#d8b4fe" font-size="6" font-weight="bold" text-anchor="middle">m-EDI</text>
-                                                            <text x="84" y="33" fill="#94a3b8" font-size="4" text-anchor="middle">Biológico</text>
-                                                        </svg>
-                                                    </div>
-                                                    <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">m-EDI (Melanopic Lux)</h4>
-                                                    <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Melanopic Equivalent Daylight Illuminance. É a métrica oficial que quantifica o estímulo biológico da luz no corpo humano. Projetos focados em bem-estar e certificações (como a WELL v2) exigem níveis específicos de m-EDI, provando que a luz afeta o estado de alerta e o sono.</p>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="relative w-full flex-grow bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
-                                    <div class="relative flex-grow w-full">
-                                        
-                                        <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-4 pointer-events-none">
-                                            
-                                            <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto backdrop-blur-md shadow-xl">
-                                                <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-3 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
-                                                <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (LP):</span><span id="hud-em-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">U (LP):</span><span id="hud-u-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (HP):</span><span id="hud-em-hp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">U (HP):</span><span id="hud-u-hp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
-                                                </div>
-                                            </div>
-
-                                            <div id="photometric-dashboard" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4 backdrop-blur-md shadow-xl">
-                                                <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> SUMÁRIO TÉCNICO</h4>
-                                                <div class="text-slate-500 dark:text-slate-400 truncate mb-3 text-[10px] font-bold" id="pd-filename">arquivo.ies</div>
-                                                <div class="space-y-2">
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Nominal:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens-nom">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Final:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens-fin">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Eficácia:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-efficacy">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm/W</span></span></div>
-                                                    <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Uplight:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-uplight">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">%</span></span></div>
-                                                </div>
-                                            </div>
-                                            
-                                        </div>
-
-                                        <div id="heatmap-legend-overlay" class="absolute bottom-6 right-6 z-40 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-72 md:w-96 hidden transition-all duration-300 backdrop-blur-md shadow-2xl pointer-events-auto">
-                                            <div class="flex justify-between items-center mb-3">
-                                                <span class="text-[10px] font-black uppercase tracking-widest text-luminous-gold">Escala de Iluminância (Lux)</span>
-                                            </div>
-                                            <div id="heatmap-gradient-bar" class="w-full h-3 rounded-full mb-2 border border-slate-200 dark:border-slate-700"></div>
-                                            <div id="heatmap-ticks" class="relative w-full h-4 text-[9px] font-bold text-slate-500 dark:text-slate-400">
-                                                </div>
-                                        </div>
-
-                                        <div id="stage-2d" class="absolute inset-0 w-full h-full z-10 block">
-                                            <div class="absolute inset-0 opacity-40 dark:opacity-5 pointer-events-none" style="background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
-                                            <canvas id="beamCanvas" class="absolute inset-0 w-full h-full block"></canvas>
+        <div class="relative w-full flex-grow bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
+            <div class="relative flex-grow w-full">
+                <div id="stage-2d" class="absolute inset-0 w-full h-full z-10 block">
+                    <div class="absolute inset-0 opacity-40 dark:opacity-5 pointer-events-none" style="background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
+                    <canvas id="beamCanvas" class="absolute inset-0 w-full h-full block"></canvas>
                                         </div>
                                         
                                         <div id="stage-3d" class="absolute inset-0 w-full h-full z-20 hidden bg-slate-50 dark:bg-slate-900">
