@@ -3,6 +3,7 @@
 
 import { RadiosityEngine } from '../../domain/photometry/RadiosityEngine';
 import { FalseColorEngine } from '../../domain/photometry/FalseColorEngine';
+import { Photometrics } from '../../domain/photometry/Photometrics';
 
 export class Canvas2DEngine {
     private static drawDimLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, text: string) { 
@@ -241,8 +242,8 @@ export class Canvas2DEngine {
                 }
             }
 
-            const rPxX = (s.height * Math.tan((currentBeamObj.c0 * Math.PI / 180) / 2)) * scale;
-            const rPxY = (s.height * Math.tan((currentBeamObj.c90 * Math.PI / 180) / 2)) * scale;
+            const rPxX = Math.abs((s.height * Math.tan((currentBeamObj.c0 * Math.PI / 180) / 2)) * scale);
+            const rPxY = Math.abs((s.height * Math.tan((currentBeamObj.c90 * Math.PI / 180) / 2)) * scale);
             const maxRad = Math.max(rPxX, rPxY);
 
             for (const fix of fixtures) {
