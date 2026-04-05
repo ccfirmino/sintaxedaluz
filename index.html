@@ -1032,10 +1032,12 @@
         </div>
     </div>
 
-    <script src="./src/infrastructure/js/engines/hcl.js"></script>
-    <script src="./src/infrastructure/js/engines/glare.js"></script>
     
     <script type="module">
+        // LUXSINTAX: Motores Secundários injetados no Grafo de Build do Vite (Bypass 404)
+        import './src/js/engines/hcl.js';
+        import './src/js/engines/glare.js';
+        
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         
         // LUXSINTAX: Variável global do módulo para que todas as funções a vejam
