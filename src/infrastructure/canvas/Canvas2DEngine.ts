@@ -6,6 +6,9 @@ import { FalseColorEngine } from '../../domain/photometry/FalseColorEngine';
 import { Photometrics } from '../../domain/photometry/Photometrics';
 
 export class Canvas2DEngine {
+    // LUXSINTAX: Controlo de Concorrência. Evita sobreposição de renders (Race Conditions)
+    private static currentRenderId = 0;
+
     private static drawDimLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, text: string) { 
         const isDark = document.documentElement.classList.contains('dark');
         ctx.beginPath(); ctx.strokeStyle = isDark ? "#475569" : "#94a3b8"; ctx.lineWidth = 1; 
@@ -46,7 +49,8 @@ export class Canvas2DEngine {
         ctx.fillStyle = "#d97706"; ctx.textAlign = "center"; ctx.fillText(text, x, y - 2); ctx.textAlign = "start"; 
     }
 
-    public static render() {
+    public static async render() {
+        const currentId = ++this.currentRenderId;
         const win = window as any;
         if (win.currentTool !== 'grid') {
             document.getElementById('grid-hud-overlay')?.classList.add('hidden');
@@ -180,7 +184,16 @@ export class Canvas2DEngine {
                 }
             }
 
-            const radiosityResult = RadiosityEngine.calculateGridMatrix({
+            // LUXSINTAX: Feedback Visual de Processamento (Loading State)
+            ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.8)" : "rgba(248, 250, 252, 0.8)";
+            ctx.fillRect(offsetX, offsetY, roomPxW, roomPxH);
+            ctx.fillStyle = "#d97706";
+            ctx.font = "bold 12px Manrope";
+            ctx.textAlign = "center";
+            ctx.fillText("A PROCESSAR MALHA FOTOMÉTRICA...", offsetX + roomPxW/2, offsetY + roomPxH/2);
+
+            // Delegação para o Web Worker (Non-blocking UI)
+            const radiosityResult = await RadiosityEngine.calculateGridMatrixAsync({
                 roomW: s.roomW,
                 roomL: s.roomL,
                 height: s.height,
@@ -195,6 +208,14 @@ export class Canvas2DEngine {
                 viewLevel: s.viewLevel,
                 cellSizeM: 0.5
             });
+
+            // Aborta a renderização se o utilizador já solicitou um novo cálculo (Cancel Token Pattern)
+            if (currentId !== this.currentRenderId) return;
+
+            // Limpa a tela de loading e prepara para pintar os resultados
+            ctx.clearRect(offsetX, offsetY, roomPxW, roomPxH);
+            ctx.fillStyle = isDark ? "#0f172a" : "#f8fafc";
+            ctx.fillRect(offsetX, offsetY, roomPxW, roomPxH);
 
             const { luxMatrix, metricsLP, metricsHP, cellCols, cellRows } = radiosityResult;
             const cellPxW = roomPxW / cellCols;
@@ -353,9 +374,21 @@ export class Canvas2DEngine {
                 if (origins.length === 2 && tiltModeGen === 'cross' && idx === 1) currentTilt = -currentTilt;
                 const tr = currentTilt * Math.PI / 180;
                 
-                let I = (win.calcMode === 'ies') ? Photometrics.getIESIntensity(s.iesData, Math.abs(currentTilt)) : win.getIntensity(s);
-                const luxFloor = (I * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
-                const luxPlane = hEff > 0 ? (I * Math.pow(Math.cos(tr), 3)) / (hEff ** 2) : 0;
+                // LUXSINTAX: Cálculo Físico via Domínio (Lei do Cosseno Cúbico e Integração IES)
+                const iesData = (win.calcMode === 'ies') ? s.iesData : null;
+                const dx = s.height * Math.tan(tr);
+                
+                // Iluminância no Piso (E = I * cos³θ / h²)
+                const resFloor = Photometrics.calculatePointIlluminance(iesData, dx, 0, s.height, currentTilt);
+                const luxFloor = (win.calcMode === 'ies') ? resFloor.lux : (win.getIntensity(s) * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
+                
+                // Iluminância no Plano de Trabalho (Cálculo na altura efetiva hEff)
+                let luxPlane = 0;
+                if (hEff > 0) {
+                    const dxPlane = hEff * Math.tan(tr);
+                    const resPlane = Photometrics.calculatePointIlluminance(iesData, dxPlane, 0, hEff, currentTilt);
+                    luxPlane = (win.calcMode === 'ies') ? resPlane.lux : (win.getIntensity(s) * Math.pow(Math.cos(tr), 3)) / (hEff ** 2);
+                }
                 
                 if (win.calcMode !== 'ies') {
                     const opBase = 0.6; 
@@ -494,9 +527,21 @@ export class Canvas2DEngine {
         }
         else if (win.currentTool === 'vertical') {
             const tr = s.tilt * Math.PI / 180, br = currentBeam * Math.PI / 180;
-            let I_v = (win.calcMode === 'ies') ? Photometrics.getIESIntensity(s.iesData, s.tilt, s.spin || 0) : win.getIntensity(s);
-            let ev = (s.tilt > 0) ? (I_v * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist) : 0;
-            let hitY_metric = s.height - (s.dist / Math.tan(tr));
+            const hitY_metric = s.height - (s.dist / Math.tan(tr));
+            
+            // LUXSINTAX: Cálculo de Iluminância Vertical Normatizado (E_vert)
+            const iesDataVertical = (win.calcMode === 'ies') ? s.iesData : null;
+            const deltaH = s.height - hitY_metric; // Altura relativa entre a fonte e o ponto de impacto
+            
+            let ev = 0;
+            if (win.calcMode === 'ies' && iesDataVertical) {
+                // Utiliza a fórmula física completa integrada no domínio
+                ev = Photometrics.calculateVerticalIlluminance(iesDataVertical, s.dist, deltaH, s.tilt);
+            } else {
+                // Fallback para intensidade paramétrica direta
+                const intensity = win.getIntensity(s);
+                ev = (s.tilt > 0) ? (intensity * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist) : 0;
+            }
             let hitY_px = floorY - (hitY_metric * scale);
             const sy = floorY - (s.height * scale);
 

@@ -185,4 +185,73 @@ export class Photometrics {
             isOval: Math.abs(bC0 - bC90) > 2 
         };
     }
+
+    /**
+     * Calcula a iluminância em um ponto específico usando a Lei do Cosseno Cúbico.
+     * Fórmula: E = (I * cos³θ) / h²
+     * * @param data Dados fotométricos IES
+     * @param x Distância horizontal X do ponto à fonte (m)
+     * @param y Distância horizontal Y do ponto à fonte (m)
+     * @param h Altura da fonte acima do plano de cálculo (m)
+     * @param tilt Inclinação da luminária (graus)
+     */
+    public static calculatePointIlluminance(
+        data: IesData | null | undefined, 
+        x: number, 
+        y: number, 
+        h: number,
+        tilt: number = 0
+    ): { lux: number; angleV: number } {
+        if (!data || h <= 0) return { lux: 0, angleV: 0 };
+
+        // 1. Calcular a distância radial e o ângulo zenital (θ)
+        const d = Math.sqrt(x * x + y * y);
+        const angleVRad = Math.atan2(d, h);
+        const angleVDeg = angleVRad * (180 / Math.PI);
+
+        // 2. Compensação de inclinação (Tilt) - Simplificada para o eixo principal
+        const effectiveAngleV = Math.abs(angleVDeg - tilt);
+
+        // 3. Obter Intensidade Luminous (I) para o ângulo calculado
+        // Nota: Para precisão total em 3D, x e y determinariam o ângulo H (azimutal)
+        const angleHDeg = Math.atan2(y, x) * (180 / Math.PI);
+        const intensity = this.getIESIntensity(data, effectiveAngleV, angleHDeg);
+
+        // 4. Aplicação da Lei do Cosseno Cúbico
+        // E = (I(θ) * cos³(θ)) / h²
+        const cosTheta = Math.cos(angleVRad);
+        const lux = (intensity * Math.pow(cosTheta, 3)) / (h * h);
+
+        return { 
+            lux: Math.max(0, lux), 
+            angleV: angleVDeg 
+        };
+    }
+
+    /**
+     * Calcula a iluminância vertical (E_vert) para superfícies como quadros ou fachadas.
+     * Fórmula: E_vert = (I * sinθ * cos²θ) / d²_horizontal
+     */
+    public static calculateVerticalIlluminance(
+        data: IesData | null | undefined,
+        distParede: number,
+        deltaH: number, // Altura da fonte - Altura do ponto no quadro
+        tilt: number = 0
+    ): number {
+        if (!data || distParede <= 0) return 0;
+
+        const angleVRad = Math.atan2(distParede, deltaH);
+        const angleVDeg = angleVRad * (180 / Math.PI);
+        
+        const intensity = this.getIESIntensity(data, Math.abs(angleVDeg - tilt), 0);
+
+        // Fórmula de Iluminância Vertical: (I * sinθ * cos²θ) / h²
+        // onde h é a altura relativa (deltaH)
+        const sinTheta = Math.sin(angleVRad);
+        const cosTheta = Math.cos(angleVRad);
+        
+        const lux = (intensity * sinTheta * Math.pow(cosTheta, 2)) / (deltaH * deltaH);
+
+        return Math.max(0, lux);
+    }
 }

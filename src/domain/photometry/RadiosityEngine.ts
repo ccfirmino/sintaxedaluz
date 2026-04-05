@@ -39,6 +39,33 @@ export interface RadiosityResult {
 
 export class RadiosityEngine {
     /**
+     * Executa o cálculo de radiosidade em uma Thread de Background (Web Worker).
+     * Padrão Enterprise para evitar travamento (freeze) da Interface de Utilizador.
+     */
+    public static calculateGridMatrixAsync(params: RadiosityParams): Promise<RadiosityResult> {
+        return new Promise((resolve, reject) => {
+            // O Vite resolve nativamente as URLs dos Workers
+            const worker = new Worker(new URL('../../infrastructure/workers/RadiosityWorker.ts', import.meta.url), { type: 'module' });
+            
+            worker.onmessage = (e) => {
+                if (e.data.error) {
+                    reject(new Error(e.data.error));
+                } else {
+                    resolve(e.data);
+                }
+                worker.terminate(); // Liberta a memória (Garbage Collection)
+            };
+            
+            worker.onerror = (error) => {
+                reject(error);
+                worker.terminate();
+            };
+            
+            worker.postMessage(params);
+        });
+    }
+
+    /**
      * Calcula a matriz topográfica de iluminância (Lux) usando a Lei do Cosseno Cúbico
      * e Multi-Sampling Vetorial para evitar picos matemáticos irreais.
      */
@@ -102,29 +129,37 @@ export class RadiosityEngine {
                         for (const fix of params.fixtures) {
                             const dx = subX - fix.x;
                             const dy = subY - fix.y;
-                            const distPlane = Math.sqrt(dx * dx + dy * dy);
-                            const azimuthDeg = (Math.atan2(dy, dx) * 180 / Math.PI) + 90;
 
-                            // Nível do Piso (LP)
-                            const angleRad_LP = Math.atan2(distPlane, hEff_LP);
-                            let I_LP = 0;
+                            // LUXSINTAX: Delegação para o Domínio Físico Unificado (Photometrics)
                             if (params.calcMode === 'ies' && params.iesData) {
-                                I_LP = Photometrics.getIESIntensity(params.iesData, angleRad_LP * 180 / Math.PI, azimuthDeg);
-                            } else if (angleRad_LP < Math.PI / 2) {
-                                I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power);
-                            }
-                            if (I_LP > 0) directLux_LP += ((I_LP * Math.pow(Math.cos(angleRad_LP), 3)) / (hEff_LP * hEff_LP)) / 4;
+                                // Piso (LP)
+                                const resLP = Photometrics.calculatePointIlluminance(params.iesData, dx, dy, hEff_LP, 0);
+                                directLux_LP += (resLP.lux / 4);
 
-                            // Plano de Trabalho (HP)
-                            if (hEff_HP > 0) {
-                                const angleRad_HP = Math.atan2(distPlane, hEff_HP);
-                                let I_HP = 0;
-                                if (params.calcMode === 'ies' && params.iesData) {
-                                    I_HP = Photometrics.getIESIntensity(params.iesData, angleRad_HP * 180 / Math.PI, azimuthDeg);
-                                } else if (angleRad_HP < Math.PI / 2) {
-                                    I_HP = maxI * Math.pow(Math.cos(angleRad_HP), n_power);
+                                // Plano de Trabalho (HP)
+                                if (hEff_HP > 0) {
+                                    const resHP = Photometrics.calculatePointIlluminance(params.iesData, dx, dy, hEff_HP, 0);
+                                    directLux_HP += (resHP.lux / 4);
                                 }
-                                if (I_HP > 0) directLux_HP += ((I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP)) / 4;
+                            } else {
+                                // Modo Paramétrico Direto (Fallback Otimizado)
+                                const distPlane = Math.sqrt(dx * dx + dy * dy);
+                                
+                                // Piso (LP)
+                                const angleRad_LP = Math.atan2(distPlane, hEff_LP);
+                                if (angleRad_LP < Math.PI / 2) {
+                                    const I_LP = maxI * Math.pow(Math.cos(angleRad_LP), n_power);
+                                    directLux_LP += ((I_LP * Math.pow(Math.cos(angleRad_LP), 3)) / (hEff_LP * hEff_LP)) / 4;
+                                }
+
+                                // Plano de Trabalho (HP)
+                                if (hEff_HP > 0) {
+                                    const angleRad_HP = Math.atan2(distPlane, hEff_HP);
+                                    if (angleRad_HP < Math.PI / 2) {
+                                        const I_HP = maxI * Math.pow(Math.cos(angleRad_HP), n_power);
+                                        directLux_HP += ((I_HP * Math.pow(Math.cos(angleRad_HP), 3)) / (hEff_HP * hEff_HP)) / 4;
+                                    }
+                                }
                             }
                         }
                     }

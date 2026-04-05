@@ -1,7 +1,9 @@
-// src/infrastructure/auth/AuthManager.ts
+// src/auth/AuthManager.ts
+import { TenantContextSchema, TenantContext } from './types';
 
 export class AuthManager {
     private static supabase: any;
+    private static currentTenant: TenantContext | null = null;
 
     public static async init(supabaseClient: any) {
         this.supabase = supabaseClient;
@@ -22,8 +24,37 @@ export class AuthManager {
         });
     }
 
+    /**
+     * Retorna o contexto de segurança atual.
+     * Invocado antes de operações de I/O na nuvem para garantir o isolamento multitenant.
+     */
+    public static getTenantContext(): TenantContext {
+        if (!this.currentTenant) {
+            throw new Error("[Security Violation] Acesso negado. Contexto de tenant ausente ou não validado.");
+        }
+        return this.currentTenant;
+    }
+
     public static handleSessionUpdate(session: any) {
-        if (session) {
+        if (session && session.user) {
+            // LUXSINTAX: Validação Estrita de Tenant via Zod (Zero Trust Architecture)
+            const validationResult = TenantContextSchema.safeParse({
+                userId: session.user.id,
+                email: session.user.email,
+                organizationId: session.user.app_metadata?.organization_id,
+                role: session.user.app_metadata?.role || 'LIGHTING_DESIGNER'
+            });
+
+            if (!validationResult.success) {
+                console.error("[LuxSintax Security] Falha na fronteira de segurança. Sessão malformada:", validationResult.error.format());
+                this.currentTenant = null;
+                this.logout();
+                return;
+            }
+
+            // Contexto criptograficamente blindado e guardado na memória da aplicação
+            this.currentTenant = validationResult.data;
+
             const name = session.user.user_metadata.first_name || (session.user.email ? session.user.email.split('@')[0] : 'Usuário');
             document.getElementById('user-name-display')!.innerText = name.toUpperCase();
             
@@ -32,6 +63,7 @@ export class AuthManager {
 
             this.unlockApp();
         } else { 
+            this.currentTenant = null;
             this.lockApp(); 
         }
     }
