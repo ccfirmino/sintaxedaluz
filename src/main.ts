@@ -489,7 +489,7 @@ window.toggleGridMode = function(mode: string) {
     const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm";
     const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
     
-    // LUXSINTAX: Referência aos containers de toggle criados no index.html
+    // LUXSINTAX: Controle de Toggles específicos por modo
     const isoToggle = document.getElementById('iso-toggle-container');
     const polar3DToggle = document.getElementById('polar-3d-toggle-container');
 
@@ -498,9 +498,7 @@ window.toggleGridMode = function(mode: string) {
         if(btnHP) btnHP.className = inactiveClass;
         if(btnLP) btnLP.className = inactiveClass;
         if(btn3D) btn3D.className = activeClass;
-        
-        // Em 3D, esconde Isolinhas e mostra Polar 3D
-        isoToggle?.classList.add('hidden');
+        isoToggle?.classList.add('hidden'); 
         polar3DToggle?.classList.remove('hidden');
     } else {
         window.toggleRenderMode('2D');
@@ -508,8 +506,6 @@ window.toggleGridMode = function(mode: string) {
         if(btnHP) btnHP.className = mode === 'HP' ? activeClass : inactiveClass;
         if(btnLP) btnLP.className = mode === 'LP' ? activeClass : inactiveClass;
         if(btn3D) btn3D.className = inactiveClass;
-        
-        // Em 2D, mostra Isolinhas e esconde Polar 3D
         isoToggle?.classList.remove('hidden');
         polar3DToggle?.classList.add('hidden');
     }
@@ -563,8 +559,7 @@ window.toggleIsolines = function(isChecked: boolean) {
             dotToggle.classList.remove('translate-x-3');
         }
     }
-    // LUXSINTAX: Força o redesenho do Canvas para aplicar a mudança visual
-    if (window.Canvas2DEngine) window.Canvas2DEngine.render();
+    window.updateCalculations();
 };
 
 window.toggleHeatmap = function(isChecked: boolean) {
@@ -923,16 +918,16 @@ window.handleGenerateReport = async (event: any) => {
         s.falseColor = true;
         window.state.showIsolines = true;
 
-        // LUXSINTAX: Renderização forçada antes da captura
+        // LUXSINTAX: Força o redesenho imediato para a captura
         window.Canvas2DEngine.render();
         
         return new Promise((resolve) => {
-            // setTimeout garante que o navegador terminou de processar o desenho no Canvas
+            // Pequeno delay para garantir que o buffer do Canvas foi preenchido
             setTimeout(() => {
                 const canvas = document.getElementById('beamCanvas') as HTMLCanvasElement;
                 const dataUrl = canvas.toDataURL('image/png');
                 
-                // Restaura o estado original da tela para o usuário
+                // Restaura o estado da UI do utilizador
                 s.viewLevel = oldLevel; s.falseColor = oldFC; window.state.showIsolines = oldIsolines;
                 window.Canvas2DEngine.render();
                 resolve(dataUrl);
@@ -1560,9 +1555,7 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
             const nbrIcon = document.getElementById('nbr-icon');
 
             if(nbrBadge && nbrStatusText && nbrIconContainer && nbrIcon) {
-                // LUXSINTAX: Mensagem técnica consolidada para todos os estados
                 const summaryMsg = `Em: ${Math.round(auditedLux)} lx | UGR: ${ugr} | Meta: ${targetLux} lx`;
-                
                 if (status === 'APPROVED') {
                     nbrPanel.style.borderColor = '#10b981';
                     nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
@@ -1574,14 +1567,14 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
                     nbrPanel.style.borderColor = '#f59e0b';
                     nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600';
                     nbrIcon.className = 'fas fa-exclamation-triangle';
-                    nbrStatusText.innerText = summaryMsg;
+                    nbrStatusText.innerText = `Auditoria NBR: Nível Marginal / Tolerável`;
                     nbrBadge.innerText = 'AVISO';
                     nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 border-amber-200';
                 } else {
                     nbrPanel.style.borderColor = '#ef4444';
                     nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
                     nbrIcon.className = 'fas fa-times-circle';
-                    nbrStatusText.innerText = summaryMsg;
+                    nbrStatusText.innerText = `Auditoria NBR: Fora dos Requisitos`;
                     nbrBadge.innerText = 'REPROVADO';
                     nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
                 }
