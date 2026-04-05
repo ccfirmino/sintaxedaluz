@@ -1881,22 +1881,22 @@ window.handleIESUpload = function(input) {
         
 
         // LUXSINTAX: Integração com o novo Módulo de Domínio (Clean Architecture)
-        import { Photometrics } from '/src/domain/photometry/Photometrics.ts';
-        import { LumenMethod } from '/src/domain/photometry/LumenMethod.ts';
-        import { RadiosityEngine } from '/src/domain/photometry/RadiosityEngine.ts';
-        import { FalseColorEngine } from '/src/domain/photometry/FalseColorEngine.ts';
-        import { StandardsEngine } from '/src/domain/standards/StandardsEngine.ts';
-        import { ReportExporter } from '/src/infrastructure/export/ReportExporter.ts';
-        import { Photometric3DEngine } from '/src/infrastructure/three/Photometric3DEngine.ts';
+        import { Photometrics } from './src/domain/photometry/Photometrics.ts';
+        import { LumenMethod } from './src/domain/photometry/LumenMethod.ts';
+        import { RadiosityEngine } from './src/domain/photometry/RadiosityEngine.ts';
+        import { FalseColorEngine } from './src/domain/photometry/FalseColorEngine.ts';
+        import { StandardsEngine } from './src/domain/standards/StandardsEngine.ts';
+        import { ReportExporter } from './src/infrastructure/export/ReportExporter.ts';
+        import { Photometric3DEngine } from './src/infrastructure/three/Photometric3DEngine.ts';
         
         // LUXSINTAX: Importação de Dicionários e Bancos de Dados
-        import { i18nDictionary } from '/src/presentation/i18n/Dictionary.ts';
-        import { normsDatabase } from '/src/domain/standards/Nbr8995Database.ts';
-        import { lpdBaselines } from '/src/domain/standards/AshraeDatabase.ts';
+        import { i18nDictionary } from './src/presentation/i18n/Dictionary.ts';
+        import { normsDatabase } from './src/domain/standards/Nbr8995Database.ts';
+        import { lpdBaselines } from './src/domain/standards/AshraeDatabase.ts';
         
         // LUXSINTAX: Importação dos Motores de Infraestrutura
-        import { AuthManager } from '/src/auth/AuthManager.ts';
-        import { Canvas2DEngine } from '/src/infrastructure/canvas/Canvas2DEngine.ts';
+        import { AuthManager } from './src/auth/AuthManager.ts';
+        import { Canvas2DEngine } from './src/infrastructure/canvas/Canvas2DEngine.ts';
 
         // Atribuição temporária ao window para manter compatibilidade com os controllers legados
         window.i18n = i18nDictionary;
