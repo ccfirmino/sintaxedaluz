@@ -1519,7 +1519,7 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
     const resUgr = document.getElementById('result-ugr');
     const resEff = document.getElementById('result-eff');
     
-    // LUXSINTAX: Determina o Lux a ser auditado com base no nível da malha (Piso vs Mesa)
+    // Sincroniza o resultado visual com o nível selecionado (Piso ou Mesa)
     const currentView = window.state.grid.viewLevel;
     const auditedLux = currentView === 'LP' ? luxPiso : lux;
 
@@ -1528,31 +1528,28 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
     
     const flux = window.state?.grid?.flux || 0;
     const inputWatts = window.state?.grid?.watts || 0;
-    if (resEff) {
-        resEff.innerText = (inputWatts > 0) ? String(Math.round(flux / inputWatts)) : "0";
-    }
+    if (resEff) resEff.innerText = (inputWatts > 0) ? String(Math.round(flux / inputWatts)) : "0";
 
+    // Atualiza HUD Flutuante no Canvas
     const hudLayout = document.getElementById('hud-layout');
     const hudEmHp = document.getElementById('hud-em-hp');
     const hudEmLp = document.getElementById('hud-em-lp');
     
-    if (hudLayout && window.state && window.state.grid) {
-        hudLayout.innerText = `${window.state.grid.cols}x${window.state.grid.rows}`;
-    }
+    if (hudLayout) hudLayout.innerText = `${window.state.grid.cols}x${window.state.grid.rows}`;
     if (hudEmHp) hudEmHp.innerText = Math.round(lux) + ' lx';
-    if (hudEmLp) hudEmLp.innerText = Math.round(luxPiso || (lux * 0.85)) + ' lx';
+    if (hudEmLp) hudEmLp.innerText = Math.round(luxPiso) + ' lx';
 
+    // Auditoria NBR na barra de conformidade
     if (window.currentNbrTarget) {
         const nbrPanel = document.getElementById('nbr-status-panel');
         if (nbrPanel) {
             const targetLux = window.currentNbrTarget.lux;
             const maxUgrLimit = window.currentNbrTarget.ugr;
-            const parsedUgr = parseFloat(String(ugr));
             
             let status = 'APPROVED';
-            if (Math.round(lux) < targetLux * 0.9) status = 'REJECTED';
-            else if (parsedUgr > maxUgrLimit) status = 'REJECTED';
-            else if (Math.round(lux) < targetLux) status = 'WARNING';
+            if (Math.round(auditedLux) < targetLux * 0.9) status = 'REJECTED';
+            else if (parseFloat(String(ugr)) > maxUgrLimit) status = 'REJECTED';
+            else if (Math.round(auditedLux) < targetLux) status = 'WARNING';
 
             const nbrBadge = document.getElementById('nbr-badge');
             const nbrStatusText = document.getElementById('nbr-status-text');
@@ -1560,28 +1557,26 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
             const nbrIcon = document.getElementById('nbr-icon');
 
             if(nbrBadge && nbrStatusText && nbrIconContainer && nbrIcon) {
-                // LUXSINTAX: Mensagem técnica consolidada para todos os estados
-                const summaryMsg = `Em: ${Math.round(auditedLux)} lx | UGR: ${ugr} | Meta: ${targetLux} lx`;
-                
+                // Exibe os números reais alcançados na barra colorida
+                const summaryMsg = `RESULTADO ATUAL: ${Math.round(auditedLux)} lx | UGR: ${ugr} | REQUISITO NBR: ${targetLux} lx`;
+                nbrStatusText.innerText = summaryMsg;
+
                 if (status === 'APPROVED') {
                     nbrPanel.style.borderColor = '#10b981';
                     nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
                     nbrIcon.className = 'fas fa-check-circle';
-                    nbrStatusText.innerText = summaryMsg;
                     nbrBadge.innerText = 'APROVADO';
                     nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 border-green-200';
                 } else if (status === 'WARNING') {
                     nbrPanel.style.borderColor = '#f59e0b';
                     nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600';
                     nbrIcon.className = 'fas fa-exclamation-triangle';
-                    nbrStatusText.innerText = summaryMsg;
                     nbrBadge.innerText = 'AVISO';
                     nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 border-amber-200';
                 } else {
                     nbrPanel.style.borderColor = '#ef4444';
                     nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
                     nbrIcon.className = 'fas fa-times-circle';
-                    nbrStatusText.innerText = summaryMsg;
                     nbrBadge.innerText = 'REPROVADO';
                     nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
                 }
