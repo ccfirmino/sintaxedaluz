@@ -2349,9 +2349,29 @@ window.initNbrSelector = function() {
             container.innerHTML = html;
             window.updateGlobalLeedSummary();
         };
+        // ==========================================
+        // BINDING DE INPUTS E SLIDERS (REATIVIDADE)
+        // ==========================================
+        window.setupInputBindings = function() {
+            // Seleciona todos os inputs numéricos e sliders das calculadoras
+            const inputs = document.querySelectorAll('input[type="number"], input[type="range"]');
+            
+            inputs.forEach(input => {
+                // Ignora inputs que já possuem eventos inline no HTML (como os do LEED)
+                if (input.hasAttribute('oninput') || input.hasAttribute('onchange')) return;
+                
+                // Sempre que o usuário mexer no slider ou digitar, recalcula a tela!
+                input.addEventListener('input', () => {
+                    if (window.updateCalculations) window.updateCalculations();
+                });
+            });
+        };
+
         // Inicialização do Sistema
         window.currentLang = 'pt';
         initializeApp();
+        window.initNbrSelector();
+        window.setupInputBindings(); // <-- Reativa a escuta dos sliders!
         window.switchTool('grid');
         window.updateCalcMode('direct');
     </script>
