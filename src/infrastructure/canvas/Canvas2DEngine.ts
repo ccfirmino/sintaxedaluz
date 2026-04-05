@@ -378,16 +378,19 @@ export class Canvas2DEngine {
                 const iesData = (win.calcMode === 'ies') ? s.iesData : null;
                 const dx = s.height * Math.tan(tr);
                 
+                // Desacoplamento da Intensidade Base (Resolve erro TS2554)
+                const baseIntensity = (win.calcMode === 'direct') ? (s.intensity || 0) : ((s.cdklm * s.flux) / 1000 || 0);
+                
                 // Iluminância no Piso (E = I * cos³θ / h²)
                 const resFloor = Photometrics.calculatePointIlluminance(iesData, dx, 0, s.height, currentTilt);
-                const luxFloor = (win.calcMode === 'ies') ? resFloor.lux : (win.getIntensity(s) * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
+                const luxFloor = (win.calcMode === 'ies') ? resFloor.lux : (baseIntensity * Math.pow(Math.cos(tr), 3)) / (s.height ** 2);
                 
                 // Iluminância no Plano de Trabalho (Cálculo na altura efetiva hEff)
                 let luxPlane = 0;
                 if (hEff > 0) {
                     const dxPlane = hEff * Math.tan(tr);
                     const resPlane = Photometrics.calculatePointIlluminance(iesData, dxPlane, 0, hEff, currentTilt);
-                    luxPlane = (win.calcMode === 'ies') ? resPlane.lux : (win.getIntensity(s) * Math.pow(Math.cos(tr), 3)) / (hEff ** 2);
+                    luxPlane = (win.calcMode === 'ies') ? resPlane.lux : (baseIntensity * Math.pow(Math.cos(tr), 3)) / (hEff ** 2);
                 }
                 
                 if (win.calcMode !== 'ies') {
@@ -538,9 +541,9 @@ export class Canvas2DEngine {
                 // Utiliza a fórmula física completa integrada no domínio
                 ev = Photometrics.calculateVerticalIlluminance(iesDataVertical, s.dist, deltaH, s.tilt);
             } else {
-                // Fallback para intensidade paramétrica direta
-                const intensity = win.getIntensity(s);
-                ev = (s.tilt > 0) ? (intensity * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist) : 0;
+                // Fallback para intensidade paramétrica direta (Desacoplado, Resolve TS2554)
+                const baseIntensity = (win.calcMode === 'direct') ? (s.intensity || 0) : ((s.cdklm * s.flux) / 1000 || 0);
+                ev = (s.tilt > 0) ? (baseIntensity * Math.pow(Math.sin(tr), 3)) / (s.dist * s.dist) : 0;
             }
             let hitY_px = floorY - (hitY_metric * scale);
             const sy = floorY - (s.height * scale);
