@@ -1073,9 +1073,9 @@
                 supabase = createClient(env.url, env.key);
                 window.supabase = supabase;
                 
-                // Liberta o AuthManager
+                // Liberta o AuthManager passando a instância do Supabase (Injeção de Dependência)
                 if (window.AuthManager) {
-                    await window.AuthManager.init();
+                    await window.AuthManager.init(supabase);
                 }
             } catch (err) {
                 console.error("Falha Crítica:", err);
@@ -1921,8 +1921,8 @@ window.handleIESUpload = function(input) {
         import { lpdBaselines } from './src/domain/standards/AshraeDatabase.ts';
         
         // LUXSINTAX: Importação dos Motores de Infraestrutura
-        import { AuthManager } from './src/auth/AuthManager.ts';
-        import { Canvas2DEngine } from './src/infrastructure/canvas/Canvas2DEngine.ts';
+        import { AuthManager } from '/src/infrastructure/auth/AuthManager.ts';
+        import { Canvas2DEngine } from '/src/infrastructure/canvas/Canvas2DEngine.ts';
 
         // Atribuição temporária ao window para manter compatibilidade com os controllers legados
         window.i18n = i18nDictionary;
