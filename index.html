@@ -267,10 +267,10 @@
     <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
         <div class="mb-4">
             <h3 class="text-md text-starlight mb-4 font-black whitespace-nowrap text-center" data-i18n="calc_params">Parâmetros da Fonte</h3>
-            <div id="calc-mode-selector" class="flex flex-row flex-wrap items-center justify-center gap-3 p-1 mb-6 mt-4 transition-opacity duration-300">
-                <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="direct" checked onchange="window.updateCalcMode('direct')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_intensity">INTENSIDADE (CD)</span></label>
-                <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="photometric" onchange="window.updateCalcMode('photometric')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_photometry">FOTOMETRIA</span></label>
-                <label class="flex items-center gap-1 cursor-pointer group"><input type="radio" name="calc_mode" value="ies" onchange="window.updateCalcMode('ies')"><span class="text-[9px] text-slate-600 group-hover:text-luminous-gold transition-colors font-bold uppercase whitespace-nowrap" data-i18n="lbl_ies">IES / LDT</span></label>
+            <div id="calc-mode-selector" class="flex gap-2 mb-6 mt-4 transition-opacity duration-300">
+                <button id="btn-mode-direct" onclick="window.updateCalcMode('direct')" class="flex-1 py-2.5 bg-luminous-gold text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md transition-all">Intensidade</button>
+                <button id="btn-mode-photometric" onclick="window.updateCalcMode('photometric')" class="flex-1 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-luminous-gold hover:text-luminous-gold text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-sm">Fotometria</button>
+                <button id="btn-mode-ies" onclick="window.updateCalcMode('ies')" class="flex-1 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-luminous-gold hover:text-luminous-gold text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-sm">IES / LDT</button>
             </div>
         </div>
         
@@ -429,27 +429,33 @@
                 </div>
             </div>
 
-            <div id="nbr-selector-section" class="mt-6 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                <label class="text-[10px] text-luminous-gold font-black uppercase mb-3 block"><i class="fas fa-book mr-1"></i> Norma NBR ISO/CIE 8995-1</label>
-                <div class="space-y-3">
-                    <select id="nbr-cat-select" onchange="window.updateNbrRooms()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600"><option value="">Selecione a Categoria...</option></select>
-                    <select id="nbr-room-select" onchange="window.applyNbrRules()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600" disabled><option value="">Selecione o Ambiente...</option></select>
-                </div>
-            </div>
             
-            <div id="report-export-panel" class="mt-6">
-                <button onclick="window.handleGenerateReport()" class="w-full py-3 bg-starlight hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-black rounded-lg uppercase tracking-widest text-[10px] transition-all shadow-md border border-slate-700"><i class="fas fa-file-pdf mr-2 text-red-400"></i> Exportar Relatório PDF</button>
-            </div>
 
         </div>
     </div>
 </div>
 
                         <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
+
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row gap-4 items-end">
+                                <div class="flex-1 w-full">
+                                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Nome do Projeto</label>
+                                    <input type="text" id="proj-name" placeholder="Ex: Sede Corporativa" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+                                </div>
+                                <div class="flex-1 w-full">
+                                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Ambiente</label>
+                                    <input type="text" id="proj-room" placeholder="Ex: Sala de Reuniões" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+                                </div>
+                                <div class="flex-1 w-full">
+                                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Responsável (LD)</label>
+                                    <input type="text" id="proj-author" placeholder="Ex: LuxSintax Design" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+                                </div>
+                                <button id="btn-export-pdf" onclick="window.handleGenerateReport()" class="h-[34px] px-6 bg-starlight hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-black rounded-lg uppercase tracking-widest text-[10px] transition-all shadow-md border border-slate-700 flex items-center whitespace-nowrap"><i class="fas fa-file-pdf mr-2 text-red-400"></i> Relatório PDF</button>
+                            </div>
+
                             <div class="glass-panel p-6 rounded-2xl flex flex-col relative w-full h-[75vh] min-h-[500px] max-h-[800px]">
-                                <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
-                                    <h3 class="text-sm text-starlight uppercase tracking-widest font-black m-0" data-i18n="hdr_results">Resultados em Tempo Real</h3>
-                                    
+                                
+                                <div class="flex justify-end items-center mb-4 border-b border-slate-200 pb-4">
                                     <div class="flex flex-wrap justify-end items-center gap-4 md:gap-6">
                                         <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                             <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Fonte Única</button>
@@ -457,12 +463,12 @@
                                         </div>
 
                                         <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" data-i18n="btn_v_section">Corte Técnico</button>
-                                            <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_elevation">Elevação Frontal</button>
+                                            <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Corte Técnico</button>
+                                            <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Elevação Frontal</button>
                                         </div>
 
                                         <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2" title="Sinaliza ângulos ofuscantes acima de 65º (NBR/IES).">
+                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
                                                 <span class="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider">GLARE >65º</span>
                                                 <div class="relative">
                                                     <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
@@ -473,7 +479,7 @@
                                         </div>
 
                                         <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-indigo-50 p-1.5 rounded-lg dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2" title="Espectrofotômetro e Impacto Circadiano">
+                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
                                                 <span class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-wider">HCL SPECTRUM</span>
                                                 <div class="relative">
                                                     <input type="checkbox" id="g-showHCL" onchange="window.toggleHCL(this.checked)" checked class="sr-only">
@@ -495,15 +501,14 @@
 
                                         <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                             <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">HEATMAP</span>
+                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">HEATMAP</span>
                                                 <div class="relative">
                                                     <input type="checkbox" id="g-falseColor" onchange="window.toggleHeatmap(this.checked)" class="sr-only">
                                                     <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
                                                     <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
                                                 </div>
                                             </label>
-                                            <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
-                                            </div>
+                                        </div>
 
                                         <div id="polar-toggle-wrapper" class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                             <label class="flex items-center gap-2 cursor-pointer group px-2">
@@ -519,7 +524,6 @@
                                 </div>
                                 
                                 <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
-                                    
                                     <div id="photometric-dashboard" class="hidden w-full bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 transition-all duration-500 z-20 relative shadow-sm">
                                         <div class="flex justify-between items-center mb-3">
                                             <h4 class="text-[10px] font-black tracking-widest text-luminous-gold uppercase"><i class="fas fa-microscope mr-1"></i> Sumário Técnico (IES/LDT)</h4>
@@ -554,6 +558,23 @@
                                         <div id="stage-3d" class="absolute inset-0 w-full h-full z-20 hidden bg-slate-900">
                                             <div id="webgl-container" class="w-full h-full cursor-move"></div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="nbr-selector-section" class="hidden bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mt-2">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <div class="w-8 h-8 rounded-lg bg-luminous-gold/20 flex items-center justify-center"><i class="fas fa-check-double text-luminous-gold"></i></div>
+                                    <h3 class="text-xs font-black text-starlight dark:text-white uppercase tracking-widest">Motor de Conferência NBR 8995-1</h3>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Categoria da Instalação</label>
+                                        <select id="nbr-cat-select" onchange="window.updateNbrRooms()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option value="">Selecione a Categoria...</option></select>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Ambiente Específico</label>
+                                        <select id="nbr-room-select" onchange="window.applyNbrRules()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-700 dark:border-slate-600 dark:text-white" disabled><option value="">Selecione o Ambiente...</option></select>
                                     </div>
                                 </div>
                             </div>
@@ -1687,11 +1708,7 @@ window.handleGenerateReport = async () => {
                 if (selectedInput) selectedInput.classList.remove('hidden');
 
                 const nbrPanel = document.getElementById('nbr-selector-section');
-                const reportPanel = document.getElementById('report-export-panel');
-                const resultsSection = document.getElementById('results-section');
                 if (nbrPanel) nbrPanel.classList.toggle('hidden', toolId !== 'grid');
-                if (reportPanel) reportPanel.classList.toggle('hidden', toolId !== 'grid');
-                if (resultsSection) resultsSection.classList.toggle('hidden', toolId !== 'grid');
                 
                 // Controle dos Wrappers de Interface da Malha (Heatmap e Nível de Iluminância LP/HP)
 // Controle dos Wrappers de Interface da Malha e Botões
@@ -1751,6 +1768,18 @@ if (toolId === 'grid') {
             document.querySelectorAll('.mode-ies-group').forEach(el => el.classList.toggle('hidden', mode !== 'ies'));
             document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
             
+            // Cor dos Botões Modernos
+            ['direct', 'photometric', 'ies'].forEach(m => {
+                const btn = document.getElementById('btn-mode-' + m);
+                if (btn) {
+                    if (m === mode) {
+                        btn.className = "flex-1 py-2.5 bg-luminous-gold text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md transition-all";
+                    } else {
+                        btn.className = "flex-1 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-luminous-gold hover:text-luminous-gold text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-sm";
+                    }
+                }
+            });
+
             // Controlo de Visibilidade Contextual do Botão 3D
             const viewModeToggle = document.getElementById('view-mode-toggle');
             if (viewModeToggle) {
