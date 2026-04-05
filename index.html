@@ -244,9 +244,9 @@
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-glow pointer-events-none opacity-50"></div>
             <div class="max-w-[1800px] mx-auto flex flex-col items-center">
                 <div class="flex justify-start w-full gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-2 custom-scrollbar">
+                    <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-layer-group text-lg mb-1"></i><span data-i18n="tab_horiz">PONTO A PONTO<br>HORIZONTAL</span></button>
                     <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">PONTO A PONTO<br>VERTICAL</span></button>
-                    <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                     
                     <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap ml-auto">
                         <i class="fas fa-microchip text-lg mb-1"></i>
@@ -379,207 +379,62 @@
         </div>
         
         <div id="inputs-grid" class="hidden">
-            <div class="flex flex-row items-center justify-center gap-6 p-1 mb-6">
-                <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="direct" checked onchange="window.updateCalcMode('direct')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_manual_source">Ficha Técnica</span></label>
-                <label class="flex items-center gap-2 cursor-pointer group"><input type="radio" name="grid_mode_sel" value="ies" onchange="window.updateCalcMode('ies')" class="accent-luminous-gold w-3 h-3"><span class="text-[10px] text-slate-600 group-hover:text-luminous-gold transition-colors font-black uppercase" data-i18n="lbl_ies_file">IES / LDT</span></label>
+            <h3 class="text-md text-starlight mb-4 font-black whitespace-nowrap text-center">Modo de Entrada</h3>
+            <div class="flex gap-2 mb-6 mt-4 transition-opacity duration-300">
+                <button id="btn-mode-direct-g" onclick="document.querySelector('input[name=\'grid_mode_sel\'][value=\'direct\']').checked=true; window.updateCalcMode('direct'); this.className='flex-1 py-2.5 bg-luminous-gold text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md transition-all'; document.getElementById('btn-mode-ies-g').className='flex-1 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-luminous-gold hover:text-luminous-gold text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-sm';" class="flex-1 py-2.5 bg-luminous-gold text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md transition-all">Ficha Técnica</button>
+                <button id="btn-mode-ies-g" onclick="document.querySelector('input[name=\'grid_mode_sel\'][value=\'ies\']').checked=true; window.updateCalcMode('ies'); this.className='flex-1 py-2.5 bg-luminous-gold text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md transition-all'; document.getElementById('btn-mode-direct-g').className='flex-1 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-luminous-gold hover:text-luminous-gold text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-sm';" class="flex-1 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-luminous-gold hover:text-luminous-gold text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-sm">IES / LDT</button>
+                <input type="radio" name="grid_mode_sel" value="direct" checked class="hidden">
+                <input type="radio" name="grid_mode_sel" value="ies" class="hidden">
             </div>
 
             <div class="mode-ies-group hidden space-y-6 mb-6">
                 <div class="group">
-                    <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
+                    <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block">CARREGAR ARQUIVO .IES / .LDT</label>
                     <input type="file" id="g-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
                     <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
                 </div>
             </div>
 
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-            
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="g-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-plane" min="0" max="5" step="0.05" value="0.75"></div>
-
-            <div class="mode-standard-only">
-                <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold">ALTURA (H)</label><div class="flex items-baseline gap-1"><input type="number" id="g-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-height" min="0.5" max="20" step="0.1" value="3.0"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold">PLANO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="g-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-plane" min="0" max="5" step="0.05" value="0.75"></div>
             </div>
 
-            <div class="space-y-6 mb-6">
-                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_fixture_flux">FLUXO DA LUMINÁRIA</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="25000" step="100" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="25000" step="100" value="3000" class="transition-opacity"></div>
-                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_power_w">Potência (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1" class="transition-opacity"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30" class="transition-opacity"></div>
-                <div class="group pt-2"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_target_lux">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500"></div>
+            <div class="mode-standard-only mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold">FLUXO (LM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-flux" value="3000" min="100" max="25000" step="100"><span class="text-[9px] text-slate-500 font-bold">LM</span></div></div><input type="range" id="range-g-flux" min="100" max="25000" step="100" value="3000"></div>
+                <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold">POTÊNCIA (W)</label><div class="flex items-baseline gap-1"><input type="number" id="g-watts" value="30" min="1" max="1000" step="1"><span class="text-[9px] text-slate-500 font-bold">W</span></div></div><input type="range" id="range-g-watts" min="1" max="1000" step="1" value="30"></div>
             </div>
 
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_w">LARGURA DO AMB. (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
-            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_room_l">COMPRIMENTO DO AMB. (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomL" value="4.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
+            <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold">ILUMINÂNCIA ALVO (EM)</label><div class="flex items-baseline gap-1"><input type="number" id="g-targetLux" value="500" min="50" max="5000" step="50"><span class="text-[9px] text-slate-500 font-bold">LX</span></div></div><input type="range" id="range-g-targetLux" min="50" max="5000" step="50" value="500"></div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold">LARGURA (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomW" value="6.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
+                <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold">COMPRIM. (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-roomL" value="4.0" min="1" max="30" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
+            </div>
             
-            <div class="flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div class="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                 <div class="group">
-                    <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block" data-i18n="lbl_util_factor">Fator Utilização (U)</label>
-                    <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
-                        <option value="0.70" data-i18n="opt_util_70">Cores Claras / Aberto (0.70)</option>
-                        <option value="0.60" selected data-i18n="opt_util_60">Padrão / Médio (0.60)</option>
-                        <option value="0.40" data-i18n="opt_util_40">Cores Escuras / Fechado (0.40)</option>
+                    <label class="text-[9px] text-slate-500 font-bold uppercase mb-2 block">Fator U</label>
+                    <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
+                        <option value="0.70">Claro (0.7)</option><option value="0.60" selected>Médio (0.6)</option><option value="0.40">Escuro (0.4)</option>
                     </select>
                 </div>
-                
                 <div class="group">
-                    <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block" data-i18n="lbl_maint_factor">Fator Manutenção (FM)</label>
-                    <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
-                        <option value="0.80" selected data-i18n="opt_maint_80">Limpo / Novo (0.80)</option>
-                        <option value="0.70" data-i18n="opt_maint_70">Normal / Escritório (0.70)</option>
-                        <option value="0.60" data-i18n="opt_maint_60">Sujo / Industrial (0.60)</option>
+                    <label class="text-[9px] text-slate-500 font-bold uppercase mb-2 block">Fator FM</label>
+                    <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600">
+                        <option value="0.80" selected>Limpo (0.8)</option><option value="0.70">Normal (0.7)</option><option value="0.60">Sujo (0.6)</option>
                     </select>
                 </div>
             </div>
-
-            
-
         </div>
     </div>
 </div>
 
                         <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
 
-                            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row gap-4 items-end">
-                                <div class="flex-1 w-full">
-                                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Nome do Projeto</label>
-                                    <input type="text" id="proj-name" placeholder="Ex: Sede Corporativa" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-900 dark:border-slate-700 dark:text-white">
-                                </div>
-                                <div class="flex-1 w-full">
-                                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Ambiente</label>
-                                    <input type="text" id="proj-room" placeholder="Ex: Sala de Reuniões" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-900 dark:border-slate-700 dark:text-white">
-                                </div>
-                                <div class="flex-1 w-full">
-                                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Responsável (LD)</label>
-                                    <input type="text" id="proj-author" placeholder="Ex: LuxSintax Design" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-900 dark:border-slate-700 dark:text-white">
-                                </div>
-                                <button id="btn-export-pdf" onclick="window.handleGenerateReport()" class="h-[34px] px-6 bg-starlight hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-black rounded-lg uppercase tracking-widest text-[10px] transition-all shadow-md border border-slate-700 flex items-center whitespace-nowrap"><i class="fas fa-file-pdf mr-2 text-red-400"></i> Relatório PDF</button>
-                            </div>
-
                             <div class="glass-panel p-6 rounded-2xl flex flex-col relative w-full h-[75vh] min-h-[500px] max-h-[800px]">
-                                
-                                <div class="flex justify-end items-center mb-4 border-b border-slate-200 pb-4">
-                                    <div class="flex flex-wrap justify-end items-center gap-4 md:gap-6">
-                                        <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Fonte Única</button>
-                                            <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
-                                        </div>
-
-                                        <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Corte Técnico</button>
-                                            <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Elevação Frontal</button>
-                                        </div>
-
-                                        <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider">GLARE >65º</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
-                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="glare-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="glare-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                        </div>
-
-                                        <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-indigo-50 p-1.5 rounded-lg dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-wider">HCL SPECTRUM</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="g-showHCL" onchange="window.toggleHCL(this.checked)" checked class="sr-only">
-                                                    <div class="block bg-indigo-500 w-7 h-4 rounded-full transition-colors duration-300" id="hcl-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="hcl-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                        </div>
-
-                                        <div id="grid-level-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleGridLevel('HP')" id="btn-gl-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Mesa (HP)</button>
-                                            <button onclick="window.toggleGridLevel('LP')" id="btn-gl-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Piso (LP)</button>
-                                        </div>
-
-                                        <div id="view-mode-toggle" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleRenderMode('2D')" id="btn-render-2d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all">Vista 2D</button>
-                                            <button onclick="window.toggleRenderMode('3D')" id="btn-render-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Sólido 3D</button>
-                                        </div>
-
-                                        <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">HEATMAP</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="g-falseColor" onchange="window.toggleHeatmap(this.checked)" class="sr-only">
-                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                        </div>
-
-                                        <div id="polar-toggle-wrapper" class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">CURVA POLAR</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="v-showPolar" onchange="window.togglePolar(this.checked)" checked class="sr-only">
-                                                    <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="polar-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="relative w-full flex-grow bg-white border border-slate-200 rounded-2xl mb-6 overflow-hidden canvas-container shadow-inner transition-colors duration-300 flex flex-col">
-                                    <div id="photometric-dashboard" class="hidden w-full bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 transition-all duration-500 z-20 relative shadow-sm">
-                                        <div class="flex justify-between items-center mb-3">
-                                            <h4 class="text-[10px] font-black tracking-widest text-luminous-gold uppercase"><i class="fas fa-microscope mr-1"></i> Sumário Técnico (IES/LDT)</h4>
-                                            <span id="pd-filename" class="text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded font-bold max-w-[200px] truncate">arquivo.ies</span>
-                                        </div>
-                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Eficácia</div>
-                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-efficacy">--</span> <span class="text-[10px] font-medium text-slate-500">lm/W</span></div>
-                                            </div>
-                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Potência (W)</div>
-                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-watts">--</span> <span class="text-[10px] font-medium text-slate-500">W</span></div>
-                                            </div>
-                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Fluxo Total</div>
-                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-lumens">--</span> <span class="text-[10px] font-medium text-slate-500">lm</span></div>
-                                            </div>
-                                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Upward Light (ULR)</div>
-                                                <div class="text-lg font-black text-starlight dark:text-white"><span id="pd-uplight">--</span> <span class="text-[10px] font-medium text-slate-500">%</span></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="relative flex-grow w-full">
-                                        <div id="stage-2d" class="absolute inset-0 w-full h-full z-10 block">
-                                            <div class="absolute inset-0 opacity-10 pointer-events-none" style="opacity: 0.4; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
-                                            <canvas id="beamCanvas" class="absolute inset-0 w-full h-full block"></canvas>
-                                        </div>
-                                        
-                                        <div id="stage-3d" class="absolute inset-0 w-full h-full z-20 hidden bg-slate-900">
-                                            <div id="webgl-container" class="w-full h-full cursor-move"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div id="nbr-selector-section" class="hidden bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mt-2">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div class="w-8 h-8 rounded-lg bg-luminous-gold/20 flex items-center justify-center"><i class="fas fa-check-double text-luminous-gold"></i></div>
-                                    <h3 class="text-xs font-black text-starlight dark:text-white uppercase tracking-widest">Motor de Conferência NBR 8995-1</h3>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Categoria da Instalação</label>
-                                        <select id="nbr-cat-select" onchange="window.updateNbrRooms()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option value="">Selecione a Categoria...</option></select>
-                                    </div>
-                                    <div>
-                                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Ambiente Específico</label>
-                                        <select id="nbr-room-select" onchange="window.applyNbrRules()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight focus:border-luminous-gold transition-colors dark:bg-slate-700 dark:border-slate-600 dark:text-white" disabled><option value="">Selecione o Ambiente...</option></select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                 <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
                         <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
@@ -4252,6 +4107,8 @@ window.applyNbrRules = function() {
         if (targetInput) targetInput.value = norm.lux;
         if (rangeInput) rangeInput.value = norm.lux;
         window.state.grid.targetLux = norm.lux;
+        const display = document.getElementById('nbr-target-display');
+        if (display) display.innerText = `${norm.lux} lx | UGR < ${norm.ugr}`;
         window.updateCalculations();
     }
 };
