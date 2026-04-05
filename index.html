@@ -1032,8 +1032,8 @@
         </div>
     </div>
 
-    <script src="./src/js/engines/hcl.js"></script>
-    <script src="./src/js/engines/glare.js"></script>
+    <script src="./src/infrastructure/js/engines/hcl.js"></script>
+    <script src="./src/infrastructure/js/engines/glare.js"></script>
     
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -1934,6 +1934,9 @@ window.handleIESUpload = function(input) {
 
         // LUXSINTAX: Motor de Cores Falsas importado do Domínio
         window.FalseColorEngine = FalseColorEngine;                
+
+        // LUXSINTAX: Conexão do Motor 2D (Clean Architecture)
+        window.Canvas2DEngine = Canvas2DEngine;                
 
         // LUXSINTAX: Motor de Interpolação Bilinear Fotométrica (Alta Precisão 3D)
         window.getIESIntensity = function(state, vAngleDeg, hAngleDeg = 0) {
