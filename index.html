@@ -1885,14 +1885,14 @@ window.handleIESUpload = function(input) {
         import { LumenMethod } from '/src/domain/photometry/LumenMethod.ts';
         import { RadiosityEngine } from '/src/domain/photometry/RadiosityEngine.ts';
         import { FalseColorEngine } from '/src/domain/photometry/FalseColorEngine.ts';
-        import { StandardsEngine } from '/src/domain/standards/StandardsEngine.ts';
+        import { StandardsEngine } from '/src/standards/StandardsEngine.ts';
         import { ReportExporter } from '/src/infrastructure/export/ReportExporter.ts';
         import { Photometric3DEngine } from '/src/infrastructure/three/Photometric3DEngine.ts';
         
         // LUXSINTAX: Importação de Dicionários e Bancos de Dados
         import { i18nDictionary } from '/src/presentation/i18n/Dictionary.ts';
-        import { normsDatabase } from '/src/domain/standards/Nbr8995Database.ts';
-        import { lpdBaselines } from '/src/domain/standards/AshraeDatabase.ts';
+        import { normsDatabase } from '/src/standards/Nbr8995Database.ts';
+        import { lpdBaselines } from '/src/standards/AshraeDatabase.ts';
         
         // LUXSINTAX: Importação dos Motores de Infraestrutura
         import { AuthManager } from '/src/auth/AuthManager.ts';
