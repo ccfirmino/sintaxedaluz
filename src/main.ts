@@ -922,21 +922,17 @@ window.handleGenerateReport = async (event: any) => {
         s.viewLevel = level;
         s.falseColor = true;
         window.state.showIsolines = true;
-
-        // LUXSINTAX: Renderização forçada antes da captura
         window.Canvas2DEngine.render();
         
         return new Promise((resolve) => {
-            // setTimeout garante que o navegador terminou de processar o desenho no Canvas
+            // Delay vital para garantir que o Canvas desenhou a malha antes do print
             setTimeout(() => {
                 const canvas = document.getElementById('beamCanvas') as HTMLCanvasElement;
                 const dataUrl = canvas.toDataURL('image/png');
-                
-                // Restaura o estado original da tela para o usuário
                 s.viewLevel = oldLevel; s.falseColor = oldFC; window.state.showIsolines = oldIsolines;
                 window.Canvas2DEngine.render();
                 resolve(dataUrl);
-            }, 150);
+            }, 200);
         });
     };
 
@@ -1539,7 +1535,7 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
     if (hudEmHp) hudEmHp.innerText = Math.round(lux) + ' lx';
     if (hudEmLp) hudEmLp.innerText = Math.round(luxPiso) + ' lx';
 
-    // Auditoria NBR na barra de conformidade
+    // Auditoria NBR na barra de conformidade (MOSTRA RESULTADOS NA BARRA)
     if (window.currentNbrTarget) {
         const nbrPanel = document.getElementById('nbr-status-panel');
         if (nbrPanel) {
@@ -1557,8 +1553,8 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
             const nbrIcon = document.getElementById('nbr-icon');
 
             if(nbrBadge && nbrStatusText && nbrIconContainer && nbrIcon) {
-                // Exibe os números reais alcançados na barra colorida
-                const summaryMsg = `RESULTADO ATUAL: ${Math.round(auditedLux)} lx | UGR: ${ugr} | REQUISITO NBR: ${targetLux} lx`;
+                // Injeta os valores reais na barra de resumo
+                const summaryMsg = `ATUAL: ${Math.round(auditedLux)} lx | UGR: ${ugr} | META: ${targetLux} lx`;
                 nbrStatusText.innerText = summaryMsg;
 
                 if (status === 'APPROVED') {
