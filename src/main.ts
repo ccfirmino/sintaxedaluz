@@ -75,6 +75,8 @@ window.Photometric3DEngine = Photometric3DEngine;
 window.StandardsEngine = StandardsEngine;
 window.ReportExporter = ReportExporter;
 window.LumenMethod = LumenMethod;
+window.Photometrics = Photometrics; // FUNDAMENTAL: Atribui o motor de física ao window
+window.RadiosityEngine = RadiosityEngine; // Atribui o motor de cálculo em background
 window.currentLang = 'pt';
 window.calcMode = 'direct';
 
@@ -330,8 +332,11 @@ window.setGridCalcMethod = function(method: string) {
 };
 
 window.updateCalcMode = function(mode: string) {
+    const oldMode = window.calcMode;
     window.calcMode = mode;
-    if (mode !== 'ies' && window.currentTool && window.state[window.currentTool]) {
+    
+    // LUXSINTAX: Limpeza inteligente. Só limpa se estivermos explicitamente a sair do modo IES para Direct
+    if (oldMode === 'ies' && mode === 'direct' && window.currentTool && window.state[window.currentTool]) {
         window.state[window.currentTool].iesData = null;
         window.state[window.currentTool].iesFileName = null;
         const fileInput = document.getElementById(window.currentTool[0] + '-ies-input') as HTMLInputElement;
@@ -650,10 +655,11 @@ window.updatePhotometricHUD = function() {
     const toolId = window.currentTool;
     const state = window.state[toolId];
     
-    // LUXSINTAX: Exibe o HUD se houver dados, independente do modo, para feedback ao utilizador
+    // LUXSINTAX: HUD Visível se houver dados e modo IES ativo
+    const isIES = (window.calcMode === 'ies');
     const hasData = state && state.iesData;
 
-    if (!hasData) {
+    if (!isIES || !hasData) {
         dash.classList.add('hidden');
         return;
     }
@@ -661,8 +667,8 @@ window.updatePhotometricHUD = function() {
     dash.classList.remove('hidden');
     document.getElementById('pd-filename')!.innerText = state.iesFileName || "arquivo.ies";
     
-    // Delegação para o Domínio Físico
-    const metrics = window.Photometrics.extractZonalMetrics(state.iesData);
+    // Uso do módulo importado localmente (Photometrics)
+    const metrics = Photometrics.extractZonalMetrics(state.iesData);
     
     let pWatts = state.iesData.wattage;
     if (!pWatts) {
@@ -743,11 +749,15 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
                 }
 
                 const targetKey = window.currentTool;
+                
+                // Primeiro mudamos o modo (isso limpa estados antigos com segurança)
+                window.calcMode = 'ies';
+                window.updateCalcMode('ies');
+
+                // Depois injetamos os dados novos
                 window.state[targetKey].iesData = parsed;
                 window.state[targetKey].iesFileName = file.name;
 
-                // LUXSINTAX: Auto-ativação do modo IES após upload e atualização do HUD
-                window.updateCalcMode('ies');
                 if (window.updatePhotometricHUD) window.updatePhotometricHUD();
 
                 const cctMatch = file.name.match(/(\d{3,4})K/i) || content.match(/(\d{3,4})K/i);
@@ -870,7 +880,8 @@ window.handleGenerateReport = async (event: any) => {
     let upRatio = 0;
 
     if (s.iesData) {
-        const metrics = window.PhotometricAnalyzer.extractZonalMetrics(s.iesData);
+        // Uso direto do motor Photometrics importado via Clean Architecture
+        const metrics = Photometrics.extractZonalMetrics(s.iesData);
         fFinal = metrics.calculatedFlux;
         fNominal = (s.iesData.totalFlux && s.iesData.totalFlux > 0) ? s.iesData.totalFlux : fFinal;
         pWatts = s.iesData.wattage || s.watts || 0;
@@ -1425,7 +1436,10 @@ window.updateCalculations = function() {
 
                     const isEn = window.currentLang === 'en';
                     const isDist =['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL', 'frameW', 'frameH'].includes(key);
-                    s[key] = (isEn && isDist) ? uiVal / 3.28084 : uiVal;
+                    
+                    // LUXSINTAX: Validação de entrada para evitar Canvas quebrado (NaN)
+                    const finalVal = isNaN(uiVal) ? 0.1 : uiVal;
+                    s[key] = (isEn && isDist) ? finalVal / 3.28084 : finalVal;
                 });
 
                 if (tool === 'grid') {
