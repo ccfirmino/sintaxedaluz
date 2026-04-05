@@ -121,7 +121,7 @@ export class Photometric3DEngine {
                 const scaleFactor = (state && state.height) ? (state.height * 0.8) / (maxI * mult) : 5 / (maxI * mult);
                 const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
                 for (let h = 0; h < hAngles.length; h++) {
-                    const pts =[];
+                    const pts = [];
                     for (let v = 0; v < vAngles.length; v++) {
                         const intensity = matrix[h][v] * mult * scaleFactor;
                         const phi = (hAngles[h] * Math.PI) / 180, theta = (vAngles[v] * Math.PI) / 180;
@@ -130,7 +130,7 @@ export class Photometric3DEngine {
                     webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
                 }
                 for (let v = 0; v < vAngles.length; v++) {
-                    const pts =[];
+                    const pts = [];
                     for (let h = 0; h < hAngles.length; h++) {
                         const intensity = matrix[h][v] * mult * scaleFactor;
                         const phi = (hAngles[h] * Math.PI) / 180, theta = (vAngles[v] * Math.PI) / 180;
@@ -164,7 +164,7 @@ export class Photometric3DEngine {
 
                 if (!state.falseColor && window.state.showIsolines === false) return new THREE.CanvasTexture(cvs);
 
-                const fixtures: any[] =[];
+                const fixtures: any[] = [];
                 const sX = -state.roomW / 2 + spacingX / 2, sZ = -state.roomL / 2 + spacingZ / 2;
                 for (let i = 0; i < state.cols; i++) for (let j = 0; j < state.rows; j++) fixtures.push({ x: sX + i * spacingX, z: sZ + j * spacingZ, y: state.height });
 
@@ -173,9 +173,9 @@ export class Photometric3DEngine {
                 const maxI = (state.flux * (n_power + 1)) / (2 * Math.PI);
                 const ambientLux = ((state.flux * state.cols * state.rows * state.utilFactor * state.maintFactor) / (state.roomW * state.roomL)) * 0.08;
 
-                const luxMatrix: number[][] =[];
+                const luxMatrix: number[][] = [];
                 for (let ix = 0; ix < resX; ix++) {
-                    luxMatrix[ix] =[];
+                    luxMatrix[ix] = [];
                     for (let iy = 0; iy < resY; iy++) {
                         let px = 0, py = 0, pz = 0;
                         if (planeType === 0) { px = -state.roomW/2 + (ix/resX)*state.roomW; py = 0; pz = -state.roomL/2 + (iy/resY)*state.roomL; } 
@@ -258,7 +258,6 @@ export class Photometric3DEngine {
                 }
             }
             if (this._lastToolRendered !== toolId) {
-                if (this._lastToolRendered !== toolId) {
                 this.camera.position.set(state.roomW * 1.2, state.height * 2.5, state.roomL * 1.2);
                 this.controls.target.set(0, state.height / 2, 0);
             }
@@ -279,7 +278,7 @@ export class Photometric3DEngine {
                 
                 if (!state.falseColor && window.state.showIsolines === false) return new THREE.CanvasTexture(cvs);
 
-                const fixtures: any[] =[];
+                const fixtures: any[] = [];
                 if (toolId === 'ponto' && state.viewMode === 'array') {
                     const tiltMode3D = document.querySelector<HTMLInputElement>('input[name="p_tilt_mode"]:checked')?.value || 'same';
                     const hS = (state.spacing || 2) / 2;
@@ -300,9 +299,9 @@ export class Photometric3DEngine {
                     maxI = ((state.flux || 1500) * (n_power + 1)) / (2 * Math.PI);
                 }
 
-                const luxMatrix: number[][] =[];
+                const luxMatrix: number[][] = [];
                 for (let ix = 0; ix < resX; ix++) {
-                    luxMatrix[ix] =[];
+                    luxMatrix[ix] = [];
                     for (let iy = 0; iy < resY; iy++) {
                         const px = toolId === 'vertical' ? (state.dist || 1) : (-floorSize/2 + (ix/resX)*floorSize);
                         const pz = toolId === 'vertical' ? (-floorSize/2 + (ix/resX)*floorSize) : (-floorSize/2 + (iy/resY)*floorSize);
