@@ -250,10 +250,10 @@
                         <div class="md:col-span-4 lg:col-span-3 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div id="calc-mode-selector" class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
-                                    <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">FICHA TÉCNICA</button>
+                                    <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">INTENSIDADE</button>
                                     <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">IES / LDT</button>
                                 </div>
-
+                                
                                 <div id="inputs-grid" class="hidden">
                                     <div class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-4 w-full">
                                         <button onclick="window.setGridCalcMethod('target')" id="btn-grid-target" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm">ALVO LUX</button>
@@ -264,38 +264,21 @@
                                         <input type="range" id="range-g-targetLux" min="50" max="2000" step="50" value="500">
                                     </div>
                                     <div class="grid grid-cols-2 gap-4 mb-6">
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">LARGURA (X)</label><input type="number" id="g-roomW" value="6.0"></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">COMPRIM. (Y)</label><input type="number" id="g-roomL" value="4.0"></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Largura (X)</label><input type="number" id="g-roomW" value="6.0"></div><input type="range" id="range-g-roomW" min="1" max="30" step="0.1" value="6.0"></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Comprim. (Y)</label><input type="number" id="g-roomL" value="4.0"></div><input type="range" id="range-g-roomL" min="1" max="30" step="0.1" value="4.0"></div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-4 mb-6">
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">ALTURA (H)</label><input type="number" id="g-height" value="3.0"></div><input type="range" id="range-g-height" min="1" max="15" step="0.1" value="3.0"></div>
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">PLANO (HP)</label><input type="number" id="g-plane" value="0.75"></div><input type="range" id="range-g-plane" min="0" max="5" step="0.05" value="0.75"></div>
-                                    </div>
-                                    <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">FLUXO (LM)</label><input type="number" id="g-flux" value="3000"></div><input type="range" id="range-g-flux" min="100" max="15000" step="100" value="3000"></div>
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">POTÊNCIA (W)</label><input type="number" id="g-watts" value="30"></div><input type="range" id="range-g-watts" min="1" max="200" step="1" value="30"></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Altura (H)</label><input type="number" id="g-height" value="3.0"></div><input type="range" id="range-g-height" min="1" max="15" step="0.1" value="3.0"></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Plano (HP)</label><input type="number" id="g-plane" value="0.75"></div><input type="range" id="range-g-plane" min="0" max="5" step="0.05" value="0.75"></div>
                                     </div>
                                     <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                        <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block">Fator Utilização (U)</label>
-                                        <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none dark:bg-slate-700">
-                                            <option value="0.70">Cores Claras (0.70)</option>
-                                            <option value="0.60" selected>Padrão (0.60)</option>
-                                            <option value="0.40">Cores Escuras (0.40)</option>
+                                        <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 block">Fator Manutenção (FM)</label>
+                                        <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none dark:bg-slate-700">
+                                            <option value="0.80" selected>Limpo / Novo (0.80)</option>
+                                            <option value="0.70">Normal (0.70)</option>
+                                            <option value="0.60">Sujo (0.60)</option>
                                         </select>
                                     </div>
-                                </div>
-
-                                <div id="inputs-ponto" class="hidden">
-                                    <div class="mode-ies-group hidden space-y-6 mb-6">
-                                        <div class="group">
-                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="p-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-                                            <p id="p-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
-                                        </div>
-                                    </div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">ALTURA DA FONTE (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
-                                    <div class="mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">PLANO DE TRABALHO (HP)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
-                                    <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="p-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-p-intensity" min="0" max="20000" step="10" value="3000"></div>
                                 </div>
                             </div>
                         </div>
@@ -407,7 +390,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div> class="py-24 px-6 border-t border-slate-200 bg-white transition-colors duration-300">
+                    </div>
+                </div>
+            </div> class="py-24 px-6 border-t border-slate-200 bg-white transition-colors duration-300">
             <div class="max-w-[1800px] mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="text-3xl text-starlight font-black tracking-widest mb-6 uppercase" data-i18n="about_title">SOBRE</h2>

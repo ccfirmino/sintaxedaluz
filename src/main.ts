@@ -932,7 +932,7 @@ window.handleGenerateReport = async (event: any) => {
                 s.viewLevel = oldLevel; s.falseColor = oldFC; window.state.showIsolines = oldIsolines;
                 window.Canvas2DEngine.render();
                 resolve(dataUrl);
-            }, 200);
+            }, 250);
         });
     };
 
@@ -1515,7 +1515,7 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
     const resUgr = document.getElementById('result-ugr');
     const resEff = document.getElementById('result-eff');
     
-    // Sincroniza o resultado visual com o nível selecionado (Piso ou Mesa)
+    // LUXSINTAX: Sincroniza a auditoria com o nível de malha selecionado (Piso vs Mesa)
     const currentView = window.state.grid.viewLevel;
     const auditedLux = currentView === 'LP' ? luxPiso : lux;
 
@@ -1535,7 +1535,7 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
     if (hudEmHp) hudEmHp.innerText = Math.round(lux) + ' lx';
     if (hudEmLp) hudEmLp.innerText = Math.round(luxPiso) + ' lx';
 
-    // Auditoria NBR na barra de conformidade (MOSTRA RESULTADOS NA BARRA)
+    // Auditoria NBR: Mostra resultados reais na barra colorida
     if (window.currentNbrTarget) {
         const nbrPanel = document.getElementById('nbr-status-panel');
         if (nbrPanel) {
