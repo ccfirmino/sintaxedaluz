@@ -489,17 +489,25 @@ window.toggleGridMode = function(mode: string) {
     const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm";
     const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
     
+    // LUXSINTAX: Controle de Toggles específicos por modo
+    const isoToggle = document.getElementById('iso-toggle-container');
+    const polar3DToggle = document.getElementById('polar-3d-toggle-container');
+
     if (mode === '3D') {
         window.toggleRenderMode('3D');
         if(btnHP) btnHP.className = inactiveClass;
         if(btnLP) btnLP.className = inactiveClass;
         if(btn3D) btn3D.className = activeClass;
+        isoToggle?.classList.add('hidden'); 
+        polar3DToggle?.classList.remove('hidden');
     } else {
         window.toggleRenderMode('2D');
         window.state.grid.viewLevel = mode;
         if(btnHP) btnHP.className = mode === 'HP' ? activeClass : inactiveClass;
         if(btnLP) btnLP.className = mode === 'LP' ? activeClass : inactiveClass;
         if(btn3D) btn3D.className = inactiveClass;
+        isoToggle?.classList.remove('hidden');
+        polar3DToggle?.classList.add('hidden');
     }
 
     if (window.toggleHeatmap) window.toggleHeatmap(window.state.grid.falseColor);
@@ -905,17 +913,25 @@ window.handleGenerateReport = async (event: any) => {
         const oldLevel = s.viewLevel;
         const oldFC = s.falseColor;
         const oldIsolines = window.state.showIsolines;
+        
         s.viewLevel = level;
         s.falseColor = true;
         window.state.showIsolines = true;
+
+        // LUXSINTAX: Força o redesenho imediato para a captura
         window.Canvas2DEngine.render();
+        
         return new Promise((resolve) => {
-            requestAnimationFrame(() => {
-                const dataUrl = (document.getElementById('beamCanvas') as HTMLCanvasElement).toDataURL('image/png');
+            // Pequeno delay para garantir que o buffer do Canvas foi preenchido
+            setTimeout(() => {
+                const canvas = document.getElementById('beamCanvas') as HTMLCanvasElement;
+                const dataUrl = canvas.toDataURL('image/png');
+                
+                // Restaura o estado da UI do utilizador
                 s.viewLevel = oldLevel; s.falseColor = oldFC; window.state.showIsolines = oldIsolines;
                 window.Canvas2DEngine.render();
                 resolve(dataUrl);
-            });
+            }, 150);
         });
     };
 
@@ -1498,7 +1514,11 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
     const resUgr = document.getElementById('result-ugr');
     const resEff = document.getElementById('result-eff');
     
-    if (resLux) resLux.innerText = String(Math.round(lux));
+    // LUXSINTAX: Determina o Lux a ser auditado com base no nível da malha (Piso vs Mesa)
+    const currentView = window.state.grid.viewLevel;
+    const auditedLux = currentView === 'LP' ? luxPiso : lux;
+
+    if (resLux) resLux.innerText = String(Math.round(auditedLux));
     if (resUgr) resUgr.innerText = String(ugr);
     
     const flux = window.state?.grid?.flux || 0;
@@ -1535,11 +1555,12 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
             const nbrIcon = document.getElementById('nbr-icon');
 
             if(nbrBadge && nbrStatusText && nbrIconContainer && nbrIcon) {
+                const summaryMsg = `Em: ${Math.round(auditedLux)} lx | UGR: ${ugr} | Meta: ${targetLux} lx`;
                 if (status === 'APPROVED') {
                     nbrPanel.style.borderColor = '#10b981';
                     nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
                     nbrIcon.className = 'fas fa-check-circle';
-                    nbrStatusText.innerText = `Auditoria NBR: Conforme a norma`;
+                    nbrStatusText.innerText = summaryMsg;
                     nbrBadge.innerText = 'APROVADO';
                     nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 border-green-200';
                 } else if (status === 'WARNING') {
