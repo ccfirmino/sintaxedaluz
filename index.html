@@ -1375,6 +1375,13 @@ window.handleGenerateReport = async (event) => {
                 });
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
+
+                const nbrPanel = document.getElementById('nbr-selector-section');
+                const reportPanel = document.getElementById('report-export-panel');
+                const resultsSection = document.getElementById('results-section');
+                if (nbrPanel) nbrPanel.classList.toggle('hidden', toolId !== 'grid');
+                if (reportPanel) reportPanel.classList.toggle('hidden', toolId !== 'grid');
+                if (resultsSection) resultsSection.classList.toggle('hidden', toolId !== 'grid');
                 
                 // LUXSINTAX: Mostra os seletores de visão correspondentes à aba ativa
                 document.getElementById('surface-selector')?.classList.toggle('hidden', toolId !== 'ponto');
@@ -1412,6 +1419,193 @@ window.handleGenerateReport = async (event) => {
             } else if (toolId === 'leedProj') {
                  window.renderLeedProject();
             }
+        };
+
+        // ==========================================
+        // LUXSINTAX: RESTAURAÇÃO DOS CONTROLADORES DE UI (OS "FIOS SOLTOS")
+        // ==========================================
+        window.setSurfaceMode = function(mode) {
+            const btnSingle = document.getElementById('btn-surf-single');
+            const btnArray = document.getElementById('btn-surf-array');
+            const btn3D = document.getElementById('btn-surf-3d');
+            const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm";
+            const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+
+            if (mode === '3D') {
+                window.toggleRenderMode('3D');
+                if(btnSingle) btnSingle.className = inact;
+                if(btnArray) btnArray.className = inact;
+                if(btn3D) btn3D.className = act;
+            } else {
+                window.toggleRenderMode('2D');
+                window.state.ponto.viewMode = mode;
+                if(btnSingle) btnSingle.className = mode === 'single' ? act : inact;
+                if(btnArray) btnArray.className = mode === 'array' ? act : inact;
+                if(btn3D) btn3D.className = inact;
+            }
+            
+            const pTiltModeGroup = document.getElementById('p-tilt-mode-group');
+            const groupSpacing = document.getElementById('group-spacing');
+            if (pTiltModeGroup) pTiltModeGroup.style.display = mode === 'array' ? 'block' : 'none';
+            if (groupSpacing) groupSpacing.classList.toggle('hidden', mode !== 'array');
+
+            if (window.toggleHeatmap) window.toggleHeatmap(window.state.ponto.falseColor);
+            window.updateCalculations();
+        };
+
+        window.togglePolar = function(isChecked) {
+            window.state.showPolar = isChecked;
+            const bgToggle = document.getElementById('polar-toggle-bg');
+            const dotToggle = document.getElementById('polar-toggle-dot');
+            if (bgToggle && dotToggle) {
+                if (isChecked) {
+                    bgToggle.classList.add('bg-luminous-gold'); 
+                    bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.add('translate-x-3');
+                } else {
+                    bgToggle.classList.remove('bg-luminous-gold'); 
+                    bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+                    dotToggle.classList.remove('translate-x-3');
+                }
+            }
+            window.updateCalculations();
+        };
+
+        window.switchQueryTab = function(tab) {
+            ['nbr8995', 'nbr5101', 'leed'].forEach(id => {
+                const content = document.getElementById('content-' + id);
+                const btn = document.getElementById('btn-q-' + id);
+                if (content) content.classList.toggle('hidden', id !== tab);
+                if (btn) {
+                    if (id === tab) btn.classList.add('query-tab-active');
+                    else btn.classList.remove('query-tab-active');
+                }
+            });
+            const searchContainer = document.getElementById('search-container');
+            if (searchContainer) searchContainer.classList.toggle('hidden', tab !== 'nbr8995');
+            
+            if (tab === 'nbr8995') {
+                window.populateCategoryFilter();
+                window.filterNorms();
+            }
+        };
+
+        window.populateCategoryFilter = function() {
+            const select = document.getElementById('category-filter');
+            if (!select || !window.normsDatabase || select.options.length > 1) return;
+            const uniqueCats = [...new Set(window.normsDatabase.map(n => n.cat))].sort();
+            uniqueCats.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat; opt.text = cat; select.appendChild(opt);
+            });
+        };
+
+        window.filterNorms = function() {
+            const tbody = document.getElementById('nbr8995-tbody');
+            if (!tbody || !window.normsDatabase) return;
+            
+            const filterCat = document.getElementById('category-filter')?.value || 'all';
+            const searchQuery = (document.getElementById('search-filter')?.value || '').toLowerCase();
+            
+            tbody.innerHTML = '';
+            
+            const filtered = window.normsDatabase.filter(n => {
+                const matchCat = filterCat === 'all' || n.cat === filterCat;
+                const matchSearch = n.room.toLowerCase().includes(searchQuery) || n.cat.toLowerCase().includes(searchQuery);
+                return matchCat && matchSearch;
+            });
+
+            filtered.forEach(n => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors cursor-pointer group";
+                tr.onclick = () => {
+                    window.currentNbrTarget = { lux: n.lux, ugr: n.ugr === '-' ? 99 : n.ugr };
+                    const gridTargetLuxInput = document.getElementById('g-targetLux');
+                    const gridRangeTargetLux = document.getElementById('range-g-targetLux');
+                    if (gridTargetLuxInput) gridTargetLuxInput.value = n.lux;
+                    if (gridRangeTargetLux) gridRangeTargetLux.value = n.lux;
+                    if (window.state && window.state.grid) window.state.grid.targetLux = n.lux;
+                    
+                    const catSelect = document.getElementById('nbr-cat-select');
+                    const roomSelect = document.getElementById('nbr-room-select');
+                    if (catSelect && roomSelect) {
+                        catSelect.value = n.cat;
+                        window.updateNbrRooms();
+                        setTimeout(() => { roomSelect.value = n.room; window.applyNbrRules(); }, 50);
+                    }
+                    
+                    window.switchTool('grid');
+                };
+                tr.innerHTML = `
+                    <td class="p-4"><span class="px-2 py-1 bg-slate-100 text-slate-500 rounded text-[9px] font-black uppercase tracking-wider">${n.cat}</span></td>
+                    <td class="p-4 text-starlight font-bold group-hover:text-luminous-gold transition-colors">${n.room}</td>
+                    <td class="p-4 text-center bg-slate-50 font-black text-luminous-gold">${n.lux}</td>
+                    <td class="p-4 text-center text-slate-500 font-bold">${n.ugr}</td>
+                    <td class="p-4 text-center text-slate-500 font-bold">${n.ra}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.switchCertTab = function(tab) {
+            ['leed', 'well'].forEach(id => {
+                const pane = document.getElementById('pane-' + id);
+                const btn = document.getElementById('cert-tab-' + id);
+                if (pane) pane.classList.toggle('hidden', id !== tab);
+                if (btn) {
+                    if (id === tab) { btn.classList.add('active'); btn.classList.remove('inactive'); }
+                    else { btn.classList.remove('active'); btn.classList.add('inactive'); }
+                }
+            });
+            if (tab === 'leed') window.updateLeedTargets();
+        };
+
+        window.setLeedTarget = function(level) {
+            window.state.leedProject.target = level;
+            ['certified', 'silver', 'gold', 'platinum'].forEach(id => {
+                const btn = document.getElementById('lvl-' + id);
+                if (btn) btn.classList.remove('active');
+            });
+            const activeBtn = document.getElementById('lvl-' + level);
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            const reductionDisplay = document.getElementById('leed-reduction-display');
+            if (reductionDisplay) {
+                const factors = { 'certified': '5%', 'silver': '10%', 'gold': '20%', 'platinum': '30%' };
+                reductionDisplay.innerText = factors[level] || '0%';
+            }
+            window.updateLeedTargets();
+        };
+
+        window.updateLeedTargets = function() {
+            const areaInput = document.getElementById('leed-area-input');
+            const targetArea = areaInput ? parseFloat(areaInput.value) || 0 : 0;
+            const tbody = document.getElementById('leed-lpd-body');
+            if (!tbody || !window.lpdBaselines) return;
+            
+            tbody.innerHTML = '';
+            const factors = { 'certified': 0.95, 'silver': 0.90, 'gold': 0.80, 'platinum': 0.70 };
+            const multiplier = factors[window.state.leedProject.target] || 1.0;
+
+            window.lpdBaselines.forEach(baseline => {
+                const targetLpd = (baseline.base * multiplier).toFixed(2);
+                const allowedWatts = (targetArea * targetLpd).toFixed(0);
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold">${baseline.type}</td>
+                    <td class="p-3 text-center text-slate-500">${baseline.base.toFixed(2)}</td>
+                    <td class="p-3 text-center text-luminous-gold font-black">${targetLpd}</td>
+                    <td class="p-3 text-right text-tech-cyan font-black">${allowedWatts} W</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.renderLeedProject = function() {
+            const container = document.getElementById('leed-project-container');
+            if (container) container.innerHTML = '<div class="text-center p-8 bg-slate-50 rounded-xl border border-slate-200"><p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2">GERENCIADOR AVANÇADO LEED</p><p class="text-[10px] text-slate-400 font-bold">A persistência de projetos na nuvem está sendo portada para o TypeScript. O simulador unificado de LPD continua a operar normalmente abaixo.</p></div>';
+            window.updateLeedTargets();
         };
                 
         window.setGridCalcMethod = function(method) {

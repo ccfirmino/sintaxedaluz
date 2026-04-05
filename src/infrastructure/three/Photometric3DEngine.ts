@@ -203,7 +203,7 @@ export class Photometric3DEngine {
                         totalLux = Math.round(totalLux * state.maintFactor + ambientLux);
                         luxMatrix[ix][iy] = totalLux;
                         if (state.falseColor) {
-                            cx.fillStyle = FalseColorEngine.getLuxColor(totalLux, 0.85);
+                            cx.fillStyle = FalseColorEngine.getLuxColor(totalLux);
                             cx.fillRect(ix, iy, 1, 1);
                         }
                     }
@@ -257,8 +257,12 @@ export class Photometric3DEngine {
                     }
                 }
             }
-            this.camera.position.set(state.roomW * 1.2, state.height * 2.5, state.roomL * 1.2);
-            this.controls.target.set(0, state.height / 2, 0);
+            if (this._lastToolRendered !== toolId) {
+                if (this._lastToolRendered !== toolId) {
+                this.camera.position.set(state.roomW * 1.2, state.height * 2.5, state.roomL * 1.2);
+                this.controls.target.set(0, state.height / 2, 0);
+            }
+            this._lastToolRendered = toolId;
 
         } else if (toolId === 'vertical' || toolId === 'ponto') {
             const h = state.height || 3;
@@ -321,7 +325,7 @@ export class Photometric3DEngine {
                         }
                         luxMatrix[ix][iy] = totalLux;
                         if (state.falseColor) {
-                            cx.fillStyle = FalseColorEngine.getLuxColor(Math.round(totalLux), 0.85);
+                            cx.fillStyle = FalseColorEngine.getLuxColor(Math.round(totalLux));
                             cx.fillRect(ix, iy, 1, 1);
                         }
                     }
@@ -378,16 +382,21 @@ export class Photometric3DEngine {
             if (toolId === 'vertical') {
                 const qty = state.qty || 1, spacing = state.spacing || 1.0, startZ = -((qty - 1) * spacing) / 2;
                 for (let i = 0; i < qty; i++) drawSource(0, startZ + (i * spacing), baseTiltRad);
-                this.camera.position.set(-(state.dist||1) * 1.5, h * 0.8, (state.dist||1) * 2.5); 
-                this.controls.target.set((state.dist||1), state.hq || 1.6, 0);
+                if (this._lastToolRendered !== toolId) {
+                    this.camera.position.set(-(state.dist||1) * 1.5, h * 0.8, (state.dist||1) * 2.5); 
+                    this.controls.target.set((state.dist||1), state.hq || 1.6, 0);
+                }
             } else {
                 if (state.viewMode === 'array') {
                     const tiltMode3D = document.querySelector<HTMLInputElement>('input[name="p_tilt_mode"]:checked')?.value || 'same';
                     drawSource(-(state.spacing||2)/2, 0, baseTiltRad); drawSource((state.spacing||2)/2, 0, tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad);
                 } else drawSource(0, 0, baseTiltRad);
                 const axesHelper = new THREE.AxesHelper(2); axesHelper.position.set(0, h, 0); this.solidGroup.add(axesHelper);
-                this.camera.position.set(5, h + 2, 5); this.controls.target.set(0, h / 2, 0);
+                if (this._lastToolRendered !== toolId) {
+                    this.camera.position.set(5, h + 2, 5); this.controls.target.set(0, h / 2, 0);
+                }
             }
+            this._lastToolRendered = toolId;
         }
         this.scene.add(this.solidGroup); this.controls.update();
     }
