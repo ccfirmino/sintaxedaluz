@@ -1930,18 +1930,12 @@ window.handleIESUpload = function(input) {
             return { c0: s.beam, c90: s.beam, isOval: false };
         };
 
-        // LUXSINTAX FIX: Pontes de Comunicação com a UI (Prevenção de Crash de Inicialização)
-        window.updateCalculations = function() {
-            console.log("[LuxSintax] Motor de Cálculo acionado. Aguardando religação das fórmulas matemáticas.");
-        };
-
-        window.initNbrSelector = function() {
-            console.log("[LuxSintax] Seletor NBR inicializado.");
-        };
-
-        window.coreRenderEngine = function() {
-            console.log("[LuxSintax] Renderização gráfica solicitada.");
-        };
+        // LUXSINTAX FIX: Religação Definitiva dos Módulos TypeScript
+        window.updateCalculations = RadiosityEngine.updateCalculations;
+        window.initNbrSelector = StandardsEngine.initNbrSelector;
+        
+        // Conecta o motor 2D exportado pelo seu novo arquivo
+        window.coreRenderEngine = Canvas2DEngine.coreRenderEngine || Canvas2DEngine.render;
 
         window.currentLang = 'pt';
         initializeApp();
