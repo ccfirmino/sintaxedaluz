@@ -117,27 +117,81 @@ export class Photometric3DEngine {
             const hAngles = iesData.hAngles, vAngles = iesData.vAngles, matrix = iesData.candelas, mult = iesData.multiplier;
             let maxI = 0;
             for (let h = 0; h < hAngles.length; h++) for (let v = 0; v < vAngles.length; v++) if (matrix[h][v] > maxI) maxI = matrix[h][v];
+            
             if (maxI > 0) {
                 const scaleFactor = (state && state.height) ? (state.height * 0.8) / (maxI * mult) : 5 / (maxI * mult);
-                const material = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.35 });
-                for (let h = 0; h < hAngles.length; h++) {
-                    const pts = [];
-                    for (let v = 0; v < vAngles.length; v++) {
-                        const intensity = matrix[h][v] * mult * scaleFactor;
-                        const phi = (hAngles[h] * Math.PI) / 180, theta = (vAngles[v] * Math.PI) / 180;
-                        pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(phi)));
+                
+                // LUXSINTAX: Algoritmo de Sólido Fotométrico 3D (Malha contínua e Mapeamento de Cores)
+                const vertices = [];
+                const indices = [];
+                const colors = [];
+                
+                const numH = hAngles.length;
+                const numV = vAngles.length;
+                
+                // 1. Definição de Vértices no espaço polar e mapeamento de cor (Heatmap 3D)
+                for (let h = 0; h < numH; h++) {
+                    for (let v = 0; v < numV; v++) {
+                        const intensity = matrix[h][v] * mult;
+                        const r = intensity * scaleFactor;
+                        
+                        const phi = (hAngles[h] * Math.PI) / 180;
+                        const theta = (vAngles[v] * Math.PI) / 180;
+                        
+                        const x = r * Math.sin(theta) * Math.cos(phi);
+                        const y = -r * Math.cos(theta); // Eixo Y para baixo na simulação de iluminação
+                        const z = r * Math.sin(theta) * Math.sin(phi);
+                        
+                        vertices.push(x, y, z);
+                        
+                        // Cor baseada na intensidade: de Luminous Gold (pico) para Azul profundo (fundo)
+                        const ratio = intensity / (maxI * mult);
+                        const color = new THREE.Color();
+                        // HSL: Matiz varia do azul escuro para o amarelo/ouro
+                        color.setHSL(0.6 - (ratio * 0.5), 1.0, 0.2 + (ratio * 0.4));
+                        colors.push(color.r, color.g, color.b);
                     }
-                    webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
                 }
-                for (let v = 0; v < vAngles.length; v++) {
-                    const pts = [];
-                    for (let h = 0; h < hAngles.length; h++) {
-                        const intensity = matrix[h][v] * mult * scaleFactor;
-                        const phi = (hAngles[h] * Math.PI) / 180, theta = (vAngles[v] * Math.PI) / 180;
-                        pts.push(new THREE.Vector3(intensity * Math.sin(theta) * Math.cos(phi), -intensity * Math.cos(theta), intensity * Math.sin(theta) * Math.sin(phi)));
+                
+                // 2. Triangulação da malha (Criação das faces)
+                for (let h = 0; h < numH - 1; h++) {
+                    for (let v = 0; v < numV - 1; v++) {
+                        const a = h * numV + v;
+                        const b = h * numV + (v + 1);
+                        const c = (h + 1) * numV + v;
+                        const d = (h + 1) * numV + (v + 1);
+                        
+                        // Construção de dois triângulos (face) para cada quadrado na malha esférica
+                        indices.push(a, b, c);
+                        indices.push(c, b, d);
                     }
-                    webGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
                 }
+
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                geometry.setIndex(indices);
+                geometry.computeVertexNormals(); // Calcula o sombreamento liso (Smooth Shading)
+
+                // 3. Material Enterprise (Simulação de Volumetria Translúcida)
+                const material = new THREE.MeshPhysicalMaterial({
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.85,
+                    roughness: 0.1,
+                    transmission: 0.6, // Deixa a luz atravessar a própria malha
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                
+                // 4. Preservação do Wireframe Fotométrico por cima do sólido
+                const wireMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 });
+                const wireframe = new THREE.LineSegments(new THREE.WireframeGeometry(geometry), wireMaterial);
+                mesh.add(wireframe);
+                
+                webGroup.add(mesh);
             }
             webGroup.rotation.y = Math.PI / 2;
         }

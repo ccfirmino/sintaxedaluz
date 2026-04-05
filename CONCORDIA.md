@@ -18,6 +18,7 @@
 - [05/04/2026]: Otimização do RadiosityEngine: Remoção de lógica matemática duplicada e integração estrita com o Domínio (preparação para Web Workers).
 - [05/04/2026]: Implementação de Web Workers (RadiosityWorker.ts): Delegação de cálculos de malha ponto a ponto para Threads secundárias (Non-blocking UI, High Performance).
 - [05/04/2026]: Implementação de Segurança Multitenant via Zod (AuthManager.ts): Validação estrita de contexto de utilizador (Zero Trust Architecture) antes de expor a interface.
+- [05/04/2026]: Upgrade Motor 3D (Photometric3DEngine.ts): Substituição do render em arame por um Algoritmo de Triangulação de Sólido Fotométrico com Mapeamento de Cores e Transmission (vidro iluminado).
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).

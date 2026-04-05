@@ -926,6 +926,7 @@ window.handleGenerateReport = async (event: any) => {
         isNbrActive,
         avgLux,
         targetLux,
+        targetUgr: isNbrActive && window.currentNbrTarget ? window.currentNbrTarget.ugr : 19,
         totalWatts,
         lpd,
         ugrStr,

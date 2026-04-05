@@ -233,29 +233,58 @@ export class ReportExporter {
             cy -= (dimsP.height + 25);
         }
 
+        // LUXSINTAX: Motor de Auditoria e Carimbo de Conformidade Normativa
         const titleBloco4 = data.isNbrActive ? '4. Síntese de Conformidade (NBR ISO/CIE 8995-1)' : '4. Síntese de Resultados (Estudo Livre)';
         cy = drawSection(titleBloco4, cy);
         
-        const resBoxY = cy - 60;
-        page.drawRectangle({ x: 40, y: resBoxY, width: width - 80, height: 70, color: data.isOk ? PDFLib.rgb(0.9, 0.98, 0.9) : PDFLib.rgb(0.98, 0.9, 0.9) });
+        let status = 'APPROVED';
+        if (data.isNbrActive) {
+            const parsedUgr = parseFloat(data.ugrStr);
+            // Tolerância estrita: Reprova se Lux < 90% do alvo, ou se UGR ultrapassar o limite da NBR
+            if (data.avgLux < data.targetLux * 0.9) status = 'REJECTED';
+            else if (!isNaN(parsedUgr) && parsedUgr > data.targetUgr) status = 'REJECTED';
+            else if (data.avgLux < data.targetLux) status = 'WARNING';
+        } else {
+            status = data.isOk ? 'APPROVED' : 'REJECTED';
+        }
 
-        page.drawText('ILUMINÂNCIA (Em) CALCULADA:', { x: 60, y: cy - 15, size: 9, font: fontBold });
-        page.drawText(`${data.avgLux} LUX`, { x: 60, y: cy - 35, size: 20, font: fontBold, color: data.isOk ? PDFLib.rgb(0.1, 0.5, 0.1) : PDFLib.rgb(0.7, 0.1, 0.1) });
+        let boxColor, textColor, stampText;
+        if (status === 'APPROVED') {
+            boxColor = PDFLib.rgb(0.92, 0.98, 0.92); textColor = PDFLib.rgb(0.06, 0.46, 0.15);
+            stampText = data.isNbrActive ? 'APROVADO NBR' : 'ALVO ATINGIDO';
+        } else if (status === 'WARNING') {
+            boxColor = PDFLib.rgb(1.0, 0.97, 0.86); textColor = PDFLib.rgb(0.75, 0.45, 0.0);
+            stampText = 'TOLERÁVEL';
+        } else {
+            boxColor = PDFLib.rgb(0.98, 0.90, 0.90); textColor = PDFLib.rgb(0.75, 0.10, 0.10);
+            stampText = data.isNbrActive ? 'NÃO CONFORME' : 'ABAIXO DO ALVO';
+        }
+
+        const resBoxY = cy - 65;
+        page.drawRectangle({ x: 40, y: resBoxY, width: width - 80, height: 75, color: boxColor, borderColor: textColor, borderWidth: 1 });
+
+        page.drawText('ILUMINÂNCIA (Em) CALCULADA:', { x: 55, y: cy - 15, size: 9, font: fontBold, color: PDFLib.rgb(0.2, 0.2, 0.2) });
+        page.drawText(`${data.avgLux} LUX`, { x: 55, y: cy - 38, size: 24, font: fontBold, color: textColor });
         
         const lblAlvo = data.isNbrActive ? `Alvo Exigido (NBR): ${data.targetLux} Lux` : `Alvo Desejado: ${data.targetLux} Lux`;
-        page.drawText(lblAlvo, { x: 60, y: cy - 47, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(lblAlvo, { x: 55, y: cy - 52, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
 
-        page.drawText('EFICIÊNCIA ENERGÉTICA E UGR:', { x: 260, y: cy - 15, size: 8, font: fontBold });
-        page.drawText(`Carga (Total): ${data.totalWatts.toFixed(1)} W`, { x: 260, y: cy - 28, size: 9, font: fontBold });
-        page.drawText(`LPD: ${data.lpd.toFixed(2)} W/m²`, { x: 260, y: cy - 39, size: 8, font: fontRegular });
-        page.drawText(`UGR Máx (Aprox): ${data.ugrStr}`, { x: 260, y: cy - 50, size: 8, font: fontRegular });
-
-        const lblParecer = data.isNbrActive ? 'PARECER FINAL NBR:' : 'STATUS DO ALVO:';
-        const txtParecerOk = data.isNbrActive ? 'APROVADO' : 'ATINGIDO';
-        const txtParecerFail = data.isNbrActive ? 'NÃO CONFORME' : 'ABAIXO DO ALVO';
+        page.drawText('MÉTRICAS COMPLEMENTARES:', { x: 240, y: cy - 15, size: 8, font: fontBold, color: PDFLib.rgb(0.2, 0.2, 0.2) });
+        page.drawText(`Carga Instalada: ${data.totalWatts.toFixed(1)} W`, { x: 240, y: cy - 28, size: 9, font: fontRegular });
+        page.drawText(`Densidade (LPD): ${data.lpd.toFixed(2)} W/m²`, { x: 240, y: cy - 40, size: 9, font: fontRegular });
         
-        page.drawText(lblParecer, { x: 440, y: cy - 15, size: 8, font: fontBold });
-        page.drawText(data.isOk ? txtParecerOk : txtParecerFail, { x: 440, y: cy - 35, size: 12, font: fontBold, color: data.isOk ? PDFLib.rgb(0.1, 0.5, 0.1) : PDFLib.rgb(0.7, 0.1, 0.1) });
+        // Destaca a vermelho se o UGR for o motivo da reprovação
+        const ugrColor = (status === 'REJECTED' && parseFloat(data.ugrStr) > (data.targetUgr || 19)) ? PDFLib.rgb(0.8, 0, 0) : PDFLib.rgb(0.2, 0.2, 0.2);
+        page.drawText(`UGR Máx (Aprox): ${data.ugrStr}`, { x: 240, y: cy - 52, size: 9, font: fontBold, color: ugrColor });
+
+        // CARIMBO OFICIAL DE AUDITORIA (STAMP)
+        const stampX = width - 190;
+        const stampY = cy - 45;
+        page.drawRectangle({ x: stampX, y: stampY - 8, width: 130, height: 42, borderColor: textColor, borderWidth: 3, color: PDFLib.rgb(1, 1, 1), opacity: 0.8 });
+        page.drawText(stampText, { x: stampX + 10, y: stampY + 12, size: 14, font: fontBold, color: textColor });
+        if (data.isNbrActive) {
+            page.drawText('ISO/CIE 8995-1', { x: stampX + 28, y: stampY - 2, size: 8, font: fontBold, color: textColor });
+        }
 
         const disclaimer = "AVISO LEGAL: Relatório técnico gerado pela suíte LuxSintax V26. Baseado em modelagem matemática e Método dos Lúmens clássico. Tratando-se de estudo paramétrico preliminar de apoio à decisão do Projetista, os resultados de iluminância e uniformidade podem variar in loco devido a interferências arquitetônicas e obstruções. Documento não substitui laudo ou projeto executivo global assinado.";
         page.drawText(disclaimer, { x: 40, y: 30, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6), maxWidth: width - 80, lineHeight: 7.5 });
