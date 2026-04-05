@@ -519,82 +519,63 @@
                     </select>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+        </div> </div> <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
+        <div class="glass-panel p-6 rounded-2xl flex flex-col relative w-full h-[75vh] min-h-[500px] max-h-[800px]">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4 w-full">
+                
+                <div class="flex items-center gap-4">
+                    <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Fonte Única</button>
+                        <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
+                        <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
+                    </div>
 
-                        <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
-                            <div class="glass-panel p-6 rounded-2xl flex flex-col relative w-full h-[75vh] min-h-[500px] max-h-[800px]">
-                                <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4 w-full">
-                                    
-                                    <div class="flex items-center gap-4">
-                                        <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Fonte Única</button>
-                                            <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
-                                            <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
-                                        </div>
+                    <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Corte Técnico</button>
+                        <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Elevação Frontal</button>
+                        <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
+                    </div>
 
-                                        <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Corte Técnico</button>
-                                            <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Elevação Frontal</button>
-                                            <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
-                                        </div>
+                    <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Planta Baixa (Piso)</button>
+                        <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Planta Baixa (Mesa)</button>
+                        <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
+                    </div>
+                </div>
 
-                                        <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Planta Baixa (Piso)</button>
-                                            <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Planta Baixa (Mesa)</button>
-                                            <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
-                                        </div>
-                                    </div>
+                <div class="flex flex-wrap justify-end items-center gap-4">
+                    <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <label id="iso-toggle-container" class="flex items-center gap-2 cursor-pointer group px-2">
+                            <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
+                            <div class="relative">
+                                <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
+                                <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
+                            </div>
+                        </label>
+                        
+                        <label id="polar-3d-toggle-container" class="hidden flex items-center gap-2 cursor-pointer group px-2">
+                            <span class="text-[9px] text-luminous-gold font-black uppercase tracking-wider">POLAR 3D</span>
+                            <div class="relative">
+                                <input type="checkbox" id="g-showPolar" onchange="window.togglePolar(this.checked)" checked class="sr-only">
+                                <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-toggle-bg"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="polar-toggle-dot"></div>
+                            </div>
+                        </label>
 
-                                    <div class="flex flex-wrap justify-end items-center gap-4">
-                                        <div id="heatmap-toggle-wrapper" class="hidden flex items-center gap-4 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <label id="iso-toggle-container" class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
-                                                    <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                            <label id="polar-3d-toggle-container" class="hidden flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-luminous-gold font-black uppercase tracking-wider">POLAR 3D</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="g-showPolar3D" onchange="window.togglePolar(this.checked)" checked class="sr-only">
-                                                    <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-3d-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="polar-3d-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                            <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">HEATMAP</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="g-falseColor" onchange="window.toggleHeatmap(this.checked)" class="sr-only">
-                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">HEATMAP</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="g-falseColor" onchange="window.toggleHeatmap(this.checked)" class="sr-only">
-                                                    <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                            <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
-                                                <div class="relative">
-                                                    <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
-                                                    <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
-                                                </div>
-                                            </label>
-                                        </div>
+                        <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
+                        
+                        <label class="flex items-center gap-2 cursor-pointer group px-2">
+                            <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_false_color">HEATMAP</span>
+                            <div class="relative">
+                                <input type="checkbox" id="g-falseColor" onchange="window.toggleHeatmap(this.checked)" class="sr-only">
+                                <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="fc-toggle-bg"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="fc-toggle-dot"></div>
+                            </div>
+                        </label>
+                    </div>
 
-                                        <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
+                    <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
                                             <label class="flex items-center gap-2 cursor-pointer relative group px-2">
                                                 <span class="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider border-b border-dashed border-red-300 dark:border-red-700 pb-0.5">GLARE >65º</span>
                                                 <div class="relative">
