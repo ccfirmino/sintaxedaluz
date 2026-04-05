@@ -428,6 +428,19 @@
                     </select>
                 </div>
             </div>
+
+            <div id="nbr-selector-section" class="mt-6 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                <label class="text-[10px] text-luminous-gold font-black uppercase mb-3 block"><i class="fas fa-book mr-1"></i> Norma NBR ISO/CIE 8995-1</label>
+                <div class="space-y-3">
+                    <select id="nbr-cat-select" onchange="window.updateNbrRooms()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600"><option value="">Selecione a Categoria...</option></select>
+                    <select id="nbr-room-select" onchange="window.applyNbrRules()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600" disabled><option value="">Selecione o Ambiente...</option></select>
+                </div>
+            </div>
+            
+            <div id="report-export-panel" class="mt-6">
+                <button onclick="window.handleGenerateReport()" class="w-full py-3 bg-starlight hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-black rounded-lg uppercase tracking-widest text-[10px] transition-all shadow-md border border-slate-700"><i class="fas fa-file-pdf mr-2 text-red-400"></i> Exportar Relatório PDF</button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -490,12 +503,15 @@
                                                 </div>
                                             </label>
                                             <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
+                                            </div>
+
+                                        <div id="polar-toggle-wrapper" class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                             <label class="flex items-center gap-2 cursor-pointer group px-2">
-                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
+                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">CURVA POLAR</span>
                                                 <div class="relative">
-                                                    <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
-                                                    <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
+                                                    <input type="checkbox" id="v-showPolar" onchange="window.togglePolar(this.checked)" checked class="sr-only">
+                                                    <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="polar-toggle-dot"></div>
                                                 </div>
                                             </label>
                                         </div>
@@ -1457,8 +1473,17 @@ window.Photometric3DEngine = {
             const gridHelper = new THREE.GridHelper(10, 10, 0x334155, 0x1e293b);
             this.solidGroup.add(gridHelper);
 
-            this.camera.position.set(5, h + 2, 5);
-            this.controls.target.set(0, h / 2, 0);
+            if (this._lastToolRendered !== toolId) {
+                this.camera.position.set(5, h + 2, 5);
+                this.controls.target.set(0, h / 2, 0);
+            }
+            this._lastToolRendered = toolId;
+        }
+
+        if (window.state.showPolar === false) {
+            this.solidGroup.children.forEach(child => {
+                if (child.type === 'Line') child.visible = false;
+            });
         }
 
         this.scene.add(this.solidGroup);
@@ -1466,7 +1491,23 @@ window.Photometric3DEngine = {
     }
 };
 
-// LUXSINTAX: Função duplicada 'toggleRenderMode' removida para evitar colisão de estado (Lag de Renderização)
+window.togglePolar = function(isChecked) {
+    window.state.showPolar = isChecked;
+    const bgToggle = document.getElementById('polar-toggle-bg');
+    const dotToggle = document.getElementById('polar-toggle-dot');
+    if (bgToggle && dotToggle) {
+        if (isChecked) {
+            bgToggle.classList.add('bg-luminous-gold'); 
+            bgToggle.classList.remove('bg-slate-200', 'dark:bg-slate-600');
+            dotToggle.classList.add('translate-x-3');
+        } else {
+            bgToggle.classList.remove('bg-luminous-gold'); 
+            bgToggle.classList.add('bg-slate-200', 'dark:bg-slate-600');
+            dotToggle.classList.remove('translate-x-3');
+        }
+    }
+    if (window.updateCalculations) window.updateCalculations();
+};
 
 window.toggleRenderMode = function(mode) {
     const stage2D = document.getElementById('stage-2d');
@@ -1636,7 +1677,7 @@ window.handleGenerateReport = async () => {
             const modeSelector = document.getElementById('calc-mode-selector');
             if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
 
-            if (toolId !== 'query' && toolId !== 'leedProj') {
+           if (toolId !== 'query' && toolId !== 'leedProj') {
                 // Esconde todos os painéis de inputs e mostra apenas o ativo
                 ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
                     const el = document.getElementById(id); 
@@ -1644,6 +1685,13 @@ window.handleGenerateReport = async () => {
                 });
                 const selectedInput = document.getElementById('inputs-' + toolId);
                 if (selectedInput) selectedInput.classList.remove('hidden');
+
+                const nbrPanel = document.getElementById('nbr-selector-section');
+                const reportPanel = document.getElementById('report-export-panel');
+                const resultsSection = document.getElementById('results-section');
+                if (nbrPanel) nbrPanel.classList.toggle('hidden', toolId !== 'grid');
+                if (reportPanel) reportPanel.classList.toggle('hidden', toolId !== 'grid');
+                if (resultsSection) resultsSection.classList.toggle('hidden', toolId !== 'grid');
                 
                 // Controle dos Wrappers de Interface da Malha (Heatmap e Nível de Iluminância LP/HP)
 // Controle dos Wrappers de Interface da Malha e Botões
@@ -4132,6 +4180,53 @@ window.generateLeedReport = async () => {
     link.click();
 };
 
+window.initNbrSelector = function() {
+    const catSelect = document.getElementById('nbr-cat-select');
+    if (!catSelect || !window.normsDatabase) return;
+    const uniqueCats = [...new Set(window.normsDatabase.map(n => n.cat))].sort();
+    catSelect.innerHTML = '<option value="">Selecione a Categoria...</option>';
+    uniqueCats.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat; opt.text = cat;
+        catSelect.appendChild(opt);
+    });
+};
+
+window.updateNbrRooms = function() {
+    const catSelect = document.getElementById('nbr-cat-select');
+    const roomSelect = document.getElementById('nbr-room-select');
+    if (!catSelect || !roomSelect || !window.normsDatabase) return;
+    
+    roomSelect.innerHTML = '<option value="">Selecione o Ambiente...</option>';
+    if (catSelect.value) {
+        const rooms = window.normsDatabase.filter(n => n.cat === catSelect.value).map(n => n.room).sort();
+        rooms.forEach(room => {
+            const opt = document.createElement('option');
+            opt.value = room; opt.text = room;
+            roomSelect.appendChild(opt);
+        });
+        roomSelect.disabled = false;
+    } else {
+        roomSelect.disabled = true;
+    }
+};
+
+window.applyNbrRules = function() {
+    const cat = document.getElementById('nbr-cat-select').value;
+    const room = document.getElementById('nbr-room-select').value;
+    if (!cat || !room) return;
+    
+    const norm = window.normsDatabase.find(n => n.cat === cat && n.room === room);
+    if (norm) {
+        const targetInput = document.getElementById('g-targetLux');
+        const rangeInput = document.getElementById('range-g-targetLux');
+        if (targetInput) targetInput.value = norm.lux;
+        if (rangeInput) rangeInput.value = norm.lux;
+        window.state.grid.targetLux = norm.lux;
+        window.updateCalculations();
+    }
+};
+
 window.setSurfaceMode = function(mode) {
     window.state.ponto.viewMode = mode;
     const isSingle = mode === 'single';
@@ -4142,13 +4237,9 @@ window.setSurfaceMode = function(mode) {
         btnA.className = !isSingle ? "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all" : "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
     }
     
-    // Mostra/Oculta a Orientação dos Fachos
     const tiltModeGrp = document.getElementById('p-tilt-mode-group');
-    if (tiltModeGrp) {
-        tiltModeGrp.style.display = isSingle ? 'none' : 'block';
-    }
+    if (tiltModeGrp) tiltModeGrp.style.display = isSingle ? 'none' : 'block';
     
-    // LUXSINTAX: Mostra/Oculta a Distância Entre Fontes
     const spacingGrp = document.getElementById('group-spacing');
     if (spacingGrp) {
         if (isSingle) spacingGrp.classList.add('hidden');
@@ -4158,8 +4249,12 @@ window.setSurfaceMode = function(mode) {
     window.updateCalculations();
 };
 
+        // LUXSINTAX: Correção de Inicialização (Evitando Erros Fatais de DOM)
+        window.currentLang = 'pt';
+        window.initNbrSelector();
         window.AuthManager.init();
         window.switchTool('ponto');
+        window.updateCalcMode('direct');
     </script>
 </body>
 </html>
