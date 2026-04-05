@@ -274,6 +274,12 @@ window.switchTool = function(toolId: string) {
         if (toolId === 'vertical') window.toggleVerticalView('section');
         if (toolId === 'grid') window.toggleGridMode('HP');
 
+        // LUXSINTAX: Controle de Visibilidade dos Painéis de Engenharia e Auditoria
+        const isGrid = toolId === 'grid';
+        document.getElementById('nbr-selector-section')?.classList.toggle('hidden', !isGrid);
+        document.getElementById('nbr-status-panel')?.classList.toggle('hidden', !isGrid);
+        document.getElementById('report-export-panel')?.classList.toggle('hidden', !isGrid);
+
         if (window.updatePhotometricHUD) window.updatePhotometricHUD();
         
         const legendOverlay = document.getElementById('heatmap-legend-overlay');
@@ -644,7 +650,11 @@ window.updatePhotometricHUD = function() {
     const toolId = window.currentTool;
     const state = window.state[toolId];
     
-    if (!state || !state.iesData || window.calcMode === 'direct') {
+    // LUXSINTAX: Garante exibição apenas quando houver dados IES ativos
+    const isIESMode = (window.calcMode === 'ies');
+    const hasData = state && state.iesData;
+
+    if (!isIESMode || !hasData) {
         dash.classList.add('hidden');
         return;
     }
@@ -1490,7 +1500,7 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
 
     if (window.currentNbrTarget) {
         const nbrPanel = document.getElementById('nbr-status-panel');
-        if (nbrPanel && !nbrPanel.classList.contains('hidden')) {
+        if (nbrPanel) {
             const targetLux = window.currentNbrTarget.lux;
             const maxUgrLimit = window.currentNbrTarget.ugr;
             const parsedUgr = parseFloat(String(ugr));
