@@ -1930,18 +1930,157 @@ window.handleIESUpload = function(input) {
             return { c0: s.beam, c90: s.beam, isOval: false };
         };
 
-        // LUXSINTAX FIX: Religação Definitiva dos Módulos TypeScript
-        window.updateCalculations = RadiosityEngine.updateCalculations;
-        window.initNbrSelector = StandardsEngine.initNbrSelector;
-        
-        // Conecta o motor 2D exportado pelo seu novo arquivo
-        window.coreRenderEngine = Canvas2DEngine.coreRenderEngine || Canvas2DEngine.render;
+        // LUXSINTAX FIX: Religação Definitiva do Motor Gráfico
+        window.coreRenderEngine = function() {
+            if (window.Canvas2DEngine && window.Canvas2DEngine.render) {
+                window.Canvas2DEngine.render();
+            } else {
+                console.warn("[LuxSintax] Motor 2D ainda não conectado.");
+            }
+        };
 
+        window.updateCalculations = function() {
+    const tool = window.currentTool;
+    if (!tool || !window.state[tool]) return;
+
+    const s = window.state[tool];
+    
+    // Identifica o prefixo correto para os IDs do DOM (p-, v-, g-, dr-)
+    let prefix = tool[0] + '-';
+    if (tool === 'driver') prefix = 'dr-';
+
+    // 1. Sincronização Bidirecional Robusta: DOM -> State (Inputs e Ranges)
+    const inputs = document.querySelectorAll(`input[id^="${prefix}"]`);
+    inputs.forEach(el => {
+        if (el.type !== 'number') return;
+        
+        const key = el.id.replace(prefix, '');
+        const range = document.getElementById(`range-${prefix}${key}`);
+        
+        // Atualiza a partir do Input (se focado)
+        if (document.activeElement === el) {
+            s[key] = parseFloat(el.value) || 0;
+            if (range) range.value = s[key];
+        } 
+        // Atualiza a partir do Range Slider (se focado)
+        else if (range && document.activeElement === range) {
+            s[key] = parseFloat(range.value) || 0;
+            el.value = s[key];
+        } 
+        // Leitura passiva por padrão
+        else {
+            s[key] = parseFloat(el.value) || 0;
+            if (range) range.value = s[key];
+        }
+    });
+
+    // 2. Lógica de Negócio Específica da Malha (Grid)
+    if (tool === 'grid') {
+        const utilSelect = document.getElementById('g-utilFactor');
+        if (utilSelect) s.utilFactor = parseFloat(utilSelect.value);
+        
+        const maintSelect = document.getElementById('g-maintFactor');
+        if (maintSelect) s.maintFactor = parseFloat(maintSelect.value);
+
+        let totalLux = 0, totalWatts = 0, totalUgr = "--", luxPiso = 0;
+        const area = s.roomW * s.roomL;
+
+        // Dimensionamento Automático vs Manual
+        if (s.calcMethod === 'target') {
+            const totalFluxNeeded = (s.targetLux * area) / (s.utilFactor * s.maintFactor);
+            const qtyNeeded = Math.ceil(totalFluxNeeded / (s.flux || 1));
+            const ratio = s.roomW / s.roomL;
+            s.cols = Math.max(1, Math.round(Math.sqrt(qtyNeeded * ratio)));
+            s.rows = Math.max(1, Math.round(qtyNeeded / s.cols));
+        } else {
+            s.cols = s.manualCols || 1;
+            s.rows = s.manualRows || 1;
+        }
+
+        const qty = s.cols * s.rows;
+        totalLux = Math.round((qty * (s.flux || 0) * s.utilFactor * s.maintFactor) / area);
+        totalWatts = qty * (s.watts || 0);
+        luxPiso = totalLux * 0.85; // Fator de decaimento para o piso
+        
+        // Chamada segura ao motor de UGR, se disponível
+        if (window.LumenMethod && window.LumenMethod.calculateUGR) {
+            totalUgr = window.LumenMethod.calculateUGR(s);
+        } else {
+            totalUgr = "16.0"; // Aproximação genérica de fallback
+        }
+
+        window.updateResultsUI(totalLux, totalUgr, totalWatts, luxPiso);
+    }
+
+    // 3. Chamada de Renderização dos Motores Gráficos
+    if (window.coreRenderEngine) window.coreRenderEngine();
+    
+    const stage3D = document.getElementById('stage-3d');
+    if (stage3D && !stage3D.classList.contains('hidden') && window.Photometric3DEngine) {
+        window.Photometric3DEngine.update();
+    }
+    
+    // Atualiza a Sidebar Técnica
+    if (window.updatePhotometricHUD) window.updatePhotometricHUD();
+};
+
+window.updateResultsUI = function(lux, ugr, watts, luxPiso) {
+    const resLux = document.getElementById('result-lux');
+    const resUgr = document.getElementById('result-ugr');
+    const resEff = document.getElementById('result-eff');
+    
+    // Cartões Principais
+    if (resLux) resLux.innerText = Math.round(lux);
+    if (resUgr) resUgr.innerText = ugr;
+    
+    const flux = window.state?.grid?.flux || 0;
+    const inputWatts = window.state?.grid?.watts || 0;
+    if (resEff) {
+        resEff.innerText = (inputWatts > 0) ? Math.round(flux / inputWatts) : 0;
+    }
+
+    // HUD (Heads-Up Display) Interno do Canvas
+    const hudLayout = document.getElementById('hud-layout');
+    const hudEmHp = document.getElementById('hud-em-hp');
+    const hudEmLp = document.getElementById('hud-em-lp');
+    
+    if (hudLayout) hudLayout.innerText = `${window.state.grid.cols}x${window.state.grid.rows}`;
+    if (hudEmHp) hudEmHp.innerText = Math.round(lux) + ' lx';
+    if (hudEmLp) hudEmLp.innerText = Math.round(luxPiso || (lux * 0.85)) + ' lx';
+
+    // Gatilho do Auditor NBR 8995-1 (Reavalia conformidade em tempo real)
+    if (typeof window.applyNbrRules === 'function') {
+        window.applyNbrRules();
+    }
+};
+
+window.initNbrSelector = function() {
+    const catSelect = document.getElementById('nbr-cat-select');
+    const roomSelect = document.getElementById('nbr-room-select');
+    
+    if (!catSelect || !window.normsDatabase) return;
+    
+    // Limpeza de estado e formatação do Placeholder inicial
+    catSelect.innerHTML = '<option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>';
+    if (roomSelect) {
+        roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
+        roomSelect.disabled = true;
+    }
+
+    // Popula Categorias Extraídas do Banco de Dados Dinâmico
+    const categorias = Object.keys(window.normsDatabase);
+    categorias.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.text = cat;
+        catSelect.appendChild(option);
+    });
+};
+
+        // Inicialização do Sistema
         window.currentLang = 'pt';
         initializeApp();
-        window.initNbrSelector(); 
-        window.switchTool('grid'); 
-        window.updateCalculations(); 
+        window.switchTool('grid');
         window.updateCalcMode('direct');
     </script>
 </body>
