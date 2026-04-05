@@ -1032,8 +1032,8 @@
         </div>
     </div>
 
-    <script src="js/engines/hcl.js"></script>
-    <script src="js/engines/glare.js"></script>
+    <script src="./src/js/engines/hcl.js"></script>
+    <script src="./src/js/engines/glare.js"></script>
     
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -1506,6 +1506,30 @@ window.handleGenerateReport = async (event) => {
         
         // LUXSINTAX: Botão Toggle (Corte vs Elevação)
         // LUXSINTAX: Botão Toggle (Piso vs Mesa no Método Lúmens)
+        window.toggleGridMode = function(mode) {
+            const btnHP = document.getElementById('btn-grid-hp');
+            const btnLP = document.getElementById('btn-grid-lp');
+            const btn3D = document.getElementById('btn-grid-3d');
+            const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm";
+            const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
+            
+            if (mode === '3D') {
+                window.toggleRenderMode('3D');
+                if(btnHP) btnHP.className = inactiveClass;
+                if(btnLP) btnLP.className = inactiveClass;
+                if(btn3D) btn3D.className = activeClass;
+            } else {
+                window.toggleRenderMode('2D');
+                window.state.grid.viewLevel = mode;
+                if(btnHP) btnHP.className = mode === 'HP' ? activeClass : inactiveClass;
+                if(btnLP) btnLP.className = mode === 'LP' ? activeClass : inactiveClass;
+                if(btn3D) btn3D.className = inactiveClass;
+            }
+
+            if (window.toggleHeatmap) window.toggleHeatmap(window.state.grid.falseColor);
+            window.updateCalculations();
+        };
+
         window.state.showHCL = false; // LUXSINTAX: HCL inicia desligado (clean UI)
 
         window.toggleHCL = function(isChecked) {
