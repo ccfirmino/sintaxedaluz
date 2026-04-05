@@ -650,11 +650,10 @@ window.updatePhotometricHUD = function() {
     const toolId = window.currentTool;
     const state = window.state[toolId];
     
-    // LUXSINTAX: Garante exibição apenas quando houver dados IES ativos
-    const isIESMode = (window.calcMode === 'ies');
+    // LUXSINTAX: Exibe o HUD se houver dados, independente do modo, para feedback ao utilizador
     const hasData = state && state.iesData;
 
-    if (!isIESMode || !hasData) {
+    if (!hasData) {
         dash.classList.add('hidden');
         return;
     }
@@ -662,7 +661,8 @@ window.updatePhotometricHUD = function() {
     dash.classList.remove('hidden');
     document.getElementById('pd-filename')!.innerText = state.iesFileName || "arquivo.ies";
     
-    const metrics = window.PhotometricAnalyzer.extractZonalMetrics(state.iesData);
+    // Delegação para o Domínio Físico
+    const metrics = window.Photometrics.extractZonalMetrics(state.iesData);
     
     let pWatts = state.iesData.wattage;
     if (!pWatts) {
@@ -745,6 +745,10 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
                 const targetKey = window.currentTool;
                 window.state[targetKey].iesData = parsed;
                 window.state[targetKey].iesFileName = file.name;
+
+                // LUXSINTAX: Auto-ativação do modo IES após upload e atualização do HUD
+                window.updateCalcMode('ies');
+                if (window.updatePhotometricHUD) window.updatePhotometricHUD();
 
                 const cctMatch = file.name.match(/(\d{3,4})K/i) || content.match(/(\d{3,4})K/i);
                 if (targetKey === 'grid') {
@@ -1433,9 +1437,10 @@ window.updateCalculations = function() {
 
                     if(window.LumenMethod && window.LumenMethod.calculateGrid) {
                         const gridResult = window.LumenMethod.calculateGrid(s);
-                        s.cols = gridResult.cols;
-                        s.rows = gridResult.rows;
-                        s.targetLux = gridResult.targetLux;
+                        // LUXSINTAX: Blindagem contra valores nulos ou zero que quebram a renderização
+                        s.cols = Math.max(1, gridResult.cols || 1);
+                        s.rows = Math.max(1, gridResult.rows || 1);
+                        s.targetLux = gridResult.targetLux || 100;
                     }
 
                     const area = s.roomW * s.roomL;
