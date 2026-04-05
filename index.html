@@ -1883,7 +1883,7 @@ window.handleIESUpload = function(input) {
                         if (toggleBtn) toggleBtn.classList.remove('hidden');
                         
                         if (window.Photometric3DEngine && window.Photometric3DEngine.isInitialized && !document.getElementById('stage-3d').classList.contains('hidden')) {
-                             window.Photometric3DEngine.renderPhotometricSolid(parsed);
+                             window.Photometric3DEngine.renderPhotometricSolid(parsed, targetKey, window.state[targetKey]);
                         }
 
                         window.updateCalculations();
@@ -1969,400 +1969,295 @@ window.handleIESUpload = function(input) {
         };
 
         window.updateCalculations = function() {
-    const tool = window.currentTool;
-    if (!tool || !window.state[tool]) return;
+            const tool = window.currentTool;
+            if (!tool || !window.state[tool]) return;
 
-    const s = window.state[tool];
-    
-    // Identifica o prefixo correto para os IDs do DOM (p-, v-, g-, dr-)
-    let prefix = tool[0] + '-';
-    if (tool === 'driver') prefix = 'dr-';
+            const s = window.state[tool];
+            let prefix = tool[0] + '-';
+            if (tool === 'driver') prefix = 'dr-';
 
-    // 1. Sincronização Bidirecional Robusta: DOM -> State (Inputs e Ranges)
-    const inputs = document.querySelectorAll(`input[id^="${prefix}"]`);
-    inputs.forEach(el => {
-        if (el.type !== 'number') return;
-        
-        const key = el.id.replace(prefix, '');
-        const range = document.getElementById(`range-${prefix}${key}`);
-        
-        // Atualiza a partir do Input (se focado)
-        if (document.activeElement === el) {
-            s[key] = parseFloat(el.value) || 0;
-            if (range) range.value = s[key];
-        } 
-        // Atualiza a partir do Range Slider (se focado)
-        else if (range && document.activeElement === range) {
-            s[key] = parseFloat(range.value) || 0;
-            el.value = s[key];
-        } 
-        // Leitura passiva por padrão
-        else {
-            s[key] = parseFloat(el.value) || 0;
-            if (range) range.value = s[key];
-        }
-    });
+            // 1. Sincronização Bidirecional Robusta: DOM -> State (Inputs e Ranges)
+            const inputs = document.querySelectorAll(`input[id^="${prefix}"]`);
+            inputs.forEach(el => {
+                if (el.type !== 'number') return;
+                
+                const key = el.id.replace(prefix, '');
+                const range = document.getElementById(`range-${prefix}${key}`);
+                
+                let uiVal = 0;
+                if (document.activeElement === el) {
+                    uiVal = parseFloat(el.value) || 0;
+                    if (range) range.value = uiVal;
+                } else if (range && document.activeElement === range) {
+                    uiVal = parseFloat(range.value) || 0;
+                    el.value = uiVal;
+                } else {
+                    uiVal = parseFloat(el.value) || 0;
+                    if (range) range.value = uiVal;
+                }
 
-    // 2. Lógica de Negócio Específica da Malha (Grid)
-    if (tool === 'grid') {
-        const utilSelect = document.getElementById('g-utilFactor');
-        if (utilSelect) s.utilFactor = parseFloat(utilSelect.value);
-        
-        const maintSelect = document.getElementById('g-maintFactor');
-        if (maintSelect) s.maintFactor = parseFloat(maintSelect.value);
+                // LUXSINTAX FIX: Conversão de Unidades (Meters vs Feet)
+                const isEn = window.currentLang === 'en';
+                const isDist =['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL', 'frameW', 'frameH'].includes(key);
+                s[key] = (isEn && isDist) ? uiVal / 3.28084 : uiVal;
+            });
 
-        let totalLux = 0, totalWatts = 0, totalUgr = "--", luxPiso = 0;
-        const area = s.roomW * s.roomL;
+            // 2. Lógica de Negócio Específica da Malha (Grid)
+            if (tool === 'grid') {
+                const utilSelect = document.getElementById('g-utilFactor');
+                if (utilSelect) s.utilFactor = parseFloat(utilSelect.value);
+                
+                const maintSelect = document.getElementById('g-maintFactor');
+                if (maintSelect) s.maintFactor = parseFloat(maintSelect.value);
 
-        // Dimensionamento Automático vs Manual
-        if (s.calcMethod === 'target') {
-            const totalFluxNeeded = (s.targetLux * area) / (s.utilFactor * s.maintFactor);
-            const qtyNeeded = Math.ceil(totalFluxNeeded / (s.flux || 1));
-            const ratio = s.roomW / s.roomL;
-            s.cols = Math.max(1, Math.round(Math.sqrt(qtyNeeded * ratio)));
-            s.rows = Math.max(1, Math.round(qtyNeeded / s.cols));
-        } else {
-            s.cols = s.manualCols || 1;
-            s.rows = s.manualRows || 1;
-        }
+                // LUXSINTAX: Uso do Módulo de Domínio para o Método dos Lúmens
+                const gridResult = LumenMethod.calculateGrid(s);
+                s.cols = gridResult.cols;
+                s.rows = gridResult.rows;
+                s.targetLux = gridResult.targetLux;
 
-        const qty = s.cols * s.rows;
-        totalLux = Math.round((qty * (s.flux || 0) * s.utilFactor * s.maintFactor) / area);
-        totalWatts = qty * (s.watts || 0);
-        luxPiso = totalLux * 0.85; // Fator de decaimento para o piso
-        
-        // Chamada segura ao motor de UGR, se disponível
-        if (window.LumenMethod && window.LumenMethod.calculateUGR) {
-            totalUgr = window.LumenMethod.calculateUGR(s);
-        } else {
-            totalUgr = "16.0"; // Aproximação genérica de fallback
-        }
+                const area = s.roomW * s.roomL;
+                const qty = s.cols * s.rows;
+                const totalLux = Math.round((qty * (s.flux || 0) * s.utilFactor * s.maintFactor) / area);
+                const totalWatts = qty * (s.watts || 0);
+                const luxPiso = totalLux * 0.85; 
+                
+                let totalUgr = "16.0"; 
+                if (LumenMethod.calculateUGR) {
+                    totalUgr = LumenMethod.calculateUGR(s);
+                }
 
-        window.updateResultsUI(totalLux, totalUgr, totalWatts, luxPiso);
-    }
+                window.updateResultsUI(totalLux, totalUgr, totalWatts, luxPiso);
+            }
 
-    // 3. Chamada de Renderização dos Motores Gráficos
-    if (window.coreRenderEngine) window.coreRenderEngine();
-    
-    const stage3D = document.getElementById('stage-3d');
-    if (stage3D && !stage3D.classList.contains('hidden') && window.Photometric3DEngine) {
-        window.Photometric3DEngine.update();
-    }
-    
-    // Atualiza a Sidebar Técnica
-    if (window.updatePhotometricHUD) window.updatePhotometricHUD();
-};
-
-window.updateResultsUI = function(lux, ugr, watts, luxPiso) {
-    const resLux = document.getElementById('result-lux');
-    const resUgr = document.getElementById('result-ugr');
-    const resEff = document.getElementById('result-eff');
-    
-    // Cartões Principais
-    if (resLux) resLux.innerText = Math.round(lux);
-    if (resUgr) resUgr.innerText = ugr;
-    
-    const flux = window.state?.grid?.flux || 0;
-    const inputWatts = window.state?.grid?.watts || 0;
-    if (resEff) {
-        resEff.innerText = (inputWatts > 0) ? Math.round(flux / inputWatts) : 0;
-    }
-
-    // HUD (Heads-Up Display) Interno do Canvas
-    const hudLayout = document.getElementById('hud-layout');
-    const hudEmHp = document.getElementById('hud-em-hp');
-    const hudEmLp = document.getElementById('hud-em-lp');
-    
-    if (hudLayout) hudLayout.innerText = `${window.state.grid.cols}x${window.state.grid.rows}`;
-    if (hudEmHp) hudEmHp.innerText = Math.round(lux) + ' lx';
-    if (hudEmLp) hudEmLp.innerText = Math.round(luxPiso || (lux * 0.85)) + ' lx';
-
-    // Gatilho do Auditor NBR 8995-1 (Reavalia conformidade em tempo real)
-    if (typeof window.applyNbrRules === 'function') {
-        window.applyNbrRules();
-    }
-};
-
-window.initNbrSelector = function() {
-    const catSelect = document.getElementById('nbr-cat-select');
-    const roomSelect = document.getElementById('nbr-room-select');
-    
-    if (!catSelect || !window.normsDatabase) return;
-    
-    // Limpeza de estado e formatação do Placeholder inicial
-    catSelect.innerHTML = '<option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>';
-    if (roomSelect) {
-        roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
-        roomSelect.disabled = true;
-    }
-
-    // Popula Categorias Extraídas do Banco de Dados Dinâmico
-    const categorias = Object.keys(window.normsDatabase);
-    categorias.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat;
-        option.text = cat;
-        catSelect.appendChild(option);
-    });
-};
-
-// ==========================================
-        // RESTAURAÇÃO DAS FUNÇÕES DE UI (LEED, NBR, ETC)
-        // ==========================================
-        window.setSurfaceMode = function(mode) {
-            const btnS = document.getElementById('btn-surf-single');
-            const btnA = document.getElementById('btn-surf-array');
-            const btn3D = document.getElementById('btn-surf-3d');
-            const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm";
-            const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
-
-            if (mode === '3D') {
-                window.toggleRenderMode('3D');
-                if(btnS) btnS.className = inact;
-                if(btnA) btnA.className = inact;
-                if(btn3D) btn3D.className = act;
-            } else {
-                window.toggleRenderMode('2D');
-                window.state.ponto.viewMode = mode;
-                if(btnS) btnS.className = mode === 'single' ? act : inact;
-                if(btnA) btnA.className = mode === 'array' ? act : inact;
-                if(btn3D) btn3D.className = inact;
+            // 3. Chamada de Renderização dos Motores Gráficos
+            if (window.coreRenderEngine) window.coreRenderEngine();
+            
+            const stage3D = document.getElementById('stage-3d');
+            if (stage3D && !stage3D.classList.contains('hidden') && window.Photometric3DEngine) {
+                // LUXSINTAX FIX: Recria o sólido 3D com os novos parâmetros em tempo real
+                window.Photometric3DEngine.renderPhotometricSolid(s.iesData, tool, s);
             }
             
-            const isArray = (mode === 'array') || (mode === '3D');
-            const tiltModeGrp = document.getElementById('p-tilt-mode-group');
-            if (tiltModeGrp) tiltModeGrp.style.display = isArray ? 'block' : 'none';
-            const spacingGrp = document.getElementById('group-spacing');
-            if (spacingGrp) {
-                if (isArray) spacingGrp.classList.remove('hidden');
-                else spacingGrp.classList.add('hidden');
+            if (window.updatePhotometricHUD) window.updatePhotometricHUD();
+        };
+
+        window.updateResultsUI = function(lux, ugr, watts, luxPiso) {
+            const resLux = document.getElementById('result-lux');
+            const resUgr = document.getElementById('result-ugr');
+            const resEff = document.getElementById('result-eff');
+            
+            if (resLux) resLux.innerText = Math.round(lux);
+            if (resUgr) resUgr.innerText = ugr;
+            
+            const flux = window.state?.grid?.flux || 0;
+            const inputWatts = window.state?.grid?.watts || 0;
+            if (resEff) {
+                resEff.innerText = (inputWatts > 0) ? Math.round(flux / inputWatts) : 0;
             }
 
-            document.querySelectorAll('#heatmap-toggle-wrapper').forEach(w => w.classList.toggle('hidden', mode !== '3D'));
-            if (window.toggleHeatmap) window.toggleHeatmap(window.state.ponto.falseColor);
+            const hudLayout = document.getElementById('hud-layout');
+            const hudEmHp = document.getElementById('hud-em-hp');
+            const hudEmLp = document.getElementById('hud-em-lp');
+            
+            if (hudLayout) hudLayout.innerText = `${window.state.grid.cols}x${window.state.grid.rows}`;
+            if (hudEmHp) hudEmHp.innerText = Math.round(lux) + ' lx';
+            if (hudEmLp) hudEmLp.innerText = Math.round(luxPiso || (lux * 0.85)) + ' lx';
+
+            // Gatilho do Auditor NBR 8995-1
+            if (window.currentNbrTarget) {
+                const nbrPanel = document.getElementById('nbr-status-panel');
+                if (nbrPanel && !nbrPanel.classList.contains('hidden')) {
+                    const targetLux = window.currentNbrTarget.lux;
+                    const maxUgrLimit = window.currentNbrTarget.ugr;
+                    const parsedUgr = parseFloat(ugr);
+                    
+                    let status = 'APPROVED';
+                    if (Math.round(lux) < targetLux * 0.9) status = 'REJECTED';
+                    else if (parsedUgr > maxUgrLimit) status = 'REJECTED';
+                    else if (Math.round(lux) < targetLux) status = 'WARNING';
+
+                    const nbrBadge = document.getElementById('nbr-badge');
+                    const nbrStatusText = document.getElementById('nbr-status-text');
+                    const nbrIconContainer = document.getElementById('nbr-icon-container');
+                    const nbrIcon = document.getElementById('nbr-icon');
+
+                    if (status === 'APPROVED') {
+                        nbrPanel.style.borderColor = '#10b981';
+                        nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
+                        nbrIcon.className = 'fas fa-check-circle';
+                        nbrStatusText.innerText = `Auditoria NBR: Conforme a norma`;
+                        nbrBadge.innerText = 'APROVADO';
+                        nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 border-green-200';
+                    } else if (status === 'WARNING') {
+                        nbrPanel.style.borderColor = '#f59e0b';
+                        nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600';
+                        nbrIcon.className = 'fas fa-exclamation-triangle';
+                        nbrStatusText.innerText = `Auditoria NBR: Nível Marginal / Tolerável`;
+                        nbrBadge.innerText = 'AVISO';
+                        nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 border-amber-200';
+                    } else {
+                        nbrPanel.style.borderColor = '#ef4444';
+                        nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
+                        nbrIcon.className = 'fas fa-times-circle';
+                        nbrStatusText.innerText = `Auditoria NBR: Fora dos Requisitos`;
+                        nbrBadge.innerText = 'REPROVADO';
+                        nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
+                    }
+                }
+            }
+        };
+
+        // LUXSINTAX: Restauração Completa do Motor NBR 8995-1
+        window.currentNbrTarget = { lux: 500, ugr: 19 };
+
+        window.initNbrSelector = function() {
+            const catSelect = document.getElementById('nbr-cat-select');
+            const roomSelect = document.getElementById('nbr-room-select');
+            
+            if (!catSelect || !window.normsDatabase) return;
+            
+            catSelect.innerHTML = '<option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>';
+            if (roomSelect) {
+                roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
+                roomSelect.disabled = true;
+            }
+
+            const uniqueCats =[...new Set(window.normsDatabase.map(n => n.cat))].sort();
+            uniqueCats.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.text = cat;
+                catSelect.appendChild(option);
+            });
+        };
+
+        window.updateNbrRooms = function() {
+            const catSelect = document.getElementById('nbr-cat-select');
+            const roomSelect = document.getElementById('nbr-room-select');
+            const selectedCat = catSelect.value;
+            
+            if (!selectedCat) return;
+
+            roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
+            roomSelect.disabled = false;
+
+            const rooms = window.normsDatabase.filter(n => n.cat === selectedCat);
+            rooms.forEach(n => {
+                const opt = document.createElement('option');
+                opt.value = n.room;
+                opt.dataset.lux = n.lux;
+                opt.dataset.ugr = n.ugr === '-' ? 99 : n.ugr;
+                opt.innerText = n.room;
+                roomSelect.appendChild(opt);
+            });
+        };
+
+        window.applyNbrRules = function() {
+            const roomSelect = document.getElementById('nbr-room-select');
+            if (!roomSelect || roomSelect.selectedIndex < 0) return;
+            
+            const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+            if (!selectedOption || !selectedOption.value) return;
+
+            const tLux = parseFloat(selectedOption.dataset.lux);
+            const tUgr = parseFloat(selectedOption.dataset.ugr);
+
+            window.currentNbrTarget = { lux: tLux, ugr: tUgr };
+
+            document.getElementById('nbr-target-lux-display').innerText = `${tLux} lx`;
+            document.getElementById('nbr-target-ugr-display').innerText = tUgr === 99 ? 'N/A' : tUgr;
+
+            const gridTargetLuxInput = document.getElementById('g-targetLux');
+            const gridRangeTargetLux = document.getElementById('range-g-targetLux');
+            if (gridTargetLuxInput && gridRangeTargetLux && window.state && window.state.grid) {
+                gridTargetLuxInput.value = tLux;
+                gridRangeTargetLux.value = tLux;
+                window.state.grid.targetLux = tLux;
+            }
+
             window.updateCalculations();
         };
 
-        window.populateCategoryFilter = function() {
-            const sel = document.getElementById('category-filter');
-            if(!sel || sel.options.length > 1) return;
-            const uniqueCats = [...new Set(window.normsDatabase.map(n => n.cat))].sort();
-            uniqueCats.forEach(c => { const o = document.createElement('option'); o.value=c; o.innerText=c; sel.appendChild(o); });
-        };
-        
-        window.filterNorms = function() {
-            const cat = document.getElementById('category-filter').value;
-            const searchInput = document.getElementById('search-filter');
-            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-            
-            const filtered = window.normsDatabase.filter(n => {
-                const matchCat = cat === 'all' || n.cat === cat;
-                const matchSearch = n.room.toLowerCase().includes(searchTerm) || n.cat.toLowerCase().includes(searchTerm);
-                return matchCat && matchSearch;
-            });
-            
-            document.getElementById('nbr8995-tbody').innerHTML = filtered.map(n => `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-slate-500 font-bold">${n.room}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`).join('');
-        };
-
-        window.switchQueryTab = function(t) {
-            ['nbr8995','nbr5101','leed'].forEach(k => {
-                document.getElementById('content-'+k).classList.toggle('hidden', k!==t);
-                document.getElementById('btn-q-'+k).className = `query-tab-btn ${k===t ? 'query-tab-active' : ''}`;
-            });
-            const searchContainer = document.getElementById('search-container');
-            if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
-
-            if(t==='nbr8995') window.filterNorms();
-            if(t==='nbr5101') window.calc5101();
-            if(t==='leed') window.updateLeedTargets();
-        };
-
-        window.calc5101 = function() {
-            const params = {
-                speed: parseInt(document.getElementById('m-speed').value),
-                volume: parseInt(document.getElementById('m-volume').value),
-                separation: parseInt(document.getElementById('m-separation').value),
-                density: parseInt(document.getElementById('m-density').value),
-                complexity: parseInt(document.getElementById('m-complexity').value),
-                ambient: parseInt(document.getElementById('m-ambient').value)
-            };
-            const res = StandardsEngine.calculateNbr5101(params);
-            document.getElementById('m-result-class').innerText = res.className;
-            document.getElementById('m-result-desc').innerText = res.desc;
-            document.getElementById('res-lmed-val').innerText = res.lmed.toFixed(1); document.getElementById('bar-lmed').style.width = (res.lmed/2.0*100)+'%';
-            document.getElementById('res-emed-val').innerText = res.emed; document.getElementById('bar-emed').style.width = (res.emed/30*100)+'%';
-            document.getElementById('res-u0-val').innerText = res.u0.toFixed(2); document.getElementById('bar-u0').style.width = (res.u0/0.4*100)+'%';
-            document.getElementById('res-ti-val').innerText = res.ti; document.getElementById('bar-ti').style.width = (res.ti/20*100)+'%';
-        };
-
-        window.switchCertTab = function(t) { ['leed','well'].forEach(k => { document.getElementById('pane-'+k).classList.toggle('hidden', k!==t); document.getElementById('cert-tab-'+k).className = `cert-tab ${k===t?'active':'inactive'}`; }); };
-        
-        window.updateLeedTargets = function() {
-            const area = parseFloat(document.getElementById('leed-area-input').value) || 0;
-            const red = window.currentLeedTarget === 'gold' ? 0.20 : (window.currentLeedTarget === 'platinum' ? 0.30 : (window.currentLeedTarget === 'silver' ? 0.10 : 0.05));
-            document.getElementById('leed-reduction-display').innerText = (red*100).toFixed(0)+'%';
-            document.getElementById('leed-lpd-body').innerHTML = window.lpdBaselines.map(b => `<tr class="border-b border-slate-100"><td class="p-3 text-starlight font-bold">${b.type}</td><td class="p-3 text-center text-slate-500 font-mono">${b.base}</td><td class="p-3 text-center text-luminous-gold font-black">${(b.base*(1-red)).toFixed(2)}</td><td class="p-3 text-right text-tech-cyan font-black">${(b.base*(1-red)*area).toFixed(0)} W</td></tr>`).join('');
-        };
-
-        window.setLeedTarget = function(t) { window.currentLeedTarget = t; document.querySelectorAll('.leed-level-box').forEach(b => b.classList.remove('active')); document.getElementById('lvl-'+t).classList.add('active'); window.updateLeedTargets(); };
-        
-        window.toggleWellFeature = function(el, pts) { el.classList.toggle('active'); let total=0; document.querySelectorAll('.well-toggle-group.active').forEach(i => total += parseInt(i.getAttribute('data-points'))); document.getElementById('well-total-score').innerHTML = `${total} <span class="text-xs text-slate-400 font-normal">/ 8</span>`; document.getElementById('well-progress-bar').style.width = (total/8*100)+'%'; document.getElementById('well-progress-text').innerText = (total/8*100).toFixed(0)+'%'; const icon = el.querySelector('.fa-check'); if(el.classList.contains('active')) icon.classList.remove('opacity-0'); else icon.classList.add('opacity-0'); };
-
-        window.addLeedRoom = function() {
-            const room = { id: Date.now(), name: "Novo Ambiente", area: 50, baseLpd: 0, fixtures:[] };
-            window.state.leedProject.rooms.push(room);
-            window.renderLeedProject();
-        };
-
-        window.removeLeedRoom = function(roomId) {
-            window.state.leedProject.rooms = window.state.leedProject.rooms.filter(r => r.id !== roomId);
-            window.renderLeedProject();
-        };
-
-        window.updateLeedRoomData = function(roomId, field, value) {
-            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
-            if (room) {
-                if (field === 'name' || field === 'typology') room[field] = value;
-                else room[field] = parseFloat(value) || 0;
-                if (field === 'typology') {
-                    const baseline = window.lpdBaselines.find(b => b.type === value);
-                    if (baseline) room.baseLpd = baseline.base;
-                }
-                window.renderLeedProject();
-            }
-        };
-
-        window.addLeedFixture = function(roomId) {
-            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
-            if (room) {
-                room.fixtures.push({ id: Date.now(), label: "Luminária", power: 15, qty: 1 });
-                window.renderLeedProject();
-            }
-        };
-
-        window.removeLeedFixture = function(roomId, fixtureId) {
-            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
-            if (room) {
-                room.fixtures = room.fixtures.filter(f => f.id !== fixtureId);
-                window.renderLeedProject();
-            }
-        };
-
-        window.updateLeedFixtureData = function(roomId, fixtureId, field, value) {
-            const room = window.state.leedProject.rooms.find(r => r.id === roomId);
-            if (room) {
-                const fixture = room.fixtures.find(f => f.id === fixtureId);
-                if (fixture) {
-                    fixture[field] = field === 'label' ? value : parseFloat(value) || 0;
-                    window.renderLeedProject();
-                }
-            }
-        };
-
-        window.updateGlobalLeedSummary = () => {
-            const s = window.state.leedProject;
-            const summary = StandardsEngine.calculateLeedCompliance(s);
-            document.getElementById('global-leed-watts').innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W Permitidos</span>`;
-            document.getElementById('global-leed-lpd').innerHTML = `${summary.currentLpd.toFixed(2)} <span class="text-lg font-light text-slate-400">W/m²</span>`;
-            const statusBox = document.getElementById('global-leed-status');
-            if (summary.totalArea > 0) {
-                statusBox.classList.remove('animate-pulse');
-                statusBox.innerText = summary.isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "ALERTA: CARGA EXCEDE LIMITE ASHRAE";
-                statusBox.className = summary.isCompliant 
-                    ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" 
-                    : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
-            }
-        };
-
-        window.renderLeedProject = function() {
-            const container = document.getElementById('leed-project-container');
-            if(!container) return;
-            const s = window.state.leedProject;
-            const savedOptions = (window.userLeedProjects ||[]).map(p => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
-
-            let html = `
-                <div class="bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg">
-                    <div class="flex-grow w-full lg:w-auto">
-                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
-                        <input type="text" value="${s.name}" onchange="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-700 text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1">
-                    </div>
-                    <div class="w-full lg:w-auto">
-                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Meta ASHRAE 90.1</label>
-                        <select onchange="window.state.leedProject.target = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-slate-800 text-luminous-gold border border-slate-700 rounded-lg px-4 py-2 font-bold text-xs uppercase outline-none w-full cursor-pointer">
-                            <option value="baseline" ${s.target === 'baseline' ? 'selected' : ''}>ASHRAE Base (0%)</option>
-                            <option value="certified" ${s.target === 'certified' ? 'selected' : ''}>Certified (-5%)</option>
-                            <option value="silver" ${s.target === 'silver' ? 'selected' : ''}>Silver (-10%)</option>
-                            <option value="gold" ${s.target === 'gold' ? 'selected' : ''}>Gold (-20%)</option>
-                            <option value="platinum" ${s.target === 'platinum' ? 'selected' : ''}>Platinum (-30%)</option>
-                        </select>
-                    </div>
-                    <div class="flex gap-2 w-full lg:w-auto">
-                        <button onclick="window.saveLeedProject()" id="btn-save-leed" class="flex-1 lg:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
-                        <button onclick="window.generateLeedReport()" class="flex-1 lg:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
-                    </div>
-                </div>
-            `;
-
-            html += s.rooms.map(room => `
-                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 animate-fade-in-up mb-6">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
-                        <div class="flex-grow w-full md:w-1/3">
-                            <input type="text" value="${room.name}" onchange="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-sm font-black text-starlight dark:text-white bg-transparent border-b border-slate-300 dark:border-slate-600 focus:border-luminous-gold transition-colors w-full pb-1 uppercase">
-                        </div>
-                        <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
-                            <div class="flex items-center gap-2">
-                                <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tipologia:</label>
-                                <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select max-w-[200px] truncate text-xs bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600 outline-none cursor-pointer">
-                                    <option value="" disabled ${!room.typology ? 'selected' : ''}>Selecione...</option>
-                                    ${window.lpdBaselines.map(b => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type}</option>`).join('')}
-                                </select>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Área (m²):</label>
-                                <input type="number" value="${room.area}" onchange="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="w-20 text-right bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600">
-                            </div>
-                            <button onclick="window.removeLeedRoom(${room.id})" class="text-slate-400 hover:text-red-500 transition-colors ml-auto"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    
-                    <table class="w-full text-xs mb-4">
-                        <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700 text-[9px] tracking-widest">
-                            <tr><th class="text-left pb-2">Luminária</th><th class="text-center pb-2">Watts (W)</th><th class="text-center pb-2">Qtd</th><th class="text-right pb-2">Subtotal</th><th class="pb-2"></th></tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            ${room.fixtures.map(f => `
-                                <tr>
-                                    <td class="py-2"><input type="text" value="${f.label}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold w-full text-slate-600 dark:text-slate-300"></td>
-                                    <td class="py-2 text-center"><input type="number" value="${f.power}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300"></td>
-                                    <td class="py-2 text-center"><input type="number" value="${f.qty}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300"></td>
-                                    <td class="py-2 text-right font-black text-starlight dark:text-white">${(f.power * f.qty).toFixed(1)} W</td>
-                                    <td class="py-2 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-400"><i class="fas fa-times"></i></button></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    
-                    <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest transition-colors"><i class="fas fa-plus-circle mr-1"></i> Adicionar Luminária</button>
-                </div>
-            `).join('');
-            
-            container.innerHTML = html;
-            window.updateGlobalLeedSummary();
-        };
         // ==========================================
-        // BINDING DE INPUTS E SLIDERS (REATIVIDADE)
+        // RESTAURAÇÃO DE UTILITÁRIOS DE UI E EVENTOS
         // ==========================================
+        
+        window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); };
+        window.openTerms = function() { document.getElementById('terms-modal').classList.remove('hidden'); };
+        window.closeTerms = function() { document.getElementById('terms-modal').classList.add('hidden'); };
+
+        window.updateInputsForLanguage = function() {
+            const isEn = window.currentLang === 'en';
+            document.querySelectorAll('.unit-m-ft').forEach(el => el.innerText = isEn ? 'FT' : 'M');
+            
+            const distParams =['height', 'plane', 'dist', 'spacing', 'hq', 'roomW', 'roomL', 'frameW', 'frameH'];['ponto', 'vertical', 'homog', 'grid'].forEach(key => {
+                distParams.forEach(param => {
+                    const numInput = document.getElementById(`${key[0]}-${param}`);
+                    const rangeInput = document.getElementById(`range-${key[0]}-${param}`);
+                    if (numInput && rangeInput && window.state[key]) {
+                        const valMeters = window.state[key][param];
+                        if (valMeters !== undefined) {
+                            if (isEn) {
+                                const valFt = valMeters * 3.28084;
+                                numInput.value = valFt.toFixed(2);
+                                rangeInput.value = valFt.toFixed(2);
+                            } else {
+                                numInput.value = valMeters.toFixed(2);
+                                rangeInput.value = valMeters.toFixed(2);
+                            }
+                        }
+                    }
+                });
+            });
+        };
+
+        window.toggleLanguage = function() { 
+            window.currentLang = window.currentLang === 'pt' ? 'en' : 'pt'; 
+            document.querySelectorAll('.lang-display').forEach(e => e.innerText = window.currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
+            document.querySelectorAll('[data-i18n]').forEach(el => { 
+                const key = el.getAttribute('data-i18n'); 
+                if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
+                    el.innerHTML = window.i18n[window.currentLang][key]; 
+                } 
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { 
+                const key = el.getAttribute('data-i18n-placeholder'); 
+                if (window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
+                    el.placeholder = window.i18n[window.currentLang][key]; 
+                } 
+            });
+            window.updateInputsForLanguage();
+            window.updateCalculations(); 
+        };
+
+        let trackingTimeout;
         window.setupInputBindings = function() {
-            // Seleciona todos os inputs numéricos e sliders das calculadoras
             const inputs = document.querySelectorAll('input[type="number"], input[type="range"]');
             
             inputs.forEach(input => {
-                // Ignora inputs que já possuem eventos inline no HTML (como os do LEED)
                 if (input.hasAttribute('oninput') || input.hasAttribute('onchange')) return;
                 
-                // Sempre que o usuário mexer no slider ou digitar, recalcula a tela!
-                input.addEventListener('input', () => {
+                input.addEventListener('input', (e) => {
+                    const tool = window.currentTool;
+                    let prefix = tool[0] + '-';
+                    if (tool === 'driver') prefix = 'dr-';
+                    
+                    const key = input.id.replace('range-', '').replace(prefix, '');
+                    
                     if (window.updateCalculations) window.updateCalculations();
+
+                    clearTimeout(trackingTimeout);
+                    trackingTimeout = setTimeout(() => {
+                        if (typeof gtag === 'function' && window.state[tool] && window.state[tool][key] !== undefined) {
+                            gtag('event', 'calc_adjustment', {
+                                'tool': tool,
+                                'parameter': key,
+                                'value': window.state[tool][key].toFixed(2),
+                                'mode': window.calcMode
+                            });
+                        }
+                    }, 1500);
                 });
             });
         };
@@ -2371,7 +2266,7 @@ window.initNbrSelector = function() {
         window.currentLang = 'pt';
         initializeApp();
         window.initNbrSelector();
-        window.setupInputBindings(); // <-- Reativa a escuta dos sliders!
+        window.setupInputBindings();
         window.switchTool('grid');
         window.updateCalcMode('direct');
     </script>
