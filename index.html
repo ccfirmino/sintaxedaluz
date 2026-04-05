@@ -1921,8 +1921,8 @@ window.handleIESUpload = function(input) {
         import { lpdBaselines } from './src/domain/standards/AshraeDatabase.ts';
         
         // LUXSINTAX: Importação dos Motores de Infraestrutura
-        import { AuthManager } from '/src/infrastructure/auth/AuthManager.ts';
-        import { Canvas2DEngine } from '/src/infrastructure/canvas/Canvas2DEngine.ts';
+        import { AuthManager } from './src/auth/AuthManager.ts';
+        import { Canvas2DEngine } from './src/infrastructure/canvas/Canvas2DEngine.ts';
 
         // Atribuição temporária ao window para manter compatibilidade com os controllers legados
         window.i18n = i18nDictionary;
