@@ -319,7 +319,7 @@ export class ReportExporter {
         let page = pdfDoc.addPage([595.28, 841.89]);
         const { width, height } = page.getSize();
 
-        // Estética Sofisticada: Cabeçalho reduzido com linha dourada e White-Labeling
+        // Estética Sofisticada Unificada (Header White-Label)
         const drawHeader = async (currentPage: any) => {
             currentPage.drawRectangle({ x: 0, y: height - 55, width, height: 55, color: PDFLib.rgb(0.06, 0.09, 0.16) });
             currentPage.drawRectangle({ x: 0, y: height - 57, width, height: 2, color: PDFLib.rgb(0.85, 0.46, 0.02) });
@@ -336,52 +336,56 @@ export class ReportExporter {
             }
         };
 
+        const drawSection = (title: string, y: number, currentPage: any) => {
+            currentPage.drawRectangle({ x: 40, y: y - 4, width: width - 80, height: 16, color: PDFLib.rgb(0.95, 0.96, 0.98) });
+            currentPage.drawText(title.toUpperCase(), { x: 50, y: y, size: 8, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+            return y - 16;
+        };
+
         await drawHeader(page);
 
-        let cy = height - 90;
-        
-        page.drawText(`PROJETO: ${project.name.toUpperCase()}`, { x: 40, y: cy, size: 12, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-        cy -= 18;
-        page.drawText(`META APLICADA: ${targetLabel.toUpperCase()}`, { x: 40, y: cy, size: 9, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-        cy -= 40;
+        page.drawText(`PROJETO: ${project.name.toUpperCase()}`, { x: 40, y: height - 75, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+        page.drawText(`META APLICADA: ${targetLabel.toUpperCase()}`, { x: 40, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+        page.drawText(`DATA: ${new Date().toLocaleDateString('pt-BR')}`, { x: width - 260, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
 
-        // Data Visualization: Gráfico de Barras Comparativo
-        page.drawText('BALANÇO ENERGÉTICO GLOBAL', { x: 40, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
-        cy -= 25;
+        let cy = height - 115;
+        
+        cy = drawSection('1. Balanço Energético Global', cy, page);
+        cy -= 12;
 
         const maxBarWidth = 350;
         const maxWatts = Math.max(summary.allowedWatts, summary.totalWatts) * 1.2 || 1; 
         
         const allowedWidth = (summary.allowedWatts / maxWatts) * maxBarWidth;
-        page.drawText('LIMITE ASHRAE:', { x: 40, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-        page.drawRectangle({ x: 120, y: cy - 2, width: allowedWidth, height: 10, color: PDFLib.rgb(0.8, 0.8, 0.8) });
-        page.drawText(`${summary.allowedWatts.toFixed(1)} W`, { x: 125 + allowedWidth, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-        cy -= 20;
+        page.drawText('LIMITE ASHRAE:', { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawRectangle({ x: 130, y: cy - 2, width: allowedWidth, height: 8, color: PDFLib.rgb(0.8, 0.8, 0.8) });
+        page.drawText(`${summary.allowedWatts.toFixed(1)} W`, { x: 135 + allowedWidth, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        cy -= 16;
 
         const projectWidth = (summary.totalWatts / maxWatts) * maxBarWidth;
         const barColor = summary.isCompliant ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
-        page.drawText('CARGA PROJETO:', { x: 40, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-        page.drawRectangle({ x: 120, y: cy - 2, width: projectWidth, height: 10, color: barColor });
-        page.drawText(`${summary.totalWatts.toFixed(1)} W`, { x: 125 + projectWidth, y: cy, size: 8, font: fontBold, color: barColor });
-        cy -= 40;
+        page.drawText('CARGA PROJETO:', { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawRectangle({ x: 130, y: cy - 2, width: projectWidth, height: 8, color: barColor });
+        page.drawText(`${summary.totalWatts.toFixed(1)} W`, { x: 135 + projectWidth, y: cy, size: 7, font: fontBold, color: barColor });
+        cy -= 24;
 
-        // Seção Impacto ESG
-        page.drawText('IMPACTO ESG E SUSTENTABILIDADE (ESTIMATIVA ANUAL)', { x: 40, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
-        cy -= 20;
+        cy = drawSection('2. Impacto ESG e Sustentabilidade (Estimativa Anual)', cy, page);
+        cy -= 12;
+        
         if (summary.esg && summary.esg.savingsKwh > 0) {
-            page.drawText(`Eficiência Operacional: Economia de ${summary.esg.savingsKwh.toFixed(0)} kWh/ano em relação à linha de base.`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 15;
-            page.drawText(`Pegada de Carbono: Redução estimada de ${summary.esg.co2ReductionKg.toFixed(0)} kg CO2 emitidos na atmosfera.`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 15;
-            page.drawText(`Equivalência Ambiental: Benefício correspondente a absorção de ${Math.round(summary.esg.treesEquivalent)} árvore(s) adulta(s).`, { x: 40, y: cy, size: 9, font: fontBold, color: PDFLib.rgb(0.3, 0.48, 0.06) }); cy -= 30;
+            page.drawText(`Eficiência Operacional: Economia de ${summary.esg.savingsKwh.toFixed(0)} kWh/ano em relação à linha de base.`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 12;
+            page.drawText(`Pegada de Carbono: Redução estimada de ${summary.esg.co2ReductionKg.toFixed(0)} kg CO2 emitidos na atmosfera.`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 12;
+            page.drawText(`Equivalência Ambiental: Benefício correspondente a absorção de ${Math.round(summary.esg.treesEquivalent)} árvore(s) adulta(s).`, { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.3, 0.48, 0.06) }); cy -= 20;
         } else {
-            page.drawText('O projeto atual não apresenta redução de carga energética frente ao limite normativo.', { x: 40, y: cy, size: 9, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 30;
+            page.drawText('O projeto atual não apresenta redução de carga energética frente ao limite normativo.', { x: 50, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 20;
         }
 
-        page.drawText('MEMORIAL DE CÁLCULO POR AMBIENTE', { x: 40, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
-        cy -= 20;
+        cy = drawSection('3. Memorial de Cálculo por Ambiente', cy, page);
+        cy -= 8;
 
         for (let i = 0; i < project.rooms.length; i++) {
             const r = project.rooms[i];
-            if (cy < 120) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 100; }
+            if (cy < 80) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
 
             let roomWatts = r.fixtures.reduce((acc: number, f: any) => acc + (f.power * f.qty), 0);
             
@@ -395,42 +399,39 @@ export class ReportExporter {
             
             let roomAllowed = r.area * (r.baseLpd || 0) * targetFactor;
 
-            page.drawRectangle({ x: 40, y: cy - 4, width: width - 80, height: 16, color: PDFLib.rgb(0.95, 0.96, 0.98) });
-            page.drawText(`${i + 1}. ${r.name.toUpperCase()}`, { x: 45, y: cy, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-            page.drawText(`Área: ${r.area} m² | LPD Alvo: ${((r.baseLpd || 0) * targetFactor).toFixed(1)} W/m²`, { x: 250, y: cy, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-            cy -= 18;
+            page.drawText(`${i + 1}. ${r.name.toUpperCase()}`, { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+            page.drawText(`Área: ${r.area} m² | LPD Alvo: ${((r.baseLpd || 0) * targetFactor).toFixed(1)} W/m²`, { x: 250, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+            cy -= 12;
 
             for (let f of r.fixtures) {
-                if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 100; }
-                page.drawText(`- ${f.qty} un x ${f.label} (${f.power}W)`, { x: 50, y: cy, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
-                page.drawText(`${(f.qty * f.power).toFixed(1)} W`, { x: 400, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.3, 0.3, 0.3) });
-                cy -= 12;
+                if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
+                page.drawText(`- ${f.qty} un x ${f.label} (${f.power}W)`, { x: 60, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+                page.drawText(`${(f.qty * f.power).toFixed(1)} W`, { x: 400, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+                cy -= 10;
             }
 
-            if (cy < 80) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 100; }
+            if (cy < 70) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
 
             const roomStatusColor = roomWatts <= roomAllowed ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
-            page.drawText(`SUBTOTAL: ${roomWatts.toFixed(1)} W`, { x: 50, y: cy, size: 8, font: fontBold, color: roomStatusColor });
-            page.drawText(`LIMITE: ${roomAllowed.toFixed(1)} W`, { x: 250, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-            cy -= 25;
+            page.drawText(`SUBTOTAL: ${roomWatts.toFixed(1)} W`, { x: 60, y: cy, size: 7, font: fontBold, color: roomStatusColor });
+            page.drawText(`LIMITE: ${roomAllowed.toFixed(1)} W`, { x: 250, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+            cy -= 18;
         }
 
-        if (cy < 180) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 100; }
+        if (cy < 150) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
 
         cy -= 10;
-        page.drawLine({ start: { x: 40, y: cy }, end: { x: width - 40, y: cy }, thickness: 1, color: PDFLib.rgb(0.8, 0.8, 0.8) });
-        cy -= 25;
+        cy = drawSection('4. Diagnóstico Técnico Global', cy, page);
+        cy -= 12;
 
         const finalStatus = summary.isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "REPROVADO (EXCEDE LIMITES)";
         
-        page.drawText('DIAGNÓSTICO TÉCNICO GLOBAL', { x: 40, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-        cy -= 20;
-        page.drawText(`LPD Médio Projetado: ${summary.currentLpd.toFixed(2)} W/m²`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 25;
-        page.drawText(finalStatus, { x: 40, y: cy, size: 12, font: fontBold, color: barColor });
+        page.drawText(`LPD Médio Projetado: ${summary.currentLpd.toFixed(2)} W/m²`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 16;
+        page.drawText(finalStatus, { x: 50, y: cy, size: 9, font: fontBold, color: barColor });
         
         // Rodapé de Isenção Legal
         if (summary.disclaimer) {
-            cy -= 45;
+            cy -= 30;
             page.drawText(summary.disclaimer, { 
                 x: 40, y: cy, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6), 
                 maxWidth: width - 80, lineHeight: 7.5 
