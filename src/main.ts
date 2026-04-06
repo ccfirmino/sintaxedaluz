@@ -485,10 +485,12 @@ window.toggleVerticalView = function(mode: string) {
     }
 
     if (window.toggleHeatmap) window.toggleHeatmap(window.state.vertical.falseColor);
-    window.updateCalculations();
+    window.updateCalculations();
 };
-    const btnHP = document.getElementById('btn-grid-hp');
-    const btnLP = document.getElementById('btn-grid-lp');
+
+window.toggleGridMode = function(mode: string) {
+    const btnHP = document.getElementById('btn-grid-hp');
+    const btnLP = document.getElementById('btn-grid-lp');
     const btn3D = document.getElementById('btn-grid-3d');
     const lblIsolines = document.getElementById('lbl-toggle-isolines');
     const lblPolar = document.getElementById('lbl-toggle-polar');
