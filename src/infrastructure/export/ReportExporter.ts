@@ -429,11 +429,10 @@ export class ReportExporter {
         page.drawText(`LPD Médio Projetado: ${summary.currentLpd.toFixed(2)} W/m²`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 16;
         page.drawText(finalStatus, { x: 50, y: cy, size: 9, font: fontBold, color: barColor });
         
-        // Rodapé de Isenção Legal
+        // Rodapé de Isenção Legal (Fixo no final da página)
         if (summary.disclaimer) {
-            cy -= 30;
             page.drawText(summary.disclaimer, { 
-                x: 40, y: cy, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6), 
+                x: 40, y: 30, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6), 
                 maxWidth: width - 80, lineHeight: 7.5 
             });
         }
