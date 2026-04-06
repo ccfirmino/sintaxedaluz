@@ -1004,21 +1004,35 @@ window.handleGenerateReport = async (event: any) => {
 };
 
 window.generateLeedReport = async () => {
-    const PDFLib = (window as any).PDFLib;
-    if (!PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
+    try {
+        const PDFLib = (window as any).PDFLib;
+        if (!PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
 
-    const s = window.state.leedProject;
-    if (s.rooms.length === 0) return alert('Adicione ao menos um ambiente ao projeto.');
+        const s = window.state.leedProject;
+        if (s.rooms.length === 0) return alert('Adicione ao menos um ambiente ao projeto.');
 
-    const summary = window.StandardsEngine.calculateLeedCompliance(s);
-    const targetLabel = window.leedTargets[s.target].label;
+        const summary = window.StandardsEngine.calculateLeedCompliance(s);
+        
+        const targetLabels: any = {
+            baseline: 'ASHRAE Base (0%)',
+            certified: 'Certified (-5%)',
+            silver: 'Silver (-10%)',
+            gold: 'Gold (-20%)',
+            platinum: 'Platinum (-30%)'
+        };
+        const targetLabel = targetLabels[s.target] || 'ASHRAE Base (0%)';
 
-    const blob = await window.ReportExporter.createLeedPdf(PDFLib, s, summary, targetLabel);
+        const blob = await window.ReportExporter.createLeedPdf(PDFLib, s, summary, targetLabel);
 
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `LuxSintax_LEED_${s.name.replace(/\s+/g, '_')}.pdf`;
-    link.click();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const safeName = s.name ? s.name.replace(/\s+/g, '_') : 'Projeto';
+        link.download = `LuxSintax_LEED_${safeName}.pdf`;
+        link.click();
+    } catch (err: any) {
+        console.error("[LuxSintax] Erro no PDF LEED:", err);
+        alert("Erro ao gerar o relatório LEED: " + err.message);
+    }
 };
 
 window.initNbrSelector = function() {
@@ -1165,10 +1179,10 @@ window.addLeedRoom = function() {
         area: 50, 
         baseLpd: 0, 
         typology: "", 
-        expanded: true, // Controle do Acordeão
-        fixtures: [{ id: Date.now() + 1, label: "Luminária Genérica", power: 0, qty: 1 }] // Onboarding Zero Fricção
+        expanded: true,
+        fixtures: [{ id: Date.now() + 1, label: "Luminária Genérica", power: 0, qty: 1 }]
     };
-    window.state.leedProject.rooms.unshift(room); // Injeção no TOPO da lista
+    window.state.leedProject.rooms.unshift(room);
     window.renderLeedProject();
 };
 
@@ -1203,11 +1217,15 @@ window.updateLeedRoomData = function(roomId: number, field: string, value: any) 
     if (room) {
         if (field === 'name' || field === 'typology') room[field] = value;
         else room[field] = parseFloat(value) || 0;
+        
         if (field === 'typology') {
             const baseline = window.lpdBaselines.find((b: any) => b.type === value);
             if (baseline) room.baseLpd = baseline.base;
         }
-        window.renderLeedProject();
+        
+        // LUXSINTAX: Atualização Visual Silenciosa em Tempo Real
+        window.updateGlobalLeedSummary();
+        window.updateLeedRoomUI(roomId);
     }
 };
 
@@ -1215,7 +1233,7 @@ window.addLeedFixture = function(roomId: number) {
     const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (room) {
         room.fixtures.push({ id: Date.now(), label: "Luminária Nova", power: 15, qty: 1 });
-        window.renderLeedProject();
+        window.renderLeedProject(); // Mudança estrutural exige recriar o HTML
     }
 };
 
@@ -1233,8 +1251,51 @@ window.updateLeedFixtureData = function(roomId: number, fixtureId: number, field
         const fixture = room.fixtures.find((f: any) => f.id === fixtureId);
         if (fixture) {
             fixture[field] = field === 'label' ? value : parseFloat(value) || 0;
-            window.renderLeedProject();
+            
+            const subtotalEl = document.getElementById(`subtotal-${roomId}-${fixtureId}`);
+            if (subtotalEl) subtotalEl.innerText = `${(fixture.power * fixture.qty).toFixed(1)} W`;
+            
+            // LUXSINTAX: Atualização Visual Silenciosa em Tempo Real
+            window.updateGlobalLeedSummary();
+            window.updateLeedRoomUI(roomId);
         }
+    }
+};
+
+window.updateLeedRoomUI = function(roomId: number) {
+    const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
+    if (!room) return;
+    
+    const roomTotalWatts = room.fixtures.reduce((sum: number, f: any) => sum + (f.power * f.qty), 0);
+    const roomLpd = room.area > 0 ? roomTotalWatts / room.area : 0;
+    const isOverLimit = room.baseLpd > 0 && roomLpd > room.baseLpd;
+    
+    const wEl = document.getElementById(`room-w-${roomId}`);
+    const lpdEl = document.getElementById(`room-lpd-${roomId}`);
+    const cardEl = document.getElementById(`room-card-${roomId}`);
+    const nameEl = document.getElementById(`room-name-${roomId}`);
+    
+    if (wEl) wEl.innerText = roomTotalWatts.toFixed(1);
+    if (lpdEl) lpdEl.innerText = roomLpd.toFixed(2);
+    
+    if (cardEl) {
+        if (isOverLimit) {
+            cardEl.classList.add('border-red-500', 'dark:border-red-500', 'shadow-[0_0_15px_rgba(239,68,68,0.15)]');
+            cardEl.classList.remove('border-slate-200', 'dark:border-slate-700');
+        } else {
+            cardEl.classList.remove('border-red-500', 'dark:border-red-500', 'shadow-[0_0_15px_rgba(239,68,68,0.15)]');
+            cardEl.classList.add('border-slate-200', 'dark:border-slate-700');
+        }
+    }
+    
+    if (isOverLimit) {
+        wEl?.classList.add('text-red-500'); wEl?.classList.remove('text-starlight', 'dark:text-white');
+        lpdEl?.classList.add('text-red-500'); lpdEl?.classList.remove('text-starlight', 'dark:text-white');
+        nameEl?.classList.add('text-red-500', 'dark:text-red-500'); nameEl?.classList.remove('text-starlight', 'dark:text-white');
+    } else {
+        wEl?.classList.remove('text-red-500'); wEl?.classList.add('text-starlight', 'dark:text-white');
+        lpdEl?.classList.remove('text-red-500'); lpdEl?.classList.add('text-starlight', 'dark:text-white');
+        nameEl?.classList.remove('text-red-500', 'dark:text-red-500'); nameEl?.classList.add('text-starlight', 'dark:text-white');
     }
 };
 
@@ -1264,7 +1325,7 @@ window.renderLeedProject = function() {
         <div class="bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg">
             <div class="flex-grow w-full lg:w-auto">
                 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
-                <input type="text" value="${s.name}" onblur="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-700 text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1">
+                <input type="text" value="${s.name}" oninput="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-700 text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1">
             </div>
             
             <div class="w-full lg:w-auto flex items-center gap-2">
@@ -1299,23 +1360,38 @@ window.renderLeedProject = function() {
         const roomLpd = room.area > 0 ? roomTotalWatts / room.area : 0;
         const isOverLimit = room.baseLpd > 0 && roomLpd > room.baseLpd;
         const borderClass = isOverLimit ? 'border-red-500 dark:border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-slate-200 dark:border-slate-700';
-        const titleColor = isOverLimit ? 'text-red-500' : 'text-starlight dark:text-white';
+        const titleColor = isOverLimit ? 'text-red-500 dark:text-red-500' : 'text-starlight dark:text-white';
         const expanded = room.expanded !== false;
         
         let roomHtml = `
-            <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border ${borderClass} animate-fade-in-up mb-6 transition-all">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
-                    <div class="flex items-center gap-3 flex-grow w-full md:w-1/3">
+            <div id="room-card-${room.id}" class="bg-slate-50 dark:bg-slate-800/30 p-4 lg:p-6 rounded-2xl border ${borderClass} animate-fade-in-up mb-6 transition-all">
+                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 w-full">
+                    
+                    <div class="flex flex-wrap items-center gap-3 flex-grow w-full xl:w-auto">
                         <button onclick="window.toggleLeedRoom(${room.id})" class="text-slate-400 hover:text-luminous-gold w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors" title="Expandir/Recolher">
                             <i class="fas ${expanded ? 'fa-minus' : 'fa-plus'} text-[10px]"></i>
                         </button>
-                        <input type="text" value="${room.name}" onblur="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-sm font-black ${titleColor} bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold transition-colors w-full pb-1 uppercase outline-none">
+                        <input type="text" id="room-name-${room.id}" value="${room.name}" oninput="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-sm font-black ${titleColor} bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold transition-colors w-auto min-w-[150px] pb-1 uppercase outline-none">
+                        
+                        <div class="flex items-center gap-2 bg-white dark:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm ml-0 xl:ml-2">
+                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest hidden md:block">Área (m²):</label>
+                            <input type="number" value="${room.area}" oninput="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="w-16 text-right bg-transparent text-[11px] font-black text-starlight dark:text-white outline-none focus:text-luminous-gold">
+                        </div>
+                        
+                        <div class="flex items-center gap-2 bg-white dark:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm">
+                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest hidden md:block">Tipologia:</label>
+                            <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[140px] md:w-[200px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold">
+                                <option value="" disabled ${!room.typology ? 'selected' : ''}>Selecione...</option>
+                                ${window.lpdBaselines.map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
+                            </select>
+                        </div>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                        <div class="flex items-center gap-3 bg-white dark:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600">
-                            <div class="text-[10px] font-bold"><span class="text-slate-400">W:</span> <span class="${titleColor} font-black">${roomTotalWatts.toFixed(1)}</span></div>
+                    
+                    <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto justify-end">
+                        <div class="flex items-center gap-3 bg-white dark:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm">
+                            <div class="text-[10px] font-bold"><span class="text-slate-400">W:</span> <span id="room-w-${room.id}" class="${titleColor} font-black">${roomTotalWatts.toFixed(1)}</span></div>
                             <div class="w-px h-3 bg-slate-300 dark:bg-slate-600"></div>
-                            <div class="text-[10px] font-bold"><span class="text-slate-400">LPD:</span> <span class="${titleColor} font-black">${roomLpd.toFixed(2)}</span></div>
+                            <div class="text-[10px] font-bold"><span class="text-slate-400">LPD:</span> <span id="room-lpd-${room.id}" class="${titleColor} font-black">${roomLpd.toFixed(2)}</span></div>
                         </div>
                         <button onclick="window.duplicateLeedRoom(${room.id})" class="text-[9px] font-black text-tech-cyan hover:text-cyan-700 uppercase tracking-widest transition-colors bg-cyan-50 dark:bg-cyan-900/30 px-3 py-2 rounded-lg border border-cyan-200 dark:border-cyan-800"><i class="fas fa-copy mr-1"></i> DUPLICAR</button>
                         <button onclick="window.removeLeedRoom(${room.id})" class="text-slate-400 hover:text-red-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"><i class="fas fa-trash"></i></button>
@@ -1326,20 +1402,6 @@ window.renderLeedProject = function() {
         if (expanded) {
             roomHtml += `
                 <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-                    <div class="flex flex-wrap items-center gap-4 mb-6">
-                        <div class="flex items-center gap-2">
-                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tipologia ASHRAE:</label>
-                            <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select max-w-[220px] truncate text-xs bg-white dark:bg-slate-700 rounded px-2 py-1.5 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600 outline-none cursor-pointer focus:border-luminous-gold">
-                                <option value="" disabled ${!room.typology ? 'selected' : ''}>Selecione...</option>
-                                ${window.lpdBaselines.map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Área (m²):</label>
-                            <input type="number" value="${room.area}" onblur="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="w-24 text-right bg-white dark:bg-slate-700 rounded px-2 py-1.5 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600 outline-none focus:border-luminous-gold">
-                        </div>
-                    </div>
-                    
                     <table class="w-full text-xs mb-4">
                         <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700 text-[9px] tracking-widest">
                             <tr><th class="text-left pb-2">Luminária</th><th class="text-center pb-2">Watts (W)</th><th class="text-center pb-2">Qtd</th><th class="text-right pb-2">Subtotal</th><th class="pb-2"></th></tr>
@@ -1347,17 +1409,16 @@ window.renderLeedProject = function() {
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                             ${room.fixtures.map((f: any) => `
                                 <tr class="group/fix hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors">
-                                    <td class="py-2 px-1"><input type="text" value="${f.label}" onblur="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold w-full text-slate-600 dark:text-slate-300 outline-none focus:text-luminous-gold border-b border-transparent focus:border-luminous-gold transition-colors"></td>
-                                    <td class="py-2 text-center"><input type="number" value="${f.power}" onblur="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 outline-none focus:border-luminous-gold transition-colors"></td>
-                                    <td class="py-2 text-center"><input type="number" value="${f.qty}" onblur="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 outline-none focus:border-luminous-gold transition-colors"></td>
-                                    <td class="py-2 text-right font-black text-starlight dark:text-white px-1">${(f.power * f.qty).toFixed(1)} W</td>
+                                    <td class="py-2 px-1"><input type="text" value="${f.label}" oninput="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold w-full text-slate-600 dark:text-slate-300 outline-none focus:text-luminous-gold border-b border-transparent focus:border-luminous-gold transition-colors"></td>
+                                    <td class="py-2 text-center"><input type="number" value="${f.power}" oninput="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 outline-none focus:border-luminous-gold transition-colors"></td>
+                                    <td class="py-2 text-center"><input type="number" value="${f.qty}" oninput="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 outline-none focus:border-luminous-gold transition-colors"></td>
+                                    <td class="py-2 text-right font-black text-starlight dark:text-white px-1" id="subtotal-${room.id}-${f.id}">${(f.power * f.qty).toFixed(1)} W</td>
                                     <td class="py-2 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-400 opacity-0 group-hover/fix:opacity-100 transition-all px-2"><i class="fas fa-times"></i></button></td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
-                    
-                    <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest transition-colors inline-flex items-center gap-1 mt-2 py-1 px-2 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded"><i class="fas fa-plus-circle"></i> Adicionar Luminária</button>
+                    <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest transition-colors inline-flex items-center gap-1 py-1 px-2 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded"><i class="fas fa-plus-circle"></i> Adicionar Luminária</button>
                 </div>
             `;
         }
