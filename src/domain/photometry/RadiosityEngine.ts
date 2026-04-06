@@ -104,7 +104,8 @@ export class RadiosityEngine {
         const totalRoomFlux = actualFixtureFlux * params.fixtures.length;
         const roomArea = params.roomW * params.roomL;
         const baseRoomE = totalRoomFlux / roomArea;
-        const indirectLuxEstimate = baseRoomE * (params.reflectance !== undefined ? params.reflectance : 0.08);
+        // Se a refletância for 0 (Paredes Escuras), a luz indireta será 0 (Cálculo Direto Puro).
+        const indirectLuxEstimate = baseRoomE * (params.reflectance !== undefined ? params.reflectance : 0.05);
         
         let minLux_LP = Infinity; let sumLux_LP = 0;
         let minLux_HP = Infinity; let sumLux_HP = 0;

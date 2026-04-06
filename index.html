@@ -480,10 +480,10 @@
                             <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">A cor das paredes e do teto afeta diretamente a luz que reflete para o chão. Paredes claras criam uma "caixa de luz" (espirrando até 15% mais iluminação), enquanto paredes escuras absorvem os fótons, mantendo o ambiente dramático.</p>
                         </div>
                     </label>
-                    <select id="g-reflectance" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
-                        <option value="0.15">Paredes Claras (Branco/Gelo)</option>
-                        <option value="0.08" selected>Paredes Médias (Cinza/Madeira)</option>
-                        <option value="0.02">Paredes Escuras (Preto/Tijolo)</option>
+                    <select id="g-reflectance" onchange="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
+                        <option value="0.10">Paredes Claras (Branco/Gelo)</option>
+                        <option value="0.05" selected>Paredes Médias (Cinza/Madeira)</option>
+                        <option value="0.00">Paredes Escuras (Preto/Tijolo)</option>
                     </select>
                 </div>
                 
@@ -509,7 +509,7 @@
                             <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium" data-i18n="card_fm_desc">Margem de segurança exigida por norma. Compensa a perda de luz ao longo dos anos causada pela degradação do chip LED (ex: L70/L80) e acúmulo de sujeira nas lentes e superfícies do ambiente.</p>
                         </div>
                     </label>
-                    <select id="g-maintFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
+                    <select id="g-maintFactor" onchange="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
                         <option value="0.80" selected data-i18n="opt_maint_80">Limpo / Novo (0.80)</option>
                         <option value="0.70" data-i18n="opt_maint_70">Normal / Escritório (0.70)</option>
                         <option value="0.60" data-i18n="opt_maint_60">Sujo / Industrial (0.60)</option>
