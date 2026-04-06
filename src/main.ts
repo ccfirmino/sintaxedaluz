@@ -992,7 +992,10 @@ window.handleGenerateReport = async (event: any) => {
         polar: s.iesData ? window.ReportExporter.getPolarPNG(s.iesData, fNominal, fFinal) : null
     };
 
-    const blob = await window.ReportExporter.createGridPdf(PDFLib, reportData, images);
+    // LUXSINTAX: Busca a Logo customizada salva localmente para o PDF do Método Lúmens
+    const userLogoBase64 = localStorage.getItem('luxsintax_user_logo') || null;
+
+    const blob = await window.ReportExporter.createGridPdf(PDFLib, reportData, images, userLogoBase64);
 
     const link = document.createElement('a');
     const safeProjectName = s.projectName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');

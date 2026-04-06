@@ -154,7 +154,7 @@ export class ReportExporter {
     /**
      * Monta o PDF do Estudo de Malha (Método dos Lúmens)
      */
-    public static async createGridPdf(PDFLib: any, data: any, images: any): Promise<Blob> {
+    public static async createGridPdf(PDFLib: any, data: any, images: any, userLogoBase64?: string | null): Promise<Blob> {
         const pdfDoc = await PDFLib.PDFDocument.create();
         const page = pdfDoc.addPage([595.28, 841.89]);
         const { width, height } = page.getSize();
@@ -162,16 +162,31 @@ export class ReportExporter {
         const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
         const fontRegular = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
-        page.drawRectangle({ x: 0, y: height - 45, width, height: 45, color: PDFLib.rgb(0.06, 0.09, 0.16) });
-        page.drawText('LUXSINTAX', { x: 40, y: height - 28, size: 14, color: PDFLib.rgb(1, 0.65, 0), font: fontBold });
-        page.drawText('| ESTUDO DE VIABILIDADE TÉCNICA v.2026', { x: 125, y: height - 28, size: 10, color: PDFLib.rgb(1, 1, 1), font: fontRegular });
+        // Estética Sofisticada Unificada (Header White-Label)
+        const drawHeader = async (currentPage: any) => {
+            currentPage.drawRectangle({ x: 0, y: height - 55, width, height: 55, color: PDFLib.rgb(0.06, 0.09, 0.16) });
+            currentPage.drawRectangle({ x: 0, y: height - 57, width, height: 2, color: PDFLib.rgb(0.85, 0.46, 0.02) });
+            
+            currentPage.drawText('LUXSINTAX', { x: 40, y: height - 32, size: 14, font: fontBold, color: PDFLib.rgb(0.85, 0.46, 0.02) });
+            currentPage.drawText('ESTUDO DE VIABILIDADE TÉCNICA E ILUMINÂNCIA', { x: 130, y: height - 32, size: 9, font: fontRegular, color: PDFLib.rgb(1, 1, 1) });
+            
+            if (userLogoBase64) {
+                try {
+                    const logoImg = await pdfDoc.embedPng(userLogoBase64); 
+                    const logoDims = logoImg.scaleToFit(100, 35);
+                    currentPage.drawImage(logoImg, { x: width - logoDims.width - 40, y: height - 10 - logoDims.height, width: logoDims.width, height: logoDims.height });
+                } catch(e) { console.warn("Erro ao renderizar logo", e); }
+            }
+        };
 
-        page.drawText(`PROJETO: ${data.projectName.toUpperCase()}`, { x: 40, y: height - 65, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-        page.drawText(`AMBIENTE: ${data.roomName.toUpperCase()}`, { x: 40, y: height - 78, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
-        page.drawText(`RESPONSÁVEL: ${data.authorName.toUpperCase()}`, { x: width - 260, y: height - 65, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-        page.drawText(`DATA: ${new Date().toLocaleDateString('pt-BR')}`, { x: width - 260, y: height - 78, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        await drawHeader(page);
 
-        let cy = height - 105; 
+        page.drawText(`PROJETO: ${data.projectName.toUpperCase()}`, { x: 40, y: height - 75, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+        page.drawText(`AMBIENTE: ${data.roomName.toUpperCase()}`, { x: 40, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+        page.drawText(`RESPONSÁVEL: ${data.authorName.toUpperCase()}`, { x: width - 260, y: height - 75, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(`DATA: ${new Date().toLocaleDateString('pt-BR')}`, { x: width - 260, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+
+        let cy = height - 115; 
 
         const drawSection = (title: string, y: number) => {
             page.drawRectangle({ x: 40, y: y - 4, width: width - 80, height: 16, color: PDFLib.rgb(0.95, 0.96, 0.98) });
