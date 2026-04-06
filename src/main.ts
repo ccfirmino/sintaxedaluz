@@ -421,6 +421,8 @@ window.setSurfaceMode = function(mode: string) {
     const btnS = document.getElementById('btn-surf-single');
     const btnA = document.getElementById('btn-surf-array');
     const btn3D = document.getElementById('btn-surf-3d');
+    const lblIsolines = document.getElementById('lbl-toggle-isolines');
+    const lblPolar = document.getElementById('lbl-toggle-polar');
     const act = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white shadow-sm";
     const inact = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
 
@@ -429,12 +431,16 @@ window.setSurfaceMode = function(mode: string) {
         if(btnS) btnS.className = inact;
         if(btnA) btnA.className = inact;
         if(btn3D) btn3D.className = act;
+        if(lblIsolines) lblIsolines.classList.add('hidden');
+        if(lblPolar) lblPolar.classList.remove('hidden');
     } else {
         window.toggleRenderMode('2D');
         window.state.ponto.viewMode = mode;
         if(btnS) btnS.className = mode === 'single' ? act : inact;
         if(btnA) btnA.className = mode === 'array' ? act : inact;
         if(btn3D) btn3D.className = inact;
+        if(lblIsolines) lblIsolines.classList.remove('hidden');
+        if(lblPolar) lblPolar.classList.add('hidden');
     }
     
     const isArray = (mode === 'array') || (mode === '3D');

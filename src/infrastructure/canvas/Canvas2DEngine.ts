@@ -444,7 +444,10 @@ export class Canvas2DEngine {
 
             origins.forEach((xPos, idx) => {
                 let currentTilt = Number(s.tilt) || 0;
-                if (origins.length === 2 && tiltModeGen === 'cross' && idx === 1) currentTilt = -currentTilt;
+                if (origins.length === 2) {
+                    if (tiltModeGen === 'cross' && idx === 1) currentTilt = -currentTilt;
+                    else if (tiltModeGen === 'diverge') currentTilt = idx === 0 ? -currentTilt : currentTilt;
+                }
                 const tr = currentTilt * Math.PI / 180;
                 
                 // LUXSINTAX: Cálculo Físico via Domínio (Lei do Cosseno Cúbico e Integração IES)
@@ -581,7 +584,10 @@ export class Canvas2DEngine {
             if (win.calcMode !== 'ies' || s.iesData) {
                 origins.forEach((xPos, idx) => {
                     let currentTilt = Number(s.tilt) || 0;
-                    if (origins.length === 2 && tiltMode === 'cross' && idx === 1) currentTilt = -currentTilt;
+                    if (origins.length === 2) {
+                        if (tiltMode === 'cross' && idx === 1) currentTilt = -currentTilt;
+                        else if (tiltMode === 'diverge') currentTilt = idx === 0 ? -currentTilt : currentTilt;
+                    }
                     const currentTr = currentTilt * Math.PI / 180;
 
                     if (currentBeamObj.isOval) {
@@ -884,7 +890,10 @@ export class Canvas2DEngine {
                 ctx.save();
                 
                 let currentTilt = Number(s.tilt) || 0;
-                if (origins.length === 2 && tiltMode2 === 'cross' && idx === 1) currentTilt = -currentTilt;
+                if (origins.length === 2) {
+                    if (tiltMode2 === 'cross' && idx === 1) currentTilt = -currentTilt;
+                    else if (tiltMode2 === 'diverge') currentTilt = idx === 0 ? -currentTilt : currentTilt;
+                }
 
                 ctx.beginPath();
                 ctx.rect(0, 0, cw, floorY);

@@ -353,8 +353,11 @@ export class Photometric3DEngine {
                 if (toolId === 'ponto' && state.viewMode === 'array') {
                     const tiltMode3D = document.querySelector<HTMLInputElement>('input[name="p_tilt_mode"]:checked')?.value || 'same';
                     const hS = (state.spacing || 2) / 2;
-                    fixtures.push({ x: -hS, y: h, z: 0, tilt: baseTiltRad, spin: ((state.spin || 0) + 90) * Math.PI / 180 });
-                    fixtures.push({ x: hS, y: h, z: 0, tilt: tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad, spin: ((state.spin || 0) + 90) * Math.PI / 180 });
+                    let tiltL = baseTiltRad, tiltR = baseTiltRad;
+                    if (tiltMode3D === 'cross') { tiltL = baseTiltRad; tiltR = -baseTiltRad; }
+                    else if (tiltMode3D === 'diverge') { tiltL = -baseTiltRad; tiltR = baseTiltRad; }
+                    fixtures.push({ x: -hS, y: h, z: 0, tilt: tiltL, spin: ((state.spin || 0) + 90) * Math.PI / 180 });
+                    fixtures.push({ x: hS, y: h, z: 0, tilt: tiltR, spin: ((state.spin || 0) + 90) * Math.PI / 180 });
                 } else if (toolId === 'vertical') {
                     const qty = state.qty || 1, spacing = state.spacing || 1.0;
                     const startZ = -((qty - 1) * spacing) / 2;
@@ -461,7 +464,11 @@ export class Photometric3DEngine {
             } else {
                 if (state.viewMode === 'array') {
                     const tiltMode3D = document.querySelector<HTMLInputElement>('input[name="p_tilt_mode"]:checked')?.value || 'same';
-                    drawSource(-(state.spacing||2)/2, 0, baseTiltRad); drawSource((state.spacing||2)/2, 0, tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad);
+                    let tiltL = baseTiltRad, tiltR = baseTiltRad;
+                    if (tiltMode3D === 'cross') { tiltL = baseTiltRad; tiltR = -baseTiltRad; }
+                    else if (tiltMode3D === 'diverge') { tiltL = -baseTiltRad; tiltR = baseTiltRad; }
+                    drawSource(-(state.spacing||2)/2, 0, tiltL); 
+                    drawSource((state.spacing||2)/2, 0, tiltR);
                 } else drawSource(0, 0, baseTiltRad);
                 const axesHelper = new THREE.AxesHelper(2); axesHelper.position.set(0, h, 0); this.solidGroup.add(axesHelper);
                 if (this._lastToolRendered !== toolId) {
