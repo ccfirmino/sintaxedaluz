@@ -293,15 +293,11 @@
                 <div class="flex bg-slate-800 p-1 rounded-lg gap-1">
                     <label class="flex-1 text-center cursor-pointer">
                         <input type="radio" name="p_tilt_mode" value="same" class="peer hidden" checked onchange="window.updateCalculations()">
-                        <div class="py-2 text-[9px] font-black uppercase text-slate-400 peer-checked:bg-slate-700 peer-checked:text-luminous-gold rounded transition-all" title="Paralelos">[ // ]</div>
+                        <div class="px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold peer-checked:bg-luminous-gold peer-checked:text-white peer-checked:shadow-sm transition-all">Mesmo Lado</div>
                     </label>
                     <label class="flex-1 text-center cursor-pointer">
                         <input type="radio" name="p_tilt_mode" value="cross" class="peer hidden" onchange="window.updateCalculations()">
-                        <div class="py-2 text-[9px] font-black uppercase text-slate-400 peer-checked:bg-slate-700 peer-checked:text-luminous-gold rounded transition-all" title="Cruzar / Convergir">[ /\ ]</div>
-                    </label>
-                    <label class="flex-1 text-center cursor-pointer">
-                        <input type="radio" name="p_tilt_mode" value="diverge" class="peer hidden" onchange="window.updateCalculations()">
-                        <div class="py-2 text-[9px] font-black uppercase text-slate-400 peer-checked:bg-slate-700 peer-checked:text-luminous-gold rounded transition-all" title="Afastar / Divergir">[ \/ ]</div>
+                        <div class="px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold peer-checked:bg-luminous-gold peer-checked:text-white peer-checked:shadow-sm transition-all">Invertido</div>
                     </label>
                 </div>
             </div>
