@@ -463,30 +463,27 @@
             
             <div class="flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                 <div class="group relative z-50">
-                    <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 flex items-center w-max cursor-help" data-i18n="lbl_util_factor">
-                        <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Fator Utilização (U)</span>
+                    <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 flex items-center w-max cursor-help">
+                        <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Cor do Ambiente (Rebatimento)</span>
                         
                         <div class="absolute bottom-full left-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4">
                             <div class="w-full h-24 mb-3 relative bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center">
                                 <svg viewBox="0 0 100 60" class="w-full h-full">
                                     <rect x="15" y="5" width="70" height="50" fill="none" stroke="#64748b" stroke-width="1.5"/>
-                                    <rect x="45" y="5" width="10" height="3" fill="#fbbf24"/>
-                                    <polygon points="45,8 55,8 65,25 35,25" fill="rgba(251, 191, 36, 0.1)" />
-                                    <line x1="50" y1="8" x2="50" y2="55" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="2,2"/>
-                                    <path d="M50,8 L20,30 L40,55" fill="none" stroke="#0ea5e9" stroke-width="1.2" stroke-dasharray="1,1"/>
-                                    <path d="M50,8 L80,30 L60,55" fill="none" stroke="#0ea5e9" stroke-width="1.2" stroke-dasharray="1,1"/>
-                                    <circle cx="20" cy="30" r="1.5" fill="#0ea5e9"/>
-                                    <circle cx="80" cy="30" r="1.5" fill="#0ea5e9"/>
+                                    <path d="M50,8 L20,30 L40,55" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="2,1"/>
+                                    <path d="M50,8 L80,30 L60,55" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="2,1"/>
+                                    <circle cx="20" cy="30" r="2" fill="#fbbf24"/>
+                                    <circle cx="80" cy="30" r="2" fill="#fbbf24"/>
                                 </svg>
                             </div>
-                            <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Coeficiente de Utilização (U)</h4>
-                            <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium" data-i18n="card_u_desc">Representa a porcentagem de lúmens que efetivamente chega ao plano de trabalho. Depende das cores do ambiente (índices de refletância do teto, parede e piso) e da proporção da sala (Índice do Recinto).</p>
+                            <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Iluminação Global (GI)</h4>
+                            <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">A cor das paredes e do teto afeta diretamente a luz que reflete para o chão. Paredes claras criam uma "caixa de luz" (espirrando até 15% mais iluminação), enquanto paredes escuras absorvem os fótons, mantendo o ambiente dramático.</p>
                         </div>
                     </label>
-                    <select id="g-utilFactor" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
-                        <option value="0.70" data-i18n="opt_util_70">Cores Claras / Aberto (0.70)</option>
-                        <option value="0.60" selected data-i18n="opt_util_60">Padrão / Médio (0.60)</option>
-                        <option value="0.40" data-i18n="opt_util_40">Cores Escuras / Fechado (0.40)</option>
+                    <select id="g-reflectance" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
+                        <option value="0.15">Paredes Claras (Branco/Gelo)</option>
+                        <option value="0.08" selected>Paredes Médias (Cinza/Madeira)</option>
+                        <option value="0.02">Paredes Escuras (Preto/Tijolo)</option>
                     </select>
                 </div>
                 
@@ -652,7 +649,7 @@
                                             
                                             <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto backdrop-blur-md shadow-xl">
                                                 <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-1 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
-                                                <div class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-3 text-center bg-slate-100 dark:bg-slate-800 rounded py-0.5">Cálculo Direto + FM</div>
+                                                <div class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-3 text-center bg-slate-100 dark:bg-slate-800 rounded py-0.5">Direta + Rebatimento (GI)</div>
                                                 <div class="space-y-2">
                                                     <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
                                                     <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (LP):</span><span id="hud-em-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
@@ -730,7 +727,7 @@
                                         <span id="result-lux" class="text-4xl font-black text-starlight dark:text-white">0</span>
                                         <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">LUX</span>
                                     </div>
-                                    <div class="absolute top-6 right-6 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[8px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-700" title="Apenas luz direta depreciada pelo Fator de Manutenção">DIRETA + FM</div>
+                                    <div class="absolute top-6 right-6 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[8px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-700" title="Luz Direta + Estimativa de Rebatimento das Paredes">ILUMINAÇÃO GLOBAL</div>
                                 </div>
                                 <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
                                     <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Ofuscamento (UGR)</p>

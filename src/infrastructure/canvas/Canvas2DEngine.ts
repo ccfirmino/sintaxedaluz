@@ -276,7 +276,8 @@ export class Canvas2DEngine {
                 flux: s.flux,
                 beam: s.beam,
                 maintFactor: s.maintFactor,
-                utilFactor: s.utilFactor,
+                utilFactor: 0.60,
+                reflectance: s.reflectance !== undefined ? s.reflectance : 0.08,
                 viewLevel: s.viewLevel,
                 cellSizeM: 0.5
             });

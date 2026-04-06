@@ -1455,8 +1455,12 @@ window.updateCalculations = function() {
                 });
 
                 if (tool === 'grid') {
-                    const utilSelect = document.getElementById('g-utilFactor') as HTMLSelectElement;
-                    if (utilSelect) s.utilFactor = parseFloat(utilSelect.value);
+                    // Fator U travado nos bastidores para manter o Motor Lúmens automático inteligente
+                    s.utilFactor = 0.60; 
+                    
+                    // Nova leitura de Cor do Ambiente (Refletância/Bounce)
+                    const refSelect = document.getElementById('g-reflectance') as HTMLSelectElement;
+                    if (refSelect) s.reflectance = parseFloat(refSelect.value);
                     
                     const maintSelect = document.getElementById('g-maintFactor') as HTMLSelectElement;
                     if (maintSelect) s.maintFactor = parseFloat(maintSelect.value);
