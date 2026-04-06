@@ -1805,6 +1805,7 @@ window.handleLogoUpload = function(input: HTMLInputElement) {
 window.updateProfileLogoUI = function() {
     const preview = document.getElementById('profile-logo-preview') as HTMLImageElement;
     const placeholder = document.getElementById('profile-logo-placeholder');
+    const removeBtn = document.getElementById('btn-remove-logo');
     const base64 = localStorage.getItem('luxsintax_user_logo');
     
     if (preview && placeholder) {
@@ -1812,12 +1813,21 @@ window.updateProfileLogoUI = function() {
             preview.src = base64;
             preview.classList.remove('hidden');
             placeholder.classList.add('hidden');
+            if (removeBtn) removeBtn.classList.remove('hidden');
         } else {
             preview.src = '';
             preview.classList.add('hidden');
             placeholder.classList.remove('hidden');
+            if (removeBtn) removeBtn.classList.add('hidden');
         }
     }
+};
+
+window.removeProfileLogo = function() {
+    // Apaga a logo da memória local
+    localStorage.removeItem('luxsintax_user_logo');
+    // Atualiza a interface instantaneamente
+    window.updateProfileLogoUI();
 };
 
 // Garante que a imagem apareça preenchida se o usuário recarregar a página
