@@ -1023,10 +1023,13 @@ window.generateLeedReport = async () => {
             };
             const targetLabel = targetLabels[s.target] || 'ASHRAE Base (0%)';
 
-            // LUXSINTAX: Fase 4 - Blindagem Legal (Disclaimer PDF)
-            summary.disclaimer = "Nota Técnica: Os cálculos apresentados possuem caráter preliminar (Concept Design). Este relatório não substitui o projeto executivo luminotécnico assinado por um profissional habilitado (ART/RRT) e não deve ser utilizado como base única para submissão a órgãos oficiais sem validação em softwares de cálculo de inter-reflexão global.";
+            // LUXSINTAX: Blindagem Legal e Injeção de Logo (White-Label)
+            summary.disclaimer = "Nota Técnica de Isenção de Responsabilidade: Os cálculos e métricas apresentados neste relatório baseiam-se em modelos matemáticos ideais e possuem caráter exclusivamente preliminar (Concept Design). Este documento destina-se ao estudo de viabilidade, orçamentação e pré-certificação (LEED/ASHRAE). Ele não substitui o projeto executivo luminotécnico assinado por um profissional legalmente habilitado (ART/RRT). A conformidade final e a segurança da instalação devem ser validadas in loco e submetidas a softwares de cálculo de inter-reflexão global para aprovação em órgãos oficiais.";
 
-            const blob = await window.ReportExporter.createLeedPdf(PDFLib, s, summary, targetLabel);
+            // Preparação Arquitetural: No futuro buscaremos do AuthManager.getTenantContext().logo
+            const userLogoBase64 = null; 
+
+            const blob = await window.ReportExporter.createLeedPdf(PDFLib, s, summary, targetLabel, userLogoBase64);
 
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);

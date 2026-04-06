@@ -296,59 +296,131 @@ export class ReportExporter {
     /**
      * Monta o PDF do Relatório LEED (ASHRAE 90.1)
      */
-    public static async createLeedPdf(PDFLib: any, project: any, summary: any, targetLabel: string): Promise<Blob> {
+    public static async createLeedPdf(PDFLib: any, project: any, summary: any, targetLabel: string, userLogoBase64?: string | null): Promise<Blob> {
         const pdfDoc = await PDFLib.PDFDocument.create();
+        const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+        const fontRegular = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+        
         let page = pdfDoc.addPage([595.28, 841.89]);
         const { width, height } = page.getSize();
 
-        page.drawRectangle({ x: 0, y: height - 80, width, height: 80, color: PDFLib.rgb(0.06, 0.09, 0.16) });
-        page.drawText('LUXSINTAX', { x: 50, y: height - 45, size: 24, color: PDFLib.rgb(0.3, 0.48, 0.06) });
-        page.drawText('RELATÓRIO DE COMPLIANCE DE CARGA (ASHRAE 90.1)', { x: 50, y: height - 65, size: 8, color: PDFLib.rgb(1, 1, 1) });
+        // Estética Sofisticada: Cabeçalho reduzido com linha dourada e White-Labeling
+        const drawHeader = async (currentPage: any) => {
+            currentPage.drawRectangle({ x: 0, y: height - 55, width, height: 55, color: PDFLib.rgb(0.06, 0.09, 0.16) });
+            currentPage.drawRectangle({ x: 0, y: height - 57, width, height: 2, color: PDFLib.rgb(0.85, 0.46, 0.02) });
+            
+            currentPage.drawText('LUXSINTAX', { x: 40, y: height - 32, size: 14, font: fontBold, color: PDFLib.rgb(0.85, 0.46, 0.02) });
+            currentPage.drawText('RELATÓRIO DE COMPLIANCE LEED / ASHRAE 90.1', { x: 130, y: height - 32, size: 9, font: fontRegular, color: PDFLib.rgb(1, 1, 1) });
+            
+            if (userLogoBase64) {
+                try {
+                    const logoImg = await pdfDoc.embedPng(userLogoBase64); 
+                    const logoDims = logoImg.scaleToFit(100, 35);
+                    currentPage.drawImage(logoImg, { x: width - logoDims.width - 40, y: height - 10 - logoDims.height, width: logoDims.width, height: logoDims.height });
+                } catch(e) { console.warn("Erro ao renderizar logo", e); }
+            }
+        };
 
-        let cy = height - 120;
+        await drawHeader(page);
+
+        let cy = height - 90;
         
-        page.drawText(`PROJETO: ${project.name.toUpperCase()}`, { x: 50, y: cy, size: 14, color: PDFLib.rgb(0, 0, 0) });
-        cy -= 20;
-        page.drawText(`META APLICADA: ${targetLabel.toUpperCase()}`, { x: 50, y: cy, size: 10, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(`PROJETO: ${project.name.toUpperCase()}`, { x: 40, y: cy, size: 12, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+        cy -= 18;
+        page.drawText(`META APLICADA: ${targetLabel.toUpperCase()}`, { x: 40, y: cy, size: 9, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
         cy -= 40;
 
-        project.rooms.forEach((r: any, idx: number) => {
-            if (cy < 100) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
+        // Data Visualization: Gráfico de Barras Comparativo
+        page.drawText('BALANÇO ENERGÉTICO GLOBAL', { x: 40, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        cy -= 25;
+
+        const maxBarWidth = 350;
+        const maxWatts = Math.max(summary.allowedWatts, summary.totalWatts) * 1.2 || 1; 
+        
+        const allowedWidth = (summary.allowedWatts / maxWatts) * maxBarWidth;
+        page.drawText('LIMITE ASHRAE:', { x: 40, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawRectangle({ x: 120, y: cy - 2, width: allowedWidth, height: 10, color: PDFLib.rgb(0.8, 0.8, 0.8) });
+        page.drawText(`${summary.allowedWatts.toFixed(1)} W`, { x: 125 + allowedWidth, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        cy -= 20;
+
+        const projectWidth = (summary.totalWatts / maxWatts) * maxBarWidth;
+        const barColor = summary.isCompliant ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
+        page.drawText('CARGA PROJETO:', { x: 40, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawRectangle({ x: 120, y: cy - 2, width: projectWidth, height: 10, color: barColor });
+        page.drawText(`${summary.totalWatts.toFixed(1)} W`, { x: 125 + projectWidth, y: cy, size: 8, font: fontBold, color: barColor });
+        cy -= 40;
+
+        // Seção Impacto ESG
+        page.drawText('IMPACTO ESG E SUSTENTABILIDADE (ESTIMATIVA ANUAL)', { x: 40, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        cy -= 20;
+        if (summary.esg && summary.esg.savingsKwh > 0) {
+            page.drawText(`Eficiência Operacional: Economia de ${summary.esg.savingsKwh.toFixed(0)} kWh/ano em relação à linha de base.`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 15;
+            page.drawText(`Pegada de Carbono: Redução estimada de ${summary.esg.co2ReductionKg.toFixed(0)} kg CO₂ emitidos na atmosfera.`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 15;
+            page.drawText(`Equivalência Ambiental: Benefício correspondente a absorção de ${Math.round(summary.esg.treesEquivalent)} árvore(s) adulta(s).`, { x: 40, y: cy, size: 9, font: fontBold, color: PDFLib.rgb(0.3, 0.48, 0.06) }); cy -= 30;
+        } else {
+            page.drawText('O projeto atual não apresenta redução de carga energética frente ao limite normativo.', { x: 40, y: cy, size: 9, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 30;
+        }
+
+        page.drawText('MEMORIAL DE CÁLCULO POR AMBIENTE', { x: 40, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        cy -= 20;
+
+        for (let i = 0; i < project.rooms.length; i++) {
+            const r = project.rooms[i];
+            if (cy < 120) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 100; }
 
             let roomWatts = r.fixtures.reduce((acc: number, f: any) => acc + (f.power * f.qty), 0);
-            let roomAllowed = r.area * (r.baseLpd || 0) * (summary.allowedWatts / (summary.totalArea * (r.baseLpd || 1))); // Aproximação do fator
             
-            page.drawText(`${idx + 1}. ${r.name.toUpperCase()} (${r.area} m²) - Tipo: ${r.baseLpd} W/m²`, { x: 50, y: cy, size: 11, color: PDFLib.rgb(0.3, 0.48, 0.06) });
-            cy -= 15;
+            // Fator de meta recriado localmente para o renderizador
+            let targetFactor = 1.0;
+            if (targetLabel.includes('-5%')) targetFactor = 0.95;
+            else if (targetLabel.includes('-10%')) targetFactor = 0.90;
+            else if (targetLabel.includes('-20%')) targetFactor = 0.80;
+            else if (targetLabel.includes('-30%')) targetFactor = 0.70;
+            else if (project.customReduction) targetFactor = Math.max(0, 1 - (project.customReduction / 100));
+            
+            let roomAllowed = r.area * (r.baseLpd || 0) * targetFactor;
 
-            r.fixtures.forEach((f: any) => {
-                if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
-                page.drawText(`- ${f.qty} un x ${f.label} (${f.power}W) = ${(f.qty * f.power).toFixed(1)}W`, { x: 60, y: cy, size: 9, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+            page.drawRectangle({ x: 40, y: cy - 4, width: width - 80, height: 16, color: PDFLib.rgb(0.95, 0.96, 0.98) });
+            page.drawText(`${i + 1}. ${r.name.toUpperCase()}`, { x: 45, y: cy, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+            page.drawText(`Área: ${r.area} m² | LPD Alvo: ${((r.baseLpd || 0) * targetFactor).toFixed(1)} W/m²`, { x: 250, y: cy, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+            cy -= 18;
+
+            for (let f of r.fixtures) {
+                if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 100; }
+                page.drawText(`- ${f.qty} un x ${f.label} (${f.power}W)`, { x: 50, y: cy, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+                page.drawText(`${(f.qty * f.power).toFixed(1)} W`, { x: 400, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.3, 0.3, 0.3) });
                 cy -= 12;
-            });
+            }
 
-            if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
+            if (cy < 80) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 100; }
 
-            page.drawText(`Carga Instalada: ${roomWatts.toFixed(1)}W | Limite: ${roomAllowed.toFixed(1)}W`, { x: 60, y: cy, size: 9, color: PDFLib.rgb(0.2, 0.2, 0.2) });
+            const roomStatusColor = roomWatts <= roomAllowed ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
+            page.drawText(`SUBTOTAL: ${roomWatts.toFixed(1)} W`, { x: 50, y: cy, size: 8, font: fontBold, color: roomStatusColor });
+            page.drawText(`LIMITE: ${roomAllowed.toFixed(1)} W`, { x: 250, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
             cy -= 25;
-        });
+        }
 
-        if (cy < 150) { page = pdfDoc.addPage([595.28, 841.89]); cy = height - 50; }
+        if (cy < 180) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 100; }
 
         cy -= 10;
-        page.drawLine({ start: { x: 50, y: cy }, end: { x: width - 50, y: cy }, thickness: 1, color: PDFLib.rgb(0.8, 0.8, 0.8) });
-        cy -= 30;
+        page.drawLine({ start: { x: 40, y: cy }, end: { x: width - 40, y: cy }, thickness: 1, color: PDFLib.rgb(0.8, 0.8, 0.8) });
+        cy -= 25;
 
-        const finalStatus = summary.isCompliant ? "APROVADO (COMPLIANT)" : "REPROVADO (EXCEDE LIMITES)";
-        const colorStatus = summary.isCompliant ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
-
-        page.drawText('DIAGNÓSTICO TÉCNICO GLOBAL', { x: 50, y: cy, size: 12, color: PDFLib.rgb(0, 0, 0) });
-        cy -= 20;
-        page.drawText(`Potência Total Projetada: ${summary.totalWatts.toFixed(1)} W`, { x: 50, y: cy, size: 10 }); cy -= 15;
-        page.drawText(`Potência Máx. Permitida: ${summary.allowedWatts.toFixed(1)} W`, { x: 50, y: cy, size: 10 }); cy -= 15;
-        page.drawText(`LPD Médio Projetado: ${summary.currentLpd.toFixed(2)} W/m²`, { x: 50, y: cy, size: 10 }); cy -= 25;
+        const finalStatus = summary.isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "REPROVADO (EXCEDE LIMITES)";
         
-        page.drawText(`STATUS DA CERTIFICAÇÃO: ${finalStatus}`, { x: 50, y: cy, size: 14, color: colorStatus });
+        page.drawText('DIAGNÓSTICO TÉCNICO GLOBAL', { x: 40, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+        cy -= 20;
+        page.drawText(`LPD Médio Projetado: ${summary.currentLpd.toFixed(2)} W/m²`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 25;
+        page.drawText(finalStatus, { x: 40, y: cy, size: 12, font: fontBold, color: barColor });
+        
+        // Rodapé de Isenção Legal
+        if (summary.disclaimer) {
+            cy -= 45;
+            page.drawText(summary.disclaimer, { 
+                x: 40, y: cy, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6), 
+                maxWidth: width - 80, lineHeight: 7.5 
+            });
+        }
 
         const bytes = await pdfDoc.save();
         return new Blob([bytes], { type: 'application/pdf' });

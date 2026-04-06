@@ -70,12 +70,24 @@ export class StandardsEngine {
             r.fixtures.forEach(f => totalWatts += (f.power * f.qty));
         });
 
+        // LUXSINTAX: Cálculo de Impacto ESG (Estimativa Anual Comercial Padrão)
+        const savingsWatts = Math.max(0, allowedWatts - totalWatts);
+        const hoursPerYear = 3000; // Padrão comercial: 12h/dia x 250 dias úteis
+        const savingsKwh = (savingsWatts / 1000) * hoursPerYear;
+        const co2ReductionKg = savingsKwh * 0.43; // Fator médio de emissão global (kgCO2/kWh)
+        const treesEquivalent = co2ReductionKg / 22; // Capacidade de absorção de uma árvore adulta (~22kg/ano)
+
         return {
             totalWatts,
             allowedWatts,
             totalArea,
             currentLpd: totalArea > 0 ? (totalWatts / totalArea) : 0,
-            isCompliant: totalWatts <= allowedWatts
+            isCompliant: totalWatts <= allowedWatts,
+            esg: {
+                savingsKwh,
+                co2ReductionKg,
+                treesEquivalent
+            }
         };
     }
 }
