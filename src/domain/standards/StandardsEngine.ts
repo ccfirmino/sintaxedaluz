@@ -22,6 +22,7 @@ export interface LeedRoom {
 
 export interface LeedProject {
     target: string;
+    customReduction?: number;
     rooms: LeedRoom[];
 }
 
@@ -56,7 +57,11 @@ export class StandardsEngine {
         let totalWatts = 0;
         let totalArea = 0;
         let allowedWatts = 0;
-        const targetFactor = this.leedTargets[project.target] || 1.0;
+        
+        let targetFactor = this.leedTargets[project.target] || 1.0;
+        if (project.target === 'custom' && project.customReduction !== undefined) {
+            targetFactor = Math.max(0, 1 - (project.customReduction / 100));
+        }
 
         project.rooms.forEach(r => {
             totalArea += r.area;

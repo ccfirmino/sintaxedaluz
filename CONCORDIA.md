@@ -28,6 +28,10 @@
 - [06/04/2026]: Ergonomia e Unicidade Geométrica (Ponto a Ponto Vertical): Agrupamento contextual de inputs na View (Altura/Distância e Tilt/Spin). Padronização do Eixo Azimutal (Spin = 180º) entre motores 2D e 3D para coerência rotacional de arquivos IES. Implementação de algoritmo de busca de Hotspot (E_max) isolado no Domínio Fotométrico com plotagem visual no Canvas.
 - [06/04/2026]: Sincronia de Rotação Azimutal (Motores 3D e Radiosidade): Aplicação de matriz de rotação inversa (Spin +90º) nos ficheiros Photometric3DEngine.ts e RadiosityEngine.ts, garantindo a correspondência exata entre o Sólido Fotométrico visual e a malha térmica de falsa cor (Heatmap) gerada por raycasting.
 - [06/04/2026]: Evolução do Ponto a Ponto Horizontal: Reordenação ergonômica da interface (Grid lado-a-lado). Inserção do toggle de Curva Polar no modo 3D. Implementação do sistema de Comportamento de Tilt dinâmico (Mesmo Lado / Invertido) para estudos de facho em matriz (Array), com sincronia matemática vetorial aplicada simultaneamente no Canvas2DEngine e Photometric3DEngine.
+- [06/04/2026]: Refatoração UI/UX (Módulo LEED): Reestruturação dos cards de ambiente para layout Data Row compacto, otimizando a densidade de informação visual.
+- [06/04/2026]: Otimização de Performance (Módulo LEED): Implementação de manipulação de estado DOM Anti-Flicker (display toggle) na expansão de ambientes, prevenindo re-renderização excessiva (DOM Thrashing).
+- [06/04/2026]: Evolução de Regra de Negócio (Interface e Domínio): Inserção de suporte matemático (`StandardsEngine.ts`) e de interface para Meta de Redução LPD Customizada.
+- [06/04/2026]: Compliance Legal (ReportExporter): Injeção automática de Disclaimer Técnico (Hold Harmless clause) nos relatórios PDF gerados, protegendo a plataforma juridicamente.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
