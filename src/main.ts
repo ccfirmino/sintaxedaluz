@@ -1320,8 +1320,8 @@ window.updateLeedRoomUI = function(roomId: number) {
 window.updateGlobalLeedSummary = () => {
     const s = window.state.leedProject;
     const summary = window.StandardsEngine.calculateLeedCompliance(s);
-    document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W Permitidos</span>`;
-    document.getElementById('global-leed-lpd')!.innerHTML = `${summary.currentLpd.toFixed(2)} <span class="text-lg font-light text-slate-400">W/m²</span>`;
+    document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W Permitidos</span>`;
+    document.getElementById('global-leed-lpd')!.innerHTML = `${summary.currentLpd.toFixed(2)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">W/m²</span>`;
     const statusBox = document.getElementById('global-leed-status');
     if (statusBox && summary.totalArea > 0) {
         statusBox.classList.remove('animate-pulse');
@@ -1340,50 +1340,50 @@ window.renderLeedProject = function() {
     const savedOptions = (window.userLeedProjects || []).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
     
     let html = `
-        <div class="bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg">
-            <div class="flex-grow w-full lg:w-auto">
-                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
-                <input type="text" value="${s.name}" oninput="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-700 text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1">
-            </div>
-            
-            <div class="w-full lg:w-auto flex items-center gap-2">
-                <select id="load-leed-select" class="bg-slate-800 text-slate-300 border border-slate-700 rounded-lg px-3 py-2.5 font-bold text-[10px] uppercase outline-none w-full lg:w-48 cursor-pointer focus:border-luminous-gold">
-                    <option value="" disabled selected>Projetos Salvos...</option>
-                    ${savedOptions}
-                </select>
-                <button onclick="window.loadSpecificLeedProject()" class="bg-slate-800 hover:bg-slate-700 text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-700" title="Carregar"><i class="fas fa-folder-open"></i></button>
-                <button onclick="window.deleteSpecificLeedProject()" class="bg-slate-800 hover:bg-red-500 text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-700" title="Excluir"><i class="fas fa-trash"></i></button>
-            </div>
-
-            <div class="w-full lg:w-auto border-l border-slate-700 pl-6 hidden lg:flex items-end gap-2">
-                <div>
-                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Meta ASHRAE 90.1</label>
-                    <select onchange="window.updateLeedTargetMode(this.value)" class="bg-slate-800 text-luminous-gold border border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold">
-                        <option value="baseline" ${s.target === 'baseline' ? 'selected' : ''}>ASHRAE Base (0%)</option>
-                        <option value="certified" ${s.target === 'certified' ? 'selected' : ''}>Certified (-5%)</option>
-                        <option value="silver" ${s.target === 'silver' ? 'selected' : ''}>Silver (-10%)</option>
-                        <option value="gold" ${s.target === 'gold' ? 'selected' : ''}>Gold (-20%)</option>
-                        <option value="platinum" ${s.target === 'platinum' ? 'selected' : ''}>Platinum (-30%)</option>
-                        <option value="custom" ${s.target === 'custom' ? 'selected' : ''}>Customizado (Manual)</option>
+            <div class="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg border border-slate-200 dark:border-slate-800 transition-colors">
+                <div class="flex-grow w-full lg:w-auto">
+                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
+                    <input type="text" value="${s.name}" oninput="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-300 dark:border-slate-700 text-starlight dark:text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1 transition-colors">
+                </div>
+                
+                <div class="w-full lg:w-auto flex items-center gap-2">
+                    <select id="load-leed-select" class="bg-white dark:bg-slate-800 text-starlight dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 font-bold text-[10px] uppercase outline-none w-full lg:w-48 cursor-pointer focus:border-luminous-gold transition-colors">
+                        <option value="" disabled selected>Projetos Salvos...</option>
+                        ${savedOptions}
                     </select>
+                    <button onclick="window.loadSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-starlight dark:text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Carregar"><i class="fas fa-folder-open"></i></button>
+                    <button onclick="window.deleteSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/50 text-slate-500 hover:text-red-500 dark:text-slate-400 w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Excluir"><i class="fas fa-trash"></i></button>
                 </div>
-                ${s.target === 'custom' ? `
-                <div class="w-20 animate-fade-in">
-                    <label class="text-[10px] text-tech-cyan font-bold uppercase tracking-widest block mb-1">Redução</label>
-                    <div class="relative">
-                        <input type="number" value="${s.customReduction || 15}" oninput="window.updateCustomLeedReduction(parseFloat(this.value) || 0)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-2.5 text-[10px] text-tech-cyan font-black outline-none focus:border-luminous-gold text-right pr-6">
-                        <span class="absolute right-2 top-2.5 text-[10px] text-slate-400 font-bold">%</span>
+
+                <div class="w-full lg:w-auto border-l border-slate-300 dark:border-slate-700 pl-6 hidden lg:flex items-end gap-2 transition-colors">
+                    <div>
+                        <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Meta ASHRAE 90.1</label>
+                        <select onchange="window.updateLeedTargetMode(this.value)" class="bg-white dark:bg-slate-800 text-luminous-gold border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold transition-colors">
+                            <option value="baseline" ${s.target === 'baseline' ? 'selected' : ''}>ASHRAE Base (0%)</option>
+                            <option value="certified" ${s.target === 'certified' ? 'selected' : ''}>Certified (-5%)</option>
+                            <option value="silver" ${s.target === 'silver' ? 'selected' : ''}>Silver (-10%)</option>
+                            <option value="gold" ${s.target === 'gold' ? 'selected' : ''}>Gold (-20%)</option>
+                            <option value="platinum" ${s.target === 'platinum' ? 'selected' : ''}>Platinum (-30%)</option>
+                            <option value="custom" ${s.target === 'custom' ? 'selected' : ''}>Customizado (Manual)</option>
+                        </select>
                     </div>
+                    ${s.target === 'custom' ? `
+                    <div class="w-20 animate-fade-in">
+                        <label class="text-[10px] text-tech-cyan font-bold uppercase tracking-widest block mb-1">Redução</label>
+                        <div class="relative">
+                            <input type="number" value="${s.customReduction || 15}" oninput="window.updateCustomLeedReduction(parseFloat(this.value) || 0)" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2.5 text-[10px] text-tech-cyan font-black outline-none focus:border-luminous-gold text-right pr-6 transition-colors">
+                            <span class="absolute right-2 top-2.5 text-[10px] text-slate-500 dark:text-slate-400 font-bold">%</span>
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
-                ` : ''}
+                
+                <div class="flex gap-2 w-full lg:w-auto">
+                    <button onclick="window.saveLeedProject()" id="btn-save-leed" class="flex-1 lg:flex-none bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
+                    <button onclick="window.generateLeedReport()" class="flex-1 lg:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
+                </div>
             </div>
-            
-            <div class="flex gap-2 w-full lg:w-auto">
-                <button onclick="window.saveLeedProject()" id="btn-save-leed" class="flex-1 lg:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
-                <button onclick="window.generateLeedReport()" class="flex-1 lg:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
-            </div>
-        </div>
-    `;
+        `;
 
     html += s.rooms.map((room: any) => {
         const roomTotalWatts = room.fixtures.reduce((sum: number, f: any) => sum + (f.power * f.qty), 0);
