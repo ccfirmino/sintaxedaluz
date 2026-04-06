@@ -1,3 +1,4 @@
+
 # Manifesto de Sincronia - Projeto Lighting SaaS
 
 ## Estado Atual da Arquitetura
@@ -19,6 +20,8 @@
 - [05/04/2026]: Implementação de Web Workers (RadiosityWorker.ts): Delegação de cálculos de malha ponto a ponto para Threads secundárias (Non-blocking UI, High Performance).
 - [05/04/2026]: Implementação de Segurança Multitenant via Zod (AuthManager.ts): Validação estrita de contexto de utilizador (Zero Trust Architecture) antes de expor a interface.
 - [05/04/2026]: Upgrade Motor 3D (Photometric3DEngine.ts): Substituição do render em arame por um Algoritmo de Triangulação de Sólido Fotométrico com Mapeamento de Cores e Transmission (vidro iluminado).
+- [05/04/2026]: Evolução do SSOT Normativo (Nbr8995Database.ts): Implementação de tipagem estrita de planos de auditoria (LP - Piso / HP - Mesa) para validação contextual de malha.
+- [05/04/2026]: Refatoração de UI/UX (index.html): Adição de Tags de Transparência Técnica (UGR ESTIMADO), rótulos contextuais de auditoria NBR e controles avançados de Sólido Fotométrico no 3D.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).

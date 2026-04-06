@@ -558,12 +558,21 @@
                                                 </div>
                                             </label>
                                             <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
-                                            <label class="flex items-center gap-2 cursor-pointer group px-2">
+                                            <label id="lbl-toggle-isolines" class="flex items-center gap-2 cursor-pointer group px-2 transition-opacity">
                                                 <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
                                                 <div class="relative">
                                                     <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
                                                     <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
                                                     <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="iso-toggle-dot"></div>
+                                                </div>
+                                            </label>
+                                            
+                                            <label id="lbl-toggle-polar" class="hidden flex items-center gap-2 cursor-pointer group px-2 transition-opacity">
+                                                <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">CURVA POLAR</span>
+                                                <div class="relative">
+                                                    <input type="checkbox" id="g-polar" onchange="window.togglePolar(this.checked)" checked class="sr-only">
+                                                    <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-toggle-bg"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300 translate-x-3" id="polar-toggle-dot"></div>
                                                 </div>
                                             </label>
                                         </div>
@@ -726,7 +735,7 @@
                                     <div class="flex items-baseline gap-2">
                                         <span id="result-ugr" class="text-4xl font-black text-starlight dark:text-white">0</span>
                                         <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">UGR</span>
-                                        <span class="ml-2 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-[8px] font-black uppercase tracking-widest rounded border border-amber-200 dark:border-amber-800">APROXIMADO</span>
+                                        <span class="ml-2 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-[8px] font-black uppercase tracking-widest rounded border border-amber-200 dark:border-amber-800">ESTIMADO</span>
                                     </div>
                                 </div>
                                 <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
@@ -745,7 +754,7 @@
                                             <i id="nbr-icon" class="fas fa-info-circle"></i>
                                         </div>
                                         <div>
-                                            <h3 class="text-sm font-black text-starlight dark:text-white uppercase tracking-widest">Auditoria NBR 8995-1</h3>
+                                            <h3 class="text-sm font-black text-starlight dark:text-white uppercase tracking-widest flex items-center gap-2">Auditoria NBR 8995-1 <span id="nbr-plane-tag" class="hidden px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[8px] rounded-full border border-slate-300 dark:border-slate-600">--</span></h3>
                                             <p id="nbr-status-text" class="text-slate-500 dark:text-slate-300 font-bold uppercase tracking-tighter text-[11px]">Processando dados fotométricos...</p>
                                         </div>
                                     </div>
