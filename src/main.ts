@@ -486,6 +486,9 @@ window.toggleGridMode = function(mode: string) {
     const btnHP = document.getElementById('btn-grid-hp');
     const btnLP = document.getElementById('btn-grid-lp');
     const btn3D = document.getElementById('btn-grid-3d');
+    const lblIsolines = document.getElementById('lbl-toggle-isolines');
+    const lblPolar = document.getElementById('lbl-toggle-polar');
+    
     const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm";
     const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
     
@@ -494,12 +497,16 @@ window.toggleGridMode = function(mode: string) {
         if(btnHP) btnHP.className = inactiveClass;
         if(btnLP) btnLP.className = inactiveClass;
         if(btn3D) btn3D.className = activeClass;
+        if (lblIsolines) lblIsolines.classList.add('hidden');
+        if (lblPolar) lblPolar.classList.remove('hidden');
     } else {
         window.toggleRenderMode('2D');
         window.state.grid.viewLevel = mode;
         if(btnHP) btnHP.className = mode === 'HP' ? activeClass : inactiveClass;
         if(btnLP) btnLP.className = mode === 'LP' ? activeClass : inactiveClass;
         if(btn3D) btn3D.className = inactiveClass;
+        if (lblIsolines) lblIsolines.classList.remove('hidden');
+        if (lblPolar) lblPolar.classList.add('hidden');
     }
 
     if (window.toggleHeatmap) window.toggleHeatmap(window.state.grid.falseColor);
@@ -896,10 +903,9 @@ window.handleGenerateReport = async (event: any) => {
     const lumName = s.iesFileName || "Fonte Paramétrica Genérica";
     const beamText = effectiveBeamObj.isOval ? `${Math.round(effectiveBeamObj.c0)}° x ${Math.round(effectiveBeamObj.c90)}°` : `${Math.round(effectiveBeamObj.c0)}°`;
 
-    const cat = catSelect ? catSelect.value : '';
-    const room = roomSelect ? roomSelect.value : '';
-    const isFloorNorm = cat === 'Áreas de Tráfego' || (room && (room.includes('Corredor') || room.includes('Sagu') || room.includes('Estacionamento') || room.includes('Escada') || room.includes('Foyer')));
-    const targetLevel = (isNbrActive && isFloorNorm) ? 'LP' : (s.viewLevel || 'HP');
+    const targetLevel = (isNbrActive && window.currentNbrTarget && window.currentNbrTarget.plane) 
+        ? window.currentNbrTarget.plane 
+        : (s.viewLevel || 'HP');
 
     const captureState = async (level: string) => {
         const oldLevel = s.viewLevel;
@@ -1030,6 +1036,7 @@ window.updateNbrRooms = function() {
         opt.value = n.room;
         opt.dataset.lux = n.lux;
         opt.dataset.ugr = n.ugr === '-' ? '99' : String(n.ugr);
+        opt.dataset.plane = n.plane || 'HP';
         opt.innerText = n.room;
         roomSelect.appendChild(opt);
     });
@@ -1044,8 +1051,9 @@ window.applyNbrRules = function() {
 
     const tLux = parseFloat(selectedOption.dataset.lux!);
     const tUgr = parseFloat(selectedOption.dataset.ugr!);
+    const tPlane = selectedOption.dataset.plane || 'HP';
 
-    window.currentNbrTarget = { lux: tLux, ugr: tUgr };
+    window.currentNbrTarget = { lux: tLux, ugr: tUgr, plane: tPlane };
 
     document.getElementById('nbr-target-lux-display')!.innerText = `${tLux} lx`;
     document.getElementById('nbr-target-ugr-display')!.innerText = tUgr === 99 ? 'N/A' : String(tUgr);
@@ -1494,13 +1502,28 @@ window.updateCalculations = function() {
 };
 
 window.updateResultsUI = function(lux: number, ugr: string | number, watts: number, luxPiso: number) {
+    let targetPlane = 'HP';
+    if (window.currentNbrTarget && window.currentNbrTarget.plane) {
+        targetPlane = window.currentNbrTarget.plane;
+    } else if (window.state && window.state.grid && window.state.grid.viewLevel) {
+        targetPlane = window.state.grid.viewLevel;
+    }
+
+    let displayLux = targetPlane === 'LP' ? (luxPiso || lux * 0.85) : lux;
+
     const resLux = document.getElementById('result-lux');
     const resUgr = document.getElementById('result-ugr');
     const resEff = document.getElementById('result-eff');
+    const nbrPlaneTag = document.getElementById('nbr-plane-tag');
     
-    if (resLux) resLux.innerText = String(Math.round(lux));
+    if (resLux) resLux.innerText = String(Math.round(displayLux));
     if (resUgr) resUgr.innerText = String(ugr);
     
+    if (nbrPlaneTag) {
+        nbrPlaneTag.classList.remove('hidden');
+        nbrPlaneTag.innerText = targetPlane === 'LP' ? 'PISO (0.00m)' : 'MESA (0.75m)';
+    }
+
     const flux = window.state?.grid?.flux || 0;
     const inputWatts = window.state?.grid?.watts || 0;
     if (resEff) {
@@ -1525,9 +1548,9 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
             const parsedUgr = parseFloat(String(ugr));
             
             let status = 'APPROVED';
-            if (Math.round(lux) < targetLux * 0.9) status = 'REJECTED';
+            if (Math.round(displayLux) < targetLux * 0.9) status = 'REJECTED';
             else if (parsedUgr > maxUgrLimit) status = 'REJECTED';
-            else if (Math.round(lux) < targetLux) status = 'WARNING';
+            else if (Math.round(displayLux) < targetLux) status = 'WARNING';
 
             const nbrBadge = document.getElementById('nbr-badge');
             const nbrStatusText = document.getElementById('nbr-status-text');

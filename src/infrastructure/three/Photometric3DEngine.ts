@@ -93,6 +93,22 @@ export class Photometric3DEngine {
         if (this.scene) this.scene.background = new THREE.Color(isDark ? 0x111827 : 0xf8fafc);
         this.clearSolid();
 
+        // --- LUXSINTAX: CLIPPING PLANES (Limites Físicos de Corte) ---
+        // Plano base: Vetor Normal (0,1,0) apontando para cima. Corta tudo abaixo de Y=0.
+        const clippingPlanes = [ new THREE.Plane(new THREE.Vector3(0, 1, 0), 0) ]; 
+
+        if (state) {
+            if (toolId === 'grid') {
+                clippingPlanes.push(new THREE.Plane(new THREE.Vector3(0, -1, 0), state.height)); // Teto
+                clippingPlanes.push(new THREE.Plane(new THREE.Vector3(-1, 0, 0), state.roomW / 2)); // Parede Direita (+X)
+                clippingPlanes.push(new THREE.Plane(new THREE.Vector3(1, 0, 0), state.roomW / 2)); // Parede Esquerda (-X)
+                clippingPlanes.push(new THREE.Plane(new THREE.Vector3(0, 0, -1), state.roomL / 2)); // Parede Fundo (+Z)
+                clippingPlanes.push(new THREE.Plane(new THREE.Vector3(0, 0, 1), state.roomL / 2)); // Parede Frente (-Z)
+            } else if (toolId === 'vertical') {
+                clippingPlanes.push(new THREE.Plane(new THREE.Vector3(-1, 0, 0), state.dist || 1)); // Parede de Destaque Vertical
+            }
+        }
+
         const hasIes = iesData && iesData.hAngles && iesData.vAngles && iesData.candelas;
         let overlay = document.getElementById('webgl-overlay');
         if (!overlay) {
@@ -181,13 +197,14 @@ export class Photometric3DEngine {
                     roughness: 0.1,
                     transmission: 0.6, // Deixa a luz atravessar a própria malha
                     side: THREE.DoubleSide,
-                    depthWrite: false
+                    depthWrite: false,
+                    clippingPlanes: clippingPlanes
                 });
 
                 const mesh = new THREE.Mesh(geometry, material);
                 
                 // 4. Preservação do Wireframe Fotométrico por cima do sólido
-                const wireMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 });
+                const wireMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, clippingPlanes: clippingPlanes });
                 const wireframe = new THREE.LineSegments(new THREE.WireframeGeometry(geometry), wireMaterial);
                 mesh.add(wireframe);
                 
@@ -305,7 +322,7 @@ export class Photometric3DEngine {
                         if (window.state.showPolar !== false) {
                             const beamRadLumen = (state.beam || 60) * Math.PI / 180 / 2;
                             const coneGeo = new THREE.CylinderGeometry(0.1, Math.tan(beamRadLumen) * state.height, state.height, 32, 1, true); coneGeo.translate(0, -state.height/2, 0);
-                            const beamMesh = new THREE.Mesh(coneGeo, new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.12 * luxFactor, side: THREE.DoubleSide, depthWrite: false }));
+                            const beamMesh = new THREE.Mesh(coneGeo, new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.12 * luxFactor, side: THREE.DoubleSide, depthWrite: false, clippingPlanes: clippingPlanes }));
                             beamMesh.position.set(posX, state.height, posZ); this.solidGroup.add(beamMesh);
                         }
                     }
@@ -407,7 +424,7 @@ export class Photometric3DEngine {
 
             const mRatio = state ? (state.mRatio || 0.52) : 0.52;
             let lightColor = mRatio < 0.5 ? 0xf59e0b : (mRatio > 0.8 ? 0xbae6fd : 0xffbf00);
-            const coneMat = new THREE.MeshBasicMaterial({ color: lightColor, transparent: true, opacity: 0.12 * luxFactor, side: THREE.DoubleSide, depthWrite: false });
+            const coneMat = new THREE.MeshBasicMaterial({ color: lightColor, transparent: true, opacity: 0.12 * luxFactor, side: THREE.DoubleSide, depthWrite: false, clippingPlanes: clippingPlanes });
             const sourceLensMat = new THREE.MeshLambertMaterial({ color: lightColor, emissive: lightColor, emissiveIntensity: 2 });
             const sourceLensGeo = new THREE.CircleGeometry(0.12, 16);
             const fixGeo = new THREE.SphereGeometry(0.06, 16, 16), fixMat = new THREE.MeshBasicMaterial({ color: 0xd97706 });
