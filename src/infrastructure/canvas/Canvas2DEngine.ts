@@ -1030,8 +1030,12 @@ export class Canvas2DEngine {
 
             const spdData = win.HCLEngine.spds[currentMRatio] || win.HCLEngine.spds["0.52"];
             
-            drawSpectralCurve(win.HCLEngine.melanopic, "#a855f7", 1.5, true);
-            drawSpectralCurve(win.HCLEngine.photopic, "#fbbf24", 1.5, true);
+            // LUXSINTAX: Prevenção de quebra caso as curvas biológicas não estejam carregadas
+            const melCurve = win.HCLEngine.melanopic || [0,0,0,0.05,0.2,0.5,0.9,1.0,0.7,0.3,0.1,0.05,0,0,0,0,0];
+            const photCurve = win.HCLEngine.photopic || [0,0,0,0.02,0.1,0.4,0.8,1.0,0.8,0.4,0.1,0.02,0,0,0,0,0];
+
+            drawSpectralCurve(melCurve, "#a855f7", 1.5, true);
+            drawSpectralCurve(photCurve, "#fbbf24", 1.5, true);
             drawSpectralCurve(spdData, isDark ? "#f8fafc" : "#0f172a", 2.5);
 
             ctx.font = "bold 8px Manrope";

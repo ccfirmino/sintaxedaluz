@@ -431,7 +431,8 @@ export class Photometric3DEngine {
 
             const drawSource = (posX: number, posZ: number, rotZ: number) => {
                 const tiltGrp = new THREE.Group(); tiltGrp.position.set(posX, h, posZ); tiltGrp.rotation.z = rotZ;
-                const spinGrp = new THREE.Group(); spinGrp.rotation.y = (state.spin || 0) * Math.PI / 180; tiltGrp.add(spinGrp); this.solidGroup.add(tiltGrp);
+                // LUXSINTAX: Compensação de +90º para alinhar o azimute 3D com o eixo Y projetado no 2D
+                const spinGrp = new THREE.Group(); spinGrp.rotation.y = ((state.spin || 0) + 90) * Math.PI / 180; tiltGrp.add(spinGrp); this.solidGroup.add(tiltGrp);
 
                 if (hasIes && webGroup.children.length > 0) {
                     tiltGrp.add(new THREE.Mesh(fixGeo, fixMat));

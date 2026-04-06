@@ -374,9 +374,15 @@ window.updateCalcMode = function(mode: string) {
     document.querySelectorAll('.mode-standard-only').forEach(el => el.classList.toggle('hidden', mode === 'ies'));
     
     const btnSurf3D = document.getElementById('btn-surf-3d');
-    if (btnSurf3D) btnSurf3D.style.display = mode === 'ies' ? 'block' : 'none';
-    const btnV3D = document.getElementById('btn-v-3d');
-    if (btnV3D) btnV3D.style.display = mode === 'ies' ? 'block' : 'none';
+    if (btnSurf3D) btnSurf3D.style.display = mode === 'ies' ? 'block' : 'none';
+    const btnV3D = document.getElementById('btn-v-3d');
+    if (btnV3D) btnV3D.style.display = mode === 'ies' ? 'block' : 'none';
+
+    // LUXSINTAX: Travar edição de CCT/Espectro se for arquivo IES (Garantia SSOT)
+    const pRatio = document.getElementById('p-mRatio') as HTMLSelectElement;
+    const vRatio = document.getElementById('v-mRatio') as HTMLSelectElement;
+    if (pRatio) { pRatio.disabled = (mode === 'ies'); pRatio.style.opacity = (mode === 'ies') ? '0.5' : '1'; }
+    if (vRatio) { vRatio.disabled = (mode === 'ies'); vRatio.style.opacity = (mode === 'ies') ? '0.5' : '1'; }
     
     if (mode !== 'ies') {
         if (window.state.ponto && window.state.ponto.viewMode === '3D') window.setSurfaceMode('single');
