@@ -4,6 +4,8 @@ import { Photometrics, IesData } from './Photometrics';
 export interface FixturePosition {
     x: number;
     y: number;
+    tilt?: number;
+    spin?: number;
 }
 
 export interface RadiosityParams {
@@ -136,15 +138,24 @@ export class RadiosityEngine {
                             const dx = subX - fix.x;
                             const dy = subY - fix.y;
 
+                            // LUXSINTAX: Sincronização Azimutal (+90º) para espelhar a malha térmica com o Sólido 3D
+                            const fTilt = fix.tilt || 0;
+                            const fSpin = (fix.spin || 0) + 90;
+                            const spinRad = -(fSpin * Math.PI / 180); // Rotação inversa do ponto de amostragem
+
+                            // Rotaciona as coordenadas (dx, dy) via álgebra linear para simular o giro azimutal da luminária
+                            const dxRot = dx * Math.cos(spinRad) - dy * Math.sin(spinRad);
+                            const dyRot = dx * Math.sin(spinRad) + dy * Math.cos(spinRad);
+
                             // LUXSINTAX: Delegação para o Domínio Físico Unificado (Photometrics)
                             if (params.calcMode === 'ies' && params.iesData) {
-                                // Piso (LP)
-                                const resLP = Photometrics.calculatePointIlluminance(params.iesData, dx, dy, hEff_LP, 0);
+                                // Piso (LP) ou Parede
+                                const resLP = Photometrics.calculatePointIlluminance(params.iesData, dxRot, dyRot, hEff_LP, fTilt);
                                 directLux_LP += (resLP.lux / 4);
 
                                 // Plano de Trabalho (HP)
                                 if (hEff_HP > 0) {
-                                    const resHP = Photometrics.calculatePointIlluminance(params.iesData, dx, dy, hEff_HP, 0);
+                                    const resHP = Photometrics.calculatePointIlluminance(params.iesData, dxRot, dyRot, hEff_HP, fTilt);
                                     directLux_HP += (resHP.lux / 4);
                                 }
                             } else {

@@ -611,8 +611,8 @@ export class Canvas2DEngine {
             
             let ev = 0;
             if (win.calcMode === 'ies' && iesDataVertical) {
-                // Utiliza a fórmula física completa integrada no domínio
-                ev = Photometrics.calculateVerticalIlluminance(iesDataVertical, s.dist, deltaH, s.tilt, s.spin || 0);
+                // Utiliza a fórmula física completa integrada no domínio (Com compensação azimutal)
+                ev = Photometrics.calculateVerticalIlluminance(iesDataVertical, s.dist, deltaH, s.tilt, (s.spin || 0) + 90);
             } else {
                 // Fallback para intensidade paramétrica direta (Desacoplado, Resolve TS2554)
                 const baseIntensity = (win.calcMode === 'direct') ? (s.intensity || 0) : ((s.cdklm * s.flux) / 1000 || 0);
@@ -757,7 +757,7 @@ export class Canvas2DEngine {
                 
                 // LUXSINTAX: Busca exata do Hotspot de E_max na parede (Domínio Físico)
                 const baseIntensity = (win.calcMode === 'direct') ? (s.intensity || 0) : ((s.cdklm * s.flux) / 1000 || 0);
-                const hotspot = Photometrics.findVerticalHotspot(iesDataVertical, s.dist, s.height, s.tilt, s.spin || 0, baseIntensity);
+                const hotspot = Photometrics.findVerticalHotspot(iesDataVertical, s.dist, s.height, s.tilt, (s.spin || 0) + 90, baseIntensity);
                 const hotspotY_px = floorY - (hotspot.yMetric * scale);
 
                 for(let i=0; i < s.qty; i++) {
