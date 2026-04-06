@@ -236,14 +236,15 @@ export class Photometrics {
         data: IesData | null | undefined,
         distParede: number,
         deltaH: number, // Altura da fonte - Altura do ponto no quadro
-        tilt: number = 0
+        tilt: number = 0,
+        spin: number = 0
     ): number {
         if (!data || distParede <= 0) return 0;
 
         const angleVRad = Math.atan2(distParede, deltaH);
         const angleVDeg = angleVRad * (180 / Math.PI);
         
-        const intensity = this.getIESIntensity(data, Math.abs(angleVDeg - tilt), 0);
+        const intensity = this.getIESIntensity(data, Math.abs(angleVDeg - tilt), spin);
 
         // Fórmula de Iluminância Vertical: (I * sinθ * cos²θ) / h²
         // onde h é a altura relativa (deltaH)
@@ -253,5 +254,38 @@ export class Photometrics {
         const lux = (intensity * sinTheta * Math.pow(cosTheta, 2)) / (deltaH * deltaH);
 
         return Math.max(0, lux);
+    }
+
+    /**
+     * Busca iterativa do Hotspot de iluminância vertical na parede (E_max)
+     */
+    public static findVerticalHotspot(
+        data: IesData | null | undefined, 
+        distParede: number, 
+        h: number, 
+        tilt: number, 
+        spin: number, 
+        baseIntensity: number = 0
+    ): { lux: number, yMetric: number } {
+        let maxLux = 0;
+        let bestY = 0;
+        
+        // Escaneia a parede verticalmente (do piso até um pouco acima da luminária) em passos de 5cm
+        for (let y = 0; y <= h * 1.2; y += 0.05) {
+            let lux = 0;
+            const deltaH = h - y;
+            if (data) {
+                lux = this.calculateVerticalIlluminance(data, distParede, deltaH, tilt, spin);
+            } else {
+                if (deltaH <= 0) continue;
+                const angleVRad = Math.atan2(distParede, deltaH);
+                lux = (tilt > 0) ? (baseIntensity * Math.pow(Math.sin(angleVRad), 3)) / (distParede * distParede) : 0;
+            }
+            if (lux > maxLux) {
+                maxLux = lux;
+                bestY = y;
+            }
+        }
+        return { lux: maxLux, yMetric: bestY };
     }
 }

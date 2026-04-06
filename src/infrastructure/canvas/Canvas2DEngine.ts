@@ -612,7 +612,7 @@ export class Canvas2DEngine {
             let ev = 0;
             if (win.calcMode === 'ies' && iesDataVertical) {
                 // Utiliza a fórmula física completa integrada no domínio
-                ev = Photometrics.calculateVerticalIlluminance(iesDataVertical, s.dist, deltaH, s.tilt);
+                ev = Photometrics.calculateVerticalIlluminance(iesDataVertical, s.dist, deltaH, s.tilt, s.spin || 0);
             } else {
                 // Fallback para intensidade paramétrica direta (Desacoplado, Resolve TS2554)
                 const baseIntensity = (win.calcMode === 'direct') ? (s.intensity || 0) : ((s.cdklm * s.flux) / 1000 || 0);
@@ -754,6 +754,11 @@ export class Canvas2DEngine {
                 const startX = centerX - ((s.qty - 1) * s.spacing * scale) / 2;
                 const trRad = tr; 
                 const brRad = br; 
+                
+                // LUXSINTAX: Busca exata do Hotspot de E_max na parede (Domínio Físico)
+                const baseIntensity = (win.calcMode === 'direct') ? (s.intensity || 0) : ((s.cdklm * s.flux) / 1000 || 0);
+                const hotspot = Photometrics.findVerticalHotspot(iesDataVertical, s.dist, s.height, s.tilt, s.spin || 0, baseIntensity);
+                const hotspotY_px = floorY - (hotspot.yMetric * scale);
 
                 for(let i=0; i < s.qty; i++) {
                     const spotX = startX + (i * s.spacing * scale);
@@ -801,16 +806,26 @@ export class Canvas2DEngine {
                     ctx.strokeStyle = "#d97706"; ctx.lineWidth = 1; ctx.stroke();
                     
                     if (i === 0 && tr > 0) {
-                        let valText = win.formatIllum(ev);
+                        // LUXSINTAX: Desenha o Hotspot na coordenada real de E_max
+                        ctx.beginPath();
+                        ctx.moveTo(spotX - 8, hotspotY_px); ctx.lineTo(spotX + 8, hotspotY_px);
+                        ctx.moveTo(spotX, hotspotY_px - 8); ctx.lineTo(spotX, hotspotY_px + 8);
+                        ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 2; ctx.stroke();
+                        ctx.beginPath(); ctx.arc(spotX, hotspotY_px, 3, 0, Math.PI * 2); ctx.fillStyle = "#ef4444"; ctx.fill();
+
+                        let valText = win.formatIllum(hotspot.lux);
                         if (win.calcMode === 'ies' && !s.iesData) valText = "LOAD IES";
-                        this.drawTextVal(ctx, valText, spotX, hitY_px_current - 10);
+                        this.drawTextVal(ctx, valText, spotX, hotspotY_px - 14);
+
+                        ctx.fillStyle = "#ef4444"; ctx.font = "900 9px Manrope"; ctx.textAlign = "center";
+                        ctx.fillText("E_MAX", spotX, hotspotY_px - 32);
 
                         if (win.state.showHCL) {
-                            const mEDI_wall = Math.round(ev * (s.mRatio || 0.52));
+                            const mEDI_wall = Math.round(hotspot.lux * (s.mRatio || 0.52));
                             ctx.font = "900 13px Manrope";
                             ctx.fillStyle = "#a855f7";
                             ctx.textAlign = "center";
-                            ctx.fillText(`${mEDI_wall} m-EDI`, spotX, hitY_px_current + 18);
+                            ctx.fillText(`${mEDI_wall} m-EDI`, spotX, hotspotY_px + 18);
                         }
                     }
                 }

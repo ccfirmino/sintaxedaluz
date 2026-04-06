@@ -54,7 +54,7 @@ declare global {
 // 2. INICIALIZAÇÃO DE ESTADO GLOBAL
 window.state = {
     ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, spin: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
-    vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, spin: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
+    vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, spin: 180, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
     homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
     grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, cct: 3000, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
     driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
@@ -453,10 +453,26 @@ window.toggleVerticalView = function(mode: string) {
     const btnS = document.getElementById('btn-v-section');
     const btnE = document.getElementById('btn-v-elevation');
     const btn3D = document.getElementById('btn-v-3d');
+    const lblIsolines = document.getElementById('lbl-toggle-isolines');
+    const lblPolar = document.getElementById('lbl-toggle-polar');
     const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all";
     const inactiveClass = "px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all";
     
     if (mode === '3D') {
+        window.toggleRenderMode('3D');
+        if(btnS) btnS.className = inactiveClass;
+        if(btnE) btnE.className = inactiveClass;
+        if(btn3D) btn3D.className = activeClass;
+        if(lblIsolines) lblIsolines.classList.add('hidden');
+        if(lblPolar) lblPolar.classList.remove('hidden');
+    } else {
+        window.toggleRenderMode('2D');
+        window.state.vertical.viewMode = mode;
+        if(btnS) btnS.className = mode === 'section' ? activeClass : inactiveClass;
+        if(btnE) btnE.className = mode === 'elevation' ? activeClass : inactiveClass;
+        if(btn3D) btn3D.className = inactiveClass;
+        if(lblIsolines) lblIsolines.classList.add('hidden');
+        if(lblPolar) lblPolar.classList.add('hidden');
         window.toggleRenderMode('3D');
         if(btnS) btnS.className = inactiveClass;
         if(btnE) btnE.className = inactiveClass;

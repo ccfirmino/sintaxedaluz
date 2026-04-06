@@ -24,7 +24,8 @@
 - [05/04/2026]: Integração de Lógica Adaptativa NBR (main.ts): Orquestração do cálculo dinâmico (LP/HP) na interface e gerador de PDF, espelhando o Single Source of Truth do banco de dados.
 - [05/04/2026]: Calibração Física Direta (RadiosityEngine.ts): Remoção do falso rebatimento indireto. O motor agora calcula estritamente a iluminância direta via Lei do Cosseno Cúbico depreciada pelo Fator de Manutenção (FM), garantindo exatidão fotométrica e honestidade técnica em estudos preliminares.
 - [05/04/2026]: Clipping 3D Físico (Photometric3DEngine.ts): Implementação de WebGL Clipping Planes dinâmicos (Piso e Paredes) atrelados às medidas do ambiente para restrição visual impecável de cones e malhas fotométricas IES.
-- [DATA ATUAL]: Integração Algorítmica (Canvas2D & Radiosity): Implementação de algoritmo físico Marching Squares para plotagem de Isolinhas Vetoriais dinâmicas e calibração de malha térmica integrando coeficientes U (Reflexão Indireta) e FM (Depreciação Lúminosa).
+- [05/04/2026]: Integração Algorítmica (Canvas2D & Radiosity): Implementação de algoritmo físico Marching Squares para plotagem de Isolinhas Vetoriais dinâmicas e calibração de malha térmica integrando coeficientes U (Reflexão Indireta) e FM (Depreciação Lúminosa).
+- [06/04/2026]: Ergonomia e Unicidade Geométrica (Ponto a Ponto Vertical): Agrupamento contextual de inputs na View (Altura/Distância e Tilt/Spin). Padronização do Eixo Azimutal (Spin = 180º) entre motores 2D e 3D para coerência rotacional de arquivos IES. Implementação de algoritmo de busca de Hotspot (E_max) isolado no Domínio Fotométrico com plotagem visual no Canvas.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
