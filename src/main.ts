@@ -473,16 +473,6 @@ window.toggleVerticalView = function(mode: string) {
         if(btn3D) btn3D.className = inactiveClass;
         if(lblIsolines) lblIsolines.classList.add('hidden');
         if(lblPolar) lblPolar.classList.add('hidden');
-        window.toggleRenderMode('3D');
-        if(btnS) btnS.className = inactiveClass;
-        if(btnE) btnE.className = inactiveClass;
-        if(btn3D) btn3D.className = activeClass;
-    } else {
-        window.toggleRenderMode('2D');
-        window.state.vertical.viewMode = mode;
-        if(btnS) btnS.className = mode === 'section' ? activeClass : inactiveClass;
-        if(btnE) btnE.className = mode === 'elevation' ? activeClass : inactiveClass;
-        if(btn3D) btn3D.className = inactiveClass;
     }
 
     const elevationGroups = document.getElementById('v-elevation-groups');
@@ -497,8 +487,6 @@ window.toggleVerticalView = function(mode: string) {
     if (window.toggleHeatmap) window.toggleHeatmap(window.state.vertical.falseColor);
     window.updateCalculations();
 };
-
-window.toggleGridMode = function(mode: string) {
     const btnHP = document.getElementById('btn-grid-hp');
     const btnLP = document.getElementById('btn-grid-lp');
     const btn3D = document.getElementById('btn-grid-3d');
