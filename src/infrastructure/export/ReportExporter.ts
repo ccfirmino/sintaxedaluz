@@ -355,7 +355,7 @@ export class ReportExporter {
         cy -= 20;
         if (summary.esg && summary.esg.savingsKwh > 0) {
             page.drawText(`Eficiência Operacional: Economia de ${summary.esg.savingsKwh.toFixed(0)} kWh/ano em relação à linha de base.`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 15;
-            page.drawText(`Pegada de Carbono: Redução estimada de ${summary.esg.co2ReductionKg.toFixed(0)} kg CO₂ emitidos na atmosfera.`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 15;
+            page.drawText(`Pegada de Carbono: Redução estimada de ${summary.esg.co2ReductionKg.toFixed(0)} kg CO2 emitidos na atmosfera.`, { x: 40, y: cy, size: 9, font: fontRegular }); cy -= 15;
             page.drawText(`Equivalência Ambiental: Benefício correspondente a absorção de ${Math.round(summary.esg.treesEquivalent)} árvore(s) adulta(s).`, { x: 40, y: cy, size: 9, font: fontBold, color: PDFLib.rgb(0.3, 0.48, 0.06) }); cy -= 30;
         } else {
             page.drawText('O projeto atual não apresenta redução de carga energética frente ao limite normativo.', { x: 40, y: cy, size: 9, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 30;
