@@ -353,14 +353,15 @@ export class Photometric3DEngine {
                 if (toolId === 'ponto' && state.viewMode === 'array') {
                     const tiltMode3D = document.querySelector<HTMLInputElement>('input[name="p_tilt_mode"]:checked')?.value || 'same';
                     const hS = (state.spacing || 2) / 2;
-                    fixtures.push({ x: -hS, y: h, z: 0, tilt: baseTiltRad, spin: 0 });
-                    fixtures.push({ x: hS, y: h, z: 0, tilt: tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad, spin: 0 });
+                    fixtures.push({ x: -hS, y: h, z: 0, tilt: baseTiltRad, spin: ((state.spin || 0) + 90) * Math.PI / 180 });
+                    fixtures.push({ x: hS, y: h, z: 0, tilt: tiltMode3D === 'cross' ? -baseTiltRad : baseTiltRad, spin: ((state.spin || 0) + 90) * Math.PI / 180 });
                 } else if (toolId === 'vertical') {
                     const qty = state.qty || 1, spacing = state.spacing || 1.0;
                     const startZ = -((qty - 1) * spacing) / 2;
-                    for (let i = 0; i < qty; i++) fixtures.push({ x: 0, y: h, z: startZ + (i * spacing), tilt: baseTiltRad, spin: (state.spin || 0) * Math.PI / 180 });
+                    // LUXSINTAX: Compensação de +90º na textura para espelhar perfeitamente o Sólido Fotométrico 3D
+                    for (let i = 0; i < qty; i++) fixtures.push({ x: 0, y: h, z: startZ + (i * spacing), tilt: baseTiltRad, spin: ((state.spin || 0) + 90) * Math.PI / 180 });
                 } else {
-                    fixtures.push({ x: 0, y: h, z: 0, tilt: baseTiltRad, spin: 0 });
+                    fixtures.push({ x: 0, y: h, z: 0, tilt: baseTiltRad, spin: ((state.spin || 0) + 90) * Math.PI / 180 });
                 }
 
                 let n_power = 1, maxI = 0, isIesActive = window.calcMode === 'ies' && hasIes;
