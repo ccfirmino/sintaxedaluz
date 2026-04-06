@@ -1159,9 +1159,38 @@ window.setLeedTarget = function(t: string) { window.currentLeedTarget = t; docum
 window.toggleWellFeature = function(el: HTMLElement, pts: number) { el.classList.toggle('active'); let total=0; document.querySelectorAll('.well-toggle-group.active').forEach(i => total += parseInt(i.getAttribute('data-points')!)); document.getElementById('well-total-score')!.innerHTML = `${total} <span class="text-xs text-slate-400 font-normal">/ 8</span>`; document.getElementById('well-progress-bar')!.style.width = (total/8*100)+'%'; document.getElementById('well-progress-text')!.innerText = (total/8*100).toFixed(0)+'%'; const icon = el.querySelector('.fa-check')!; if(el.classList.contains('active')) icon.classList.remove('opacity-0'); else icon.classList.add('opacity-0'); };
 
 window.addLeedRoom = function() {
-    const room = { id: Date.now(), name: "Novo Ambiente", area: 50, baseLpd: 0, fixtures:[] };
-    window.state.leedProject.rooms.push(room);
+    const room = { 
+        id: Date.now(), 
+        name: "Novo Ambiente", 
+        area: 50, 
+        baseLpd: 0, 
+        typology: "", 
+        expanded: true, // Controle do Acordeão
+        fixtures: [{ id: Date.now() + 1, label: "Luminária Genérica", power: 0, qty: 1 }] // Onboarding Zero Fricção
+    };
+    window.state.leedProject.rooms.unshift(room); // Injeção no TOPO da lista
     window.renderLeedProject();
+};
+
+window.duplicateLeedRoom = function(roomId: number) {
+    const roomToCopy = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
+    if (roomToCopy) {
+        const clonedRoom = JSON.parse(JSON.stringify(roomToCopy));
+        clonedRoom.id = Date.now();
+        clonedRoom.name = clonedRoom.name + " (Cópia)";
+        clonedRoom.expanded = true;
+        clonedRoom.fixtures.forEach((f: any, idx: number) => { f.id = Date.now() + 100 + idx; });
+        window.state.leedProject.rooms.unshift(clonedRoom);
+        window.renderLeedProject();
+    }
+};
+
+window.toggleLeedRoom = function(roomId: number) {
+    const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
+    if (room) {
+        room.expanded = !room.expanded;
+        window.renderLeedProject();
+    }
 };
 
 window.removeLeedRoom = function(roomId: number) {
@@ -1185,7 +1214,7 @@ window.updateLeedRoomData = function(roomId: number, field: string, value: any) 
 window.addLeedFixture = function(roomId: number) {
     const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (room) {
-        room.fixtures.push({ id: Date.now(), label: "Luminária", power: 15, qty: 1 });
+        room.fixtures.push({ id: Date.now(), label: "Luminária Nova", power: 15, qty: 1 });
         window.renderLeedProject();
     }
 };
@@ -1228,17 +1257,28 @@ window.renderLeedProject = function() {
     const container = document.getElementById('leed-project-container');
     if(!container) return;
     const s = window.state.leedProject;
-    const savedOptions = (window.userLeedProjects ||[]).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
-
+    
+    const savedOptions = (window.userLeedProjects || []).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
+    
     let html = `
         <div class="bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg">
             <div class="flex-grow w-full lg:w-auto">
                 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
-                <input type="text" value="${s.name}" onchange="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-700 text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1">
+                <input type="text" value="${s.name}" onblur="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-700 text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1">
             </div>
-            <div class="w-full lg:w-auto">
+            
+            <div class="w-full lg:w-auto flex items-center gap-2">
+                <select id="load-leed-select" class="bg-slate-800 text-slate-300 border border-slate-700 rounded-lg px-3 py-2.5 font-bold text-[10px] uppercase outline-none w-full lg:w-48 cursor-pointer focus:border-luminous-gold">
+                    <option value="" disabled selected>Projetos Salvos...</option>
+                    ${savedOptions}
+                </select>
+                <button onclick="window.loadSpecificLeedProject()" class="bg-slate-800 hover:bg-slate-700 text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-700" title="Carregar"><i class="fas fa-folder-open"></i></button>
+                <button onclick="window.deleteSpecificLeedProject()" class="bg-slate-800 hover:bg-red-500 text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-700" title="Excluir"><i class="fas fa-trash"></i></button>
+            </div>
+
+            <div class="w-full lg:w-auto border-l border-slate-700 pl-6 hidden lg:block">
                 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Meta ASHRAE 90.1</label>
-                <select onchange="window.state.leedProject.target = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-slate-800 text-luminous-gold border border-slate-700 rounded-lg px-4 py-2 font-bold text-xs uppercase outline-none w-full cursor-pointer">
+                <select onchange="window.state.leedProject.target = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-slate-800 text-luminous-gold border border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold">
                     <option value="baseline" ${s.target === 'baseline' ? 'selected' : ''}>ASHRAE Base (0%)</option>
                     <option value="certified" ${s.target === 'certified' ? 'selected' : ''}>Certified (-5%)</option>
                     <option value="silver" ${s.target === 'silver' ? 'selected' : ''}>Silver (-10%)</option>
@@ -1246,55 +1286,85 @@ window.renderLeedProject = function() {
                     <option value="platinum" ${s.target === 'platinum' ? 'selected' : ''}>Platinum (-30%)</option>
                 </select>
             </div>
+            
             <div class="flex gap-2 w-full lg:w-auto">
-                <button onclick="window.saveLeedProject()" id="btn-save-leed" class="flex-1 lg:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
-                <button onclick="window.generateLeedReport()" class="flex-1 lg:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
+                <button onclick="window.saveLeedProject()" id="btn-save-leed" class="flex-1 lg:flex-none bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
+                <button onclick="window.generateLeedReport()" class="flex-1 lg:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
             </div>
         </div>
     `;
 
-    html += s.rooms.map((room: any) => `
-        <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 animate-fade-in-up mb-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
-                <div class="flex-grow w-full md:w-1/3">
-                    <input type="text" value="${room.name}" onchange="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-sm font-black text-starlight dark:text-white bg-transparent border-b border-slate-300 dark:border-slate-600 focus:border-luminous-gold transition-colors w-full pb-1 uppercase">
-                </div>
-                <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
-                    <div class="flex items-center gap-2">
-                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tipologia:</label>
-                        <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select max-w-[200px] truncate text-xs bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600 outline-none cursor-pointer">
-                            <option value="" disabled ${!room.typology ? 'selected' : ''}>Selecione...</option>
-                            ${window.lpdBaselines.map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type}</option>`).join('')}
-                        </select>
+    html += s.rooms.map((room: any) => {
+        const roomTotalWatts = room.fixtures.reduce((sum: number, f: any) => sum + (f.power * f.qty), 0);
+        const roomLpd = room.area > 0 ? roomTotalWatts / room.area : 0;
+        const isOverLimit = room.baseLpd > 0 && roomLpd > room.baseLpd;
+        const borderClass = isOverLimit ? 'border-red-500 dark:border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-slate-200 dark:border-slate-700';
+        const titleColor = isOverLimit ? 'text-red-500' : 'text-starlight dark:text-white';
+        const expanded = room.expanded !== false;
+        
+        let roomHtml = `
+            <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border ${borderClass} animate-fade-in-up mb-6 transition-all">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
+                    <div class="flex items-center gap-3 flex-grow w-full md:w-1/3">
+                        <button onclick="window.toggleLeedRoom(${room.id})" class="text-slate-400 hover:text-luminous-gold w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors" title="Expandir/Recolher">
+                            <i class="fas ${expanded ? 'fa-minus' : 'fa-plus'} text-[10px]"></i>
+                        </button>
+                        <input type="text" value="${room.name}" onblur="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-sm font-black ${titleColor} bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold transition-colors w-full pb-1 uppercase outline-none">
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Área (m²):</label>
-                        <input type="number" value="${room.area}" onchange="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="w-20 text-right bg-white dark:bg-slate-700 rounded px-2 py-1 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600">
+                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                        <div class="flex items-center gap-3 bg-white dark:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600">
+                            <div class="text-[10px] font-bold"><span class="text-slate-400">W:</span> <span class="${titleColor} font-black">${roomTotalWatts.toFixed(1)}</span></div>
+                            <div class="w-px h-3 bg-slate-300 dark:bg-slate-600"></div>
+                            <div class="text-[10px] font-bold"><span class="text-slate-400">LPD:</span> <span class="${titleColor} font-black">${roomLpd.toFixed(2)}</span></div>
+                        </div>
+                        <button onclick="window.duplicateLeedRoom(${room.id})" class="text-[9px] font-black text-tech-cyan hover:text-cyan-700 uppercase tracking-widest transition-colors bg-cyan-50 dark:bg-cyan-900/30 px-3 py-2 rounded-lg border border-cyan-200 dark:border-cyan-800"><i class="fas fa-copy mr-1"></i> DUPLICAR</button>
+                        <button onclick="window.removeLeedRoom(${room.id})" class="text-slate-400 hover:text-red-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"><i class="fas fa-trash"></i></button>
                     </div>
-                    <button onclick="window.removeLeedRoom(${room.id})" class="text-slate-400 hover:text-red-500 transition-colors ml-auto"><i class="fas fa-trash"></i></button>
                 </div>
-            </div>
-            
-            <table class="w-full text-xs mb-4">
-                <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700 text-[9px] tracking-widest">
-                    <tr><th class="text-left pb-2">Luminária</th><th class="text-center pb-2">Watts (W)</th><th class="text-center pb-2">Qtd</th><th class="text-right pb-2">Subtotal</th><th class="pb-2"></th></tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                    ${room.fixtures.map((f: any) => `
-                        <tr>
-                            <td class="py-2"><input type="text" value="${f.label}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold w-full text-slate-600 dark:text-slate-300"></td>
-                            <td class="py-2 text-center"><input type="number" value="${f.power}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300"></td>
-                            <td class="py-2 text-center"><input type="number" value="${f.qty}" onchange="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300"></td>
-                            <td class="py-2 text-right font-black text-starlight dark:text-white">${(f.power * f.qty).toFixed(1)} W</td>
-                            <td class="py-2 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-400"><i class="fas fa-times"></i></button></td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-            
-            <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest transition-colors"><i class="fas fa-plus-circle mr-1"></i> Adicionar Luminária</button>
-        </div>
-    `).join('');
+        `;
+        
+        if (expanded) {
+            roomHtml += `
+                <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <div class="flex flex-wrap items-center gap-4 mb-6">
+                        <div class="flex items-center gap-2">
+                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tipologia ASHRAE:</label>
+                            <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select max-w-[220px] truncate text-xs bg-white dark:bg-slate-700 rounded px-2 py-1.5 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600 outline-none cursor-pointer focus:border-luminous-gold">
+                                <option value="" disabled ${!room.typology ? 'selected' : ''}>Selecione...</option>
+                                ${window.lpdBaselines.map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Área (m²):</label>
+                            <input type="number" value="${room.area}" onblur="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="w-24 text-right bg-white dark:bg-slate-700 rounded px-2 py-1.5 font-bold text-starlight dark:text-white border border-slate-200 dark:border-slate-600 outline-none focus:border-luminous-gold">
+                        </div>
+                    </div>
+                    
+                    <table class="w-full text-xs mb-4">
+                        <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700 text-[9px] tracking-widest">
+                            <tr><th class="text-left pb-2">Luminária</th><th class="text-center pb-2">Watts (W)</th><th class="text-center pb-2">Qtd</th><th class="text-right pb-2">Subtotal</th><th class="pb-2"></th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                            ${room.fixtures.map((f: any) => `
+                                <tr class="group/fix hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors">
+                                    <td class="py-2 px-1"><input type="text" value="${f.label}" onblur="window.updateLeedFixtureData(${room.id}, ${f.id}, 'label', this.value)" class="bg-transparent font-bold w-full text-slate-600 dark:text-slate-300 outline-none focus:text-luminous-gold border-b border-transparent focus:border-luminous-gold transition-colors"></td>
+                                    <td class="py-2 text-center"><input type="number" value="${f.power}" onblur="window.updateLeedFixtureData(${room.id}, ${f.id}, 'power', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 outline-none focus:border-luminous-gold transition-colors"></td>
+                                    <td class="py-2 text-center"><input type="number" value="${f.qty}" onblur="window.updateLeedFixtureData(${room.id}, ${f.id}, 'qty', this.value)" class="w-16 text-center bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 outline-none focus:border-luminous-gold transition-colors"></td>
+                                    <td class="py-2 text-right font-black text-starlight dark:text-white px-1">${(f.power * f.qty).toFixed(1)} W</td>
+                                    <td class="py-2 text-right"><button onclick="window.removeLeedFixture(${room.id}, ${f.id})" class="text-slate-300 hover:text-red-400 opacity-0 group-hover/fix:opacity-100 transition-all px-2"><i class="fas fa-times"></i></button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest transition-colors inline-flex items-center gap-1 mt-2 py-1 px-2 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded"><i class="fas fa-plus-circle"></i> Adicionar Luminária</button>
+                </div>
+            `;
+        }
+        
+        roomHtml += `</div>`;
+        return roomHtml;
+    }).join('');
     
     container.innerHTML = html;
     window.updateGlobalLeedSummary();
