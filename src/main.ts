@@ -1026,8 +1026,8 @@ window.generateLeedReport = async () => {
             // LUXSINTAX: Blindagem Legal e Injeção de Logo (White-Label)
             summary.disclaimer = "Nota Técnica de Isenção de Responsabilidade: Os cálculos e métricas apresentados neste relatório baseiam-se em modelos matemáticos ideais e possuem caráter exclusivamente preliminar (Concept Design). Este documento destina-se ao estudo de viabilidade, orçamentação e pré-certificação (LEED/ASHRAE). Ele não substitui o projeto executivo luminotécnico assinado por um profissional legalmente habilitado (ART/RRT). A conformidade final e a segurança da instalação devem ser validadas in loco e submetidas a softwares de cálculo de inter-reflexão global para aprovação em órgãos oficiais.";
 
-            // Preparação Arquitetural: No futuro buscaremos do AuthManager.getTenantContext().logo
-            const userLogoBase64 = null; 
+            // LUXSINTAX: Busca a Logo customizada salva localmente no perfil do usuário
+            const userLogoBase64 = localStorage.getItem('luxsintax_user_logo') || null;
 
             const blob = await window.ReportExporter.createLeedPdf(PDFLib, s, summary, targetLabel, userLogoBase64);
 
@@ -1777,6 +1777,53 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
         }
     }
 };
+
+// LUXSINTAX: Sistema de White-Label (Upload e Persistência de Logo)
+window.handleLogoUpload = function(input: HTMLInputElement) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Proteção Arquitetural: Bloqueia imagens gigantes que travam o PDFLib
+        if (file.size > 2 * 1024 * 1024) {
+            return alert("A imagem é muito pesada. Por favor, escolha uma logo com menos de 2MB.");
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target!.result as string;
+            
+            // Salva no LocalStorage (SSOT temporário do Frontend)
+            localStorage.setItem('luxsintax_user_logo', base64);
+            
+            // Atualiza a UI imediatamente
+            window.updateProfileLogoUI();
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+window.updateProfileLogoUI = function() {
+    const preview = document.getElementById('profile-logo-preview') as HTMLImageElement;
+    const placeholder = document.getElementById('profile-logo-placeholder');
+    const base64 = localStorage.getItem('luxsintax_user_logo');
+    
+    if (preview && placeholder) {
+        if (base64) {
+            preview.src = base64;
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+        } else {
+            preview.src = '';
+            preview.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+        }
+    }
+};
+
+// Garante que a imagem apareça preenchida se o usuário recarregar a página
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(window.updateProfileLogoUI, 1000);
+});
 
 let trackingTimeout: any;
 window.setupInputBindings = function() {

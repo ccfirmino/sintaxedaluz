@@ -1010,9 +1010,24 @@
             <h3 class="text-starlight font-black tracking-widest text-lg mb-6 uppercase text-center" data-i18n="profile_title">Configurações de Conta</h3>
             
             <div class="space-y-5">
+                <div class="flex flex-col items-center mb-6">
+                    <div class="w-24 h-24 rounded-full bg-slate-50 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden mb-3 relative group cursor-pointer hover:border-luminous-gold transition-colors shadow-sm" onclick="document.getElementById('profile-logo-input').click()">
+                        <img id="profile-logo-preview" src="" class="w-full h-full object-contain hidden bg-white p-2">
+                        <div id="profile-logo-placeholder" class="text-slate-400 flex flex-col items-center group-hover:text-luminous-gold transition-colors">
+                            <i class="fas fa-camera text-2xl mb-1"></i>
+                            <span class="text-[8px] font-black uppercase tracking-widest">Sua Logo</span>
+                        </div>
+                        <div class="absolute inset-0 bg-starlight/70 hidden group-hover:flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
+                            <i class="fas fa-upload text-white text-xl"></i>
+                        </div>
+                    </div>
+                    <input type="file" id="profile-logo-input" accept="image/png, image/jpeg" class="hidden" onchange="window.handleLogoUpload(this)">
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center">Marca para Relatórios (PNG/JPG)</p>
+                </div>
+
                 <div class="auth-input-group">
                     <label data-i18n="profile_email">E-mail de Cadastro</label>
-                    <input type="text" id="profile-email-display" disabled class="disabled:opacity-60 disabled:cursor-not-allowed bg-slate-50 border-b border-slate-200 p-2">
+                    <input type="text" id="profile-email-display" disabled class="disabled:opacity-60 disabled:cursor-not-allowed bg-slate-50 border-b border-slate-200 p-2 text-center font-bold">
                 </div>
                 <div class="auth-input-group">
                     <label data-i18n="profile_new_pass">Nova Senha</label>
