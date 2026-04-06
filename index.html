@@ -651,7 +651,8 @@
                                         <div id="hud-container" class="absolute top-4 left-4 z-40 flex flex-col gap-4 pointer-events-none">
                                             
                                             <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto backdrop-blur-md shadow-xl">
-                                                <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-3 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                                <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-1 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
+                                                <div class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-3 text-center bg-slate-100 dark:bg-slate-800 rounded py-0.5">Cálculo Direto + FM</div>
                                                 <div class="space-y-2">
                                                     <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
                                                     <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (LP):</span><span id="hud-em-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
@@ -723,12 +724,13 @@
                             </div>
 
                             <div id="results-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full hidden animate-fade-in-up">
-                                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
+                                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full relative">
                                     <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Iluminância (Em)</p>
                                     <div class="flex items-baseline gap-2">
                                         <span id="result-lux" class="text-4xl font-black text-starlight dark:text-white">0</span>
                                         <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">LUX</span>
                                     </div>
+                                    <div class="absolute top-6 right-6 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[8px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-700" title="Apenas luz direta depreciada pelo Fator de Manutenção">DIRETA + FM</div>
                                 </div>
                                 <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
                                     <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Ofuscamento (UGR)</p>

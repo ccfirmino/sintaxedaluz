@@ -22,6 +22,7 @@
 - [05/04/2026]: Evolução do SSOT Normativo (Nbr8995Database.ts): Implementação de tipagem estrita de planos de auditoria (LP - Piso / HP - Mesa) para validação contextual de malha.
 - [05/04/2026]: Refatoração de UI/UX (index.html): Adição de Tags de Transparência Técnica (UGR ESTIMADO), rótulos contextuais de auditoria NBR e controles avançados de Sólido Fotométrico no 3D.
 - [05/04/2026]: Integração de Lógica Adaptativa NBR (main.ts): Orquestração do cálculo dinâmico (LP/HP) na interface e gerador de PDF, espelhando o Single Source of Truth do banco de dados.
+- [05/04/2026]: Calibração Física Direta (RadiosityEngine.ts): Remoção do falso rebatimento indireto. O motor agora calcula estritamente a iluminância direta via Lei do Cosseno Cúbico depreciada pelo Fator de Manutenção (FM), garantindo exatidão fotométrica e honestidade técnica em estudos preliminares.
 - [05/04/2026]: Clipping 3D Físico (Photometric3DEngine.ts): Implementação de WebGL Clipping Planes dinâmicos (Piso e Paredes) atrelados às medidas do ambiente para restrição visual impecável de cones e malhas fotométricas IES.
 - [DATA ATUAL]: Integração Algorítmica (Canvas2D & Radiosity): Implementação de algoritmo físico Marching Squares para plotagem de Isolinhas Vetoriais dinâmicas e calibração de malha térmica integrando coeficientes U (Reflexão Indireta) e FM (Depreciação Lúminosa).
 

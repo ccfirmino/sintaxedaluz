@@ -98,14 +98,10 @@ export class RadiosityEngine {
             maxI = (actualFixtureFlux * (n_power + 1)) / (2 * Math.PI);
         }
 
-        // LUXSINTAX: Integração Física dos Fatores de Utilização (U) e Manutenção (FM)
-        const totalFluxAvailable = actualFixtureFlux * params.fixtures.length;
-        const roomArea = params.roomW * params.roomL;
-        const baseE = totalFluxAvailable / roomArea;
+        // LUXSINTAX: Calibração Direta Pura (Caminho B)
+        // O Fator de Utilização (U) atua apenas na sugestão de layout (LumenMethod).
+        // O motor de radiosidade calcula estritamente a Iluminância Direta + FM.
         
-        // A luz indireta (rebatida) é aproximada proporcionalmente ao Fator de Utilização (U).
-        const indirectLuxEstimate = baseE * (params.utilFactor * 0.45); 
-
         let minLux_LP = Infinity; let sumLux_LP = 0;
         let minLux_HP = Infinity; let sumLux_HP = 0;
         let cellCount = 0;
@@ -170,9 +166,9 @@ export class RadiosityEngine {
                     }
                 }
 
-                // Aplica a componente indireta (reflexões) e deprecia com o Fator de Manutenção (FM)
-                const totalLux_LP = Math.round((directLux_LP + indirectLuxEstimate) * params.maintFactor);
-                const totalLux_HP = hEff_HP > 0 ? Math.round((directLux_HP + indirectLuxEstimate) * params.maintFactor) : 0;
+                // Aplica estritamente a depreciação do Fator de Manutenção (FM) sobre a Luz Direta
+                const totalLux_LP = Math.round(directLux_LP * params.maintFactor);
+                const totalLux_HP = hEff_HP > 0 ? Math.round(directLux_HP * params.maintFactor) : 0;
 
                 if (totalLux_LP < minLux_LP) minLux_LP = totalLux_LP;
                 sumLux_LP += totalLux_LP;
