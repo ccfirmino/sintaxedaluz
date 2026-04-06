@@ -1395,29 +1395,30 @@ window.renderLeedProject = function() {
         
         let roomHtml = `
             <div id="room-card-${room.id}" class="bg-slate-50 dark:bg-slate-800/30 p-3 lg:p-4 rounded-xl border ${borderClass} animate-fade-in-up mb-4 transition-all">
-                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 w-full">
+                <div class="flex flex-wrap items-center gap-3 w-full">
                     
-                    <div class="flex items-center gap-3 w-full xl:w-auto overflow-x-auto custom-scrollbar pb-2 xl:pb-0">
+                    <div class="flex items-center gap-3 flex-grow min-w-[200px]">
                         <button onclick="window.toggleLeedRoom(${room.id})" class="text-slate-400 hover:text-luminous-gold w-6 h-6 flex-shrink-0 flex items-center justify-center rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shadow-sm transition-colors" title="Expandir/Recolher">
                             <i id="icon-toggle-${room.id}" class="fas ${expanded ? 'fa-minus' : 'fa-plus'} text-[10px]"></i>
                         </button>
-                        
-                        <input type="text" id="room-name-${room.id}" value="${room.name}" oninput="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-xs font-black ${titleColor} bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold transition-colors w-32 md:w-48 pb-1 uppercase outline-none truncate flex-shrink-0">
-                        
-                        <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-600 shadow-sm flex-shrink-0">
-                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest hidden md:block">ÁREA (m²):</label>
+                        <input type="text" id="room-name-${room.id}" value="${room.name}" oninput="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-xs font-black ${titleColor} bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold transition-colors w-full min-w-0 pb-1 uppercase outline-none truncate">
+                    </div>
+                    
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-600 shadow-sm">
+                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest hidden sm:block">ÁREA (m²):</label>
                             <input type="number" value="${room.area}" oninput="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="w-12 text-right bg-transparent text-[11px] font-black text-starlight dark:text-white outline-none focus:text-luminous-gold">
                         </div>
                         
-                        <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-600 shadow-sm flex-shrink-0">
-                            <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[140px] md:w-[200px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
+                        <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-600 shadow-sm">
+                            <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[130px] md:w-[180px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
                                 <option value="" disabled ${!room.typology ? 'selected' : ''}>TIPOLOGIA ASHRAE...</option>
                                 ${window.lpdBaselines.map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
                             </select>
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-3 w-full xl:w-auto justify-end flex-shrink-0 mt-2 xl:mt-0">
+                    <div class="flex items-center gap-2 flex-shrink-0 ml-0 xl:ml-auto w-full xl:w-auto justify-end mt-2 xl:mt-0">
                         <div class="flex items-center gap-2 bg-white dark:bg-slate-700 px-3 py-1.5 rounded border border-slate-200 dark:border-slate-600 shadow-sm">
                             <div class="text-[10px] font-bold"><span class="text-slate-400">W:</span> <span id="room-w-${room.id}" class="${titleColor} font-black">${roomTotalWatts.toFixed(1)}</span></div>
                             <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
