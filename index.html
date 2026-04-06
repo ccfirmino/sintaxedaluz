@@ -292,12 +292,12 @@
                 <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-2">COMPORTAMENTO DO TILT</label>
                 <div class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm w-full">
                     <label class="flex-1 text-center cursor-pointer">
-                        <input type="radio" name="p_tilt_mode" value="same" class="peer hidden" checked onchange="window.updateCalculations()">
-                        <div class="block w-full px-2 py-1.5 text-[8px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold peer-checked:bg-luminous-gold peer-checked:text-white peer-checked:shadow-sm transition-all">Mesmo Lado</div>
+                        <input type="radio" name="p_tilt_mode" value="same" class="peer" style="display: none !important;" checked onchange="window.updateCalculations()">
+                        <div class="block w-full px-2 py-1.5 text-[8px] font-black uppercase rounded-lg text-slate-400 dark:text-slate-400 hover:text-luminous-gold peer-checked:bg-luminous-gold peer-checked:text-white dark:peer-checked:text-white peer-checked:shadow-sm transition-all">Mesmo Lado</div>
                     </label>
                     <label class="flex-1 text-center cursor-pointer">
-                        <input type="radio" name="p_tilt_mode" value="cross" class="peer hidden" onchange="window.updateCalculations()">
-                        <div class="block w-full px-2 py-1.5 text-[8px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold peer-checked:bg-luminous-gold peer-checked:text-white peer-checked:shadow-sm transition-all">Invertido</div>
+                        <input type="radio" name="p_tilt_mode" value="cross" class="peer" style="display: none !important;" onchange="window.updateCalculations()">
+                        <div class="block w-full px-2 py-1.5 text-[8px] font-black uppercase rounded-lg text-slate-400 dark:text-slate-400 hover:text-luminous-gold peer-checked:bg-luminous-gold peer-checked:text-white dark:peer-checked:text-white peer-checked:shadow-sm transition-all">Invertido</div>
                     </label>
                 </div>
             </div>
