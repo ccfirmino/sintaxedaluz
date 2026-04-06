@@ -914,14 +914,18 @@ window.handleGenerateReport = async (event: any) => {
         s.viewLevel = level;
         s.falseColor = true;
         window.state.showIsolines = true;
-        window.Canvas2DEngine.render();
+        
+        // AWAIT obriga a câmera a esperar a Promessa do Worker do Canvas2DEngine terminar de pintar
+        await window.Canvas2DEngine.render(); 
+        
         return new Promise((resolve) => {
-            requestAnimationFrame(() => {
+            // Um leve delay para garantir que o GPU do Canvas descarregou o buffer na tela
+            setTimeout(() => {
                 const dataUrl = (document.getElementById('beamCanvas') as HTMLCanvasElement).toDataURL('image/png');
                 s.viewLevel = oldLevel; s.falseColor = oldFC; window.state.showIsolines = oldIsolines;
-                window.Canvas2DEngine.render();
+                window.Canvas2DEngine.render(); // Restaura sem precisar de await
                 resolve(dataUrl);
-            });
+            }, 100);
         });
     };
 
@@ -1514,14 +1518,21 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
     const resLux = document.getElementById('result-lux');
     const resUgr = document.getElementById('result-ugr');
     const resEff = document.getElementById('result-eff');
-    const nbrPlaneTag = document.getElementById('nbr-plane-tag');
     
     if (resLux) resLux.innerText = String(Math.round(displayLux));
     if (resUgr) resUgr.innerText = String(ugr);
-    
-    if (nbrPlaneTag) {
-        nbrPlaneTag.classList.remove('hidden');
-        nbrPlaneTag.innerText = targetPlane === 'LP' ? 'PISO (0.00m)' : 'MESA (0.75m)';
+
+    // Atualização do novo Resumo Compacto da Auditoria
+    const nbrSummaryRow = document.getElementById('nbr-summary-row');
+    if (nbrSummaryRow) {
+        nbrSummaryRow.classList.remove('hidden');
+        nbrSummaryRow.classList.add('flex');
+        const sumLux = document.getElementById('nbr-sum-lux');
+        const sumUgr = document.getElementById('nbr-sum-ugr');
+        const sumPlane = document.getElementById('nbr-sum-plane');
+        if (sumLux) sumLux.innerText = String(Math.round(displayLux));
+        if (sumUgr) sumUgr.innerText = String(ugr);
+        if (sumPlane) sumPlane.innerText = targetPlane === 'LP' ? 'NÍVEL PISO (0.00m)' : 'NÍVEL MESA (0.75m)';
     }
 
     const flux = window.state?.grid?.flux || 0;

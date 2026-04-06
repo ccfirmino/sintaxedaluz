@@ -98,8 +98,13 @@ export class RadiosityEngine {
             maxI = (actualFixtureFlux * (n_power + 1)) / (2 * Math.PI);
         }
 
-        const avgLumen = (actualFixtureFlux * params.fixtures.length * params.utilFactor * params.maintFactor) / (params.roomW * params.roomL);
-        const ambientLux = avgLumen * 0.08;
+        // LUXSINTAX: Integração Física dos Fatores de Utilização (U) e Manutenção (FM)
+        const totalFluxAvailable = actualFixtureFlux * params.fixtures.length;
+        const roomArea = params.roomW * params.roomL;
+        const baseE = totalFluxAvailable / roomArea;
+        
+        // A luz indireta (rebatida) é aproximada proporcionalmente ao Fator de Utilização (U).
+        const indirectLuxEstimate = baseE * (params.utilFactor * 0.45); 
 
         let minLux_LP = Infinity; let sumLux_LP = 0;
         let minLux_HP = Infinity; let sumLux_HP = 0;
@@ -109,7 +114,7 @@ export class RadiosityEngine {
         const hEff_HP = params.height - (params.plane || 0.75);
 
         const luxMatrix: number[][] = [];
-        const offsets =[-0.125, 0.125];
+        const offsets = [-0.125, 0.125];
         const currentLevel = params.viewLevel || 'HP';
 
         for (let i = 0; i < cellCols; i++) {
@@ -165,8 +170,9 @@ export class RadiosityEngine {
                     }
                 }
 
-                const totalLux_LP = Math.round(directLux_LP * params.maintFactor + ambientLux);
-                const totalLux_HP = hEff_HP > 0 ? Math.round(directLux_HP * params.maintFactor + ambientLux) : 0;
+                // Aplica a componente indireta (reflexões) e deprecia com o Fator de Manutenção (FM)
+                const totalLux_LP = Math.round((directLux_LP + indirectLuxEstimate) * params.maintFactor);
+                const totalLux_HP = hEff_HP > 0 ? Math.round((directLux_HP + indirectLuxEstimate) * params.maintFactor) : 0;
 
                 if (totalLux_LP < minLux_LP) minLux_LP = totalLux_LP;
                 sumLux_LP += totalLux_LP;

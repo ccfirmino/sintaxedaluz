@@ -49,6 +49,78 @@ export class Canvas2DEngine {
         ctx.fillStyle = "#d97706"; ctx.textAlign = "center"; ctx.fillText(text, x, y - 2); ctx.textAlign = "start"; 
     }
 
+    // LUXSINTAX: Algoritmo Marching Squares para Isolinhas Fotométricas
+    private static drawIsolines(ctx: CanvasRenderingContext2D, matrix: number[][], cols: number, rows: number, cellW: number, cellH: number, offsetX: number, offsetY: number, hasFalseColor: boolean, isDark: boolean) {
+        const levels = [100, 200, 300, 500, 750, 1000, 1500, 2000];
+        ctx.lineJoin = "round";
+
+        const getPt = (vA: number, vB: number, pA: {x:number, y:number}, pB: {x:number, y:number}, lvl: number) => {
+            if (vA === vB) return { x: pA.x, y: pA.y };
+            const t = (lvl - vA) / (vB - vA);
+            return { x: pA.x + t * (pB.x - pA.x), y: pA.y + t * (pB.y - pA.y) };
+        };
+
+        levels.forEach(lvl => {
+            ctx.beginPath();
+            ctx.strokeStyle = hasFalseColor ? (isDark ? "rgba(255,255,255,0.6)" : "rgba(15,23,42,0.6)") : (isDark ? "rgba(14,165,233,0.8)" : "rgba(2,132,199,0.8)");
+            ctx.lineWidth = hasFalseColor ? 1 : 1.5;
+
+            let segmentCount = 0;
+
+            for (let i = 0; i < cols - 1; i++) {
+                for (let j = 0; j < rows - 1; j++) {
+                    const v0 = matrix[i][j], v1 = matrix[i+1][j], v2 = matrix[i+1][j+1], v3 = matrix[i][j+1];
+                    const p0 = { x: offsetX + (i + 0.5) * cellW, y: offsetY + (j + 0.5) * cellH };
+                    const p1 = { x: offsetX + (i + 1.5) * cellW, y: offsetY + (j + 0.5) * cellH };
+                    const p2 = { x: offsetX + (i + 1.5) * cellW, y: offsetY + (j + 1.5) * cellH };
+                    const p3 = { x: offsetX + (i + 0.5) * cellW, y: offsetY + (j + 1.5) * cellH };
+
+                    let state = 0;
+                    if (v0 >= lvl) state |= 1;
+                    if (v1 >= lvl) state |= 2;
+                    if (v2 >= lvl) state |= 4;
+                    if (v3 >= lvl) state |= 8;
+
+                    if (state === 0 || state === 15) continue;
+
+                    const pts: any[] = [];
+                    const s0 = state & 1, s1 = (state & 2) >> 1, s2 = (state & 4) >> 2, s3 = (state & 8) >> 3;
+
+                    if (s0 !== s1) pts.push(getPt(v0, v1, p0, p1, lvl)); // Topo
+                    if (s1 !== s2) pts.push(getPt(v1, v2, p1, p2, lvl)); // Direita
+                    if (s2 !== s3) pts.push(getPt(v3, v2, p3, p2, lvl)); // Fundo
+                    if (s3 !== s0) pts.push(getPt(v0, v3, p0, p3, lvl)); // Esquerda
+
+                    if (pts.length >= 2) {
+                        ctx.moveTo(pts[0].x, pts[0].y);
+                        ctx.lineTo(pts[1].x, pts[1].y);
+                        
+                        if (pts.length === 4) {
+                            ctx.moveTo(pts[2].x, pts[2].y);
+                            ctx.lineTo(pts[3].x, pts[3].y);
+                        }
+
+                        segmentCount++;
+                        // Adicionar Rótulo Numérico estrategicamente espaçado (a cada 25 nós do grid)
+                        if (segmentCount % 25 === 0) {
+                            ctx.save();
+                            ctx.font = "bold 9px Manrope";
+                            const tw = ctx.measureText(String(lvl)).width;
+                            ctx.fillStyle = isDark ? "rgba(15,23,42,0.85)" : "rgba(255,255,255,0.85)";
+                            ctx.fillRect(pts[0].x - tw/2 - 2, pts[0].y - 6, tw + 4, 12);
+                            ctx.fillStyle = hasFalseColor ? (isDark ? "#ffffff" : "#0f172a") : "#0284c7";
+                            ctx.textAlign = "center";
+                            ctx.textBaseline = "middle";
+                            ctx.fillText(String(lvl), pts[0].x, pts[0].y);
+                            ctx.restore();
+                        }
+                    }
+                }
+            }
+            ctx.stroke();
+        });
+    }
+
     public static async render() {
         const currentId = ++this.currentRenderId;
         const win = window as any;
@@ -247,8 +319,8 @@ export class Canvas2DEngine {
                 }
             }
 
-            if (win.state.showIsolines !== false && win.drawIsolinesOnCanvas) {
-                win.drawIsolinesOnCanvas(ctx, luxMatrix, cellCols, cellRows, s.falseColor);
+            if (win.state.showIsolines !== false) {
+                this.drawIsolines(ctx, luxMatrix, cellCols, cellRows, cellPxW, cellPxH, offsetX, offsetY, s.falseColor, isDark);
             }
 
             const bgToggle = document.getElementById('fc-toggle-bg');

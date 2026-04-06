@@ -541,8 +541,8 @@
                                         </div>
 
                                         <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                            <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Planta Baixa (Mesa)</button>
-                                            <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Planta Baixa (Piso)</button>
+                                            <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Nível Mesa</button>
+                                            <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Nível Piso</button>
                                             <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
                                         </div>
                                     </div>
@@ -754,8 +754,13 @@
                                             <i id="nbr-icon" class="fas fa-info-circle"></i>
                                         </div>
                                         <div>
-                                            <h3 class="text-sm font-black text-starlight dark:text-white uppercase tracking-widest flex items-center gap-2">Auditoria NBR 8995-1 <span id="nbr-plane-tag" class="hidden px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[8px] rounded-full border border-slate-300 dark:border-slate-600">--</span></h3>
-                                            <p id="nbr-status-text" class="text-slate-500 dark:text-slate-300 font-bold uppercase tracking-tighter text-[11px]">Processando dados fotométricos...</p>
+                                            <h3 class="text-sm font-black text-starlight dark:text-white uppercase tracking-widest flex items-center gap-2 mb-1">Auditoria NBR 8995-1</h3>
+                                            <div id="nbr-summary-row" class="hidden items-center gap-3 mb-1">
+                                                <span class="text-starlight dark:text-white font-black text-xs"><span id="nbr-sum-lux">0</span> lx</span>
+                                                <span class="text-starlight dark:text-white font-black text-xs">UGR <span id="nbr-sum-ugr">0</span></span>
+                                                <span id="nbr-sum-plane" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[8px] rounded-full border border-slate-300 dark:border-slate-600 font-bold tracking-widest">--</span>
+                                            </div>
+                                            <p id="nbr-status-text" class="text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tighter text-[9px]">Processando dados fotométricos...</p>
                                         </div>
                                     </div>
                                     <div id="nbr-badge" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
