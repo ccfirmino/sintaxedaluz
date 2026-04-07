@@ -1806,7 +1806,8 @@ window.updateCalculations = function() {
 
                 if (window.updatePhotometricHUD) window.updatePhotometricHUD();
 
-                if (tool === 'audit' && window.updateAuditUI) {
+                // LUXSINTAX: Atualiza a interface de Auditoria tanto na aba HCL/ESG quanto no Driver Hub
+                if ((tool === 'audit' || tool === 'driver') && window.updateAuditUI) {
                     window.updateAuditUI();
                 }
 
