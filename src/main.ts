@@ -247,15 +247,16 @@ window.switchTool = function(toolId: string) {
         activeBtn.classList.add('tab-active', 'text-luminous-gold');
     }
 
-    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit');
+    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver');
         document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
         document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
         document.getElementById('audit-tool')?.classList.toggle('hidden', toolId !== 'audit');
+        document.getElementById('driver-tool')?.classList.toggle('hidden', toolId !== 'driver');
     
     const modeSelector = document.getElementById('calc-mode-selector');
     if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
 
-    if (toolId !== 'query' && toolId !== 'leedProj') {
+    if (toolId !== 'query' && toolId !== 'leedProj' && toolId !== 'audit' && toolId !== 'driver') {
         ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
             const el = document.getElementById(id); 
             if(el) el.classList.add('hidden'); 
