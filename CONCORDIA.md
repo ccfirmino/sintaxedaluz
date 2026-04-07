@@ -35,14 +35,17 @@
 - [06/04/2026]: Módulo de Auditoria e Performance (Fase 1 - Elétrica): Criação da aba "Auditoria & Performance". Implementação do ElectricalEngine.ts no Domínio para cálculo de Queda de Tensão (Driver Intelligence).
 - [06/04/2026]: Módulo de Auditoria e Performance (Fase 2 - HCL): Implementação do HCLEngine.ts no Domínio. Cálculo do m-EDI (Melanopic Equivalent Daylight Illuminance) para validação de ciclo circadiano e certificação WELL.
 - [06/04/2026]: Módulo de Auditoria e Performance (Fase 3 - ESG & ROI): Implementação do ESGEngine.ts no Domínio. Cálculo dinâmico de Payback, economia de energia em R$ e compensação de Carbono (CO2 convertido em árvores/ano).
+- [07/04/2026]: Refatoração Sistêmica (Driver Intelligence Hub): Migração do "Guardião Elétrico" para a aba Driver. Implementação de Dashboard visual para dimensionamento de fontes com Auditoria de Carga (80% Safety Margin) e sugestões de Topologia.
+- [07/04/2026]: Upgrade do Motor ESG (ESGEngine.ts): Inclusão de variáveis de Climatização (HVAC) e Custos de Manutenção (OPEX) para cálculo de ROI Enterprise.
+- [07/04/2026]: Refinamento HCL: Adição de alertas contextuais sobre Iluminância Vertical (Ev) para conformidade técnica com WELL v2.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
 - src/main.ts: Ponto de entrada, orquestrador de estado global e ponte Window.
-- src/domain/: Lógica pura matemática e física (Fotometria, Elétrica, Normas).
+- src/domain/: Lógica pura matemática e física (Fotometria, Elétrica, Normas, ESG).
 - src/infrastructure/: Motores de renderização (Three.js, Canvas2D) e exportação.
 - [DATA ATUAL]: Modularização do HTML concluída via AI Studio.
-- [06/04/2026]: Início do Desenvolvimento da Tríade de Auditoria Estratégica (Elétrica, HCL, ESG).
+- [07/04/2026]: Implementação do Dashboard de Auditoria & Performance e Driver Hub concluídos.
 
 ## Regras para a IA
 1. Antes de sugerir código, verifique se a convenção de `organization_id` está mantida.

@@ -846,64 +846,82 @@
                         </div>
                     </div>    
 
+                    <div id="driver-tool" class="w-full animate-fade-in-up col-span-12 hidden">
+                        <div class="glass-panel p-8 rounded-2xl bg-white dark:bg-slate-900 shadow-xl">
+                            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
+                                <div>
+                                    <h3 class="text-xl text-starlight dark:text-white font-black tracking-widest flex items-center gap-2 uppercase">
+                                        <i class="fas fa-microchip text-luminous-gold"></i> <span>Driver Intelligence Hub</span>
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mt-1 font-bold">Cálculo de carga, cabeamento e topologia de instalação.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
+                                    <h4 class="text-sm font-black text-luminous-gold mb-4 uppercase tracking-widest"><i class="fas fa-weight-hanging mr-2"></i> Auditoria de Carga</h4>
+                                    <div class="space-y-4 mb-6">
+                                        <div class="flex justify-between items-end"><span class="text-[10px] font-bold text-slate-500 uppercase">Potência Real (Carga):</span><span class="text-lg font-black text-starlight dark:text-white" id="driver-total-watts">0.0 W</span></div>
+                                        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                                            <span class="text-[9px] font-black text-luminous-gold uppercase block mb-1">Fonte Recomendada (+20%)</span>
+                                            <span class="text-xl font-black text-starlight dark:text-white" id="driver-recommended-source">0.0 W</span>
+                                        </div>
+                                    </div>
+                                    <div id="driver-safety-box" class="p-3 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                        <i class="fas fa-shield-alt mr-1"></i> Mantenha sempre 20% de folga térmica para estender a vida útil do driver.
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative">
+                                    <h4 class="text-sm font-black text-tech-cyan mb-4 uppercase tracking-widest"><i class="fas fa-bolt mr-2"></i> Guardião Elétrico</h4>
+                                    <div class="space-y-4 mb-4">
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Distância (m)</label>
+                                                <input type="number" id="audit-wire-length" value="5" min="1" max="50" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-right outline-none focus:border-tech-cyan">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Bitola (mm²)</label>
+                                                <select id="audit-wire-gauge" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-2 text-[10px] font-bold outline-none focus:border-tech-cyan cursor-pointer">
+                                                    <option value="0.5">0.50 mm²</option><option value="0.75">0.75 mm²</option><option value="1.0">1.00 mm²</option><option value="1.5" selected>1.50 mm²</option><option value="2.5">2.50 mm²</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <div class="flex justify-between items-end mb-2">
+                                            <span class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">Queda (ΔV)</span>
+                                            <span class="text-lg font-black text-starlight dark:text-white" id="audit-drop-pct">0.0%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden"><div id="audit-drop-bar" class="h-full bg-leed-green w-0 transition-all"></div></div>
+                                        <div id="audit-alert-box" class="mt-3 p-2 rounded bg-slate-50 text-[9px] font-bold border border-slate-200 hidden"><span id="audit-alert-msg">OK</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
+                                    <h4 class="text-sm font-black text-starlight dark:text-white mb-4 uppercase tracking-widest"><i class="fas fa-project-diagram mr-2"></i> Topologia Sugerida</h4>
+                                    <div id="topology-card" class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center">
+                                        <div id="topology-icon" class="text-4xl text-leed-green mb-4"><i class="fas fa-arrow-right"></i></div>
+                                        <span id="topology-name" class="text-xs font-black uppercase tracking-widest text-starlight dark:text-white mb-2">Alimentação Unilateral</span>
+                                        <p id="topology-desc" class="text-[10px] text-slate-500 font-bold leading-relaxed">Cabo conectado em apenas uma extremidade da fita LED. Recomendado para baixas quedas de tensão.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="audit-tool" class="w-full animate-fade-in-up col-span-12 hidden">
                         <div class="glass-panel p-8 rounded-2xl bg-white dark:bg-slate-900 transition-colors duration-300">
                             <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
                                 <div>
                                     <h3 class="text-xl text-starlight dark:text-white font-black tracking-widest flex items-center gap-2 uppercase">
-                                        <i class="fas fa-radar text-luminous-gold"></i> <span>Radar de Auditoria & Performance</span>
+                                        <i class="fas fa-radar text-luminous-gold"></i> <span>Auditoria & Impacto (HCL / ESG)</span>
                                     </h3>
-                                    <p class="text-xs text-slate-500 mt-1 font-bold">Validação de integridade elétrica, saúde circadiana e ESG.</p>
+                                    <p class="text-xs text-slate-500 mt-1 font-bold">Avaliação biológica e viabilidade financeira do projeto.</p>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative group">
-                                    <h4 class="text-sm font-black text-tech-cyan mb-4 flex justify-between items-center uppercase tracking-widest">
-                                        <span><i class="fas fa-bolt mr-2"></i> Guardião Elétrico</span>
-                                    </h4>
-                                    
-                                    <div class="space-y-4 mb-6">
-                                        <div>
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Tensão do Sistema</label>
-                                            <select id="audit-voltage" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-tech-cyan cursor-pointer transition-colors">
-                                                <option value="12">12V (Fita LED Padrão)</option>
-                                                <option value="24">24V (Fita LED Alta Potência)</option>
-                                            </select>
-                                        </div>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Distância (m)</label>
-                                                <input type="number" id="audit-wire-length" value="5" min="1" max="50" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-tech-cyan text-right">
-                                            </div>
-                                            <div>
-                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Bitola (mm²)</label>
-                                                <select id="audit-wire-gauge" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-tech-cyan cursor-pointer transition-colors">
-                                                    <option value="0.5">0.50 mm²</option>
-                                                    <option value="0.75">0.75 mm²</option>
-                                                    <option value="1.0">1.00 mm²</option>
-                                                    <option value="1.5" selected>1.50 mm²</option>
-                                                    <option value="2.5">2.50 mm²</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <span class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">Queda de Tensão (ΔV)</span>
-                                            <span class="text-lg font-black text-starlight dark:text-white"><span id="audit-drop-pct">0.0</span>% <span class="text-xs text-slate-400 font-normal">(<span id="audit-drop-val">0.00</span>V)</span></span>
-                                        </div>
-                                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                                            <div id="audit-drop-bar" class="h-full bg-leed-green transition-all duration-500" style="width: 0%"></div>
-                                        </div>
-                                        
-                                        <div id="audit-alert-box" class="hidden mt-4 p-3 bg-slate-50 rounded-lg text-[10px] text-slate-700 font-bold border border-slate-200">
-                                            <span id="audit-alert-msg"><i class="fas fa-info-circle mr-1"></i> Calculando integridade...</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative group">
                                     <h4 class="text-sm font-black text-purple-500 mb-4 flex justify-between items-center uppercase tracking-widest">
                                         <span><i class="fas fa-clock mr-2"></i> Relógio Biológico</span>
@@ -911,8 +929,11 @@
                                     
                                     <div class="space-y-4 mb-6">
                                         <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Lux no Plano (E)</label>
+                                            <div class="relative group/tooltip">
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Lux no Plano (E)</label>
+                                                <div class="absolute bottom-full left-0 mb-2 w-48 bg-slate-800 text-white text-[9px] p-2 rounded shadow-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50">
+                                                    Para rigor técnico (Ex: WELL v2), insira o Lux Vertical (Ev) medido na altura do olho (1.20m), e não no piso.
+                                                </div>
                                                 <input type="number" id="audit-visual-lux" value="500" min="10" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right">
                                             </div>
                                             <div>
@@ -978,6 +999,16 @@
                                             <div>
                                                 <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Uso Diário (Horas)</label>
                                                 <input type="number" id="audit-daily-hours" value="10" min="1" max="24" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-leed-green text-right">
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-600">
+                                                <input type="checkbox" id="audit-has-ac" onchange="window.updateCalculations()" class="w-4 h-4 accent-leed-green cursor-pointer">
+                                                <label for="audit-has-ac" class="text-[9px] font-black text-slate-500 uppercase cursor-pointer">Ar Condicionado</label>
+                                            </div>
+                                            <div>
+                                                <label class="text-[9px] text-slate-500 font-bold uppercase block mb-1">Manutenção/Ano (R$)</label>
+                                                <input type="number" id="audit-opex-savings" value="0" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-[10px] font-bold text-right outline-none focus:border-leed-green">
                                             </div>
                                         </div>
                                     </div>
