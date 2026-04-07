@@ -17,6 +17,7 @@ import { AuthManager } from './auth/AuthManager';
 import { Canvas2DEngine } from './infrastructure/canvas/Canvas2DEngine';
 import { ElectricalEngine } from './domain/electrical/ElectricalEngine';
 import { HCLEngine } from './domain/health/HCLEngine';
+import { ESGEngine } from './domain/standards/ESGEngine';
 
 /**
  * Interface de Extensão do Objeto Window para TypeScript estrito
@@ -61,7 +62,7 @@ window.state = {
     grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, cct: 3000, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
     driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
     leedProject: { name: "Novo Projeto LEED", target: "baseline", rooms: [] },
-        audit: { wireLength: 5, wireGauge: 1.5, voltage: 12, useType: 'office', timeOfDay: 'morning', mRatio: 0.52, visualLux: 500 },
+        audit: { wireLength: 5, wireGauge: 1.5, voltage: 12, useType: 'office', timeOfDay: 'morning', mRatio: 0.52, visualLux: 500, baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260 },
         showIsolines: true,
     showPolar: true,
     showHCL: false
@@ -81,6 +82,7 @@ window.LumenMethod = LumenMethod;
 window.Photometrics = Photometrics; // FUNDAMENTAL: Atribui o motor de física ao window
 window.ElectricalEngine = ElectricalEngine; // Módulo de Auditoria Elétrica
 window.HCLEngine = HCLEngine; // Módulo de Saúde Circadiana
+window.ESGEngine = ESGEngine; // Módulo de Finanças e ESG
 window.RadiosityEngine = RadiosityEngine; // Atribui o motor de cálculo em background
 window.currentLang = 'pt';
 window.calcMode = 'direct';
@@ -1602,6 +1604,10 @@ window.updateAuditUI = function() {
     const mRatioSelect = document.getElementById('audit-mratio') as HTMLSelectElement;
     const luxInput = document.getElementById('audit-visual-lux') as HTMLInputElement;
     
+    const baseWattsInput = document.getElementById('audit-baseline-watts') as HTMLInputElement;
+    const kwhCostInput = document.getElementById('audit-kwh-cost') as HTMLInputElement;
+    const hoursInput = document.getElementById('audit-daily-hours') as HTMLInputElement;
+
     if (lenInput) s.wireLength = parseFloat(lenInput.value) || 5;
     if (gaugeSelect) s.wireGauge = parseFloat(gaugeSelect.value) || 1.5;
     if (voltSelect) s.voltage = parseFloat(voltSelect.value) || 12;
@@ -1612,6 +1618,10 @@ window.updateAuditUI = function() {
     // Herdamos o Lux do método Lúmens se não for digitado manualmente
     const fallbackLux = window.state.grid?.targetLux || 500;
     if (luxInput) s.visualLux = parseFloat(luxInput.value) || fallbackLux;
+
+    if (baseWattsInput) s.baselineWatts = parseFloat(baseWattsInput.value) || 1500;
+    if (kwhCostInput) s.kwhCost = parseFloat(kwhCostInput.value) || 0.85;
+    if (hoursInput) s.dailyHours = parseFloat(hoursInput.value) || 10;
 
     if (window.ElectricalEngine) {
         const result = window.ElectricalEngine.calculateVoltageDrop(s.wireLength, s.wireGauge, totalPower, s.voltage);
@@ -1669,6 +1679,40 @@ window.updateAuditUI = function() {
                 alertBox.classList.remove('hidden');
                 alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200`;
                 alertEl.innerHTML = `<i class="fas fa-brain mr-1"></i> ${bioResult.message}`;
+            }
+        }
+    }
+
+    if (window.ESGEngine && window.ESGEngine.calculateESGImpact) {
+        // Captura a potência atual do sistema ativo (Malha ou Driver)
+        let systemWatts = 0;
+        if (window.currentTool === 'grid' && window.state.grid) {
+            systemWatts = (window.state.grid.watts || 0) * (window.state.grid.cols || 1) * (window.state.grid.rows || 1);
+        } else if (window.currentTool === 'driver' && window.state.driver) {
+            systemWatts = totalPower;
+        } else {
+            systemWatts = 300; // Valor de fallback
+        }
+
+        const esgResult = window.ESGEngine.calculateESGImpact(systemWatts, s.baselineWatts, s.kwhCost, s.dailyHours, s.daysPerYear);
+        
+        const moneyEl = document.getElementById('audit-money-val');
+        const treesEl = document.getElementById('audit-trees-val');
+        const alertEl = document.getElementById('audit-esg-msg');
+        const alertBox = document.getElementById('audit-esg-box');
+
+        if (moneyEl) moneyEl.innerText = esgResult.savingsMoney.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        if (treesEl) treesEl.innerText = esgResult.treesPlanted.toFixed(1);
+
+        if (alertBox && alertEl) {
+            if (!esgResult.isProfitable) {
+                alertBox.classList.remove('hidden');
+                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-red-50 text-red-700 border border-red-200`;
+                alertEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${esgResult.message}`;
+            } else {
+                alertBox.classList.remove('hidden');
+                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-green-50 text-green-700 border border-green-200`;
+                alertEl.innerHTML = `<i class="fas fa-leaf mr-1"></i> ${esgResult.message}`;
             }
         }
     }

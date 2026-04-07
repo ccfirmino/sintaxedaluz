@@ -32,7 +32,9 @@
 - [06/04/2026]: Otimização de Performance (Módulo LEED): Implementação de manipulação de estado DOM Anti-Flicker (display toggle) na expansão de ambientes, prevenindo re-renderização excessiva (DOM Thrashing).
 - [06/04/2026]: Evolução de Regra de Negócio (Interface e Domínio): Inserção de suporte matemático (`StandardsEngine.ts`) e de interface para Meta de Redução LPD Customizada.
 - [06/04/2026]: Compliance Legal (ReportExporter): Injeção automática de Disclaimer Técnico (Hold Harmless clause) nos relatórios PDF gerados, protegendo a plataforma juridicamente.
-- [06/04/2026]: Módulo de Auditoria e Performance (Fase 1 - Elétrica): Criação da aba "Auditoria & Performance" na interface (Cockpit Estratégico). Implementação do ElectricalEngine.ts no Domínio para cálculo isolado de Queda de Tensão e dimensionamento de cabos (Driver Intelligence Hub), mantendo a Clean Architecture.
+- [06/04/2026]: Módulo de Auditoria e Performance (Fase 1 - Elétrica): Criação da aba "Auditoria & Performance". Implementação do ElectricalEngine.ts no Domínio para cálculo de Queda de Tensão (Driver Intelligence).
+- [06/04/2026]: Módulo de Auditoria e Performance (Fase 2 - HCL): Implementação do HCLEngine.ts no Domínio. Cálculo do m-EDI (Melanopic Equivalent Daylight Illuminance) para validação de ciclo circadiano e certificação WELL.
+- [06/04/2026]: Módulo de Auditoria e Performance (Fase 3 - ESG & ROI): Implementação do ESGEngine.ts no Domínio. Cálculo dinâmico de Payback, economia de energia em R$ e compensação de Carbono (CO2 convertido em árvores/ano).
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).

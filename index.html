@@ -960,10 +960,42 @@
                                     </div>
                                 </div>
 
-                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm opacity-50 pointer-events-none flex flex-col items-center justify-center text-center min-h-[300px]">
-                                    <i class="fas fa-leaf text-3xl text-leed-green mb-3"></i>
-                                    <h4 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">Viabilidade ESG</h4>
-                                    <p class="text-[10px] text-slate-400 font-bold">Módulo ROI/Carbono em construção...</p>
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative group">
+                                    <h4 class="text-sm font-black text-leed-green mb-4 flex justify-between items-center uppercase tracking-widest">
+                                        <span><i class="fas fa-leaf mr-2"></i> Viabilidade ESG & ROI</span>
+                                    </h4>
+                                    
+                                    <div class="space-y-4 mb-6">
+                                        <div>
+                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Carga Anterior / Base (Watts)</label>
+                                            <input type="number" id="audit-baseline-watts" value="1500" min="10" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-leed-green text-right">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Tarifa (R$/kWh)</label>
+                                                <input type="number" id="audit-kwh-cost" value="0.85" step="0.01" min="0.1" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-leed-green text-right">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Uso Diário (Horas)</label>
+                                                <input type="number" id="audit-daily-hours" value="10" min="1" max="24" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-leed-green text-right">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <div class="flex justify-between items-end mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                                            <span class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">Economia Anual</span>
+                                            <span class="text-lg font-black text-leed-green" id="audit-money-val">R$ 0,00</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mb-2">
+                                            <span class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">Impacto Carbônico (Árvores/Ano)</span>
+                                            <span class="text-lg font-black text-tech-cyan"><i class="fas fa-tree text-sm mr-1"></i> <span id="audit-trees-val">0.0</span></span>
+                                        </div>
+                                        
+                                        <div id="audit-esg-box" class="hidden mt-4 p-3 bg-slate-50 rounded-lg text-[10px] text-slate-700 font-bold border border-slate-200">
+                                            <span id="audit-esg-msg"><i class="fas fa-leaf mr-1"></i> Calculando viabilidade...</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
