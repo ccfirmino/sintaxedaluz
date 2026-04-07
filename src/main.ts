@@ -1595,8 +1595,9 @@ window.deleteSpecificLeedProject = async () => {
 window.updateAuditUI = function() {
     const s = window.state.audit;
     const driverState = window.state.driver;
-    const totalPower = driverState.power * driverState.qty; // Puxa a potência do setup do driver
+    const totalPower = driverState.power * driverState.qty; // Puxa a potência
     
+    // Captura de Elementos UI
     const lenInput = document.getElementById('audit-wire-length') as HTMLInputElement;
     const gaugeSelect = document.getElementById('audit-wire-gauge') as HTMLSelectElement;
     const voltSelect = document.getElementById('audit-voltage') as HTMLSelectElement;
@@ -1604,26 +1605,37 @@ window.updateAuditUI = function() {
     const timeSelect = document.getElementById('audit-time') as HTMLSelectElement;
     const mRatioSelect = document.getElementById('audit-mratio') as HTMLSelectElement;
     const luxInput = document.getElementById('audit-visual-lux') as HTMLInputElement;
-    
     const baseWattsInput = document.getElementById('audit-baseline-watts') as HTMLInputElement;
     const kwhCostInput = document.getElementById('audit-kwh-cost') as HTMLInputElement;
     const hoursInput = document.getElementById('audit-daily-hours') as HTMLInputElement;
 
+    // Atualização de Estado
     if (lenInput) s.wireLength = parseFloat(lenInput.value) || 5;
     if (gaugeSelect) s.wireGauge = parseFloat(gaugeSelect.value) || 1.5;
-    if (voltSelect) s.voltage = parseFloat(voltSelect.value) || 12;
+    if (voltSelect) s.voltage = parseFloat(voltSelect.value) || 24;
     if (useSelect) s.useType = useSelect.value || 'office';
     if (timeSelect) s.timeOfDay = timeSelect.value || 'morning';
     if (mRatioSelect) s.mRatio = parseFloat(mRatioSelect.value) || 0.52;
-    
-    // Herdamos o Lux do método Lúmens se não for digitado manualmente
-    const fallbackLux = window.state.grid?.targetLux || 500;
-    if (luxInput) s.visualLux = parseFloat(luxInput.value) || fallbackLux;
-
     if (baseWattsInput) s.baselineWatts = parseFloat(baseWattsInput.value) || 1500;
     if (kwhCostInput) s.kwhCost = parseFloat(kwhCostInput.value) || 0.85;
     if (hoursInput) s.dailyHours = parseFloat(hoursInput.value) || 10;
+    
+    const fallbackLux = window.state.grid?.targetLux || 500;
+    if (luxInput) s.visualLux = parseFloat(luxInput.value) || fallbackLux;
 
+    // ==========================================
+    // 1. MÓDULOS DO DRIVER HUB
+    // ==========================================
+    
+    // Atualiza Card 1 (Carga e Fonte)
+    const totalWattsEl = document.getElementById('driver-total-watts');
+    const recSourceEl = document.getElementById('driver-recommended-source');
+    if (totalWattsEl && recSourceEl) {
+        totalWattsEl.innerText = `${totalPower.toFixed(1)} W`;
+        recSourceEl.innerText = `${(totalPower * 1.2).toFixed(1)} W`; // Aplica regra dos 20%
+    }
+
+    // Atualiza Card 2 (Guardião) e Card 3 (Topologia)
     if (window.ElectricalEngine) {
         const result = window.ElectricalEngine.calculateVoltageDrop(s.wireLength, s.wireGauge, totalPower, s.voltage);
         
@@ -1644,33 +1656,51 @@ window.updateAuditUI = function() {
         if (alertBox && alertEl) {
             if (result.isCritical || result.isWarning) {
                 alertBox.classList.remove('hidden');
-                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold ${result.isCritical ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`;
+                alertBox.className = `mt-3 p-2 rounded-lg text-[9px] font-bold ${result.isCritical ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`;
                 alertEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${result.message}`;
             } else {
                 alertBox.classList.remove('hidden');
-                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-green-50 text-green-700 border border-green-200`;
+                alertBox.className = `mt-3 p-2 rounded-lg text-[9px] font-bold bg-green-50 text-green-700 border border-green-200`;
                 alertEl.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${result.message}`;
+            }
+        }
+
+        // Lógica de Reação do Card 3 (Topologia Sugerida)
+        const topIcon = document.getElementById('topology-icon');
+        const topName = document.getElementById('topology-name');
+        const topDesc = document.getElementById('topology-desc');
+        
+        if (topIcon && topName && topDesc) {
+            if (result.dropPercentage > 4) {
+                topIcon.innerHTML = '<i class="fas fa-arrows-alt-h"></i>';
+                topIcon.className = "text-4xl text-red-500 mb-4 animate-pulse";
+                topName.innerText = "Alimentação Bilateral";
+                topDesc.innerText = "RISCO CRÍTICO: Conecte o driver em ambas as pontas da fita LED. Se mantiver unilateral, o final da fita terá perda severa de brilho e alteração na temperatura de cor.";
+            } else {
+                topIcon.innerHTML = '<i class="fas fa-arrow-right"></i>';
+                topIcon.className = "text-4xl text-leed-green mb-4";
+                topName.innerText = "Alimentação Unilateral";
+                topDesc.innerText = "Padrão Seguro: A queda de tensão é baixa. Conectar o cabo em apenas uma extremidade da fita LED é suficiente para manter a uniformidade.";
             }
         }
     }
 
+    // ==========================================
+    // 2. MÓDULOS DE AUDITORIA & PERFORMANCE (HCL/ESG)
+    // ==========================================
     if (window.HCLEngine && window.HCLEngine.evaluateCircadianImpact) {
         const bioResult = window.HCLEngine.evaluateCircadianImpact(s.visualLux, s.mRatio, s.useType, s.timeOfDay);
-        
         const mediEl = document.getElementById('audit-medi-val');
         const barEl = document.getElementById('audit-hcl-bar');
         const alertEl = document.getElementById('audit-hcl-msg');
         const alertBox = document.getElementById('audit-hcl-box');
 
         if (mediEl) mediEl.innerText = Math.round(bioResult.medi).toString();
-        
         if (barEl) {
-            // Normaliza a barra para no máximo 350 m-EDI
             const pct = Math.min((bioResult.medi / 350) * 100, 100);
             barEl.style.width = pct + '%';
             barEl.className = `h-full rounded-full transition-all duration-500 ${bioResult.isWarning ? 'bg-amber-500' : 'bg-tech-cyan'}`;
         }
-
         if (alertBox && alertEl) {
             if (bioResult.isWarning) {
                 alertBox.classList.remove('hidden');
@@ -1685,17 +1715,19 @@ window.updateAuditUI = function() {
     }
 
     if (window.ESGEngine && window.ESGEngine.calculateESGImpact) {
-        // Captura a potência atual do sistema ativo (Malha ou Driver)
         let systemWatts = 0;
         if (window.currentTool === 'grid' && window.state.grid) {
             systemWatts = (window.state.grid.watts || 0) * (window.state.grid.cols || 1) * (window.state.grid.rows || 1);
         } else if (window.currentTool === 'driver' && window.state.driver) {
             systemWatts = totalPower;
         } else {
-            systemWatts = 300; // Valor de fallback
+            systemWatts = 300; 
         }
 
-        const esgResult = window.ESGEngine.calculateESGImpact(systemWatts, s.baselineWatts, s.kwhCost, s.dailyHours, s.daysPerYear);
+        const hasAC = (document.getElementById('audit-has-ac') as HTMLInputElement)?.checked || false;
+        const maintSavings = parseFloat((document.getElementById('audit-opex-savings') as HTMLInputElement)?.value) || 0;
+
+        const esgResult = window.ESGEngine.calculateESGImpact(systemWatts, s.baselineWatts, s.kwhCost, s.dailyHours, s.daysPerYear, hasAC, maintSavings);
         
         const moneyEl = document.getElementById('audit-money-val');
         const treesEl = document.getElementById('audit-trees-val');

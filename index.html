@@ -875,7 +875,13 @@
                                 </div>
 
                                 <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative">
-                                    <h4 class="text-sm font-black text-tech-cyan mb-4 uppercase tracking-widest"><i class="fas fa-bolt mr-2"></i> Guardião Elétrico</h4>
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="text-sm font-black text-tech-cyan uppercase tracking-widest"><i class="fas fa-bolt mr-2"></i> Guardião Elétrico</h4>
+                                        <select id="audit-voltage" onchange="window.updateCalculations()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1 text-[9px] font-bold outline-none focus:border-tech-cyan cursor-pointer text-starlight dark:text-white">
+                                            <option value="12">12V</option>
+                                            <option value="24" selected>24V</option>
+                                        </select>
+                                    </div>
                                     <div class="space-y-4 mb-4">
                                         <div class="grid grid-cols-2 gap-4">
                                             <div>
