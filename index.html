@@ -247,6 +247,10 @@
                         <i class="fas fa-building text-lg mb-1"></i>
                         <span data-i18n="tab_leed_proj">PROJETO<br>LEED (LPD)</span>
                     </button>    
+                    <button onclick="window.switchTool('audit')" id="tab-audit" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
+                        <i class="fas fa-stethoscope text-lg mb-1"></i>
+                        <span>AUDITORIA &<br>PERFORMANCE</span>
+                    </button>
                     <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold">
                         <i class="fas fa-search text-lg mb-1"></i>
                         <span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span>
@@ -841,6 +845,80 @@
                             </div>
                         </div>
                     </div>    
+
+                    <div id="audit-tool" class="w-full animate-fade-in-up col-span-12 hidden">
+                        <div class="glass-panel p-8 rounded-2xl bg-white dark:bg-slate-900 transition-colors duration-300">
+                            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
+                                <div>
+                                    <h3 class="text-xl text-starlight dark:text-white font-black tracking-widest flex items-center gap-2 uppercase">
+                                        <i class="fas fa-radar text-luminous-gold"></i> <span>Radar de Auditoria & Performance</span>
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mt-1 font-bold">Validação de integridade elétrica, saúde circadiana e ESG.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative group">
+                                    <h4 class="text-sm font-black text-tech-cyan mb-4 flex justify-between items-center uppercase tracking-widest">
+                                        <span><i class="fas fa-bolt mr-2"></i> Guardião Elétrico</span>
+                                    </h4>
+                                    
+                                    <div class="space-y-4 mb-6">
+                                        <div>
+                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Tensão do Sistema</label>
+                                            <select id="audit-voltage" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-tech-cyan cursor-pointer transition-colors">
+                                                <option value="12">12V (Fita LED Padrão)</option>
+                                                <option value="24">24V (Fita LED Alta Potência)</option>
+                                            </select>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Distância (m)</label>
+                                                <input type="number" id="audit-wire-length" value="5" min="1" max="50" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-tech-cyan text-right">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Bitola (mm²)</label>
+                                                <select id="audit-wire-gauge" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-tech-cyan cursor-pointer transition-colors">
+                                                    <option value="0.5">0.50 mm²</option>
+                                                    <option value="0.75">0.75 mm²</option>
+                                                    <option value="1.0">1.00 mm²</option>
+                                                    <option value="1.5" selected>1.50 mm²</option>
+                                                    <option value="2.5">2.50 mm²</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <div class="flex justify-between items-end mb-2">
+                                            <span class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">Queda de Tensão (ΔV)</span>
+                                            <span class="text-lg font-black text-starlight dark:text-white"><span id="audit-drop-pct">0.0</span>% <span class="text-xs text-slate-400 font-normal">(<span id="audit-drop-val">0.00</span>V)</span></span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                            <div id="audit-drop-bar" class="h-full bg-leed-green transition-all duration-500" style="width: 0%"></div>
+                                        </div>
+                                        
+                                        <div id="audit-alert-box" class="hidden mt-4 p-3 bg-slate-50 rounded-lg text-[10px] text-slate-700 font-bold border border-slate-200">
+                                            <span id="audit-alert-msg"><i class="fas fa-info-circle mr-1"></i> Calculando integridade...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm opacity-50 pointer-events-none flex flex-col items-center justify-center text-center min-h-[300px]">
+                                    <i class="fas fa-clock text-3xl text-purple-400 mb-3"></i>
+                                    <h4 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">Relógio Biológico</h4>
+                                    <p class="text-[10px] text-slate-400 font-bold">Módulo HCL em construção...</p>
+                                </div>
+
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm opacity-50 pointer-events-none flex flex-col items-center justify-center text-center min-h-[300px]">
+                                    <i class="fas fa-leaf text-3xl text-leed-green mb-3"></i>
+                                    <h4 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">Viabilidade ESG</h4>
+                                    <p class="text-[10px] text-slate-400 font-bold">Módulo ROI/Carbono em construção...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 		<div id="query-tool" class="w-full animate-fade-in-up col-span-12">
                         <div class="glass-panel p-8 rounded-2xl">
                             <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-slate-200 pb-4 gap-4">

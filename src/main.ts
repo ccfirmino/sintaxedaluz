@@ -15,6 +15,7 @@ import { normsDatabase } from './domain/standards/Nbr8995Database';
 import { lpdBaselines } from './domain/standards/AshraeDatabase';
 import { AuthManager } from './auth/AuthManager';
 import { Canvas2DEngine } from './infrastructure/canvas/Canvas2DEngine';
+import { ElectricalEngine } from './domain/electrical/ElectricalEngine';
 
 /**
  * Interface de Extensão do Objeto Window para TypeScript estrito
@@ -59,7 +60,8 @@ window.state = {
     grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, cct: 3000, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
     driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
     leedProject: { name: "Novo Projeto LEED", target: "baseline", rooms: [] },
-    showIsolines: true,
+        audit: { wireLength: 5, wireGauge: 1.5, voltage: 12 },
+        showIsolines: true,
     showPolar: true,
     showHCL: false
 };
@@ -76,6 +78,7 @@ window.StandardsEngine = StandardsEngine;
 window.ReportExporter = ReportExporter;
 window.LumenMethod = LumenMethod;
 window.Photometrics = Photometrics; // FUNDAMENTAL: Atribui o motor de física ao window
+window.ElectricalEngine = ElectricalEngine; // Módulo de Auditoria Elétrica
 window.RadiosityEngine = RadiosityEngine; // Atribui o motor de cálculo em background
 window.currentLang = 'pt';
 window.calcMode = 'direct';
@@ -250,9 +253,10 @@ window.switchTool = function(toolId: string) {
         activeBtn.classList.add('tab-active', 'text-luminous-gold');
     }
 
-    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj');
-    document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
-    document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
+    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit');
+        document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
+        document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
+        document.getElementById('audit-tool')?.classList.toggle('hidden', toolId !== 'audit');
     
     const modeSelector = document.getElementById('calc-mode-selector');
     if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
@@ -1592,7 +1596,51 @@ window.deleteSpecificLeedProject = async () => {
     }
 };
 
-// 12. CONTROLO DE CÁLCULOS
+// 12. CONTROLO DE CÁLCULOS E AUDITORIA
+window.updateAuditUI = function() {
+    const s = window.state.audit;
+    const driverState = window.state.driver;
+    const totalPower = driverState.power * driverState.qty; // Puxa a potência do setup do driver
+    
+    const lenInput = document.getElementById('audit-wire-length') as HTMLInputElement;
+    const gaugeSelect = document.getElementById('audit-wire-gauge') as HTMLSelectElement;
+    const voltSelect = document.getElementById('audit-voltage') as HTMLSelectElement;
+    
+    if (lenInput) s.wireLength = parseFloat(lenInput.value) || 5;
+    if (gaugeSelect) s.wireGauge = parseFloat(gaugeSelect.value) || 1.5;
+    if (voltSelect) s.voltage = parseFloat(voltSelect.value) || 12;
+
+    if (window.ElectricalEngine) {
+        const result = window.ElectricalEngine.calculateVoltageDrop(s.wireLength, s.wireGauge, totalPower, s.voltage);
+        
+        const dropEl = document.getElementById('audit-drop-val');
+        const pctEl = document.getElementById('audit-drop-pct');
+        const barEl = document.getElementById('audit-drop-bar');
+        const alertEl = document.getElementById('audit-alert-msg');
+        const alertBox = document.getElementById('audit-alert-box');
+        
+        if (dropEl) dropEl.innerText = result.dropV.toFixed(2);
+        if (pctEl) pctEl.innerText = result.dropPercentage.toFixed(1);
+        if (barEl) {
+            const pct = Math.min(result.dropPercentage, 100);
+            barEl.style.width = pct + '%';
+            barEl.className = `h-full rounded-full transition-all duration-500 ${result.isCritical ? 'bg-red-500' : (result.isWarning ? 'bg-amber-500' : 'bg-leed-green')}`;
+        }
+        
+        if (alertBox && alertEl) {
+            if (result.isCritical || result.isWarning) {
+                alertBox.classList.remove('hidden');
+                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold ${result.isCritical ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`;
+                alertEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${result.message}`;
+            } else {
+                alertBox.classList.remove('hidden');
+                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-green-50 text-green-700 border border-green-200`;
+                alertEl.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${result.message}`;
+            }
+        }
+    }
+};
+
 window._isRenderPending = false;
 
 window.updateCalculations = function() {
@@ -1680,6 +1728,10 @@ window.updateCalculations = function() {
                 }
 
                 if (window.updatePhotometricHUD) window.updatePhotometricHUD();
+
+                if (tool === 'audit' && window.updateAuditUI) {
+                    window.updateAuditUI();
+                }
 
             } catch (erro) {
                 console.error("[LuxSintax] Erro interno de desenho:", erro);
