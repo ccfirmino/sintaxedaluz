@@ -16,6 +16,7 @@ import { lpdBaselines } from './domain/standards/AshraeDatabase';
 import { AuthManager } from './auth/AuthManager';
 import { Canvas2DEngine } from './infrastructure/canvas/Canvas2DEngine';
 import { ElectricalEngine } from './domain/electrical/ElectricalEngine';
+import { HCLEngine } from './domain/health/HCLEngine';
 
 /**
  * Interface de Extensão do Objeto Window para TypeScript estrito
@@ -60,7 +61,7 @@ window.state = {
     grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, cct: 3000, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
     driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
     leedProject: { name: "Novo Projeto LEED", target: "baseline", rooms: [] },
-        audit: { wireLength: 5, wireGauge: 1.5, voltage: 12 },
+        audit: { wireLength: 5, wireGauge: 1.5, voltage: 12, useType: 'office', timeOfDay: 'morning', mRatio: 0.52, visualLux: 500 },
         showIsolines: true,
     showPolar: true,
     showHCL: false
@@ -79,6 +80,7 @@ window.ReportExporter = ReportExporter;
 window.LumenMethod = LumenMethod;
 window.Photometrics = Photometrics; // FUNDAMENTAL: Atribui o motor de física ao window
 window.ElectricalEngine = ElectricalEngine; // Módulo de Auditoria Elétrica
+window.HCLEngine = HCLEngine; // Módulo de Saúde Circadiana
 window.RadiosityEngine = RadiosityEngine; // Atribui o motor de cálculo em background
 window.currentLang = 'pt';
 window.calcMode = 'direct';
@@ -119,18 +121,8 @@ async function initializeApp() {
 document.addEventListener('DOMContentLoaded', initializeApp);
 
 /**
- * REGRAS DE NEGÓCIO TÉCNICAS (HCL / GLARE)
+ * REGRAS DE NEGÓCIO TÉCNICAS (GLARE)
  */
-window.HCLEngine = {
-    spds: {
-        "0.45":[0.01, 0.02, 0.05, 0.15, 0.20, 0.10, 0.15, 0.40, 0.70, 0.95, 1.00, 0.85, 0.60, 0.30, 0.10, 0.05, 0.02],
-        "0.52":[0.01, 0.02, 0.08, 0.25, 0.35, 0.15, 0.20, 0.50, 0.80, 1.00, 0.95, 0.75, 0.50, 0.20, 0.08, 0.03, 0.01],
-        "0.68":[0.02, 0.05, 0.15, 0.50, 0.70, 0.30, 0.35, 0.60, 0.90, 1.00, 0.85, 0.60, 0.35, 0.15, 0.05, 0.02, 0.01],
-        "0.92":[0.03, 0.08, 0.25, 0.70, 0.95, 0.50, 0.50, 0.70, 0.90, 1.00, 0.75, 0.50, 0.25, 0.10, 0.03, 0.01, 0.00],
-        "1.10":[0.05, 0.10, 0.40, 0.85, 1.00, 0.65, 0.65, 0.75, 0.85, 0.85, 0.60, 0.40, 0.20, 0.08, 0.02, 0.01, 0.00]
-    }
-};
-
 window.GlareEngine = {
     calculateGuthIndex: (distX: number, distY: number, hEye: number) => {
         const d = Math.sqrt(distX**2 + distY**2);
@@ -1605,10 +1597,21 @@ window.updateAuditUI = function() {
     const lenInput = document.getElementById('audit-wire-length') as HTMLInputElement;
     const gaugeSelect = document.getElementById('audit-wire-gauge') as HTMLSelectElement;
     const voltSelect = document.getElementById('audit-voltage') as HTMLSelectElement;
+    const useSelect = document.getElementById('audit-use-type') as HTMLSelectElement;
+    const timeSelect = document.getElementById('audit-time') as HTMLSelectElement;
+    const mRatioSelect = document.getElementById('audit-mratio') as HTMLSelectElement;
+    const luxInput = document.getElementById('audit-visual-lux') as HTMLInputElement;
     
     if (lenInput) s.wireLength = parseFloat(lenInput.value) || 5;
     if (gaugeSelect) s.wireGauge = parseFloat(gaugeSelect.value) || 1.5;
     if (voltSelect) s.voltage = parseFloat(voltSelect.value) || 12;
+    if (useSelect) s.useType = useSelect.value || 'office';
+    if (timeSelect) s.timeOfDay = timeSelect.value || 'morning';
+    if (mRatioSelect) s.mRatio = parseFloat(mRatioSelect.value) || 0.52;
+    
+    // Herdamos o Lux do método Lúmens se não for digitado manualmente
+    const fallbackLux = window.state.grid?.targetLux || 500;
+    if (luxInput) s.visualLux = parseFloat(luxInput.value) || fallbackLux;
 
     if (window.ElectricalEngine) {
         const result = window.ElectricalEngine.calculateVoltageDrop(s.wireLength, s.wireGauge, totalPower, s.voltage);
@@ -1636,6 +1639,36 @@ window.updateAuditUI = function() {
                 alertBox.classList.remove('hidden');
                 alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-green-50 text-green-700 border border-green-200`;
                 alertEl.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${result.message}`;
+            }
+        }
+    }
+
+    if (window.HCLEngine && window.HCLEngine.evaluateCircadianImpact) {
+        const bioResult = window.HCLEngine.evaluateCircadianImpact(s.visualLux, s.mRatio, s.useType, s.timeOfDay);
+        
+        const mediEl = document.getElementById('audit-medi-val');
+        const barEl = document.getElementById('audit-hcl-bar');
+        const alertEl = document.getElementById('audit-hcl-msg');
+        const alertBox = document.getElementById('audit-hcl-box');
+
+        if (mediEl) mediEl.innerText = Math.round(bioResult.medi).toString();
+        
+        if (barEl) {
+            // Normaliza a barra para no máximo 350 m-EDI
+            const pct = Math.min((bioResult.medi / 350) * 100, 100);
+            barEl.style.width = pct + '%';
+            barEl.className = `h-full rounded-full transition-all duration-500 ${bioResult.isWarning ? 'bg-amber-500' : 'bg-tech-cyan'}`;
+        }
+
+        if (alertBox && alertEl) {
+            if (bioResult.isWarning) {
+                alertBox.classList.remove('hidden');
+                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200`;
+                alertEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${bioResult.message}`;
+            } else {
+                alertBox.classList.remove('hidden');
+                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200`;
+                alertEl.innerHTML = `<i class="fas fa-brain mr-1"></i> ${bioResult.message}`;
             }
         }
     }

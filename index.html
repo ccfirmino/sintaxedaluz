@@ -904,10 +904,60 @@
                                     </div>
                                 </div>
                                 
-                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm opacity-50 pointer-events-none flex flex-col items-center justify-center text-center min-h-[300px]">
-                                    <i class="fas fa-clock text-3xl text-purple-400 mb-3"></i>
-                                    <h4 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">Relógio Biológico</h4>
-                                    <p class="text-[10px] text-slate-400 font-bold">Módulo HCL em construção...</p>
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative group">
+                                    <h4 class="text-sm font-black text-purple-500 mb-4 flex justify-between items-center uppercase tracking-widest">
+                                        <span><i class="fas fa-clock mr-2"></i> Relógio Biológico</span>
+                                    </h4>
+                                    
+                                    <div class="space-y-4 mb-6">
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Lux no Plano (E)</label>
+                                                <input type="number" id="audit-visual-lux" value="500" min="10" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Espectro (CCT)</label>
+                                                <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
+                                                    <option value="0.45">2700K (M/P: 0.45)</option>
+                                                    <option value="0.52" selected>3000K (M/P: 0.52)</option>
+                                                    <option value="0.68">4000K (M/P: 0.68)</option>
+                                                    <option value="0.92">5000K (M/P: 0.92)</option>
+                                                    <option value="1.10">6500K (M/P: 1.10)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Uso do Espaço</label>
+                                                <select id="audit-use-type" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-[10px] font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
+                                                    <option value="office">Trabalho / Foco</option>
+                                                    <option value="residential">Residencial / Lazer</option>
+                                                    <option value="hospital">Clínico / Saúde</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Horário de Uso</label>
+                                                <select id="audit-time" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-[10px] font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
+                                                    <option value="morning">Diurno (08h - 17h)</option>
+                                                    <option value="night">Noturno (Após 18h)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <div class="flex justify-between items-end mb-2">
+                                            <span class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">Estímulo Melanópico</span>
+                                            <span class="text-lg font-black text-starlight dark:text-white"><span id="audit-medi-val">260</span> <span class="text-xs text-slate-400 font-normal">m-EDI</span></span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                            <div id="audit-hcl-bar" class="h-full bg-tech-cyan transition-all duration-500" style="width: 0%"></div>
+                                        </div>
+                                        
+                                        <div id="audit-hcl-box" class="hidden mt-4 p-3 bg-slate-50 rounded-lg text-[10px] text-slate-700 font-bold border border-slate-200">
+                                            <span id="audit-hcl-msg"><i class="fas fa-brain mr-1"></i> Calculando ritmo circadiano...</span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm opacity-50 pointer-events-none flex flex-col items-center justify-center text-center min-h-[300px]">
