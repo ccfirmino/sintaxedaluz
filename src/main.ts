@@ -245,6 +245,16 @@ window.toggleLanguage = function() {
 
 window.switchTool = function(toolId: string) {
     window.currentTool = toolId;
+    
+    // LUXSINTAX: Analytics - Rastreamento de Tela Virtual (SPA/PWA)
+    if (typeof (window as any).gtag === 'function') {
+        (window as any).gtag('event', 'page_view', {
+            page_title: 'Módulo: ' + toolId.toUpperCase(),
+            page_location: window.location.href + '#' + toolId,
+            page_path: '/' + toolId
+        });
+    }
+
     document.querySelectorAll('.mode-tab-btn').forEach(btn => {
         btn.classList.remove('tab-active', 'text-luminous-gold');
         btn.classList.add('tab-inactive');
@@ -1004,6 +1014,14 @@ window.handleGenerateReport = async (event: any) => {
 
     const blob = await window.ReportExporter.createGridPdf(PDFLib, reportData, images, userLogoBase64);
 
+    // LUXSINTAX: Analytics - Rastreamento de Conversão (Geração de Relatório)
+    if (typeof (window as any).gtag === 'function') {
+        (window as any).gtag('event', 'generate_report', {
+            report_type: 'Metodo_Lumens',
+            is_nbr_active: isNbrActive
+        });
+    }
+
     const link = document.createElement('a');
     const safeProjectName = s.projectName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
     link.download = `Estudo_LuxSintax_${safeProjectName}.pdf`;
@@ -1040,6 +1058,14 @@ window.generateLeedReport = async () => {
             const userLogoBase64 = localStorage.getItem('luxsintax_user_logo') || null;
 
             const blob = await window.ReportExporter.createLeedPdf(PDFLib, s, summary, targetLabel, userLogoBase64);
+
+            // LUXSINTAX: Analytics - Rastreamento de Conversão (Geração de Relatório)
+            if (typeof (window as any).gtag === 'function') {
+                (window as any).gtag('event', 'generate_report', {
+                    report_type: 'Projeto_LEED',
+                    leed_target: s.target
+                });
+            }
 
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
