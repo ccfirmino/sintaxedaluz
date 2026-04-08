@@ -1727,12 +1727,13 @@ window.updateAuditUI = function() {
         if (barEl) {
             const pct = Math.min((bioResult.medi / 350) * 100, 100);
             barEl.style.width = pct + '%';
-            barEl.className = `h-full rounded-full transition-all duration-500 ${bioResult.isWarning ? 'bg-amber-500' : 'bg-tech-cyan'}`;
+            // LUXSINTAX: Injeção do estado Crítico (Vermelho)
+            barEl.className = `h-full rounded-full transition-all duration-500 ${bioResult.isCritical ? 'bg-red-500' : (bioResult.isWarning ? 'bg-amber-500' : 'bg-tech-cyan')}`;
         }
         if (alertBox && alertEl) {
-            if (bioResult.isWarning) {
+            if (bioResult.isCritical || bioResult.isWarning) {
                 alertBox.classList.remove('hidden');
-                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200`;
+                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold ${bioResult.isCritical ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`;
                 alertEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${bioResult.message}`;
             } else {
                 alertBox.classList.remove('hidden');
