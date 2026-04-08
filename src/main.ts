@@ -1732,6 +1732,15 @@ window.updateAuditUI = function() {
             // LUXSINTAX: Injeção do estado Crítico (Vermelho)
             barEl.className = `h-full rounded-full transition-all duration-500 ${bioResult.isCritical ? 'bg-red-500' : (bioResult.isWarning ? 'bg-amber-500' : 'bg-tech-cyan')}`;
         }
+// Cálculo de CS (Circadian Stimulus) e Desenho do Gráfico
+        let cs = 0.7 * (1 - Math.pow(1 + Math.pow(bioResult.medi/300, 1.2), -1));
+        if (cs > 0.7) cs = 0.7; // Teto biológico do CS
+        const csEl = document.getElementById('audit-cs-val');
+        if (csEl) csEl.innerText = cs.toFixed(2);
+
+        if (window.drawCircadianChart) {
+            window.drawCircadianChart(bioResult.medi, s.timeOfDay, bioResult.isCritical);
+        }
         if (alertBox && alertEl) {
             if (bioResult.isCritical || bioResult.isWarning) {
                 alertBox.classList.remove('hidden');
@@ -2161,4 +2170,92 @@ const oldUpdate = window.updateCalculations;
 window.updateCalculations = function() {
     oldUpdate();
     if (window.currentTool === 'esg' && window.updateEsgUI) window.updateEsgUI();
+};
+// LUXSINTAX: Motor de Visualização do Ritmo Circadiano (Neurociência)
+window.drawCircadianChart = function(medi: number, timeOfDay: string, isCritical: boolean) {
+    const canvas = document.getElementById('circadianChart') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.parentElement?.getBoundingClientRect();
+    if (rect) {
+        canvas.width = rect.width - 32;
+        canvas.height = rect.height - 32;
+    }
+
+    const w = canvas.width;
+    const h = canvas.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // 1. Curva Base de Melatonina (Natural)
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    for (let x = 0; x <= w; x++) {
+        const normalizedX = (x / w) * Math.PI * 2;
+        const y = h/2 + (Math.cos(normalizedX) * (h/3)); 
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.2)"; // Cinza dim
+    ctx.stroke();
+
+    // 2. Cálculo do Ponto de Exposição do Utilizador
+    let userX = timeOfDay === 'morning' ? w * 0.25 : w * 0.75; 
+    let baseY = h/2 + (Math.cos((userX / w) * Math.PI * 2) * (h/3));
+    
+    let userY = baseY;
+    if (timeOfDay === 'night' && isCritical) {
+        userY = baseY + (h/4); // Melatonina suprimida = curva cai bruscamente
+    } else if (timeOfDay === 'morning') {
+        userY = baseY + (medi > 250 ? (h/5) : 0); // Supressão diurna profunda é excelente
+    }
+
+    // 3. Desenho da Curva Modificada pela Luz (Gráfico Dinâmico)
+    ctx.beginPath();
+    for (let x = 0; x <= w; x++) {
+        const normalizedX = (x / w) * Math.PI * 2;
+        let bY = h/2 + (Math.cos(normalizedX) * (h/3)); 
+        
+        // Deformação Gaussiana suave na curva onde o utilizador está
+        const distance = Math.abs(x - userX);
+        const influence = Math.exp(-(distance*distance) / (w*w*0.02));
+        const finalY = bY + ((userY - bY) * influence);
+
+        if (x === 0) ctx.moveTo(x, finalY);
+        else ctx.lineTo(x, finalY);
+    }
+    
+    const grad = ctx.createLinearGradient(0, 0, w, 0);
+    if (isCritical) {
+        grad.addColorStop(0, "#ef4444"); // Vermelho Crítico
+        grad.addColorStop(1, "#f87171");
+    } else {
+        grad.addColorStop(0, "#06b6d4"); // Ciano de Alta Performance
+        grad.addColorStop(1, "#a855f7"); // Roxo Circadiano
+    }
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 4;
+    ctx.lineJoin = "round";
+    ctx.stroke();
+
+    // 4. Marcação do Ponto de Análise (Olho)
+    ctx.beginPath();
+    ctx.arc(userX, userY, 8, 0, Math.PI*2);
+    ctx.fillStyle = isCritical ? "#ef4444" : "#a855f7";
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ffffff";
+    ctx.stroke();
+    
+    // 5. Régua de Horas (Eixo X)
+    ctx.fillStyle = "#64748b";
+    ctx.font = "bold 10px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("06:00", 20, h - 5);
+    ctx.fillText("12:00", w*0.25, h - 5);
+    ctx.fillText("18:00", w*0.5, h - 5);
+    ctx.fillText("00:00", w*0.75, h - 5);
+    ctx.fillText("06:00", w - 20, h - 5);
 };

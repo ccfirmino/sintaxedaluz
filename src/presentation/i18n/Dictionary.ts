@@ -2,7 +2,9 @@
 
 export const i18nDictionary = {
     pt: {
-        nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "PONTO A PONTO<br>HORIZONTAL", tab_vert: "PONTO A PONTO<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "TOPOLOGIA<br>& DRIVERS", tab_esg: "VIABILIDADE<br>& ROI",
+        nav_home: "INÍCIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "PONTO A PONTO<br>HORIZONTAL", tab_vert: "PONTO A PONTO<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "TOPOLOGIA<br>& DRIVERS", tab_esg: "VIABILIDADE<br>& ROI",
+        pil_eng: "1. Engenharia & Física", pil_health: "2. Saúde (HCL)", pil_esg: "3. Viabilidade & ESG", pil_market: "4. Mercado",
+        tab_smart: "BUSCA<br>INTELIGENTE", tag_soon: "EM BREVE",
         calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES / LDT", lbl_ies_upload: "CARREGAR .IES / .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
         lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
         lbl_room_w: "LARGURA DO AMB. (X)", lbl_room_l: "COMPRIMENTO DO AMB. (Y)", lbl_grid_sug: "MALHA SUGERIDA", lbl_grid_unit: "PEÇAS", lbl_grid_desc: "Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.",
@@ -61,17 +63,18 @@ export const i18nDictionary = {
         pdf_leed_esg_fail: "O projeto atual não apresenta redução de carga energética frente ao limite normativo.",
         pdf_leed_lpd_target: "LPD Alvo:", pdf_leed_subtotal: "SUBTOTAL:", pdf_leed_limit_2: "LIMITE:",
         pdf_leed_avg: "LPD Médio Projetado:", pdf_leed_pass: "COMPLIANCE ATINGIDO (APROVADO)", pdf_leed_fail: "REPROVADO (EXCEDE LIMITES)",
-        // LUXSINTAX: Novas Chaves - Sprint Polimento
         dr_load_src: "Carga e Fonte", dr_power_m: "Potência (W/m)", dr_len: "Metragem (m)", dr_real_load: "Potência Real (Carga):", dr_rec_src: "Fonte Recomendada (+20%)", dr_safety: "Mantenha sempre 20% de folga térmica para estender a vida útil do driver.",
         dr_guard: "Guardião Elétrico", dr_dist: "Distância (m)", dr_gauge: "Bitola (mm²)", dr_drop: "Queda (ΔV)", dr_top: "Topologia Sugerida",
-        hcl_ev: "Lux Vertical no Olho (Ev)", hcl_use: "Uso do Espaço", hcl_time: "Horário de Exposição", hcl_medi: "Estímulo Melanópico",
+        hcl_ev: "Lux Vertical no Olho (Ev)", hcl_use: "Uso do Espaço", hcl_time: "Horário de Exposição", hcl_medi: "Estímulo Melanópico (m-EDI)",
         opt_use_office: "Trabalho / Foco", opt_use_res: "Residencial / Lazer", opt_use_hosp: "Clínico / Saúde",
         opt_time_day: "Diurno (08h - 17h)", opt_time_night: "Noturno (Após 18h)",
-        esg_input: "Dados de Entrada", esg_base_w: "Carga Atual (W)", esg_prop_w: "Carga Nova (W)", esg_capex: "Custo Instalação", esg_tariff: "Tarifa", esg_hrs: "Uso Diário (Horas)", esg_days: "Dias/Ano", esg_ac: "Incluir Bônus Ar Condicionado",
+        esg_input: "Dados de Entrada", esg_base_w: "Carga Atual (W)", esg_prop_w: "Carga Nova (W)", esg_capex: "Custo Instalação (R$)", esg_tariff: "Tarifa (R$/kWh)", esg_hrs: "Uso Diário (Horas)", esg_days: "Dias/Ano", esg_ac: "Incluir Bônus Ar Condicionado",
         esg_save_yr: "Economia Financeira (Ano)", esg_pb: "Payback (Retorno)", esg_roi: "ROI (5 Anos)", esg_save_e: "Economia de Energia", esg_impact: "Impacto Ambiental"
     },
     en: {
         nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "TOPOLOGY<br>& DRIVERS", tab_esg: "FEASIBILITY<br>& ROI",
+        pil_eng: "1. Engineering & Physics", pil_health: "2. Health (HCL)", pil_esg: "3. Feasibility & ESG", pil_market: "4. Market",
+        tab_smart: "SMART<br>SPECIFIER", tag_soon: "COMING SOON",
         calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES / LDT", lbl_ies_upload: "UPLOAD .IES / .LDT", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
         lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
         lbl_room_w: "ROOM WIDTH (X)", lbl_room_l: "ROOM LENGTH (Y)", lbl_grid_sug: "SUGGESTED GRID", lbl_grid_unit: "FIXTURES", lbl_grid_desc: "Autonomous distribution aiming for 25% beam overlap on the projected light spot.",
@@ -133,7 +136,7 @@ export const i18nDictionary = {
         // LUXSINTAX: Novas Chaves - Sprint Polimento
         dr_load_src: "Load and Power Supply", dr_power_m: "Power (W/m)", dr_len: "Length (m)", dr_real_load: "Real Power (Load):", dr_rec_src: "Recommended Driver (+20%)", dr_safety: "Always maintain a 20% thermal margin to extend driver lifespan.",
         dr_guard: "Electrical Guardian", dr_dist: "Distance (m)", dr_gauge: "Wire Gauge (mm²)", dr_drop: "Voltage Drop (ΔV)", dr_top: "Suggested Topology",
-        hcl_ev: "Vertical Lux at Eye (Ev)", hcl_use: "Space Usage", hcl_time: "Exposure Time", hcl_medi: "Melanopic Stimulus",
+        hcl_ev: "Vertical Lux at Eye (Ev)", hcl_use: "Space Usage", hcl_time: "Exposure Time", hcl_medi: "Melanopic Stimulus (m-EDI)",
         opt_use_office: "Work / Focus", opt_use_res: "Residential / Leisure", opt_use_hosp: "Clinical / Healthcare",
         opt_time_day: "Daytime (08h - 17h)", opt_time_night: "Nighttime (After 18h)",
         esg_input: "Input Data", esg_base_w: "Current Load (W)", esg_prop_w: "New Load (W)", esg_capex: "Installation Cost", esg_tariff: "Tariff", esg_hrs: "Daily Usage (Hours)", esg_days: "Days/Year", esg_ac: "Include AC Bonus",
