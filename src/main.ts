@@ -1671,7 +1671,8 @@ window.updateAuditUI = function() {
 
     // Atualiza Card 2 (Guardião) e Card 3 (Topologia)
     if (window.ElectricalEngine) {
-        const result = window.ElectricalEngine.calculateVoltageDrop(s.wireLength, s.wireGauge, totalPower, s.voltage);
+        // Envia todos os parâmetros de fita e cabo para análise integrada
+        const result = window.ElectricalEngine.evaluateSystem(s.wireLength, s.wireGauge, driverState.power, driverState.qty, s.voltage);
         
         const dropEl = document.getElementById('audit-drop-val');
         const pctEl = document.getElementById('audit-drop-pct');
@@ -1705,17 +1706,10 @@ window.updateAuditUI = function() {
         const topDesc = document.getElementById('topology-desc');
         
         if (topIcon && topName && topDesc) {
-            if (result.dropPercentage > 4) {
-                topIcon.innerHTML = '<i class="fas fa-arrows-alt-h"></i>';
-                topIcon.className = "text-4xl text-red-500 mb-4 animate-pulse";
-                topName.innerText = "Alimentação Bilateral";
-                topDesc.innerText = "RISCO CRÍTICO: Conecte o driver em ambas as pontas da fita LED. Se mantiver unilateral, o final da fita terá perda severa de brilho e alteração na temperatura de cor.";
-            } else {
-                topIcon.innerHTML = '<i class="fas fa-arrow-right"></i>';
-                topIcon.className = "text-4xl text-leed-green mb-4";
-                topName.innerText = "Alimentação Unilateral";
-                topDesc.innerText = "Padrão Seguro: A queda de tensão é baixa. Conectar o cabo em apenas uma extremidade da fita LED é suficiente para manter a uniformidade.";
-            }
+            topIcon.innerHTML = `<i class="fas ${result.topologyIcon}"></i>`;
+            topIcon.className = `text-4xl mb-4 ${result.isTopologyCritical ? 'text-red-500 animate-pulse' : 'text-leed-green'}`;
+            topName.innerText = result.topologyTitle;
+            topDesc.innerText = result.topologyDesc;
         }
     }
 

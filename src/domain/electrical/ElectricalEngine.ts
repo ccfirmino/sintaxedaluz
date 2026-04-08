@@ -2,36 +2,55 @@
 
 export const ElectricalEngine = {
     /**
-     * Calcula a queda de tensão em cabos de cobre (Corrente Contínua)
-     * @param distance Comprimento do cabo entre driver e fita (m)
-     * @param gauge Seção nominal do cabo (mm²)
-     * @param totalPower Potência total da carga na fita (W)
-     * @param voltage Tensão da fonte (12V ou 24V)
-     * @returns Objeto com a queda em Volts, Porcentagem e mensagens didáticas de alerta.
+     * Avalia o sistema elétrico completo: Queda de Tensão no cabo e Topologia da Fita LED
      */
-    calculateVoltageDrop: (distance: number, gauge: number, totalPower: number, voltage: number) => {
-        // Proteção contra divisão por zero
-        if (gauge <= 0 || voltage <= 0) return { dropV: 0, dropPercentage: 0, isWarning: false, isCritical: false, message: "Parâmetros inválidos." };
+    evaluateSystem: (wireDistance: number, wireGauge: number, powerPerMeter: number, stripLength: number, voltage: number) => {
+        if (wireGauge <= 0 || voltage <= 0 || stripLength <= 0) {
+            return { dropV: 0, dropPercentage: 0, isWarning: false, isCritical: false, message: "Parâmetros inválidos.", topologyTitle: "--", topologyDesc: "--", topologyIcon: "fa-ban", isTopologyCritical: false };
+        }
 
-        const rho = 0.0172; // Resistividade do Cobre em ohm * mm²/m (temperatura ambiente)
-        const current = totalPower / voltage; // I = P / V
+        const totalPower = powerPerMeter * stripLength;
+        const rho = 0.0172; // Resistividade do cobre
+        const current = totalPower / voltage; 
         
-        // O fator 2 representa o circuito de ida (positivo) e volta (negativo)
-        const dropV = (2 * distance * current * rho) / gauge;
+        // Fator 2 (cabo de ida e volta)
+        const dropV = (2 * wireDistance * current * rho) / wireGauge;
         const dropPercentage = (dropV / voltage) * 100;
         
         let isWarning = false;
         let isCritical = false;
-        let message = "Operação Otimizada. Queda de tensão dentro dos limites ideais (< 3%).";
+        let message = "Operação Otimizada. Queda de tensão no cabo dentro dos limites ideais (< 3%).";
 
         if (dropPercentage > 5) {
             isCritical = true;
-            message = `Risco Severo: A queda de ${dropPercentage.toFixed(1)}% causará perda drástica de fluxo luminoso e alterará o CCT (Temperatura de Cor) no final da fita. Aumente a bitola ou utilize alimentação bilateral.`;
+            message = `Risco Severo (Cabo): A queda de ${dropPercentage.toFixed(1)}% causará perda drástica de fluxo luminoso. Engrosse a bitola do cabo ou aproxime a fonte da fita.`;
         } else if (dropPercentage > 3) {
             isWarning = true;
-            message = `Alerta de Performance: Queda de ${dropPercentage.toFixed(1)}%. Pode haver leve variação de brilho no fim do circuito. Recomenda-se centralizar o driver ou engrossar o cabo.`;
+            message = `Alerta de Performance (Cabo): Queda de ${dropPercentage.toFixed(1)}%. Pode haver leve variação de brilho no início do circuito.`;
         }
 
-        return { dropV, dropPercentage, isWarning, isCritical, message };
+        // ==========================================
+        // AVALIAÇÃO DE TOPOLOGIA FÍSICA DA FITA LED
+        // ==========================================
+        const maxContinuousRun = voltage === 12 ? 5 : 10;
+        
+        let topologyTitle = "Alimentação Unilateral";
+        let topologyDesc = `Padrão Seguro: Conecte a fonte em apenas uma extremidade. A trilha da fita de ${voltage}V suporta até ${maxContinuousRun}m sem atenuação visível.`;
+        let topologyIcon = "fa-arrow-right";
+        let isTopologyCritical = false;
+
+        if (stripLength > maxContinuousRun * 1.5) {
+            topologyTitle = "Divisão de Circuito (Paralelo)";
+            topologyDesc = `RISCO DE QUEIMA: Fitas de ${voltage}V não suportam mais que ${maxContinuousRun}m contínuos. Divida obrigatoriamente a fita em ${Math.ceil(stripLength / maxContinuousRun)} trechos ligados em paralelo à mesma fonte principal.`;
+            topologyIcon = "fa-project-diagram";
+            isTopologyCritical = true;
+        } else if (stripLength > maxContinuousRun) {
+            topologyTitle = "Alimentação Bilateral";
+            topologyDesc = `ATENÇÃO: A metragem excede o limite ideal contínuo (${maxContinuousRun}m). É altamente recomendado levar o cabo da fonte para AS DUAS pontas da fita para equalizar a tensão e evitar perda de luz no meio.`;
+            topologyIcon = "fa-arrows-alt-h";
+            isTopologyCritical = true;
+        }
+
+        return { dropV, dropPercentage, isWarning, isCritical, message, topologyTitle, topologyDesc, topologyIcon, isTopologyCritical };
     }
 };
