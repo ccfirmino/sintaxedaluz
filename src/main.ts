@@ -1798,7 +1798,16 @@ window.updateCalculations = function() {
                     
                     // LUXSINTAX: Validação de entrada para evitar Canvas quebrado (NaN)
                     const finalVal = isNaN(uiVal) ? 0.1 : uiVal;
-                    s[key] = (isEn && isDist) ? finalVal / 3.28084 : finalVal;
+                    let newMeters = (isEn && isDist) ? finalVal / 3.28084 : finalVal;
+                    
+                    // LUXSINTAX: Prevenir loop de arredondamento que quebra o algoritmo de malha
+                    if (isEn && isDist && s[key] !== undefined) {
+                        const oldFt = parseFloat((s[key] * 3.28084).toFixed(2));
+                        if (oldFt === finalVal) {
+                            newMeters = s[key]; // Mantém a precisão matemática original
+                        }
+                    }
+                    s[key] = newMeters;
                 });
 
                 if (tool === 'grid') {

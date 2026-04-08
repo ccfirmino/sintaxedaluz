@@ -43,6 +43,7 @@
 - [08/04/2026]: Refinamento de UI (PWA). Simplificação da tag <title> no index.html para remoção de redundância e polimento do cabeçalho na janela standalone do Desktop.
 - [08/04/2026]: Refatoração UI/UX: Reordenação dos módulos na barra de navegação (Priorização da Auditoria) e redesenho estrutural do painel de Auditoria NBR 8995-1 (Maior legibilidade de dados, tags contextuais e suporte nativo a internacionalização de texto no motor TS).
 - [08/04/2026]: Implementação de Internacionalização Inteligente (i18n) na camada de infraestrutura (ReportExporter). Relatórios em PDF agora herdam o idioma do estado global (window.currentLang) puxando tags do dicionário. Refatoração UI do Painel de Auditoria NBR e ordenação lógica dos botões de navegação no header.
+- [08/04/2026]: Correção de Algoritmo. Implementação de trava de arredondamento (Floating Point Precision) na ponte UI-Estado (main.ts), garantindo que as conversões do sistema Imperial (pés) para o sistema Métrico não deturpem os algoritmos de cálculo de índice de recinto do Método dos Lúmens.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
