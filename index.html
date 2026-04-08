@@ -897,36 +897,36 @@
                             
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
-                                    <h4 class="text-sm font-black text-luminous-gold mb-4 uppercase tracking-widest"><i class="fas fa-weight-hanging mr-2"></i> Carga e Fonte</h4>
+                                    <h4 class="text-sm font-black text-luminous-gold mb-4 uppercase tracking-widest"><i class="fas fa-weight-hanging mr-2"></i> <span data-i18n="dr_load_src">Carga e Fonte</span></h4>
                                     
                                     <div class="space-y-4 mb-4">
                                         <div class="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label class="text-[10px] text-slate-500 font-bold uppercase block mb-1">Potência (W/m)</label>
+                                                <label class="text-[10px] text-slate-500 font-bold uppercase block mb-1" data-i18n="dr_power_m">Potência (W/m)</label>
                                                 <input type="number" id="dr-power" value="14.4" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-right outline-none focus:border-luminous-gold">
                                             </div>
                                             <div>
-                                                <label class="text-[10px] text-slate-500 font-bold uppercase block mb-1">Metragem (m)</label>
+                                                <label class="text-[10px] text-slate-500 font-bold uppercase block mb-1" data-i18n="dr_len">Metragem (m)</label>
                                                 <input type="number" id="dr-qty" value="5" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-right outline-none focus:border-luminous-gold">
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="space-y-4 mb-6">
-                                        <div class="flex justify-between items-end"><span class="text-[10px] font-bold text-slate-500 uppercase">Potência Real (Carga):</span><span class="text-lg font-black text-starlight dark:text-white" id="driver-total-watts">0.0 W</span></div>
+                                        <div class="flex justify-between items-end"><span class="text-[10px] font-bold text-slate-500 uppercase" data-i18n="dr_real_load">Potência Real (Carga):</span><span class="text-lg font-black text-starlight dark:text-white" id="driver-total-watts">0.0 W</span></div>
                                         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
-                                            <span class="text-[9px] font-black text-luminous-gold uppercase block mb-1">Fonte Recomendada (+20%)</span>
+                                            <span class="text-[9px] font-black text-luminous-gold uppercase block mb-1" data-i18n="dr_rec_src">Fonte Recomendada (+20%)</span>
                                             <span class="text-xl font-black text-starlight dark:text-white" id="driver-recommended-source">0.0 W</span>
                                         </div>
                                     </div>
                                     <div id="driver-safety-box" class="p-3 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                        <i class="fas fa-shield-alt mr-1"></i> Mantenha sempre 20% de folga térmica para estender a vida útil do driver.
+                                        <i class="fas fa-shield-alt mr-1"></i> <span data-i18n="dr_safety">Mantenha sempre 20% de folga térmica para estender a vida útil do driver.</span>
                                     </div>
                                 </div>
 
                                 <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative">
                                     <div class="flex justify-between items-center mb-4">
-                                        <h4 class="text-sm font-black text-tech-cyan uppercase tracking-widest"><i class="fas fa-bolt mr-2"></i> Guardião Elétrico</h4>
+                                        <h4 class="text-sm font-black text-tech-cyan uppercase tracking-widest"><i class="fas fa-bolt mr-2"></i> <span data-i18n="dr_guard">Guardião Elétrico</span></h4>
                                         <select id="audit-voltage" onchange="window.updateCalculations()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1 text-[9px] font-bold outline-none focus:border-tech-cyan cursor-pointer text-starlight dark:text-white">
                                             <option value="12">12V</option>
                                             <option value="24" selected>24V</option>
@@ -935,11 +935,11 @@
                                     <div class="space-y-4 mb-4">
                                         <div class="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Distância (m)</label>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="dr_dist">Distância (m)</label>
                                                 <input type="number" id="audit-wire-length" value="5" min="1" max="50" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-right outline-none focus:border-tech-cyan">
                                             </div>
                                             <div>
-                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Bitola (mm²)</label>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="dr_gauge">Bitola (mm²)</label>
                                                 <select id="audit-wire-gauge" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-2 text-[10px] font-bold outline-none focus:border-tech-cyan cursor-pointer">
                                                     <option value="0.5">0.50 mm²</option><option value="0.75">0.75 mm²</option><option value="1.0">1.00 mm²</option><option value="1.5" selected>1.50 mm²</option><option value="2.5">2.50 mm²</option>
                                                 </select>
@@ -948,7 +948,7 @@
                                     </div>
                                     <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                                         <div class="flex justify-between items-end mb-2">
-                                            <span class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">Queda (ΔV)</span>
+                                            <span class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400" data-i18n="dr_drop">Queda (ΔV)</span>
                                             <span class="text-lg font-black text-starlight dark:text-white" id="audit-drop-pct">0.0%</span>
                                         </div>
                                         <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden"><div id="audit-drop-bar" class="h-full bg-leed-green w-0 transition-all"></div></div>
@@ -957,7 +957,7 @@
                                 </div>
 
                                 <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
-                                    <h4 class="text-sm font-black text-starlight dark:text-white mb-4 uppercase tracking-widest"><i class="fas fa-project-diagram mr-2"></i> Topologia Sugerida</h4>
+                                    <h4 class="text-sm font-black text-starlight dark:text-white mb-4 uppercase tracking-widest"><i class="fas fa-project-diagram mr-2"></i> <span data-i18n="dr_top">Topologia Sugerida</span></h4>
                                     <div id="topology-card" class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center">
                                         <div id="topology-icon" class="text-4xl text-leed-green mb-4"><i class="fas fa-arrow-right"></i></div>
                                         <span id="topology-name" class="text-xs font-black uppercase tracking-widest text-starlight dark:text-white mb-2">Alimentação Unilateral</span>
@@ -973,7 +973,7 @@
                             <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
                                 <div>
                                     <h3 class="text-xl text-starlight dark:text-white font-black tracking-widest flex items-center gap-2 uppercase">
-                                        <i class="fas fa-brain text-purple-500"></i> <span>Auditoria Circadiana (HCL)</span>
+                                        <i class="fas fa-brain text-purple-500"></i> <span data-i18n="tab_audit">Auditoria Circadiana</span>
                                     </h3>
                                     <p class="text-xs text-slate-500 mt-1 font-bold">Avaliação neurobiológica e conformidade com WELL v2.</p>
                                 </div>
@@ -983,11 +983,11 @@
                                 <div class="space-y-6 mb-8">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div class="relative group/tooltip">
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Lux Vertical no Olho (Ev)</label>
+                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max" data-i18n="hcl_ev">Lux Vertical no Olho (Ev)</label>
                                             <input type="number" id="audit-visual-lux" value="500" min="10" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right">
                                         </div>
                                         <div>
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Espectro da Fonte (CCT)</label>
+                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="lbl_source_type">Espectro da Fonte (CCT)</label>
                                             <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
                                                 <option value="0.45">2700K (M/P: 0.45)</option>
                                                 <option value="0.52" selected>3000K (M/P: 0.52)</option>
@@ -999,18 +999,18 @@
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Uso do Espaço</label>
+                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="hcl_use">Uso do Espaço</label>
                                             <select id="audit-use-type" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
-                                                <option value="office">Trabalho / Foco</option>
-                                                <option value="residential">Residencial / Lazer</option>
-                                                <option value="hospital">Clínico / Saúde</option>
+                                                <option value="office" data-i18n="opt_use_office">Trabalho / Foco</option>
+                                                <option value="residential" data-i18n="opt_use_res">Residencial / Lazer</option>
+                                                <option value="hospital" data-i18n="opt_use_hosp">Clínico / Saúde</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Horário de Exposição</label>
+                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="hcl_time">Horário de Exposição</label>
                                             <select id="audit-time" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
-                                                <option value="morning">Diurno (08h - 17h)</option>
-                                                <option value="night">Noturno (Após 18h)</option>
+                                                <option value="morning" data-i18n="opt_time_day">Diurno (08h - 17h)</option>
+                                                <option value="night" data-i18n="opt_time_night">Noturno (Após 18h)</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1018,7 +1018,7 @@
 
                                 <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
                                     <div class="flex justify-between items-end mb-4">
-                                        <span class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Estímulo Melanópico</span>
+                                        <span class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400" data-i18n="hcl_medi">Estímulo Melanópico</span>
                                         <span class="text-3xl font-black text-starlight dark:text-white"><span id="audit-medi-val">260</span> <span class="text-sm text-slate-400 font-normal">m-EDI</span></span>
                                     </div>
                                     <div class="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
@@ -1037,7 +1037,7 @@
                             <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
                                 <div>
                                     <h3 class="text-xl text-emerald-600 font-black tracking-widest flex items-center gap-2 uppercase">
-                                        <i class="fas fa-hand-holding-usd"></i> <span>Viabilidade Financeira & ESG</span>
+                                        <i class="fas fa-hand-holding-usd"></i> <span data-i18n="tab_esg">Viabilidade Financeira & ESG</span>
                                     </h3>
                                     <p class="text-xs text-slate-500 mt-1 font-bold">A Máquina de Vendas: Calcule o Payback e o retorno do projeto luminotécnico.</p>
                                 </div>
@@ -1045,43 +1045,43 @@
 
                             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                                 <div class="lg:col-span-5 space-y-6 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-200 dark:border-slate-700">
-                                    <h4 class="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest border-b border-slate-200 dark:border-slate-700 pb-2 mb-4">Dados de Entrada</h4>
+                                    <h4 class="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest border-b border-slate-200 dark:border-slate-700 pb-2 mb-4" data-i18n="esg_input">Dados de Entrada</h4>
                                     
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1">Carga Atual (W)</label>
+                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1" data-i18n="esg_base_w">Carga Atual (W)</label>
                                             <input type="number" id="esg-baseline-watts" value="1500" min="10" oninput="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-starlight text-right focus:border-emerald-500 outline-none">
                                         </div>
                                         <div>
-                                            <label class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest block mb-1">Carga Nova (W)</label>
+                                            <label class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest block mb-1" data-i18n="esg_prop_w">Carga Nova (W)</label>
                                             <input type="number" id="esg-proposed-watts" value="300" min="10" oninput="window.updateCalculations()" class="w-full bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2 text-xs font-bold text-emerald-800 text-right focus:border-emerald-500 outline-none">
                                         </div>
                                     </div>
 
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1">Custo Instalação (R$)</label>
+                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1" data-i18n="esg_capex">Custo Instalação</label>
                                             <input type="number" id="esg-capex" value="5000" min="0" oninput="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-starlight text-right focus:border-emerald-500 outline-none">
                                         </div>
                                         <div>
-                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1">Tarifa (R$/kWh)</label>
+                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1" data-i18n="esg_tariff">Tarifa (R$/kWh)</label>
                                             <input type="number" id="esg-kwh-cost" value="0.85" step="0.01" oninput="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-starlight text-right focus:border-emerald-500 outline-none">
                                         </div>
                                     </div>
 
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1">Uso Diário (Horas)</label>
+                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1" data-i18n="esg_hrs">Uso Diário (Horas)</label>
                                             <input type="number" id="esg-daily-hours" value="10" min="1" max="24" oninput="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-starlight text-right focus:border-emerald-500 outline-none">
                                         </div>
                                         <div>
-                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1">Dias/Ano</label>
+                                            <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1" data-i18n="esg_days">Dias/Ano</label>
                                             <input type="number" id="esg-days-year" value="260" min="1" max="365" oninput="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-starlight text-right focus:border-emerald-500 outline-none">
                                         </div>
                                     </div>
                                     
                                     <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
-                                        <label for="esg-has-ac" class="text-[10px] font-black text-slate-600 uppercase cursor-pointer tracking-widest">Incluir Bônus Ar Condicionado</label>
+                                        <label for="esg-has-ac" class="text-[10px] font-black text-slate-600 uppercase cursor-pointer tracking-widest" data-i18n="esg_ac">Incluir Bônus Ar Condicionado</label>
                                         <input type="checkbox" id="esg-has-ac" checked onchange="window.updateCalculations()" class="w-5 h-5 accent-emerald-600 cursor-pointer">
                                     </div>
                                 </div>
@@ -1090,17 +1090,17 @@
                                     <div class="bg-starlight p-8 rounded-3xl shadow-xl flex flex-col justify-center h-full relative overflow-hidden">
                                         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/40 via-starlight to-starlight pointer-events-none"></div>
                                         <div class="relative z-10 text-center mb-8">
-                                            <p class="text-xs text-slate-400 font-black uppercase tracking-[0.2em] mb-2">Economia Financeira (Ano)</p>
+                                            <p class="text-xs text-slate-400 font-black uppercase tracking-[0.2em] mb-2" data-i18n="esg_save_yr">Economia Financeira (Ano)</p>
                                             <h2 id="esg-money-val" class="text-5xl font-black text-emerald-400">R$ 0,00</h2>
                                         </div>
                                         
                                         <div class="relative z-10 grid grid-cols-2 gap-6 px-4">
                                             <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-center">
-                                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Payback (Retorno)</p>
+                                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1" data-i18n="esg_pb">Payback (Retorno)</p>
                                                 <p class="text-2xl font-black text-white"><span id="esg-payback-val">0.0</span> <span class="text-sm font-normal text-slate-300">meses</span></p>
                                             </div>
                                             <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-center">
-                                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">ROI (5 Anos)</p>
+                                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1" data-i18n="esg_roi">ROI (5 Anos)</p>
                                                 <p class="text-2xl font-black text-white"><span id="esg-roi-val">0</span><span class="text-sm font-normal text-slate-300">%</span></p>
                                             </div>
                                         </div>
@@ -1113,14 +1113,14 @@
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center justify-between">
                                             <div>
-                                                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1">Economia de Energia</p>
+                                                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1" data-i18n="esg_save_e">Economia de Energia</p>
                                                 <p class="text-lg font-black text-starlight"><span id="esg-kwh-val">0</span> <span class="text-[10px] text-slate-400">kWh/ano</span></p>
                                             </div>
                                             <i class="fas fa-bolt text-2xl text-luminous-gold opacity-50"></i>
                                         </div>
                                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center justify-between">
                                             <div>
-                                                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1">Impacto Ambiental</p>
+                                                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1" data-i18n="esg_impact">Impacto Ambiental</p>
                                                 <p class="text-lg font-black text-starlight"><span id="esg-trees-val">0</span> <span class="text-[10px] text-slate-400">Árvores/ano</span></p>
                                             </div>
                                             <i class="fas fa-tree text-2xl text-emerald-600 opacity-50"></i>
