@@ -39,6 +39,8 @@
 - [07/04/2026]: Upgrade do Motor ESG (ESGEngine.ts): Inclusão de variáveis de Climatização (HVAC) e Custos de Manutenção (OPEX) para cálculo de ROI Enterprise.
 - [07/04/2026]: Refinamento HCL: Adição de alertas contextuais sobre Iluminância Vertical (Ev) para conformidade técnica com WELL v2.
 - [08/04/2026]: Implementação de Infraestrutura PWA (Progressive Web App). Criação de manifest.json e sw.js. Injeção de lógica de interceptação 'beforeinstallprompt' em main.ts e botão dinâmico de instalação desktop no header (index.html).
+- [08/04/2026]: Refinamento de UX/UI. Atualização da tag 'name' no manifest.json para simplificação do atalho desktop e injeção do Favicon global no index.html.
+- [08/04/2026]: Refinamento de UI (PWA). Simplificação da tag <title> no index.html para remoção de redundância e polimento do cabeçalho na janela standalone do Desktop.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
