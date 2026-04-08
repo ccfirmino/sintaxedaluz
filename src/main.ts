@@ -2044,23 +2044,8 @@ window.setupInputBindings = function() {
 // ==========================================
 // LUXSINTAX: PWA & INSTALAÇÃO DESKTOP (INFRASTRUCTURE)
 // ==========================================
-let deferredPrompt: any;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    // 1. Previne o aviso feio padrão do Chrome de aparecer do nada
-    e.preventDefault();
-    // 2. Guarda o evento na memória
-    deferredPrompt = e;
-    // 3. Mostra o nosso botão elegante no Header
-    const installBtn = document.getElementById('pwa-install-btn');
-    if (installBtn) {
-        installBtn.classList.remove('hidden');
-        installBtn.classList.add('flex');
-    }
-});
-
 window.installPWA = async () => {
-    if (!deferredPrompt) return;
+    if (!window.deferredPrompt) return;
     
     // Mostra o pop-up nativo de instalação do sistema operacional
     deferredPrompt.prompt();
@@ -2079,10 +2064,10 @@ window.installPWA = async () => {
     }
     
     // Limpa a memória
-    deferredPrompt = null;
+    window.deferredPrompt = null;
 };
 
 window.addEventListener('appinstalled', () => {
     console.log('[LuxSintax] Instalação PWA confirmada pelo SO.');
-    deferredPrompt = null;
+    window.deferredPrompt = null;
 });

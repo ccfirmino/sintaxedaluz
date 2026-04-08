@@ -8,6 +8,20 @@
     <meta name="theme-color" content="#0f172a">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <script>
+        // LUXSINTAX: Captura Antecipada do Evento PWA (Blindagem contra Race Condition)
+        window.deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window.deferredPrompt = e;
+            const showBtn = () => {
+                const btn = document.getElementById('pwa-install-btn');
+                if (btn) { btn.classList.remove('hidden'); btn.classList.add('flex'); }
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', showBtn);
+            else showBtn();
+        });
+    </script>
     
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
