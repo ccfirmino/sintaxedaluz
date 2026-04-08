@@ -2,7 +2,7 @@
 
 export const i18nDictionary = {
     pt: {
-        nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "PONTO A PONTO<br>HORIZONTAL", tab_vert: "PONTO A PONTO<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "DIMENSIONAR<br>DRIVER",
+        nav_home: "INICIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "PONTO A PONTO<br>HORIZONTAL", tab_vert: "PONTO A PONTO<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "TOPOLOGIA<br>& DRIVERS",
         calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES / LDT", lbl_ies_upload: "CARREGAR .IES / .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
         lbl_intensity_i: "INTENSIDADE (I)", lbl_flux: "FLUXO LUMINOSO", lbl_photo_val: "VALOR FOTOMÉTRICO", lbl_hq: "EIXO DO QUADRO (hq)", lbl_wall_dist: "DISTÂNCIA DA PAREDE (D)", lbl_spacing: "DISTÂNCIA ENTRE FONTES (D)",
         lbl_room_w: "LARGURA DO AMB. (X)", lbl_room_l: "COMPRIMENTO DO AMB. (Y)", lbl_grid_sug: "MALHA SUGERIDA", lbl_grid_unit: "PEÇAS", lbl_grid_desc: "Distribuição autônoma visando 25% de sobreposição (overlap) do facho luminoso projetado.",
@@ -42,7 +42,7 @@ export const i18nDictionary = {
         card_u_desc: "Representa a porcentagem de lúmens que chega ao plano. Depende das cores e Índice do Recinto.", 
         card_fm_desc: "Margem de segurança exigida por norma. Compensa degradação do LED e acúmulo de sujeira.", 
         card_glare_desc: "Luz acima de 65º em relação ao nadir entra direto no campo visual, causando UGR alto.",
-        tab_audit: "AUDITORIA &<br>PERFORMANCE", tag_estimated: "ESTIMADO", nbr_audit_title: "Auditoria NBR 8995-1",
+        tab_audit: "AUDITORIA<br>CIRCADIANA", tag_estimated: "ESTIMADO", nbr_audit_title: "Auditoria NBR 8995-1",
         pdf_grid_title: "ESTUDO DE VIABILIDADE TÉCNICA E ILUMINÂNCIA", pdf_proj: "PROJETO:", pdf_room: "AMBIENTE:", pdf_author: "RESPONSÁVEL:", pdf_date: "DATA:",
         pdf_sec_1: "1. Parâmetros do Ambiente", pdf_sec_2: "2. Especificações da Fonte Luminosa", pdf_sec_3: "3. Distribuição de Iluminância e Fotometria", pdf_sec_4_nbr: "4. Síntese de Conformidade (NBR ISO/CIE 8995-1)", pdf_sec_4_free: "4. Síntese de Resultados (Estudo Livre)",
         pdf_dim: "Dimensões:", pdf_area: "Área:", pdf_height: "Pé-direito (H):", pdf_util: "Fator Utilização (U):", pdf_plane: "Plano Trabalho (HP):", pdf_maint: "Fator Manutenção (FM):", pdf_grid: "Malha Prevista:",
@@ -63,7 +63,7 @@ export const i18nDictionary = {
         pdf_leed_avg: "LPD Médio Projetado:", pdf_leed_pass: "COMPLIANCE ATINGIDO (APROVADO)", pdf_leed_fail: "REPROVADO (EXCEDE LIMITES)"
     },
     en: {
-        nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "DRIVER<br>SIZING",
+        nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "TOPOLOGY<br>& DRIVERS",
         calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES / LDT", lbl_ies_upload: "UPLOAD .IES / .LDT", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",
         lbl_intensity_i: "INTENSITY (I)", lbl_flux: "LUMINOUS FLUX", lbl_photo_val: "PHOTOMETRIC VALUE", lbl_hq: "PICTURE AXIS (hq)", lbl_wall_dist: "WALL DISTANCE (D)", lbl_spacing: "FIXTURE SPACING (D)",
         lbl_room_w: "ROOM WIDTH (X)", lbl_room_l: "ROOM LENGTH (Y)", lbl_grid_sug: "SUGGESTED GRID", lbl_grid_unit: "FIXTURES", lbl_grid_desc: "Autonomous distribution aiming for 25% beam overlap on the projected light spot.",
@@ -103,7 +103,7 @@ export const i18nDictionary = {
         card_u_desc: "Percentage of lumens that effectively reach the work plane. Depends on room colors and Index.", 
         card_fm_desc: "Safety margin required by standard. Compensates for LED degradation and dirt accumulation.", 
         card_glare_desc: "Light above 65º from nadir enters the visual field directly, causing severe discomfort (high UGR).",
-        tab_audit: "AUDIT &<br>PERFORMANCE", tag_estimated: "ESTIMATED", nbr_audit_title: "ISO 8995-1 Audit",
+        tab_audit: "CIRCADIAN<br>AUDIT", tag_estimated: "ESTIMATED", nbr_audit_title: "ISO 8995-1 Audit",
         pdf_grid_title: "TECHNICAL FEASIBILITY AND ILLUMINANCE STUDY", pdf_proj: "PROJECT:", pdf_room: "ROOM:", pdf_author: "AUTHOR:", pdf_date: "DATE:",
         pdf_sec_1: "1. Room Parameters", pdf_sec_2: "2. Light Source Specifications", pdf_sec_3: "3. Illuminance Distribution and Photometry", pdf_sec_4_nbr: "4. Compliance Summary (ISO/CIE 8995-1)", pdf_sec_4_free: "4. Results Summary (Free Study)",
         pdf_dim: "Dimensions:", pdf_area: "Area:", pdf_height: "Ceiling Height (H):", pdf_util: "Utilization Factor (U):", pdf_plane: "Work Plane (HP):", pdf_maint: "Maintenance Factor (FM):", pdf_grid: "Planned Grid:",
