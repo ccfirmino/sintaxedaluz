@@ -155,6 +155,10 @@ export class ReportExporter {
      * Monta o PDF do Estudo de Malha (Método dos Lúmens)
      */
     public static async createGridPdf(PDFLib: any, data: any, images: any, userLogoBase64?: string | null): Promise<Blob> {
+        const lang = (window as any).currentLang || 'pt';
+        const dict = (window as any).i18n[lang] || (window as any).i18n['pt'];
+        const t = (key: string) => dict[key] || key;
+
         const pdfDoc = await PDFLib.PDFDocument.create();
         const page = pdfDoc.addPage([595.28, 841.89]);
         const { width, height } = page.getSize();
@@ -168,7 +172,7 @@ export class ReportExporter {
             currentPage.drawRectangle({ x: 0, y: height - 57, width, height: 2, color: PDFLib.rgb(0.85, 0.46, 0.02) });
             
             currentPage.drawText('LUXSINTAX', { x: 40, y: height - 32, size: 14, font: fontBold, color: PDFLib.rgb(0.85, 0.46, 0.02) });
-            currentPage.drawText('ESTUDO DE VIABILIDADE TÉCNICA E ILUMINÂNCIA', { x: 130, y: height - 32, size: 9, font: fontRegular, color: PDFLib.rgb(1, 1, 1) });
+            currentPage.drawText(t('pdf_grid_title'), { x: 130, y: height - 32, size: 9, font: fontRegular, color: PDFLib.rgb(1, 1, 1) });
             
             if (userLogoBase64) {
                 try {
@@ -181,10 +185,11 @@ export class ReportExporter {
 
         await drawHeader(page);
 
-        page.drawText(`PROJETO: ${data.projectName.toUpperCase()}`, { x: 40, y: height - 75, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-        page.drawText(`AMBIENTE: ${data.roomName.toUpperCase()}`, { x: 40, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
-        page.drawText(`RESPONSÁVEL: ${data.authorName.toUpperCase()}`, { x: width - 260, y: height - 75, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-        page.drawText(`DATA: ${new Date().toLocaleDateString('pt-BR')}`, { x: width - 260, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(`${t('pdf_proj')} ${data.projectName.toUpperCase()}`, { x: 40, y: height - 75, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+        page.drawText(`${t('pdf_room')} ${data.roomName.toUpperCase()}`, { x: 40, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+        page.drawText(`${t('pdf_author')} ${data.authorName.toUpperCase()}`, { x: width - 260, y: height - 75, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        const dateStr = lang === 'en' ? new Date().toLocaleDateString('en-US') : new Date().toLocaleDateString('pt-BR');
+        page.drawText(`${t('pdf_date')} ${dateStr}`, { x: width - 260, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
 
         let cy = height - 115; 
 
@@ -194,8 +199,10 @@ export class ReportExporter {
             return y - 16;
         };
 
-        cy = drawSection('1. Parâmetros do Ambiente', cy);
-        const gridRows = [['Dimensões:', `${data.roomW.toFixed(2)}m x ${data.roomL.toFixed(2)}m (Área: ${data.area.toFixed(2)}m²)`, 'Pé-direito (H):', `${data.height.toFixed(2)}m`],['Fator Utilização (U):', `${data.utilFactor.toFixed(2)}`, 'Plano Trabalho (HP):', `${data.plane.toFixed(2)}m`],['Fator Manutenção (FM):', `${data.maintFactor.toFixed(2)}`, 'Malha Prevista:', `${data.cols}x${data.rows} (${data.totalFixtures} peças)`]
+        cy = drawSection(t('pdf_sec_1'), cy);
+        const gridRows = [[t('pdf_dim'), `${data.roomW.toFixed(2)}m x ${data.roomL.toFixed(2)}m (${t('pdf_area')} ${data.area.toFixed(2)}m²)`, t('pdf_height'), `${data.height.toFixed(2)}m`],
+            [t('pdf_util'), `${data.utilFactor.toFixed(2)}`, t('pdf_plane'), `${data.plane.toFixed(2)}m`],
+            [t('pdf_maint'), `${data.maintFactor.toFixed(2)}`, t('pdf_grid'), `${data.cols}x${data.rows} (${data.totalFixtures})`]
         ];
 
         gridRows.forEach(row => {
@@ -205,17 +212,17 @@ export class ReportExporter {
         });
 
         cy -= 8;
-        cy = drawSection('2. Especificações da Fonte Luminosa', cy);
-        page.drawText('Modelo (IES):', { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(data.lumName, { x: 140, y: cy, size: 7, font: fontRegular }); 
-        page.drawText('Temp. de Cor:', { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(data.cct ? `${data.cct} K` : 'Não informado', { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
-        page.drawText('Potência:', { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${data.pWatts.toFixed(1)} W`, { x: 140, y: cy, size: 7, font: fontRegular });
-        page.drawText('Abertura Facho:', { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(data.beamText, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
-        page.drawText('Fluxo Nominal:', { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${Math.round(data.fNominal)} lm`, { x: 140, y: cy, size: 7, font: fontRegular });
-        page.drawText('Eficácia Final:', { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(`${data.eff} lm/W`, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
-        page.drawText('Fluxo Final:', { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${Math.round(data.fFinal)} lm`, { x: 140, y: cy, size: 7, font: fontRegular });
-        page.drawText('Uplight:', { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(`${data.upRatio.toFixed(1)} %`, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 18;
+        cy = drawSection(t('pdf_sec_2'), cy);
+        page.drawText(t('pdf_model'), { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(data.lumName, { x: 140, y: cy, size: 7, font: fontRegular }); 
+        page.drawText(t('pdf_cct'), { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(data.cct ? `${data.cct} K` : t('pdf_not_informed'), { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
+        page.drawText(t('pdf_power'), { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${data.pWatts.toFixed(1)} W`, { x: 140, y: cy, size: 7, font: fontRegular });
+        page.drawText(t('pdf_beam'), { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(data.beamText, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
+        page.drawText(t('pdf_flux_nom'), { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${Math.round(data.fNominal)} lm`, { x: 140, y: cy, size: 7, font: fontRegular });
+        page.drawText(t('pdf_eff'), { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(`${data.eff} lm/W`, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 12;
+        page.drawText(t('pdf_flux_fin'), { x: 50, y: cy, size: 7, font: fontBold }); page.drawText(`${Math.round(data.fFinal)} lm`, { x: 140, y: cy, size: 7, font: fontRegular });
+        page.drawText(t('pdf_uplight'), { x: 340, y: cy, size: 7, font: fontBold }); page.drawText(`${data.upRatio.toFixed(1)} %`, { x: 440, y: cy, size: 7, font: fontRegular }); cy -= 18;
 
-        cy = drawSection('3. Distribuição de Iluminância e Fotometria', cy);
+        cy = drawSection(t('pdf_sec_3'), cy);
         
         const imgT = await pdfDoc.embedPng(images.topografia);
         const maxWidthTopo = width - 80;
@@ -224,7 +231,8 @@ export class ReportExporter {
         const xT = (width - dimsT.width) / 2;
         page.drawImage(imgT, { x: xT, y: cy - dimsT.height, width: dimsT.width, height: dimsT.height });
         page.drawRectangle({ x: xT, y: cy - dimsT.height, width: dimsT.width, height: dimsT.height, borderColor: PDFLib.rgb(0.8, 0.8, 0.8), borderWidth: 1 });
-        page.drawText(`PLANO AVALIADO: ${data.targetLevel === 'LP' ? 'PISO (0.00m)' : `MESA (${data.plane.toFixed(2)}m)`}`, { x: xT, y: cy - dimsT.height - 12, size: 7, font: fontBold });
+        const planeStr = data.targetLevel === 'LP' ? `${t('pdf_floor')} (0.00m)` : `${t('pdf_desk')} (${data.plane.toFixed(2)}m)`;
+        page.drawText(`${t('pdf_eval_plane')} ${planeStr}`, { x: xT, y: cy - dimsT.height - 12, size: 7, font: fontBold });
 
         const imgLeg = await pdfDoc.embedPng(images.legend);
         const dimsLeg = imgLeg.scaleToFit(dimsT.width, 30); 
@@ -242,20 +250,18 @@ export class ReportExporter {
             
             const textX = xP + dimsP.width + 15;
             const textY = cy - (dimsP.height / 2);
-            page.drawText('CURVA POLAR', { x: textX, y: textY + 6, size: 8, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+            page.drawText(t('pdf_polar'), { x: textX, y: textY + 6, size: 8, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
             page.drawText('(C0-C180 / C90-C270)', { x: textX, y: textY - 6, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
             
             cy -= (dimsP.height + 25);
         }
 
-        // LUXSINTAX: Motor de Auditoria e Carimbo de Conformidade Normativa
-        const titleBloco4 = data.isNbrActive ? '4. Síntese de Conformidade (NBR ISO/CIE 8995-1)' : '4. Síntese de Resultados (Estudo Livre)';
+        const titleBloco4 = data.isNbrActive ? t('pdf_sec_4_nbr') : t('pdf_sec_4_free');
         cy = drawSection(titleBloco4, cy);
         
         let status = 'APPROVED';
         if (data.isNbrActive) {
             const parsedUgr = parseFloat(data.ugrStr);
-            // Tolerância estrita: Reprova se Lux < 90% do alvo, ou se UGR ultrapassar o limite da NBR
             if (data.avgLux < data.targetLux * 0.9) status = 'REJECTED';
             else if (!isNaN(parsedUgr) && parsedUgr > data.targetUgr) status = 'REJECTED';
             else if (data.avgLux < data.targetLux) status = 'WARNING';
@@ -266,43 +272,40 @@ export class ReportExporter {
         let boxColor, textColor, stampText;
         if (status === 'APPROVED') {
             boxColor = PDFLib.rgb(0.92, 0.98, 0.92); textColor = PDFLib.rgb(0.06, 0.46, 0.15);
-            stampText = data.isNbrActive ? 'APROVADO NBR' : 'ALVO ATINGIDO';
+            stampText = data.isNbrActive ? t('pdf_appr_nbr') : t('pdf_appr');
         } else if (status === 'WARNING') {
             boxColor = PDFLib.rgb(1.0, 0.97, 0.86); textColor = PDFLib.rgb(0.75, 0.45, 0.0);
-            stampText = 'TOLERÁVEL';
+            stampText = t('pdf_warn');
         } else {
             boxColor = PDFLib.rgb(0.98, 0.90, 0.90); textColor = PDFLib.rgb(0.75, 0.10, 0.10);
-            stampText = data.isNbrActive ? 'NÃO CONFORME' : 'ABAIXO DO ALVO';
+            stampText = data.isNbrActive ? t('pdf_rej_nbr') : t('pdf_rej');
         }
 
         const resBoxY = cy - 65;
         page.drawRectangle({ x: 40, y: resBoxY, width: width - 80, height: 75, color: boxColor, borderColor: textColor, borderWidth: 1 });
 
-        page.drawText('ILUMINÂNCIA (Em) CALCULADA:', { x: 55, y: cy - 15, size: 9, font: fontBold, color: PDFLib.rgb(0.2, 0.2, 0.2) });
+        page.drawText(t('pdf_calc_lux'), { x: 55, y: cy - 15, size: 9, font: fontBold, color: PDFLib.rgb(0.2, 0.2, 0.2) });
         page.drawText(`${data.avgLux} LUX`, { x: 55, y: cy - 38, size: 24, font: fontBold, color: textColor });
         
-        const lblAlvo = data.isNbrActive ? `Alvo Exigido (NBR): ${data.targetLux} Lux` : `Alvo Desejado: ${data.targetLux} Lux`;
+        const lblAlvo = data.isNbrActive ? `${t('pdf_req_target')} ${data.targetLux} Lux` : `${t('pdf_des_target')} ${data.targetLux} Lux`;
         page.drawText(lblAlvo, { x: 55, y: cy - 52, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
 
-        page.drawText('MÉTRICAS COMPLEMENTARES:', { x: 240, y: cy - 15, size: 8, font: fontBold, color: PDFLib.rgb(0.2, 0.2, 0.2) });
-        page.drawText(`Carga Instalada: ${data.totalWatts.toFixed(1)} W`, { x: 240, y: cy - 28, size: 9, font: fontRegular });
-        page.drawText(`Densidade (LPD): ${data.lpd.toFixed(2)} W/m²`, { x: 240, y: cy - 40, size: 9, font: fontRegular });
+        page.drawText(t('pdf_metrics'), { x: 240, y: cy - 15, size: 8, font: fontBold, color: PDFLib.rgb(0.2, 0.2, 0.2) });
+        page.drawText(`${t('pdf_load')} ${data.totalWatts.toFixed(1)} W`, { x: 240, y: cy - 28, size: 9, font: fontRegular });
+        page.drawText(`${t('pdf_lpd')} ${data.lpd.toFixed(2)} W/m²`, { x: 240, y: cy - 40, size: 9, font: fontRegular });
         
-        // Destaca a vermelho se o UGR for o motivo da reprovação
         const ugrColor = (status === 'REJECTED' && parseFloat(data.ugrStr) > (data.targetUgr || 19)) ? PDFLib.rgb(0.8, 0, 0) : PDFLib.rgb(0.2, 0.2, 0.2);
-        page.drawText(`UGR Máx (Aprox): ${data.ugrStr}`, { x: 240, y: cy - 52, size: 9, font: fontBold, color: ugrColor });
+        page.drawText(`${t('pdf_ugr')} ${data.ugrStr}`, { x: 240, y: cy - 52, size: 9, font: fontBold, color: ugrColor });
 
-        // CARIMBO OFICIAL DE AUDITORIA (STAMP)
         const stampX = width - 190;
         const stampY = cy - 45;
         page.drawRectangle({ x: stampX, y: stampY - 8, width: 130, height: 42, borderColor: textColor, borderWidth: 3, color: PDFLib.rgb(1, 1, 1), opacity: 0.8 });
-        page.drawText(stampText, { x: stampX + 10, y: stampY + 12, size: 14, font: fontBold, color: textColor });
+        page.drawText(stampText, { x: stampX + 10, y: stampY + 12, size: 10, font: fontBold, color: textColor });
         if (data.isNbrActive) {
             page.drawText('ISO/CIE 8995-1', { x: stampX + 28, y: stampY - 2, size: 8, font: fontBold, color: textColor });
         }
 
-        const disclaimer = "AVISO LEGAL: Relatório técnico gerado pela suíte LuxSintax V26. Baseado em modelagem matemática e Método dos Lúmens clássico. Tratando-se de estudo paramétrico preliminar de apoio à decisão do Projetista, os resultados de iluminância e uniformidade podem variar in loco devido a interferências arquitetônicas e obstruções. Documento não substitui laudo ou projeto executivo global assinado.";
-        page.drawText(disclaimer, { x: 40, y: 30, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6), maxWidth: width - 80, lineHeight: 7.5 });
+        page.drawText(t('pdf_disclaimer'), { x: 40, y: 30, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6), maxWidth: width - 80, lineHeight: 7.5 });
 
         const pdfBytes = await pdfDoc.save();
         return new Blob([pdfBytes], { type: 'application/pdf' });
@@ -312,6 +315,10 @@ export class ReportExporter {
      * Monta o PDF do Relatório LEED (ASHRAE 90.1)
      */
     public static async createLeedPdf(PDFLib: any, project: any, summary: any, targetLabel: string, userLogoBase64?: string | null): Promise<Blob> {
+        const lang = (window as any).currentLang || 'pt';
+        const dict = (window as any).i18n[lang] || (window as any).i18n['pt'];
+        const t = (key: string) => dict[key] || key;
+
         const pdfDoc = await PDFLib.PDFDocument.create();
         const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
         const fontRegular = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
@@ -325,7 +332,7 @@ export class ReportExporter {
             currentPage.drawRectangle({ x: 0, y: height - 57, width, height: 2, color: PDFLib.rgb(0.85, 0.46, 0.02) });
             
             currentPage.drawText('LUXSINTAX', { x: 40, y: height - 32, size: 14, font: fontBold, color: PDFLib.rgb(0.85, 0.46, 0.02) });
-            currentPage.drawText('RELATÓRIO DE COMPLIANCE LEED / ASHRAE 90.1', { x: 130, y: height - 32, size: 9, font: fontRegular, color: PDFLib.rgb(1, 1, 1) });
+            currentPage.drawText(t('pdf_leed_title'), { x: 130, y: height - 32, size: 9, font: fontRegular, color: PDFLib.rgb(1, 1, 1) });
             
             if (userLogoBase64) {
                 try {
@@ -344,43 +351,44 @@ export class ReportExporter {
 
         await drawHeader(page);
 
-        page.drawText(`PROJETO: ${project.name.toUpperCase()}`, { x: 40, y: height - 75, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-        page.drawText(`META APLICADA: ${targetLabel.toUpperCase()}`, { x: 40, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
-        page.drawText(`DATA: ${new Date().toLocaleDateString('pt-BR')}`, { x: width - 260, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(`${t('pdf_proj')} ${project.name.toUpperCase()}`, { x: 40, y: height - 75, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+        page.drawText(`${t('pdf_leed_target')} ${targetLabel.toUpperCase()}`, { x: 40, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+        const dateStrL = lang === 'en' ? new Date().toLocaleDateString('en-US') : new Date().toLocaleDateString('pt-BR');
+        page.drawText(`${t('pdf_date')} ${dateStrL}`, { x: width - 260, y: height - 88, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
 
         let cy = height - 115;
         
-        cy = drawSection('1. Balanço Energético Global', cy, page);
+        cy = drawSection(t('pdf_leed_sec_1'), cy, page);
         cy -= 12;
 
         const maxBarWidth = 350;
         const maxWatts = Math.max(summary.allowedWatts, summary.totalWatts) * 1.2 || 1; 
         
         const allowedWidth = (summary.allowedWatts / maxWatts) * maxBarWidth;
-        page.drawText('LIMITE ASHRAE:', { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(t('pdf_leed_limit'), { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
         page.drawRectangle({ x: 130, y: cy - 2, width: allowedWidth, height: 8, color: PDFLib.rgb(0.8, 0.8, 0.8) });
         page.drawText(`${summary.allowedWatts.toFixed(1)} W`, { x: 135 + allowedWidth, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
         cy -= 16;
 
         const projectWidth = (summary.totalWatts / maxWatts) * maxBarWidth;
         const barColor = summary.isCompliant ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
-        page.drawText('CARGA PROJETO:', { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+        page.drawText(t('pdf_leed_proj_load'), { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
         page.drawRectangle({ x: 130, y: cy - 2, width: projectWidth, height: 8, color: barColor });
         page.drawText(`${summary.totalWatts.toFixed(1)} W`, { x: 135 + projectWidth, y: cy, size: 7, font: fontBold, color: barColor });
         cy -= 24;
 
-        cy = drawSection('2. Impacto ESG e Sustentabilidade (Estimativa Anual)', cy, page);
+        cy = drawSection(t('pdf_leed_sec_2'), cy, page);
         cy -= 12;
         
         if (summary.esg && summary.esg.savingsKwh > 0) {
-            page.drawText(`Eficiência Operacional: Economia de ${summary.esg.savingsKwh.toFixed(0)} kWh/ano em relação à linha de base.`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 12;
-            page.drawText(`Pegada de Carbono: Redução estimada de ${summary.esg.co2ReductionKg.toFixed(0)} kg CO2 emitidos na atmosfera.`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 12;
-            page.drawText(`Equivalência Ambiental: Benefício correspondente a absorção de ${Math.round(summary.esg.treesEquivalent)} árvore(s) adulta(s).`, { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.3, 0.48, 0.06) }); cy -= 20;
+            page.drawText(`${t('pdf_leed_esg_1')} ${summary.esg.savingsKwh.toFixed(0)} ${t('pdf_leed_esg_1_1')}`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 12;
+            page.drawText(`${t('pdf_leed_esg_2')} ${summary.esg.co2ReductionKg.toFixed(0)} ${t('pdf_leed_esg_2_1')}`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 12;
+            page.drawText(`${t('pdf_leed_esg_3')} ${Math.round(summary.esg.treesEquivalent)} ${t('pdf_leed_esg_3_1')}`, { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.3, 0.48, 0.06) }); cy -= 20;
         } else {
-            page.drawText('O projeto atual não apresenta redução de carga energética frente ao limite normativo.', { x: 50, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 20;
+            page.drawText(t('pdf_leed_esg_fail'), { x: 50, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) }); cy -= 20;
         }
 
-        cy = drawSection('3. Memorial de Cálculo por Ambiente', cy, page);
+        cy = drawSection(t('pdf_leed_sec_3'), cy, page);
         cy -= 8;
 
         for (let i = 0; i < project.rooms.length; i++) {
@@ -400,7 +408,7 @@ export class ReportExporter {
             let roomAllowed = r.area * (r.baseLpd || 0) * targetFactor;
 
             page.drawText(`${i + 1}. ${r.name.toUpperCase()}`, { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-            page.drawText(`Área: ${r.area} m² | LPD Alvo: ${((r.baseLpd || 0) * targetFactor).toFixed(1)} W/m²`, { x: 250, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+            page.drawText(`${t('pdf_area')} ${r.area} m² | ${t('pdf_leed_lpd_target')} ${((r.baseLpd || 0) * targetFactor).toFixed(1)} W/m²`, { x: 250, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
             cy -= 12;
 
             for (let f of r.fixtures) {
@@ -413,25 +421,25 @@ export class ReportExporter {
             if (cy < 70) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
 
             const roomStatusColor = roomWatts <= roomAllowed ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
-            page.drawText(`SUBTOTAL: ${roomWatts.toFixed(1)} W`, { x: 60, y: cy, size: 7, font: fontBold, color: roomStatusColor });
-            page.drawText(`LIMITE: ${roomAllowed.toFixed(1)} W`, { x: 250, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+            page.drawText(`${t('pdf_leed_subtotal')} ${roomWatts.toFixed(1)} W`, { x: 60, y: cy, size: 7, font: fontBold, color: roomStatusColor });
+            page.drawText(`${t('pdf_leed_limit_2')} ${roomAllowed.toFixed(1)} W`, { x: 250, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
             cy -= 18;
         }
 
         if (cy < 150) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
 
         cy -= 10;
-        cy = drawSection('4. Diagnóstico Técnico Global', cy, page);
+        cy = drawSection(t('pdf_leed_sec_4'), cy, page);
         cy -= 12;
 
-        const finalStatus = summary.isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "REPROVADO (EXCEDE LIMITES)";
+        const finalStatus = summary.isCompliant ? t('pdf_leed_pass') : t('pdf_leed_fail');
         
-        page.drawText(`LPD Médio Projetado: ${summary.currentLpd.toFixed(2)} W/m²`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 16;
+        page.drawText(`${t('pdf_leed_avg')} ${summary.currentLpd.toFixed(2)} W/m²`, { x: 50, y: cy, size: 7, font: fontRegular }); cy -= 16;
         page.drawText(finalStatus, { x: 50, y: cy, size: 9, font: fontBold, color: barColor });
         
         // Rodapé de Isenção Legal (Fixo no final da página)
         if (summary.disclaimer) {
-            page.drawText(summary.disclaimer, { 
+            page.drawText(t('pdf_disclaimer'), { 
                 x: 40, y: 30, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6), 
                 maxWidth: width - 80, lineHeight: 7.5 
             });

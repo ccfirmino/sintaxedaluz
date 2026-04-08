@@ -41,6 +41,8 @@
 - [08/04/2026]: Implementação de Infraestrutura PWA (Progressive Web App). Criação de manifest.json e sw.js. Injeção de lógica de interceptação 'beforeinstallprompt' em main.ts e botão dinâmico de instalação desktop no header (index.html).
 - [08/04/2026]: Refinamento de UX/UI. Atualização da tag 'name' no manifest.json para simplificação do atalho desktop e injeção do Favicon global no index.html.
 - [08/04/2026]: Refinamento de UI (PWA). Simplificação da tag <title> no index.html para remoção de redundância e polimento do cabeçalho na janela standalone do Desktop.
+- [08/04/2026]: Refatoração UI/UX: Reordenação dos módulos na barra de navegação (Priorização da Auditoria) e redesenho estrutural do painel de Auditoria NBR 8995-1 (Maior legibilidade de dados, tags contextuais e suporte nativo a internacionalização de texto no motor TS).
+- [08/04/2026]: Implementação de Internacionalização Inteligente (i18n) na camada de infraestrutura (ReportExporter). Relatórios em PDF agora herdam o idioma do estado global (window.currentLang) puxando tags do dicionário. Refatoração UI do Painel de Auditoria NBR e ordenação lógica dos botões de navegação no header.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).

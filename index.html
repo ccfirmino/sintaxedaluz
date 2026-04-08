@@ -268,13 +268,13 @@
                         <i class="fas fa-microchip text-lg mb-1"></i>
                         <span data-i18n="tab_driver">DRIVER<br>HUB</span>
                     </button>
+                    <button onclick="window.switchTool('audit')" id="tab-audit" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
+                        <i class="fas fa-stethoscope text-lg mb-1"></i>
+                        <span data-i18n="tab_audit">AUDITORIA &<br>PERFORMANCE</span>
+                    </button>
                     <button onclick="window.switchTool('leedProj')" id="tab-leedProj" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
                         <i class="fas fa-building text-lg mb-1"></i>
                         <span data-i18n="tab_leed_proj">PROJETO<br>LEED (LPD)</span>
-                    </button>    
-                    <button onclick="window.switchTool('audit')" id="tab-audit" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap">
-                        <i class="fas fa-stethoscope text-lg mb-1"></i>
-                        <span>AUDITORIA &<br>PERFORMANCE</span>
                     </button>
                     <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn text-[12px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold">
                         <i class="fas fa-search text-lg mb-1"></i>
@@ -784,22 +784,30 @@
                             </div>
 
                             <div id="nbr-status-panel" class="hidden glass-panel p-6 rounded-2xl border-2 transition-all duration-500 w-full animate-fade-in-up">
-                                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                                    <div class="flex items-center gap-4">
-                                        <div id="nbr-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                                <div class="flex flex-col md:flex-row items-center justify-between gap-6 w-full">
+                                    <div class="flex items-center gap-4 flex-shrink-0 w-full md:w-auto">
+                                        <div id="nbr-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0">
                                             <i id="nbr-icon" class="fas fa-info-circle"></i>
                                         </div>
-                                        <div>
-                                            <h3 class="text-sm font-black text-starlight dark:text-white uppercase tracking-widest flex items-center gap-2 mb-1">Auditoria NBR 8995-1</h3>
-                                            <div id="nbr-summary-row" class="hidden items-center gap-3 mb-1">
-                                                <span class="text-starlight dark:text-white font-black text-xs"><span id="nbr-sum-lux">0</span> lx</span>
-                                                <span class="text-starlight dark:text-white font-black text-xs">UGR <span id="nbr-sum-ugr">0</span></span>
-                                                <span id="nbr-sum-plane" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[8px] rounded-full border border-slate-300 dark:border-slate-600 font-bold tracking-widest">--</span>
-                                            </div>
+                                        <div class="flex-shrink-0 w-48">
+                                            <h3 class="text-sm font-black text-starlight dark:text-white uppercase tracking-widest flex items-center gap-2 mb-1" data-i18n="nbr_audit_title">Auditoria NBR 8995-1</h3>
                                             <p id="nbr-status-text" class="text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tighter text-[9px]">Processando dados fotométricos...</p>
                                         </div>
                                     </div>
-                                    <div id="nbr-badge" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
+                                    
+                                    <div id="nbr-summary-row" class="hidden flex-grow flex-col md:flex-row items-center justify-center gap-4 md:gap-8 border-t md:border-t-0 md:border-l md:border-r border-slate-200 dark:border-slate-700 py-4 md:py-0 px-2 md:px-6 mx-0 md:mx-4 w-full md:w-auto">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-3xl font-black text-starlight dark:text-white"><span id="nbr-sum-lux">0</span> <span class="text-base text-slate-500 dark:text-slate-400 font-bold">lx</span></span>
+                                            <span id="nbr-sum-plane" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[9px] rounded border border-slate-300 dark:border-slate-600 font-black tracking-widest uppercase">NÍVEL MESA</span>
+                                        </div>
+                                        <div class="hidden md:block w-px h-10 bg-slate-200 dark:bg-slate-700"></div>
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-3xl font-black text-starlight dark:text-white"><span class="text-base text-slate-500 dark:text-slate-400 font-bold">UGR</span> <span id="nbr-sum-ugr">0</span></span>
+                                            <span class="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-[9px] rounded border border-amber-200 dark:border-amber-800 font-black tracking-widest uppercase" data-i18n="tag_estimated">ESTIMADO</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="nbr-badge" class="px-6 py-2 rounded-full text-[12px] font-black uppercase tracking-widest border flex-shrink-0 text-center w-full md:w-48">
                                         AGUARDANDO
                                     </div>
                                 </div>

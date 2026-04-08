@@ -1888,7 +1888,12 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
         const sumPlane = document.getElementById('nbr-sum-plane');
         if (sumLux) sumLux.innerText = String(Math.round(displayLux));
         if (sumUgr) sumUgr.innerText = String(ugr);
-        if (sumPlane) sumPlane.innerText = targetPlane === 'LP' ? 'NÍVEL PISO (0.00m)' : 'NÍVEL MESA (0.75m)';
+        if (sumPlane) {
+            const isEn = window.currentLang === 'en';
+            sumPlane.innerText = targetPlane === 'LP' 
+                ? (isEn ? 'FLOOR LEVEL (0.00m)' : 'NÍVEL PISO (0.00m)') 
+                : (isEn ? 'DESK LEVEL (0.75m)' : 'NÍVEL MESA (0.75m)');
+        }
     }
 
     const flux = window.state?.grid?.flux || 0;
@@ -1925,27 +1930,28 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
             const nbrIcon = document.getElementById('nbr-icon');
 
             if(nbrBadge && nbrStatusText && nbrIconContainer && nbrIcon) {
+                const isEn = window.currentLang === 'en';
                 if (status === 'APPROVED') {
                     nbrPanel.style.borderColor = '#10b981';
-                    nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600';
+                    nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-green-100 text-green-600 flex-shrink-0';
                     nbrIcon.className = 'fas fa-check-circle';
-                    nbrStatusText.innerText = `Auditoria NBR: Conforme a norma`;
-                    nbrBadge.innerText = 'APROVADO';
-                    nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 border-green-200';
+                    nbrStatusText.innerText = isEn ? 'Standard Audit: Compliant' : 'Auditoria NBR: Conforme a norma';
+                    nbrBadge.innerText = isEn ? 'APPROVED' : 'APROVADO';
+                    nbrBadge.className = 'px-6 py-2 rounded-full text-[12px] font-black bg-green-100 text-green-700 border-green-200 flex-shrink-0 text-center w-full md:w-48';
                 } else if (status === 'WARNING') {
                     nbrPanel.style.borderColor = '#f59e0b';
-                    nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600';
+                    nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600 flex-shrink-0';
                     nbrIcon.className = 'fas fa-exclamation-triangle';
-                    nbrStatusText.innerText = `Auditoria NBR: Nível Marginal / Tolerável`;
-                    nbrBadge.innerText = 'AVISO';
-                    nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 border-amber-200';
+                    nbrStatusText.innerText = isEn ? 'Standard Audit: Marginal / Tolerable' : 'Auditoria NBR: Nível Marginal / Tolerável';
+                    nbrBadge.innerText = isEn ? 'WARNING' : 'AVISO';
+                    nbrBadge.className = 'px-6 py-2 rounded-full text-[12px] font-black bg-amber-100 text-amber-700 border-amber-200 flex-shrink-0 text-center w-full md:w-48';
                 } else {
                     nbrPanel.style.borderColor = '#ef4444';
-                    nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600';
+                    nbrIconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center bg-red-100 text-red-600 flex-shrink-0';
                     nbrIcon.className = 'fas fa-times-circle';
-                    nbrStatusText.innerText = `Auditoria NBR: Fora dos Requisitos`;
-                    nbrBadge.innerText = 'REPROVADO';
-                    nbrBadge.className = 'px-4 py-1.5 rounded-full text-[10px] font-black bg-red-100 text-red-700 border-red-200';
+                    nbrStatusText.innerText = isEn ? 'Standard Audit: Non-Compliant' : 'Auditoria NBR: Fora dos Requisitos';
+                    nbrBadge.innerText = isEn ? 'REJECTED' : 'REPROVADO';
+                    nbrBadge.className = 'px-6 py-2 rounded-full text-[12px] font-black bg-red-100 text-red-700 border-red-200 flex-shrink-0 text-center w-full md:w-48';
                 }
             }
         }
