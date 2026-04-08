@@ -50,6 +50,7 @@ declare global {
         updateCalcMode: (mode: string) => void;
         toggleTheme: () => void;
         toggleLanguage: () => void;
+        installPWA: () => void;
         [key: string]: any; // Permite chamadas dinâmicas do HTML
     }
 }
@@ -111,8 +112,15 @@ async function initializeApp() {
         // Boot UI
         window.initNbrSelector();
         window.setupInputBindings();
+        
+        // Infraestrutura PWA (Service Worker)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[LuxSintax] Infraestrutura PWA armada.', reg.scope))
+                .catch(err => console.warn('[LuxSintax] SW falhou:', err));
+        }
+
         window.switchTool('grid');
-        window.updateCalcMode('direct');
 
     } catch (err) {
         console.error("[LuxSintax] Falha Crítica no Boot:", err);
@@ -2032,3 +2040,49 @@ window.setupInputBindings = function() {
         });
     });
 };
+
+// ==========================================
+// LUXSINTAX: PWA & INSTALAÇÃO DESKTOP (INFRASTRUCTURE)
+// ==========================================
+let deferredPrompt: any;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // 1. Previne o aviso feio padrão do Chrome de aparecer do nada
+    e.preventDefault();
+    // 2. Guarda o evento na memória
+    deferredPrompt = e;
+    // 3. Mostra o nosso botão elegante no Header
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) {
+        installBtn.classList.remove('hidden');
+        installBtn.classList.add('flex');
+    }
+});
+
+window.installPWA = async () => {
+    if (!deferredPrompt) return;
+    
+    // Mostra o pop-up nativo de instalação do sistema operacional
+    deferredPrompt.prompt();
+    
+    // Aguarda a resposta do usuário
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+        console.log('[LuxSintax] Usuário promoveu a plataforma para Desktop.');
+        // Esconde o botão, pois o software já foi instalado
+        const installBtn = document.getElementById('pwa-install-btn');
+        if (installBtn) {
+            installBtn.classList.remove('flex');
+            installBtn.classList.add('hidden');
+        }
+    }
+    
+    // Limpa a memória
+    deferredPrompt = null;
+};
+
+window.addEventListener('appinstalled', () => {
+    console.log('[LuxSintax] Instalação PWA confirmada pelo SO.');
+    deferredPrompt = null;
+});
