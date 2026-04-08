@@ -64,6 +64,7 @@ window.state = {
     driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
     leedProject: { name: "Novo Projeto LEED", target: "baseline", rooms: [] },
         audit: { wireLength: 5, wireGauge: 1.5, voltage: 12, useType: 'office', timeOfDay: 'morning', mRatio: 0.52, visualLux: 500, baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260 },
+	esg: { proposedWatts: 300, baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260, hasAC: true, maintSavings: 0, capex: 5000 },
         showIsolines: true,
     showPolar: true,
     showHCL: false
@@ -265,11 +266,12 @@ window.switchTool = function(toolId: string) {
         activeBtn.classList.add('tab-active', 'text-luminous-gold');
     }
 
-    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver');
+    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg');
         document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
         document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
         document.getElementById('audit-tool')?.classList.toggle('hidden', toolId !== 'audit');
         document.getElementById('driver-tool')?.classList.toggle('hidden', toolId !== 'driver');
+        document.getElementById('esg-tool')?.classList.toggle('hidden', toolId !== 'esg');
     
     const modeSelector = document.getElementById('calc-mode-selector');
     if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
@@ -2107,3 +2109,56 @@ window.addEventListener('appinstalled', () => {
     console.log('[LuxSintax] Instalação PWA confirmada pelo SO.');
     window.deferredPrompt = null;
 });
+// LUXSINTAX: A Nova Máquina de Vendas
+window.updateEsgUI = function() {
+    const s = window.state.esg;
+    
+    // 1. Captura as entradas
+    const wBase = document.getElementById('esg-baseline-watts') as HTMLInputElement;
+    const wProp = document.getElementById('esg-proposed-watts') as HTMLInputElement;
+    const cost = document.getElementById('esg-kwh-cost') as HTMLInputElement;
+    const hrs = document.getElementById('esg-daily-hours') as HTMLInputElement;
+    const dys = document.getElementById('esg-days-year') as HTMLInputElement;
+    const capex = document.getElementById('esg-capex') as HTMLInputElement;
+    const hasAC = document.getElementById('esg-has-ac') as HTMLInputElement;
+
+    if(wBase) s.baselineWatts = parseFloat(wBase.value) || 1500;
+    if(wProp) s.proposedWatts = parseFloat(wProp.value) || 300;
+    if(cost) s.kwhCost = parseFloat(cost.value) || 0.85;
+    if(hrs) s.dailyHours = parseFloat(hrs.value) || 10;
+    if(dys) s.daysPerYear = parseFloat(dys.value) || 260;
+    if(capex) s.capex = parseFloat(capex.value) || 0;
+    if(hasAC) s.hasAC = hasAC.checked;
+
+    // 2. Aciona o Motor
+    if (window.ESGEngine) {
+        const res = window.ESGEngine.calculateESGImpact(s.proposedWatts, s.baselineWatts, s.kwhCost, s.dailyHours, s.daysPerYear, s.hasAC, 0, s.capex);
+        
+        // 3. Atualiza UI
+        const moneyEl = document.getElementById('esg-money-val');
+        const kwhEl = document.getElementById('esg-kwh-val');
+        const treesEl = document.getElementById('esg-trees-val');
+        const pbEl = document.getElementById('esg-payback-val');
+        const roiEl = document.getElementById('esg-roi-val');
+        const alertEl = document.getElementById('esg-alert-msg');
+        const alertBox = document.getElementById('esg-alert-box');
+
+        if(moneyEl) moneyEl.innerText = res.totalSavingsYearly.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        if(kwhEl) kwhEl.innerText = Math.round(res.savedKwh).toLocaleString('pt-BR');
+        if(treesEl) treesEl.innerText = res.treesPlanted.toFixed(1);
+        if(pbEl) pbEl.innerText = res.isProfitable && s.capex > 0 ? res.paybackMonths.toFixed(1) : '--';
+        if(roiEl) roiEl.innerText = res.isProfitable && s.capex > 0 ? res.roi5Years.toFixed(0) : '--';
+
+        if (alertBox && alertEl) {
+            alertBox.className = `relative z-10 mt-8 mx-4 p-4 rounded-xl text-xs font-bold text-center border ${res.isProfitable ? 'bg-emerald-900/30 text-emerald-300 border-emerald-500/30' : 'bg-red-900/30 text-red-300 border-red-500/30'}`;
+            alertEl.innerHTML = res.isProfitable ? `<i class="fas fa-check-circle mr-2"></i> ${res.message}` : `<i class="fas fa-exclamation-triangle mr-2"></i> ${res.message}`;
+        }
+    }
+};
+
+// Injetar chamada na função updateCalculations existente:
+const oldUpdate = window.updateCalculations;
+window.updateCalculations = function() {
+    oldUpdate();
+    if (window.currentTool === 'esg' && window.updateEsgUI) window.updateEsgUI();
+};

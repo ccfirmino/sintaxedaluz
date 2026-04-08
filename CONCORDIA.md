@@ -46,6 +46,7 @@
 - [08/04/2026]: Correção de Algoritmo. Implementação de trava de arredondamento (Floating Point Precision) na ponte UI-Estado (main.ts), garantindo que as conversões do sistema Imperial (pés) para o sistema Métrico não deturpem os algoritmos de cálculo de índice de recinto do Método dos Lúmens.
 - [08/04/2026]: Integração Analítica (GA4). Injeção de rastreadores de Virtual Page Views no switchTool e mapeamento de Macro-Conversões (generate_report) nos métodos de exportação de PDF, garantindo a coleta de dados de engajamento na arquitetura Single Page Application.
 - [08/04/2026]: Sprint 2 (Renascimento Elétrico). Refatoração massiva do ElectricalEngine.ts e integração avançada no main.ts. O sistema agora audita limites de comprimento contínuo da fita LED (Topologia Física) cruzando voltagem (12V/24V) contra as perdas no cabo (Voltage Drop), exigindo divisão de circuitos (Paralelo) para garantir a segurança da infraestrutura do cliente.
+- [08/04/2026]: Sprint 3 (Auditor Circadiano). Refatoração do HCLEngine.ts para implementar auditoria implacável de saúde humana (WELL v2 / Neurociência). O sistema agora emite Alerta Crítico de Supressão de Melatonina em cenários noturnos utilizando espectros frios (>4000K) e alerta de "Ambiente Adormecido" para escritórios diurnos com m-EDI inferior a 250.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).

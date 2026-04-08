@@ -2,38 +2,50 @@
 
 export const ESGEngine = {
     /**
-     * Calcula o Impacto ESG e Financeiro Avançado (ROI Enterprise)
+     * Calcula o impacto financeiro (ROI/Payback) e ambiental de um projeto luminotécnico.
      */
-    calculateESGImpact: (systemWatts: number, baselineWatts: number, kwhCost: number, dailyHours: number, daysPerYear: number, hasAC: boolean = false, maintenanceSavings: number = 0) => {
-        if (systemWatts <= 0 || baselineWatts <= 0) return { savingsMoney: 0, treesPlanted: 0, paybackMonths: 0, isProfitable: false, message: "Parâmetros inválidos." };
-
-        let deltaWatts = baselineWatts - systemWatts;
+    calculateESGImpact: (proposedWatts: number, baselineWatts: number, kwhCost: number, dailyHours: number, daysPerYear: number, hasAC: boolean, maintSavingsYearly: number, capex: number) => {
         
-        // Fator HVAC: Se houver ar-condicionado, cada 3W de luz removida economiza ~1W de refrigeração
-        const hvacBonus = hasAC ? (deltaWatts / 3) : 0;
-        const totalEffectiveSavingsWatts = deltaWatts + hvacBonus;
-
-        const annualHours = dailyHours * daysPerYear;
-        const annualKWhSaved = (totalEffectiveSavingsWatts * annualHours) / 1000;
+        const currentKwh = (baselineWatts * dailyHours * daysPerYear) / 1000;
+        const newKwh = (proposedWatts * dailyHours * daysPerYear) / 1000;
         
-        // Economia Financeira = Energia + Manutenção Evitada
-        const energySavingsMoney = annualKWhSaved * kwhCost;
-        const totalAnnualSavings = energySavingsMoney + maintenanceSavings;
+        let savedKwh = currentKwh - newKwh;
+        if (savedKwh < 0) savedKwh = 0; 
+        
+        // Bônus Térmico: Menos calor da iluminação = Menos esforço do Ar Condicionado
+        if (hasAC) savedKwh *= 1.33;
 
-        // Ambiental: 0.25kg CO2/kWh evitado
-        const carbonAvoidedKg = annualKWhSaved * 0.25;
-        const treesPlanted = carbonAvoidedKg / 20;
+        const energySavingsMoney = savedKwh * kwhCost;
+        const totalSavingsYearly = energySavingsMoney + maintSavingsYearly;
 
-        let message = `Performance ESG: Economia de ${annualKWhSaved.toFixed(0)} kWh/ano. `;
-        if (hasAC) message += `(Incluindo redução de carga térmica no Ar-Condicionado). `;
-        message += `Impacto equivalente a ${treesPlanted.toFixed(1)} árvores/ano.`;
+        const co2ReductionKg = savedKwh * 0.085; // Mix energético BR (aprox)
+        const treesPlanted = co2ReductionKg / 20;
 
-        return { 
-            savingsMoney: totalAnnualSavings, 
-            treesPlanted, 
-            isProfitable: deltaWatts > 0, 
-            message,
-            hvacContribution: (hvacBonus * annualHours / 1000) * kwhCost
+        let paybackMonths = 0;
+        let roi5Years = 0;
+        let isProfitable = totalSavingsYearly > 0;
+        let message = "";
+
+        if (isProfitable) {
+            if (capex > 0) {
+                paybackMonths = (capex / totalSavingsYearly) * 12;
+                roi5Years = (((totalSavingsYearly * 5) - capex) / capex) * 100;
+                
+                if (paybackMonths <= 24) {
+                    message = `Projeto Altamente Viável! Payback ultra-rápido em ${paybackMonths.toFixed(1)} meses e ROI de ${roi5Years.toFixed(0)}% em 5 anos.`;
+                } else {
+                    message = `Projeto Sustentável. O investimento se paga em ${paybackMonths.toFixed(1)} meses.`;
+                }
+            } else {
+                message = "Economia comprovada! Insira o Custo de Implantação (R$) para calcularmos os meses de Payback.";
+            }
+        } else {
+            message = "A carga proposta excede a atual. Sem viabilidade financeira baseada em eficiência energética.";
+        }
+
+        return {
+            savedKwh, energySavingsMoney, totalSavingsYearly, co2ReductionKg,
+            treesPlanted, paybackMonths, roi5Years, isProfitable, message
         };
     }
 };
