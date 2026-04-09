@@ -149,7 +149,14 @@
 /* LUXSINTAX: Aumentar textos das Caixas Explicativas (Tooltips) */
         .group-hover\:visible h4 { font-size: 13px !important; margin-bottom: 8px !important; }
         .group-hover\:visible p { font-size: 11px !important; color: #cbd5e1 !important; line-height: 1.6 !important; }
-        
+
+        /* LUXSINTAX FIX: Blindagem do Layout contra injeções de estilo inline do JavaScript */
+        #visual-tools:not(.hidden), #results-section:not(.hidden), .mode-photo-group:not(.hidden) { 
+            display: grid !important; 
+        }
+        .flex:not(.hidden)[id$="-selector"], .flex:not(.hidden)[id$="-wrapper"] {
+            display: flex !important;
+        }
 </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-luminous-gold selection:text-white transition-colors duration-300">
