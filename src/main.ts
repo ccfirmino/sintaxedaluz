@@ -327,7 +327,7 @@ window.switchTool = function(toolId: string) {
         document.getElementById('grid-selector')?.classList.toggle('hidden', toolId !== 'grid');
         
         document.getElementById('heatmap-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'grid');
-        document.getElementById('hcl-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'ponto' && toolId !== 'vertical');
+        document.getElementById('hcl-toggle-wrapper')?.classList.toggle('hidden', toolId !== 'vertical');
 
         if (toolId === 'ponto') window.setSurfaceMode('single');
         if (toolId === 'vertical') window.toggleVerticalView('section');
@@ -2228,7 +2228,7 @@ window.updateEsgUI = function() {
         if(roiEl) roiEl.innerText = res.isProfitable && s.capex > 0 ? res.roi5Years.toFixed(0) : '--';
 
         if (alertBox && alertEl) {
-            alertBox.className = `relative z-10 mt-8 mx-4 p-4 rounded-xl text-xs font-bold text-center border ${res.isProfitable ? 'bg-emerald-900/30 text-emerald-300 border-emerald-500/30' : 'bg-red-900/30 text-red-300 border-red-500/30'}`;
+            alertBox.className = `relative z-10 mt-8 mx-4 p-4 rounded-xl text-xs font-bold text-center border transition-colors ${res.isProfitable ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-500/30' : 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-500/30'}`;
             alertEl.innerHTML = res.isProfitable ? `<i class="fas fa-check-circle mr-2"></i> ${res.message}` : `<i class="fas fa-exclamation-triangle mr-2"></i> ${res.message}`;
         }
     }
@@ -2361,12 +2361,13 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         ctx.font = "bold 9px Manrope";
         ctx.fillStyle = textColor;
         ctx.textAlign = "center";
-        ctx.fillText("400nm (Azul)", padding + 30, h - 15);
-        ctx.fillText("700nm (Vermelho)", w - 40, h - 15);
+        ctx.fillText("380nm (UV)", padding + 20, h - 10);
+        ctx.fillText("480nm", padding + ((w - padding - 10) * 0.25), h - 10);
+        ctx.fillText("780nm (IR)", w - 30, h - 10);
         
         ctx.save();
         ctx.translate(15, h / 2); ctx.rotate(-Math.PI / 2);
-        ctx.fillText("Energia Relativa", 0, 0);
+        ctx.fillText("Intensidade Relativa (%)", 0, 0);
         ctx.restore();
 
         const mRatio = state.mRatio || 0.52;
@@ -2376,12 +2377,30 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         // Simulação do Envelhecimento do Cristalino (Filtro Amarelo Biológico)
         const lensFactor = userAge > 25 ? Math.max(0.3, 1.0 - (userAge - 25) * 0.015) : 1.0;
 
-        // 1. Retina (Biologia): Se a idade sobe, a absorção do azul cai drasticamente.
+        // Auto-scaling: Descobrir o pico máximo para não cortar o gráfico
+        let bluePower = 0.3 + (mRatio * 0.5); 
+        let yellowPower = 1.2 - (mRatio * 0.4);
+        let maxPeak = Math.max(bluePower, yellowPower, 0.8 * lensFactor);
+        const scaleY = (maxPeak > 1.2) ? (1.2 / maxPeak) : 1.0; // Normalizador dinâmico
+
+        // Linha Guia Didática: 480nm (Pico Circadiano)
+        const peakX = padding + ((w - padding - 10) * 0.25); // 480nm estimado aos 25% da curva
+        ctx.beginPath();
+        ctx.moveTo(peakX, h - padding);
+        ctx.lineTo(peakX, 10);
+        ctx.strokeStyle = "rgba(168, 85, 247, 0.4)"; // Roxo sutil
+        ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+        
+        ctx.font = "bold 8px Manrope";
+        ctx.fillStyle = "#a855f7";
+        ctx.fillText("Pico Melanópico", peakX, 15);
+
+        // 1. Retina (Biologia)
         ctx.beginPath();
         ctx.moveTo(padding, h - padding);
         for (let x = padding; x <= w - 10; x += 2) {
             const progress = (x - padding) / (w - padding - 10);
-            const melCurve = Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor; // Age Impact!
+            const melCurve = Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor * scaleY;
             const py = (h - padding) - (melCurve * (h - padding - 20));
             ctx.lineTo(x, py);
         }
@@ -2391,25 +2410,36 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         ctx.strokeStyle = "#0ea5e9";
         ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
 
-        // 2. LED (Física): Se for SunLike, preenchemos o "Cyanosis Dip" (falha no ciano).
-        let bluePower = 0.3 + (mRatio * 0.5); 
-        let yellowPower = 1.2 - (mRatio * 0.4);
-        
+        // 2. LED (Física) com Gradiente de Preenchimento
         ctx.beginPath();
+        let ledPoints = [];
         for (let x = padding; x <= w - 10; x += 2) {
             const progress = (x - padding) / (w - padding - 10);
-            
-            const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
-            const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
-            
-            // Cyanosis Dip Filler (TM-30 Premium Quality)
-            const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
+            const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower * scaleY;
+            const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower * scaleY;
+            const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) * scaleY : 0;
             
             const totalY = Math.min(1, ledBlue + ledYellow + cyanFill);
             const py = (h - padding) - (totalY * (h - padding - 20));
+            ledPoints.push({x, py});
             if (x === padding) ctx.moveTo(x, py);
             else ctx.lineTo(x, py);
         }
+        
+        // Área sob a curva do Espectro (Sombra suave)
+        ctx.lineTo(w - 10, h - padding);
+        ctx.lineTo(padding, h - padding);
+        ctx.closePath();
+        let gradient = ctx.createLinearGradient(0, h - padding, 0, 10);
+        gradient.addColorStop(0, isDark ? "rgba(248, 250, 252, 0.0)" : "rgba(15, 23, 42, 0.0)");
+        gradient.addColorStop(1, isDark ? "rgba(248, 250, 252, 0.1)" : "rgba(15, 23, 42, 0.05)");
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Linha Principal do Espectro
+        ctx.beginPath();
+        ctx.moveTo(ledPoints[0].x, ledPoints[0].py);
+        ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
         ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
 
         ctx.textAlign = "right"; ctx.font = "900 10px Manrope";
