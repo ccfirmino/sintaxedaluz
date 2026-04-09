@@ -2040,6 +2040,31 @@ window.updateResultsUI = function(lux: number, ugr: string | number, watts: numb
 
     let displayLux = targetPlane === 'LP' ? (luxPiso || lux * 0.85) : lux;
 
+    // LUXSINTAX: Ponte Silenciosa (Data Bridge) para o Módulo de Saúde (HCL)
+    // Sincroniza o esforço de engenharia diretamente para a neurociência, mantendo a independência das abas.
+    if (window.state && window.state.audit) {
+        let evEstimate = displayLux;
+        
+        // Se a origem do cálculo for a Grade (Método Lúmens - Lux Horizontal na Mesa),
+        // aplicamos a proporção física de Cilíndrica/Vertical (aprox. 50% do horizontal em reflexões padrão).
+        if (window.currentTool === 'grid') {
+            evEstimate = displayLux * 0.5;
+        }
+
+        const finalEv = Math.round(evEstimate);
+        
+        // Só atualizamos se o valor for válido e não zerar o input acidentalmente em uma transição de tela
+        if (finalEv > 0) {
+            window.state.audit.visualLux = finalEv;
+            
+            // Sincroniza o Input visual na aba Circadiana caso ele já exista no DOM
+            const luxInputAudit = document.getElementById('audit-visual-lux') as HTMLInputElement;
+            if (luxInputAudit && document.activeElement !== luxInputAudit) {
+                luxInputAudit.value = String(finalEv);
+            }
+        }
+    }
+
     const resLux = document.getElementById('result-lux');
     const resUgr = document.getElementById('result-ugr');
     const resEff = document.getElementById('result-eff');
