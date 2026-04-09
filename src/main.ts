@@ -183,7 +183,6 @@ window.GlareEngine = {
 
 // ... Restante das funções auxiliares devem ser exportadas/atribuídas aqui
 // (SwitchTool, UpdateCalculations, etc, conforme definido anteriormente)
-// --- COLE ISTO NO FINAL DO SEU src/main.ts ---
 
 // 5. UTILITÁRIOS DE UI
 window.formatDist = function(m: number) {
@@ -1257,7 +1256,8 @@ window.toggleWellFeature = function(el: HTMLElement, pts: number) { el.classList
 
 window.addLeedRoom = function() {
     const room = { 
-        id: Date.now(), 
+        id: Date.now(),
+        floor: "GERAL", 
         name: "Novo Ambiente", 
         area: 50, 
         baseLpd: 0, 
@@ -1312,7 +1312,7 @@ window.removeLeedRoom = function(roomId: number) {
 window.updateLeedRoomData = function(roomId: number, field: string, value: any) {
     const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (room) {
-        if (field === 'name' || field === 'typology') room[field] = value;
+        if (field === 'name' || field === 'typology' || field === 'floor') room[field] = value;
         else room[field] = parseFloat(value) || 0;
         
         if (field === 'typology') {
@@ -1480,7 +1480,10 @@ window.renderLeedProject = function() {
                         <button onclick="window.toggleLeedRoom(${room.id})" class="text-slate-400 hover:text-luminous-gold w-6 h-6 flex-shrink-0 flex items-center justify-center rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shadow-sm transition-colors" title="Expandir/Recolher">
                             <i id="icon-toggle-${room.id}" class="fas ${expanded ? 'fa-minus' : 'fa-plus'} text-[10px]"></i>
                         </button>
-                        <input type="text" id="room-name-${room.id}" value="${room.name}" oninput="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-xs font-black ${titleColor} bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold transition-colors w-full max-w-[400px] pb-1 uppercase outline-none truncate">
+                        <div class="flex flex-col w-full max-w-[400px]">
+                            <input type="text" value="${room.floor || ''}" placeholder="PAVIMENTO" oninput="window.updateLeedRoomData(${room.id}, 'floor', this.value)" class="text-[9px] font-bold text-slate-400 dark:text-slate-500 bg-transparent border-none outline-none uppercase truncate w-full">
+                            <input type="text" id="room-name-${room.id}" value="${room.name}" oninput="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-xs font-black ${titleColor} bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold transition-colors w-full pb-1 uppercase outline-none truncate mt-[-2px]">
+                        </div>
                     </div>
                     
                     <div class="flex items-center gap-2 flex-shrink-0">
@@ -2394,70 +2397,90 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         // Garantimos que a curva da Retina também não estoure a escala
         if (0.8 * lensFactor > maxPeak) maxPeak = 0.8 * lensFactor;
 
-        // Fator de escala dinâmico (adicionamos 10% de margem no topo de respiro visual)
-        const scaleY = 1 / (maxPeak * 1.1);
+        // --- COLE ISTO NO FINAL DO SEU src/main.ts ---
 
-        // Linha Guia Didática: 480nm (Pico Circadiano)
-        const peakX = padding + ((w - padding - 10) * 0.25); // 480nm estimado
-        ctx.beginPath();
-        ctx.moveTo(peakX, h - padding);
-        ctx.lineTo(peakX, 10);
-        ctx.strokeStyle = "rgba(168, 85, 247, 0.4)"; // Roxo sutil
-        ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
-        
-        ctx.font = "bold 8px Manrope";
-        ctx.fillStyle = "#a855f7";
-        ctx.fillText("Pico Melanópico", peakX, 15);
-
-        // 1. Retina (Biologia)
-        ctx.beginPath();
-        ctx.moveTo(padding, h - padding);
-        for (let x = padding; x <= w - 10; x += 2) {
-            const progress = (x - padding) / (w - padding - 10);
-            const melCurve = (Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor) * scaleY;
-            const py = (h - padding) - (melCurve * (h - padding - 20));
-            ctx.lineTo(x, py);
-        }
-        ctx.lineTo(w - 10, h - padding);
-        ctx.fillStyle = isDark ? "rgba(14, 165, 233, 0.15)" : "rgba(14, 165, 233, 0.08)";
-        ctx.fill();
-        ctx.strokeStyle = "#0ea5e9";
-        ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
-
-        // 2. LED (Física) com Gradiente de Preenchimento
-        ctx.beginPath();
-        let ledPoints = [];
-        for (let x = padding; x <= w - 10; x += 2) {
-            const progress = (x - padding) / (w - padding - 10);
-            const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
-            const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
-            const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
-            
-            const totalY = (ledBlue + ledYellow + cyanFill) * scaleY;
-            const py = (h - padding) - (totalY * (h - padding - 20));
-            ledPoints.push({x, py});
-            if (x === padding) ctx.moveTo(x, py);
-            else ctx.lineTo(x, py);
-        }
-        
-        // Área sob a curva do Espectro (Sombra suave)
-        ctx.lineTo(w - 10, h - padding);
-        ctx.lineTo(padding, h - padding);
-        ctx.closePath();
-        let gradient = ctx.createLinearGradient(0, h - padding, 0, 10);
-        gradient.addColorStop(0, isDark ? "rgba(248, 250, 252, 0.0)" : "rgba(15, 23, 42, 0.0)");
-        gradient.addColorStop(1, isDark ? "rgba(248, 250, 252, 0.1)" : "rgba(15, 23, 42, 0.05)");
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // Linha Principal do Espectro
-        ctx.beginPath();
-        ctx.moveTo(ledPoints[0].x, ledPoints[0].py);
-        ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
-        ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
-
-        ctx.textAlign = "right"; ctx.font = "900 10px Manrope";
-        ctx.fillStyle = accentColor; ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : "── LED (Física Padrão)", w - 20, 20);
-        ctx.fillStyle = "#0ea5e9"; ctx.fillText(`- - Retina (${userAge} anos)`, w - 20, 35);
+// LUXSINTAX: Engine de Importação Excel e Mapeamento Inteligente (Hash Map)
+window.handleExcelUpload = async function(input: HTMLInputElement) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    
+    if (!(window as any).XLSX) {
+        alert("O motor de leitura de planilhas está carregando. Tente novamente em alguns segundos.");
+        return;
     }
+
+    const btnLabel = document.getElementById('lbl-excel-upload');
+    if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> PROCESSANDO...';
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target!.result as ArrayBuffer);
+            const workbook = (window as any).XLSX.read(data, {type: 'array'});
+            const firstSheet = workbook.SheetNames[0];
+            const rows = (window as any).XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+
+            // Dicionário (Hash Map) para agrupar luminárias no mesmo ambiente
+            const roomMap = new Map();
+
+            rows.forEach((row: any) => {
+                // Algoritmo Fuzzy simples: Procura chaves no Excel que se pareçam com nossos dados
+                const getVal = (aliases: string[]) => {
+                    const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase().includes(a)));
+                    return key ? row[key] : null;
+                };
+
+                const floor = getVal(['pavimento', 'andar', 'nivel', 'level']) || "Geral";
+                const roomName = getVal(['ambiente', 'sala', 'nome', 'room', 'espaco']) || "Ambiente Não Nomeado";
+                const area = parseFloat(getVal(['area', 'área', 'm2', 'm²'])) || 0;
+                const fixture = getVal(['luminaria', 'luminária', 'tipo', 'modelo', 'equipamento']) || "Luminária Importada";
+                const power = parseFloat(getVal(['potencia', 'potência', 'w', 'watts', 'carga'])) || 0;
+                const qty = parseInt(getVal(['qtd', 'quantidade', 'numero'])) || 1;
+
+                // A Chave Única garante que "Recepção - Térreo" seja diferente de "Recepção - 1º Andar"
+                const uniqueKey = `${floor}_${roomName}`;
+
+                if (!roomMap.has(uniqueKey)) {
+                    roomMap.set(uniqueKey, {
+                        id: Date.now() + Math.random(), // Evita colisões rápidas no loop
+                        floor: floor,
+                        name: roomName,
+                        area: area,
+                        baseLpd: 0,
+                        typology: "", // Fica vazio para o usuário classificar na plataforma (ASHRAE)
+                        expanded: false, // Inicia fechado para não poluir a tela com tabelas gigantes
+                        fixtures: []
+                    });
+                }
+
+                const roomObj = roomMap.get(uniqueKey);
+                // Se o Revit exportar a área duplicada, ou apenas na primeira linha, pegamos a maior para não perder
+                if (area > roomObj.area) roomObj.area = area;
+
+                if (power > 0) {
+                    roomObj.fixtures.push({
+                        id: Date.now() + Math.random(),
+                        label: fixture,
+                        power: power,
+                        qty: qty
+                    });
+                }
+            });
+
+            // Converte o Mapa em Array e joga no início da lista do projeto
+            const newRooms = Array.from(roomMap.values());
+            window.state.leedProject.rooms = [...newRooms, ...window.state.leedProject.rooms];
+            
+            window.renderLeedProject();
+            
+            if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
+            input.value = ""; // Limpa o input para poder subir a mesma planilha de novo se precisar
+
+        } catch (err) {
+            console.error("[LuxSintax Excel Parser]", err);
+            alert("Falha na importação. Certifique-se de que a planilha possui cabeçalhos claros (Pavimento, Ambiente, Área, Luminária, Potência).");
+            if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
+        }
+    };
+    reader.readAsArrayBuffer(file);
 };
