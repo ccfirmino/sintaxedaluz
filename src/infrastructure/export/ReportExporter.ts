@@ -391,39 +391,78 @@ export class ReportExporter {
         cy = drawSection(t('pdf_leed_sec_3'), cy, page);
         cy -= 8;
 
-        for (let i = 0; i < project.rooms.length; i++) {
-            const r = project.rooms[i];
-            if (cy < 80) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
+        // LUXSINTAX: Mapeamento de Títulos por Categoria (i18n Ready)
+        const catTitles: Record<string, string> = {
+            interior: t('pdf_cat_interior') || "ILUMINAÇÃO INTERNA (ASHRAE INTERIOR)",
+            facade: t('pdf_cat_facade') || "ILUMINAÇÃO DE FACHADA (ASHRAE FACADE)",
+            exterior: t('pdf_cat_exterior') || "ÁREAS EXTERNAS (ASHRAE EXTERIOR)"
+        };
 
-            let roomWatts = r.fixtures.reduce((acc: number, f: any) => acc + (f.power * f.qty), 0);
-            
-            // Fator de meta recriado localmente para o renderizador
-            let targetFactor = 1.0;
-            if (targetLabel.includes('-5%')) targetFactor = 0.95;
-            else if (targetLabel.includes('-10%')) targetFactor = 0.90;
-            else if (targetLabel.includes('-20%')) targetFactor = 0.80;
-            else if (targetLabel.includes('-30%')) targetFactor = 0.70;
-            else if (project.customReduction) targetFactor = Math.max(0, 1 - (project.customReduction / 100));
-            
-            let roomAllowed = r.area * (r.baseLpd || 0) * targetFactor;
+        // Fator de meta recriado localmente
+        let targetFactor = 1.0;
+        if (targetLabel.includes('-5%')) targetFactor = 0.95;
+        else if (targetLabel.includes('-10%')) targetFactor = 0.90;
+        else if (targetLabel.includes('-20%')) targetFactor = 0.80;
+        else if (targetLabel.includes('-30%')) targetFactor = 0.70;
+        else if (project.customReduction) targetFactor = Math.max(0, 1 - (project.customReduction / 100));
 
-            page.drawText(`${i + 1}. ${r.name.toUpperCase()}`, { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-            page.drawText(`${t('pdf_area')} ${r.area} m² | ${t('pdf_leed_lpd_target')} ${((r.baseLpd || 0) * targetFactor).toFixed(1)} W/m²`, { x: 250, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-            cy -= 12;
+        let globalRoomIndex = 1;
 
-            for (let f of r.fixtures) {
-                if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
-                page.drawText(`- ${f.qty} un x ${f.label} (${f.power}W)`, { x: 60, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
-                page.drawText(`${(f.qty * f.power).toFixed(1)} W`, { x: 400, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
-                cy -= 10;
+        // Iterar sobre as categorias (Context Grouping) para o PDF
+        for (const catKey of Object.keys(summary.categories)) {
+            const catData = summary.categories[catKey];
+            const catRooms = project.rooms.filter((r: any) => (r.leedCategory || 'interior') === catKey);
+
+            if (catRooms.length === 0) continue; // Pula categorias que o usuário não usou
+
+            if (cy < 100) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
+
+            // Cabeçalho Visual da Categoria
+            page.drawText(catTitles[catKey] || catKey.toUpperCase(), { x: 40, y: cy, size: 9, font: fontBold, color: PDFLib.rgb(0.85, 0.46, 0.02) });
+            cy -= 14;
+
+            // Loop de salas estritamente desta categoria
+            for (let i = 0; i < catRooms.length; i++) {
+                const r = catRooms[i];
+                if (cy < 80) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
+
+                let roomWatts = r.fixtures.reduce((acc: number, f: any) => acc + (f.power * f.qty), 0);
+                let roomAllowed = r.area * (r.baseLpd || 0) * targetFactor;
+
+                page.drawText(`${globalRoomIndex}. ${r.name.toUpperCase()}`, { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+                page.drawText(`${t('pdf_area')} ${r.area} m² | ${t('pdf_leed_lpd_target')} ${((r.baseLpd || 0) * targetFactor).toFixed(1)} W/m²`, { x: 250, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+                cy -= 12;
+
+                for (let f of r.fixtures) {
+                    if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
+                    page.drawText(`- ${f.qty} un x ${f.label} (${f.power}W)`, { x: 60, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+                    page.drawText(`${(f.qty * f.power).toFixed(1)} W`, { x: 400, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+                    cy -= 10;
+                }
+
+                if (cy < 70) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
+
+                const roomStatusColor = roomWatts <= roomAllowed ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
+                page.drawText(`${t('pdf_leed_subtotal')} ${roomWatts.toFixed(1)} W`, { x: 60, y: cy, size: 7, font: fontBold, color: roomStatusColor });
+                page.drawText(`${t('pdf_leed_limit_2')} ${roomAllowed.toFixed(1)} W`, { x: 250, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+                cy -= 16;
+                globalRoomIndex++;
             }
 
-            if (cy < 70) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
-
-            const roomStatusColor = roomWatts <= roomAllowed ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
-            page.drawText(`${t('pdf_leed_subtotal')} ${roomWatts.toFixed(1)} W`, { x: 60, y: cy, size: 7, font: fontBold, color: roomStatusColor });
-            page.drawText(`${t('pdf_leed_limit_2')} ${roomAllowed.toFixed(1)} W`, { x: 250, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
-            cy -= 18;
+            // LUXSINTAX: Subtotal da Categoria (A Prova do Anti-Trade-Off no Relatório)
+            if (cy < 80) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
+            
+            // Só julga se houver limite estabelecido (area > 0 com LPD)
+            const isZoneApproved = (catData.allowed === 0 || catData.watts <= catData.allowed);
+            const catStatusColor = isZoneApproved ? PDFLib.rgb(0.3, 0.48, 0.06) : PDFLib.rgb(0.8, 0.2, 0.2);
+            const catStatusText = isZoneApproved ? (t('pdf_zone_pass') || "ZONA APROVADA") : (t('pdf_zone_fail') || "REPROVADO (EXCESSO)");
+            
+            page.drawRectangle({ x: 50, y: cy - 10, width: width - 100, height: 18, color: PDFLib.rgb(0.96, 0.97, 0.98) });
+            const subtotalText = `${t('pdf_zone_sub') || 'SUBTOTAL'}: ${catData.watts.toFixed(1)} W / ${t('pdf_zone_allow') || 'PERMITIDO'}: ${catData.allowed.toFixed(1)} W`;
+            page.drawText(subtotalText, { x: 60, y: cy - 4, size: 7, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+            page.drawText(catStatusText, { x: width - 200, y: cy - 4, size: 7, font: fontBold, color: catStatusColor });
+            
+            cy -= 24; // Espaçamento extra para respirar antes da próxima zona
         }
 
         if (cy < 150) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }

@@ -1262,6 +1262,7 @@ window.addLeedRoom = function() {
         area: 50, 
         baseLpd: 0, 
         typology: "", 
+        leedCategory: "interior", // LUXSINTAX: Nova diretiva de zona LEED
         expanded: true,
         fixtures: [{ id: Date.now() + 1, label: "Luminária Genérica", power: 0, qty: 1 }]
     };
@@ -1312,7 +1313,7 @@ window.removeLeedRoom = function(roomId: number) {
 window.updateLeedRoomData = function(roomId: number, field: string, value: any) {
     const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (room) {
-        if (field === 'name' || field === 'typology' || field === 'floor') room[field] = value;
+        if (field === 'name' || field === 'typology' || field === 'floor' || field === 'leedCategory') room[field] = value;
         else room[field] = parseFloat(value) || 0;
         
         if (field === 'typology') {
@@ -1493,7 +1494,12 @@ window.renderLeedProject = function() {
                         </div>
                         
                         <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 h-[34px] rounded border border-slate-200 dark:border-slate-600 shadow-sm">
-                            <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[180px] md:w-[300px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
+                            <select onchange="window.updateLeedRoomData(${room.id}, 'leedCategory', this.value)" class="custom-select w-[90px] md:w-[120px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase border-r border-slate-200 dark:border-slate-600 pr-2 mr-2">
+                                <option value="interior" ${room.leedCategory === 'interior' || !room.leedCategory ? 'selected' : ''}>${window.currentLang === 'en' ? 'INTERIOR' : 'INTERIOR'}</option>
+                                <option value="facade" ${room.leedCategory === 'facade' ? 'selected' : ''}>${window.currentLang === 'en' ? 'FACADE' : 'FACHADA'}</option>
+                                <option value="exterior" ${room.leedCategory === 'exterior' ? 'selected' : ''}>${window.currentLang === 'en' ? 'OUTDOOR' : 'EXTERNA'}</option>
+                            </select>
+                            <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[140px] md:w-[220px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
                                 <option value="" disabled ${!room.typology ? 'selected' : ''}>TIPOLOGIA ASHRAE...</option>
                                 ${window.lpdBaselines.map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
                             </select>
@@ -2513,6 +2519,7 @@ window.handleExcelUpload = async function(input: HTMLInputElement) {
                         area: area,
                         baseLpd: 0,
                         typology: "", 
+                        leedCategory: "interior", // LUXSINTAX: Default para importação
                         expanded: false, 
                         fixtures: []
                     });

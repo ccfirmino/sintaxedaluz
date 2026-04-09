@@ -63,6 +63,8 @@ export const i18nDictionary = {
         pdf_leed_esg_fail: "O projeto atual não apresenta redução de carga energética frente ao limite normativo.",
         pdf_leed_lpd_target: "LPD Alvo:", pdf_leed_subtotal: "SUBTOTAL:", pdf_leed_limit_2: "LIMITE:",
         pdf_leed_avg: "LPD Médio Projetado:", pdf_leed_pass: "COMPLIANCE ATINGIDO (APROVADO)", pdf_leed_fail: "REPROVADO (EXCEDE LIMITES)",
+        pdf_cat_interior: "ILUMINAÇÃO INTERNA (ASHRAE INTERIOR)", pdf_cat_facade: "ILUMINAÇÃO DE FACHADA (ASHRAE FACADE)", pdf_cat_exterior: "ÁREAS EXTERNAS (ASHRAE EXTERIOR)",
+        pdf_zone_pass: "ZONA APROVADA", pdf_zone_fail: "REPROVADO (EXCESSO DE CARGA)", pdf_zone_sub: "SUBTOTAL DA ZONA", pdf_zone_allow: "PERMITIDO",
         dr_load_src: "Carga e Fonte", dr_power_m: "Potência (W/m)", dr_len: "Metragem (m)", dr_real_load: "Potência Real (Carga):", dr_rec_src: "Fonte Recomendada (+20%)", dr_safety: "Mantenha sempre 20% de folga térmica para estender a vida útil do driver.",
         dr_guard: "Guardião Elétrico", dr_dist: "Distância (m)", dr_gauge: "Bitola (mm²)", dr_drop: "Queda (ΔV)", dr_top: "Topologia Sugerida",
         hcl_ev: "Lux Vertical no Olho (Ev)", hcl_use: "Uso do Espaço", hcl_time: "Horário de Exposição", hcl_medi: "Estímulo Melanópico (m-EDI)",
@@ -133,6 +135,8 @@ export const i18nDictionary = {
         pdf_leed_esg_fail: "Current project shows no energy load reduction against normative limit.",
         pdf_leed_lpd_target: "Target LPD:", pdf_leed_subtotal: "SUBTOTAL:", pdf_leed_limit_2: "LIMIT:",
         pdf_leed_avg: "Projected Average LPD:", pdf_leed_pass: "COMPLIANCE REACHED (APPROVED)", pdf_leed_fail: "REJECTED (EXCEEDS LIMITS)",
+        pdf_cat_interior: "INTERIOR LIGHTING (ASHRAE INTERIOR)", pdf_cat_facade: "FACADE LIGHTING (ASHRAE FACADE)", pdf_cat_exterior: "OUTDOOR AREAS (ASHRAE EXTERIOR)",
+        pdf_zone_pass: "ZONE APPROVED", pdf_zone_fail: "REJECTED (LOAD EXCEEDED)", pdf_zone_sub: "ZONE SUBTOTAL", pdf_zone_allow: "ALLOWED",
         // LUXSINTAX: Novas Chaves - Sprint Polimento
         dr_load_src: "Load and Power Supply", dr_power_m: "Power (W/m)", dr_len: "Length (m)", dr_real_load: "Real Power (Load):", dr_rec_src: "Recommended Driver (+20%)", dr_safety: "Always maintain a 20% thermal margin to extend driver lifespan.",
         dr_guard: "Electrical Guardian", dr_dist: "Distance (m)", dr_gauge: "Wire Gauge (mm²)", dr_drop: "Voltage Drop (ΔV)", dr_top: "Suggested Topology",

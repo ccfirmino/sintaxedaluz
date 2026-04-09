@@ -17,6 +17,7 @@ export interface LeedFixture {
 export interface LeedRoom {
     area: number;
     baseLpd: number;
+    leedCategory?: string; // LUXSINTAX: Discriminador de Zona (Interior/Fachada/Exterior)
     fixtures: LeedFixture[];
 }
 
@@ -63,12 +64,43 @@ export class StandardsEngine {
             targetFactor = Math.max(0, 1 - (project.customReduction / 100));
         }
 
+        // LUXSINTAX: Isolamento de Contexto (Context Grouping)
+        const categories: Record<string, { watts: number, allowed: number, area: number }> = {
+            interior: { watts: 0, allowed: 0, area: 0 },
+            facade: { watts: 0, allowed: 0, area: 0 },
+            exterior: { watts: 0, allowed: 0, area: 0 }
+        };
+
         project.rooms.forEach(r => {
+            const cat = r.leedCategory || 'interior';
+            const roomAllowedWatts = (r.baseLpd || 0) * targetFactor * r.area;
+            let roomWatts = 0;
+            
+            r.fixtures.forEach(f => roomWatts += (f.power * f.qty));
+
+            if (categories[cat]) {
+                categories[cat].watts += roomWatts;
+                categories[cat].allowed += roomAllowedWatts;
+                categories[cat].area += r.area;
+            }
+
             totalArea += r.area;
-            const roomAllowedLpd = (r.baseLpd || 0) * targetFactor;
-            allowedWatts += (roomAllowedLpd * r.area);
-            r.fixtures.forEach(f => totalWatts += (f.power * f.qty));
+            allowedWatts += roomAllowedWatts;
+            totalWatts += roomWatts;
         });
+
+        // LUXSINTAX: A conformidade global exige que NENHUMA categoria extrapole seu limite (Anti-Trade-off)
+        let isCompliant = true;
+        Object.keys(categories).forEach(k => {
+            const cat = categories[k];
+            // Se a categoria tem meta definida e ultrapassou, o projeto INTEIRO reprova.
+            if (cat.allowed > 0 && cat.watts > cat.allowed) {
+                isCompliant = false;
+            }
+        });
+        
+        // Se a carga global estourar, falha também (Redundância de Segurança)
+        if (totalWatts > allowedWatts) isCompliant = false;
 
         // LUXSINTAX: Cálculo de Impacto ESG (Estimativa Anual Comercial Padrão)
         const savingsWatts = Math.max(0, allowedWatts - totalWatts);
@@ -82,7 +114,8 @@ export class StandardsEngine {
             allowedWatts,
             totalArea,
             currentLpd: totalArea > 0 ? (totalWatts / totalArea) : 0,
-            isCompliant: totalWatts <= allowedWatts,
+            isCompliant, // LUXSINTAX: Validação rigorosa e anti-trade-off
+            categories,  // LUXSINTAX: Exposto para o ReportExporter gerar seções separadas
             esg: {
                 savingsKwh,
                 co2ReductionKg,

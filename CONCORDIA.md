@@ -53,7 +53,9 @@
 - [09/04/2026]: Refinamento de UI/UX e Consistência: Restauração do controle HCL no modo Vertical e padronização minimalista de Tooltips (atributo title) para parâmetros de CCT/Espectro em toda a plataforma.
 - [09/04/2026]: Evolução Pedagógica do HCL: Implementação de Auto-scaling dinâmico no eixo Y (prevenção de clipping da curva), preenchimento com gradiente espectral e marcação técnica do pico melanópico em 480nm.
 - [09/04/2026]: Refinamento de UI/UX e Consistência: Restauração do controle HCL no modo Vertical e padronização minimalista de Tooltips (atributo title) para parâmetros de CCT/Espectro em toda a plataforma.
-- [10/04/2026]: Sprint de BIM & Produtividade (Módulo LEED): Integração do motor `SheetJS` no ambiente de View (`index.html`). Implementação de arquitetura `ExcelParser` (Hash Map) no orquestrador (`main.ts`) permitindo upload massivo de tabelas (.xlsx). Evolução do modelo de dados do estado local adicionando propriedades `floor` (Pavimento) e `area` (m²) ao schema dinâmico de `rooms`.
+- [09/04/2026]: Sprint de BIM & Produtividade (Módulo LEED): Integração do motor `SheetJS` no ambiente de View (`index.html`). Implementação de arquitetura `ExcelParser` (Hash Map) no orquestrador (`main.ts`) permitindo upload massivo de tabelas (.xlsx). Evolução do modelo de dados do estado local adicionando propriedades `floor` (Pavimento) e `area` (m²) ao schema dinâmico de `rooms`.
+- [09/04/2026]: Evolução de Regra de Negócio (Módulo LEED): Implementação do conceito de "Context Grouping" no StandardsEngine.ts e main.ts. O sistema agora separa o cálculo de interiores, fachadas e áreas externas, aplicando a regra estrita de Anti-Trade-Off (Não-Compensação de Carga) da norma ASHRAE 90.1, e preparando a base para relatórios seccionados.
+- [09/04/2026]: Evolução de Relatórios (ReportExporter.ts): Refatoração do motor de PDF-Lib para gerar relatórios divididos em seções (Zonas LEED). Injeção de blocos dinâmicos de Subtotal que evidenciam o "Context Grouping" aprovando ou reprovando Zonas Isoladas de Fachada, Exterior e Interior.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
