@@ -66,6 +66,7 @@
 - [09/04/2026]: Refatoração Matemática Híbrida no StandardsEngine.ts. Implementação de suporte nativo a unidades lineares (W/m) e injeção dinâmica de Base Allowance atrelada a Lighting Zones (LZ0-LZ4) para conformidade total com áreas externas e fachadas da norma ASHRAE 90.1.
 - [09/04/2026]: Evolução de Compliance no Exportador PDF (ReportExporter.ts): Injeção de tipagem dinâmica para unidades físicas híbridas (m² vs m Linear). O relatório gerado agora respeita perfeitamente as normativas ASHRAE 90.1 para cálculos de fachada, prevenindo erros em auditorias LEED devido a conversões indevidas de área.
 - [09/04/2026]: Evolução de i18n (Dictionary.ts): Mapeamento cruzado e injeção de dicionário (PT/EN) para as features Enterprise recém-adicionadas: CFO Mode (ESG), Zonas ASHRAE (LZ0-LZ4) e suporte a terminologias de cálculo de fachada híbrido (Área vs Linear). A plataforma consolida seu status de arquitetura 100% Bilíngue.
+- [09/04/2026]: Refinamento de UX/UI (Módulo LEED): Implementação de algoritmo de ordenação alfabética in-memory (`localeCompare`) no orquestrador `main.ts` para as tipologias ASHRAE 90.1, facilitando a busca de ambientes pelo usuário sem mutar a estrutura do banco de dados (SSOT).
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
