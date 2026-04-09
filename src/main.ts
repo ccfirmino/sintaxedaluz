@@ -63,7 +63,7 @@ window.state = {
     grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, cct: 3000, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
     driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
     leedProject: { name: "Novo Projeto LEED", target: "baseline", rooms: [] },
-        audit: { wireLength: 5, wireGauge: 1.5, voltage: 12, useType: 'office', timeOfDay: 'morning', mRatio: 0.52, visualLux: 500, baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260 },
+        audit: { wireLength: 5, wireGauge: 1.5, voltage: 12, useType: 'office', timeOfDay: 'morning', mRatio: 0.52, visualLux: 500, age: 30, tm30: 'cri80', flicker: 'low', baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260 },
 	esg: { proposedWatts: 300, baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260, hasAC: true, maintSavings: 0, capex: 5000 },
         showIsolines: true,
     showPolar: true,
@@ -1641,6 +1641,9 @@ window.updateAuditUI = function() {
     const timeSelect = document.getElementById('audit-time') as HTMLSelectElement;
     const mRatioSelect = document.getElementById('audit-mratio') as HTMLSelectElement;
     const luxInput = document.getElementById('audit-visual-lux') as HTMLInputElement;
+    const ageInput = document.getElementById('audit-age') as HTMLInputElement;
+    const tm30Select = document.getElementById('audit-tm30') as HTMLSelectElement;
+    const flickerSelect = document.getElementById('audit-flicker') as HTMLSelectElement;
     const baseWattsInput = document.getElementById('audit-baseline-watts') as HTMLInputElement;
     const kwhCostInput = document.getElementById('audit-kwh-cost') as HTMLInputElement;
     const hoursInput = document.getElementById('audit-daily-hours') as HTMLInputElement;
@@ -1652,9 +1655,10 @@ window.updateAuditUI = function() {
     if (useSelect) s.useType = useSelect.value || 'office';
     if (timeSelect) s.timeOfDay = timeSelect.value || 'morning';
     if (mRatioSelect) s.mRatio = parseFloat(mRatioSelect.value) || 0.52;
+    if (ageInput) s.age = parseInt(ageInput.value) || 30;
+    if (tm30Select) s.tm30 = tm30Select.value || 'cri80';
+    if (flickerSelect) s.flicker = flickerSelect.value || 'low';
     if (baseWattsInput) s.baselineWatts = parseFloat(baseWattsInput.value) || 1500;
-    if (kwhCostInput) s.kwhCost = parseFloat(kwhCostInput.value) || 0.85;
-    if (hoursInput) s.dailyHours = parseFloat(hoursInput.value) || 10;
     
     const fallbackLux = window.state.grid?.targetLux || 500;
     if (luxInput) s.visualLux = parseFloat(luxInput.value) || fallbackLux;
@@ -1719,11 +1723,39 @@ window.updateAuditUI = function() {
     // 2. MÓDULOS DE AUDITORIA & PERFORMANCE (HCL/ESG)
     // ==========================================
     if (window.HCLEngine && window.HCLEngine.evaluateCircadianImpact) {
-        const bioResult = window.HCLEngine.evaluateCircadianImpact(s.visualLux, s.mRatio, s.useType, s.timeOfDay);
+        // LUXSINTAX: Passando a nova "Tríade Não-Visual" para o motor físico
+        const bioResult = window.HCLEngine.evaluateCircadianImpact(s.visualLux, s.mRatio, s.useType, s.timeOfDay, s.age);
         const mediEl = document.getElementById('audit-medi-val');
         const barEl = document.getElementById('audit-hcl-bar');
         const alertEl = document.getElementById('audit-hcl-msg');
         const alertBox = document.getElementById('audit-hcl-box');
+
+        // LUXSINTAX: Atualização do Score de Performance Humana (UI Base)
+        const tm30ScoreEl = document.getElementById('audit-tm30-score');
+        const tm30StatusEl = document.getElementById('audit-tm30-status');
+        if (tm30ScoreEl && tm30StatusEl) {
+            if (s.tm30 === 'cri80') { tm30ScoreEl.innerText = 'Rf 78 / Rg 95'; tm30StatusEl.innerText = 'Básico'; tm30StatusEl.className = 'text-[9px] text-amber-400 font-bold uppercase mt-1'; }
+            else if (s.tm30 === 'cri90') { tm30ScoreEl.innerText = 'Rf 90 / Rg 100'; tm30StatusEl.innerText = 'Excelente'; tm30StatusEl.className = 'text-[9px] text-leed-green font-bold uppercase mt-1'; }
+            else { tm30ScoreEl.innerText = 'Rf 96 / Rg 100'; tm30StatusEl.innerText = 'SunLike / Premium'; tm30StatusEl.className = 'text-[9px] text-tech-cyan font-bold uppercase mt-1'; }
+        }
+
+        const tlmScoreEl = document.getElementById('audit-tlm-score');
+        const tlmStatusEl = document.getElementById('audit-tlm-status');
+        if (tlmScoreEl && tlmStatusEl) {
+            if (s.flicker === 'low') { tlmScoreEl.innerText = 'SVM < 0.4'; tlmStatusEl.innerText = 'Seguro / Foco'; tlmStatusEl.className = 'text-[9px] text-tech-cyan font-bold uppercase mt-1'; }
+            else if (s.flicker === 'medium') { tlmScoreEl.innerText = 'SVM < 1.0'; tlmStatusEl.innerText = 'Aceitável'; tlmStatusEl.className = 'text-[9px] text-amber-400 font-bold uppercase mt-1'; }
+            else { tlmScoreEl.innerText = 'SVM > 1.0'; tlmStatusEl.innerText = 'Risco Enxaqueca'; tlmStatusEl.className = 'text-[9px] text-red-500 font-bold uppercase mt-1 animate-pulse'; }
+        }
+
+        const ageScoreEl = document.getElementById('audit-age-score');
+        const ageStatusEl = document.getElementById('audit-age-status');
+        if (ageScoreEl && ageStatusEl) {
+            // Estimativa visual simples (será sobrescrita pela física real do HCLEngine)
+            const transmission = Math.max(10, 100 - (s.age - 20) * 1.2).toFixed(0);
+            ageScoreEl.innerText = `${transmission}% Visível`;
+            ageStatusEl.innerText = s.age > 50 ? 'Compensação Ativa' : 'Lente Jovem';
+            ageStatusEl.className = s.age > 50 ? 'text-[9px] text-luminous-gold font-bold uppercase mt-1' : 'text-[9px] text-slate-300 font-bold uppercase mt-1';
+        }
 
         if (mediEl) mediEl.innerText = Math.round(bioResult.medi).toString();
         if (barEl) {
@@ -1732,11 +1764,9 @@ window.updateAuditUI = function() {
             // LUXSINTAX: Injeção do estado Crítico (Vermelho)
             barEl.className = `h-full rounded-full transition-all duration-500 ${bioResult.isCritical ? 'bg-red-500' : (bioResult.isWarning ? 'bg-amber-500' : 'bg-tech-cyan')}`;
         }
-// Cálculo de CS (Circadian Stimulus) e Desenho do Gráfico
-        let cs = 0.7 * (1 - Math.pow(1 + Math.pow(bioResult.medi/300, 1.2), -1));
-        if (cs > 0.7) cs = 0.7; // Teto biológico do CS
+// LUXSINTAX: O CS agora é calculado isoladamente no Domínio Físico (HCLEngine)
         const csEl = document.getElementById('audit-cs-val');
-        if (csEl) csEl.innerText = cs.toFixed(2);
+        if (csEl) csEl.innerText = bioResult.cs.toFixed(2);
 
         if (window.drawCircadianChart) {
             window.drawCircadianChart(bioResult.medi, s.timeOfDay, bioResult.isCritical);

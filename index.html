@@ -906,13 +906,56 @@
                                         </div>
                                         <div>
                                             <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="lbl_source_type">Espectro da Fonte (CCT)</label>
-                                            <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
+                                            <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors mb-4">
                                                 <option value="0.45">2700K (M/P: 0.45)</option>
                                                 <option value="0.52" selected>3000K (M/P: 0.52)</option>
                                                 <option value="0.68">4000K (M/P: 0.68)</option>
                                                 <option value="0.92">5000K (M/P: 0.92)</option>
                                                 <option value="1.10">6500K (M/P: 1.10)</option>
                                             </select>
+
+                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 relative group cursor-help w-max">
+                                                <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Qualidade Cromática (TM-30)</span>
+                                                <div class="absolute bottom-full left-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4 z-50">
+                                                    <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Métricas de Fidelidade</h4>
+                                                    <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Avalia a capacidade do LED de reproduzir as cores de forma real (Rf) e saturada (Rg). LEDs de alta fidelidade imitam o espectro natural, beneficiando o bem-estar e a percepção do espaço.</p>
+                                                </div>
+                                            </label>
+                                            <select id="audit-tm30" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
+                                                <option value="cri80" selected>LED Padrão (Rf 78 / Rg 95)</option>
+                                                <option value="cri90">Alta Fidelidade (Rf 90 / Rg 100)</option>
+                                                <option value="sunlike">Full Spectrum / SunLike (Rf 96)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 relative group cursor-help w-max">
+                                                    <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Idade do Usuário</span>
+                                                    <div class="absolute bottom-full left-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4 z-50">
+                                                        <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Amarelecimento do Cristalino</h4>
+                                                        <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Com a idade, o olho atua como um filtro amarelo, bloqueando até 50% da luz azul-ciano (480nm). O cálculo de m-EDI compensará essa perda de transmitância retinal.</p>
+                                                    </div>
+                                                </label>
+                                                <div class="flex items-center gap-2">
+                                                    <input type="number" id="audit-age" value="30" min="10" max="90" step="1" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-center transition-colors">
+                                                    <span class="text-[10px] font-bold text-slate-500">Anos</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 relative group cursor-help w-max">
+                                                    <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Driver (Flicker)</span>
+                                                    <div class="absolute bottom-full right-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4 z-50">
+                                                        <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Modulação Temporal (TLM)</h4>
+                                                        <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">O flicker invisível anula os ganhos de concentração do ciclo circadiano, gerando estresse neurológico e enxaqueca. O índice SVM mede este risco estroboscópico.</p>
+                                                    </div>
+                                                </label>
+                                                <select id="audit-flicker" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-3 text-[10px] font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors uppercase">
+                                                    <option value="low" selected>Premium (SVM &lt; 0.4)</option>
+                                                    <option value="medium">Standard (Aceitável)</option>
+                                                    <option value="high">Baixo Custo (Risco)</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div>
                                             <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="hcl_use">Uso do Espaço</label>
@@ -953,8 +996,26 @@
                                             <canvas id="circadianChart" class="w-full h-full"></canvas>
                                         </div>
 
-                                        <div id="audit-hcl-box" class="relative z-10 mt-6 p-4 rounded-xl text-xs font-bold border transition-colors">
-                                            <span id="audit-hcl-msg"><i class="fas fa-brain mr-2"></i> Processando...</span>
+                                        <div class="relative z-10 mt-6 grid grid-cols-3 gap-3 md:gap-4">
+                                            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 text-center flex flex-col justify-center">
+                                                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Qualidade Cromática</p>
+                                                <p id="audit-tm30-score" class="text-xs md:text-sm font-black text-white truncate">Rf 78 / Rg 95</p>
+                                                <p id="audit-tm30-status" class="text-[9px] text-amber-400 font-bold uppercase mt-1 truncate">Básico</p>
+                                            </div>
+                                            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 text-center flex flex-col justify-center">
+                                                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Conforto Neural</p>
+                                                <p id="audit-tlm-score" class="text-xs md:text-sm font-black text-white truncate">SVM &lt; 0.4</p>
+                                                <p id="audit-tlm-status" class="text-[9px] text-tech-cyan font-bold uppercase mt-1 truncate">Seguro</p>
+                                            </div>
+                                            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 text-center flex flex-col justify-center">
+                                                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Lente / Transmissão</p>
+                                                <p id="audit-age-score" class="text-xs md:text-sm font-black text-white truncate">100%</p>
+                                                <p id="audit-age-status" class="text-[9px] text-slate-300 font-bold uppercase mt-1 truncate">Lente Jovem</p>
+                                            </div>
+                                        </div>
+
+                                        <div id="audit-hcl-box" class="relative z-10 mt-4 p-4 rounded-xl text-xs font-bold border transition-colors bg-black/20 border-white/10">
+                                            <span id="audit-hcl-msg" class="text-slate-300"><i class="fas fa-brain mr-2"></i> Aguardando calibração matemática...</span>
                                         </div>
                                     </div>
                                 </div>
