@@ -2201,7 +2201,7 @@ window.addEventListener('appinstalled', () => {
 window.updateEsgUI = function() {
     const s = window.state.esg;
     
-    // 1. Captura as entradas
+    // 1. Captura as entradas principais e avançadas
     const wBase = document.getElementById('esg-baseline-watts') as HTMLInputElement;
     const wProp = document.getElementById('esg-proposed-watts') as HTMLInputElement;
     const cost = document.getElementById('esg-kwh-cost') as HTMLInputElement;
@@ -2209,6 +2209,11 @@ window.updateEsgUI = function() {
     const dys = document.getElementById('esg-days-year') as HTMLInputElement;
     const capex = document.getElementById('esg-capex') as HTMLInputElement;
     const hasAC = document.getElementById('esg-has-ac') as HTMLInputElement;
+    
+    // LUXSINTAX: Captura das Premissas Financeiras (Smart Defaults)
+    const inflationInput = document.getElementById('esg-inflation') as HTMLInputElement;
+    const discountInput = document.getElementById('esg-discount-rate') as HTMLInputElement;
+    const yearsInput = document.getElementById('esg-analysis-years') as HTMLInputElement;
 
     if(wBase) s.baselineWatts = parseFloat(wBase.value) || 1500;
     if(wProp) s.proposedWatts = parseFloat(wProp.value) || 300;
@@ -2218,9 +2223,14 @@ window.updateEsgUI = function() {
     if(capex) s.capex = parseFloat(capex.value) || 0;
     if(hasAC) s.hasAC = hasAC.checked;
 
-    // 2. Aciona o Motor
+    // Converte de porcentagem (UI) para decimal (Motor) ou assume padrão
+    s.energyInflation = inflationInput ? (parseFloat(inflationInput.value) / 100) : 0.05;
+    s.discountRate = discountInput ? (parseFloat(discountInput.value) / 100) : 0.10;
+    s.analysisYears = yearsInput ? parseInt(yearsInput.value) : 5;
+
+    // 2. Aciona o Motor ESG Enterprise (LCC e VPL)
     if (window.ESGEngine) {
-        const res = window.ESGEngine.calculateESGImpact(s.proposedWatts, s.baselineWatts, s.kwhCost, s.dailyHours, s.daysPerYear, s.hasAC, 0, s.capex);
+        const res = window.ESGEngine.calculateESGImpact(s.proposedWatts, s.baselineWatts, s.kwhCost, s.dailyHours, s.daysPerYear, s.hasAC, 0, s.capex, s.energyInflation, s.discountRate, s.analysisYears);
         
         // 3. Atualiza UI
         const moneyEl = document.getElementById('esg-money-val');
@@ -2321,35 +2331,41 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Lógica Físico-Dinâmica da Posição
-        let userHour = 12;
-        if(state.timeOfDay === 'morning') userHour = 9;
-        else if(state.timeOfDay === 'afternoon') userHour = 15;
-        else if(state.timeOfDay === 'night') userHour = 22;
+        // LUXSINTAX: A Nova Crono-Simulação!
+        // Chama a jornada baseada no perfil escolhido para desenhar o Gêmeo Digital da Melatonina
+        const shift = (state.useType === 'hospital' || state.timeOfDay === 'night') ? 'nocturnal' : 'diurnal';
+        const journey = window.HCLEngine.simulateCircadianJourney(state.visualLux, state.mRatio, state.age, shift);
 
-        // O CS (Circadian Stimulus) puxa o ponto em direção ao centro (Supressão)
-        const suppressionPull = (bioResult.cs || 0) * 40; 
-        const userAngle = (userHour / 24) * Math.PI * 2 - Math.PI / 2;
-        const dynamicRadius = radius - suppressionPull;
+        // Desenha a "Sombra" da exposição real do usuário contornando as 24 horas
+        ctx.beginPath();
+        journey.forEach((point: any, idx: number) => {
+            const angle = (point.hour / 24) * Math.PI * 2 - Math.PI / 2;
+            
+            // O CS (0 a 0.7) puxa a curva em direção ao centro. Quanto maior o CS, maior a supressão de melatonina (raio menor).
+            const suppression = point.actualCS * 40; 
+            
+            // Replicamos o raio base natural e subtraímos a supressão artificial do LED
+            const naturalMel = Math.max(0, Math.cos((point.hour - 3) * Math.PI / 12));
+            const r = (radius - 8 + (naturalMel * 25)) - suppression;
+
+            const px = cx + Math.cos(angle) * r;
+            const py = cy + Math.sin(angle) * r;
+
+            if (idx === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        });
+        ctx.closePath();
         
-        const dotX = cx + Math.cos(userAngle) * dynamicRadius;
-        const dotY = cy + Math.sin(userAngle) * dynamicRadius;
-
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(dotX, dotY);
-        ctx.strokeStyle = bioResult.isCritical ? "rgba(239, 68, 68, 0.5)" : "rgba(16, 185, 129, 0.5)";
-        ctx.lineWidth = 2;
+        // Define o alerta visual da linha inteira baseado no estado atual
+        ctx.strokeStyle = bioResult.isCritical ? "rgba(239, 68, 68, 0.9)" : (bioResult.isWarning ? "rgba(245, 158, 11, 0.9)" : "rgba(16, 185, 129, 0.9)");
+        ctx.lineWidth = 3;
         ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(dotX, dotY, 6, 0, Math.PI * 2);
-        ctx.fillStyle = bioResult.isCritical ? "#ef4444" : (bioResult.isWarning ? "#f59e0b" : "#10b981"); 
+        
+        // Preenchimento Suave da Área Sob a Curva
+        ctx.fillStyle = bioResult.isCritical ? "rgba(239, 68, 68, 0.15)" : (bioResult.isWarning ? "rgba(245, 158, 11, 0.15)" : "rgba(16, 185, 129, 0.15)");
         ctx.fill();
-        ctx.strokeStyle = accentColor;
-        ctx.lineWidth = 2;
-        ctx.stroke();
 
+        // Feedback Visual no Centro
         ctx.font = "900 12px Manrope";
         ctx.fillStyle = accentColor;
         ctx.fillText(bioResult.isCritical ? 'Risco Biológico' : (bioResult.isWarning ? 'Alerta Moderado' : 'Sincronizado'), cx, cy - 6);

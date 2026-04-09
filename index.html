@@ -1074,6 +1074,40 @@
                                         <label for="esg-has-ac" class="text-[10px] font-black text-slate-600 uppercase cursor-pointer tracking-widest" data-i18n="esg_ac">Incluir Bônus Ar Condicionado</label>
                                         <input type="checkbox" id="esg-has-ac" checked onchange="window.updateCalculations()" class="w-5 h-5 accent-emerald-600 cursor-pointer">
                                     </div>
+
+                                    <div class="mt-4 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden transition-all">
+                                        <button onclick="document.getElementById('esg-advanced-settings').classList.toggle('hidden')" class="w-full bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 px-4 py-3 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex justify-between items-center transition-colors outline-none">
+                                            <span><i class="fas fa-sliders-h mr-2"></i> Premissas Financeiras (CFO Mode)</span>
+                                            <i class="fas fa-chevron-down text-[10px]"></i>
+                                        </button>
+                                        
+                                        <div id="esg-advanced-settings" class="hidden p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                    <label class="text-[9px] font-black text-tech-cyan uppercase tracking-widest block mb-1" title="Projeção média de aumento da tarifa de energia por ano.">Inflação Energia (a.a.) <i class="fas fa-info-circle ml-1 opacity-50"></i></label>
+                                                    <div class="relative">
+                                                        <input type="number" id="esg-inflation" value="5.0" step="0.1" oninput="window.updateCalculations()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-tech-cyan transition-colors text-right pr-8">
+                                                        <span class="absolute right-3 top-2 text-xs font-bold text-slate-400">%</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="text-[9px] font-black text-luminous-gold uppercase tracking-widest block mb-1" title="Custo de Capital (WACC) ou taxa SELIC esperada.">Taxa Desconto/SELIC <i class="fas fa-info-circle ml-1 opacity-50"></i></label>
+                                                    <div class="relative">
+                                                        <input type="number" id="esg-discount-rate" value="10.0" step="0.1" oninput="window.updateCalculations()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-luminous-gold transition-colors text-right pr-8">
+                                                        <span class="absolute right-3 top-2 text-xs font-bold text-slate-400">%</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-1" title="Horizonte de anos para simulação LCC.">Anos de Análise LCC <i class="fas fa-info-circle ml-1 opacity-50"></i></label>
+                                                    <div class="relative">
+                                                        <input type="number" id="esg-analysis-years" value="5" min="1" max="20" oninput="window.updateCalculations()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-slate-400 transition-colors text-right pr-12">
+                                                        <span class="absolute right-3 top-2 text-xs font-bold text-slate-400">Anos</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-[9px] text-slate-400 dark:text-slate-500 mt-3 italic">* Padrões baseados em métricas conservadoras. Alterá-los recalculará o VPL.</p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="lg:col-span-7 flex flex-col gap-6">

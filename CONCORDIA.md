@@ -58,6 +58,9 @@
 - [09/04/2026]: Evolução de Relatórios (ReportExporter.ts): Refatoração do motor de PDF-Lib para gerar relatórios divididos em seções (Zonas LEED). Injeção de blocos dinâmicos de Subtotal que evidenciam o "Context Grouping" aprovando ou reprovando Zonas Isoladas de Fachada, Exterior e Interior.
 - [09/04/2026]: Evolução de Regra de Negócio (Módulo LEED): Expansão do algoritmo de Fuzzymatching na importação de planilhas Excel (main.ts). O sistema agora reconhece variações nominais (CÓD, ID, TAG, REF) garantindo a importação fidedigna da nomenclatura dos equipamentos especificados.
 - [09/04/2026]: Refatoração Arquitetural (Clean Architecture): Extração da lógica de leitura e normalização de planilhas do main.ts para um serviço dedicado em src/infrastructure/services/ExcelParser.ts.
+- [09/04/2026]: Evolução Arquitetural do Módulo ESG: Implementação de cálculo LCC (Life Cycle Costing) com Valor Presente Líquido (VPL), inflação energética (5%) e taxa de desconto (10%), utilizando padrão Progressive Disclosure no main.ts e ESGEngine.ts.
+- [09/04/2026]: Atualização UI/UX: Injeção de Widget "CFO Mode" no Módulo ESG para controle de VPL. Evolução do HCLEngine.ts: Criação do método simulateCircadianJourney para avaliação temporal de supressão de melatonina (Turnos Diurnos e Noturnos).
+- [09/04/2026]: Atualização UI/UX e View: Injeção de Widget "CFO Mode" no Módulo ESG do index.html para suporte ao Progressive Disclosure. Atualização do renderizador do Canvas (main.ts) consumindo o método 'simulateCircadianJourney' para desenhar a curva dinâmica de supressão da melatonina ao longo das 24 horas.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
