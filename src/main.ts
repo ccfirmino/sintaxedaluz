@@ -47,6 +47,8 @@ declare global {
         leedTargets: any;
         updateCalculations: () => void;
         switchTool: (toolId: string) => void;
+        setHCLViewMode: (mode: 'clock' | 'spd') => void;
+        redrawAllCanvases: () => void;
         updateCalcMode: (mode: string) => void;
         toggleTheme: () => void;
         toggleLanguage: () => void;
@@ -57,6 +59,7 @@ declare global {
 
 // 2. INICIALIZAÇÃO DE ESTADO GLOBAL
 window.state = {
+    hclViewMode: 'clock', // LUXSINTAX: Estado do Segmented Control HCL
     ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, spin: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
     vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, spin: 180, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
     homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
@@ -129,7 +132,42 @@ async function initializeApp() {
 }
 
 // Inicia a aplicação
-document.addEventListener('DOMContentLoaded', initializeApp);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+    
+    // LUXSINTAX: Observador de Tema (Reatividade do Canvas)
+    const themeObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class' && window.redrawAllCanvases) {
+                window.redrawAllCanvases();
+            }
+        });
+    });
+    themeObserver.observe(document.documentElement, { attributes: true });
+});
+
+// LUXSINTAX: Repintura Global
+window.redrawAllCanvases = () => {
+    if (window.currentTool === 'audit' && window.updateAuditUI) {
+        window.updateAuditUI(); // Engatilha o redesenho com o tema correto
+    }
+};
+
+// LUXSINTAX: Controlador do Super Canvas HCL
+window.setHCLViewMode = (mode: 'clock' | 'spd') => {
+    window.state.hclViewMode = mode;
+    const btnClock = document.getElementById('btn-hcl-clock');
+    const btnSpd = document.getElementById('btn-hcl-spd');
+    
+    if (btnClock && btnSpd) {
+        const activeClass = "flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-white dark:bg-white/20 text-starlight dark:text-white shadow-sm transition-all";
+        const inactiveClass = "flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all";
+        
+        btnClock.className = mode === 'clock' ? activeClass : inactiveClass;
+        btnSpd.className = mode === 'spd' ? activeClass : inactiveClass;
+    }
+    window.redrawAllCanvases();
+};
 
 /**
  * REGRAS DE NEGÓCIO TÉCNICAS (GLARE)
@@ -2201,91 +2239,187 @@ window.updateCalculations = function() {
     oldUpdate();
     if (window.currentTool === 'esg' && window.updateEsgUI) window.updateEsgUI();
 };
-// LUXSINTAX: Motor de Visualização do Ritmo Circadiano (Neurociência)
+// LUXSINTAX: Super Canvas HCL (Ritmo 24H + Espectro SPD com Reatividade de Tema)
 window.drawCircadianChart = function(medi: number, timeOfDay: string, isCritical: boolean) {
     const canvas = document.getElementById('circadianChart') as HTMLCanvasElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.parentElement?.getBoundingClientRect();
-    if (rect) {
-        canvas.width = rect.width - 32;
-        canvas.height = rect.height - 32;
-    }
+    const win = window as any;
+    const isDark = document.documentElement.classList.contains('dark');
+    const viewMode = win.state?.hclViewMode || 'clock';
 
-    const w = canvas.width;
-    const h = canvas.height;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement!.getBoundingClientRect();
+    
+    // Dimensões corrigidas para caber no container com padding
+    canvas.width = (rect.width - 32) * dpr;
+    canvas.height = (rect.height - 32) * dpr;
+    ctx.scale(dpr, dpr);
+    const w = rect.width - 32;
+    const h = rect.height - 32;
 
     ctx.clearRect(0, 0, w, h);
 
-    // 1. Curva Base de Melatonina (Natural)
-    ctx.beginPath();
-    ctx.lineWidth = 3;
-    for (let x = 0; x <= w; x++) {
-        const normalizedX = (x / w) * Math.PI * 2;
-        const y = h/2 + (Math.cos(normalizedX) * (h/3)); 
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    }
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.2)"; // Cinza dim
-    ctx.stroke();
+    // Design Tokens Dinâmicos
+    const textColor = isDark ? "#94a3b8" : "#64748b";     
+    const gridColor = isDark ? "#334155" : "#e2e8f0";     
+    const accentColor = isDark ? "#f8fafc" : "#0f172a";   
+    const primaryColor = isDark ? "#a855f7" : "#9333ea";  
 
-    // 2. Cálculo do Ponto de Exposição do Utilizador
-    let userX = timeOfDay === 'morning' ? w * 0.25 : w * 0.75; 
-    let baseY = h/2 + (Math.cos((userX / w) * Math.PI * 2) * (h/3));
-    
-    let userY = baseY;
-    if (timeOfDay === 'night' && isCritical) {
-        userY = baseY + (h/4); // Melatonina suprimida = curva cai bruscamente
-    } else if (timeOfDay === 'morning') {
-        userY = baseY + (medi > 250 ? (h/5) : 0); // Supressão diurna profunda é excelente
-    }
+    if (viewMode === 'clock') {
+        // ==========================================
+        // MODO 1: RELÓGIO BIOLÓGICO DE 24 HORAS
+        // ==========================================
+        const cx = w / 2;
+        const cy = h / 2;
+        const radius = Math.min(w, h) / 2.6;
 
-    // 3. Desenho da Curva Modificada pela Luz (Gráfico Dinâmico)
-    ctx.beginPath();
-    for (let x = 0; x <= w; x++) {
-        const normalizedX = (x / w) * Math.PI * 2;
-        let bY = h/2 + (Math.cos(normalizedX) * (h/3)); 
-        
-        // Deformação Gaussiana suave na curva onde o utilizador está
-        const distance = Math.abs(x - userX);
-        const influence = Math.exp(-(distance*distance) / (w*w*0.02));
-        const finalY = bY + ((userY - bY) * influence);
+        // Anel do Relógio
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-        if (x === 0) ctx.moveTo(x, finalY);
-        else ctx.lineTo(x, finalY);
-    }
-    
-    const grad = ctx.createLinearGradient(0, 0, w, 0);
-    if (isCritical) {
-        grad.addColorStop(0, "#ef4444"); // Vermelho Crítico
-        grad.addColorStop(1, "#f87171");
+        // Marcações
+        ctx.font = "bold 10px Inter, sans-serif";
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const hours = [0, 6, 12, 18];
+        const labels = ["24h", "06h", "12h", "18h"];
+        for (let i = 0; i < hours.length; i++) {
+            const angle = (hours[i] / 24) * Math.PI * 2 - Math.PI / 2;
+            const tx = cx + Math.cos(angle) * (radius + 18);
+            const ty = cy + Math.sin(angle) * (radius + 18);
+            ctx.fillText(labels[i], tx, ty);
+        }
+
+        // Curva Natural de Melatonina
+        ctx.beginPath();
+        for(let hr = 0; hr <= 24; hr += 0.5) {
+            const angle = (hr / 24) * Math.PI * 2 - Math.PI / 2;
+            const melLevel = Math.max(0, Math.cos((hr - 3) * Math.PI / 12)); 
+            const r = radius - 8 + (melLevel * 25);
+            const px = cx + Math.cos(angle) * r;
+            const py = cy + Math.sin(angle) * r;
+            if(hr === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = primaryColor;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Posição do Usuário
+        let userHour = 12;
+        if(timeOfDay === 'morning') userHour = 9;
+        else if(timeOfDay === 'afternoon') userHour = 15;
+        else if(timeOfDay === 'night') userHour = 22;
+
+        const userAngle = (userHour / 24) * Math.PI * 2 - Math.PI / 2;
+        const dotX = cx + Math.cos(userAngle) * radius;
+        const dotY = cy + Math.sin(userAngle) * radius;
+
+        // Ponto e Linha para o centro
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(dotX, dotY);
+        ctx.strokeStyle = isCritical ? "rgba(239, 68, 68, 0.5)" : "rgba(16, 185, 129, 0.5)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, 6, 0, Math.PI * 2);
+        ctx.fillStyle = isCritical ? "#ef4444" : "#10b981"; 
+        ctx.fill();
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Rótulo Central
+        ctx.font = "bold 12px Inter, sans-serif";
+        ctx.fillStyle = accentColor;
+        ctx.fillText(isCritical ? 'Risco Biológico' : 'Sincronizado', cx, cy - 6);
+        ctx.font = "10px Inter, sans-serif";
+        ctx.fillStyle = textColor;
+        ctx.fillText(`Exposição: ${userHour}h`, cx, cy + 10);
+
     } else {
-        grad.addColorStop(0, "#06b6d4"); // Ciano de Alta Performance
-        grad.addColorStop(1, "#a855f7"); // Roxo Circadiano
-    }
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 4;
-    ctx.lineJoin = "round";
-    ctx.stroke();
+        // ==========================================
+        // MODO 2: COMPARADOR DE ESPECTRO (SPD)
+        // ==========================================
+        const padding = 35;
+        
+        // Eixos X e Y
+        ctx.beginPath();
+        ctx.moveTo(padding, h - padding);
+        ctx.lineTo(w - 10, h - padding); 
+        ctx.moveTo(padding, h - padding);
+        ctx.lineTo(padding, 10); 
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
-    // 4. Marcação do Ponto de Análise (Olho)
-    ctx.beginPath();
-    ctx.arc(userX, userY, 8, 0, Math.PI*2);
-    ctx.fillStyle = isCritical ? "#ef4444" : "#a855f7";
-    ctx.fill();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#ffffff";
-    ctx.stroke();
-    
-    // 5. Régua de Horas (Eixo X)
-    ctx.fillStyle = "#64748b";
-    ctx.font = "bold 10px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("06:00", 20, h - 5);
-    ctx.fillText("12:00", w*0.25, h - 5);
-    ctx.fillText("18:00", w*0.5, h - 5);
-    ctx.fillText("00:00", w*0.75, h - 5);
-    ctx.fillText("06:00", w - 20, h - 5);
+        // Legendas dos Eixos
+        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "center";
+        ctx.fillText("400nm (Azul)", padding + 30, h - 15);
+        ctx.fillText("700nm (Vermelho)", w - 40, h - 15);
+        
+        ctx.save();
+        ctx.translate(15, h / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText("Energia Relativa", 0, 0);
+        ctx.restore();
+
+        const mRatio = win.state?.audit?.mRatio || 0.52;
+        const bluePower = 0.3 + (mRatio * 0.5); 
+        const yellowPower = 1.2 - (mRatio * 0.4);
+
+        // 1. Curva Sensibilidade Melanópica (A biologia)
+        ctx.beginPath();
+        ctx.moveTo(padding, h - padding);
+        for (let x = padding; x <= w - 10; x += 2) {
+            const progress = (x - padding) / (w - padding - 10);
+            const melCurve = Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8;
+            const py = (h - padding) - (melCurve * (h - padding - 20));
+            ctx.lineTo(x, py);
+        }
+        ctx.lineTo(w - 10, h - padding);
+        ctx.fillStyle = isDark ? "rgba(14, 165, 233, 0.15)" : "rgba(14, 165, 233, 0.08)";
+        ctx.fill();
+        ctx.strokeStyle = "#0ea5e9";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 2. Espectro do LED (A física)
+        ctx.beginPath();
+        for (let x = padding; x <= w - 10; x += 2) {
+            const progress = (x - padding) / (w - padding - 10);
+            const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
+            const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
+            const totalY = Math.min(1, ledBlue + ledYellow);
+            
+            const py = (h - padding) - (totalY * (h - padding - 20));
+            if (x === padding) ctx.moveTo(x, py);
+            else ctx.lineTo(x, py);
+        }
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Legenda
+        ctx.textAlign = "right";
+        ctx.fillStyle = accentColor;
+        ctx.fillText("── LED (Física)", w - 20, 20);
+        ctx.fillStyle = "#0ea5e9";
+        ctx.fillText("- - Retina (Biologia)", w - 20, 35);
+    }
 };
