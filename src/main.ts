@@ -2397,9 +2397,77 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         // Garantimos que a curva da Retina também não estoure a escala
         if (0.8 * lensFactor > maxPeak) maxPeak = 0.8 * lensFactor;
 
-        // --- COLE ISTO NO FINAL DO SEU src/main.ts ---
+        // Fator de escala dinâmico (adicionamos 10% de margem no topo de respiro visual)
+        const scaleY = 1 / (maxPeak * 1.1);
 
-// LUXSINTAX: Engine de Importação Excel e Mapeamento Inteligente (Hash Map)
+        // Linha Guia Didática: 480nm (Pico Circadiano)
+        const peakX = padding + ((w - padding - 10) * 0.25); // 480nm estimado
+        ctx.beginPath();
+        ctx.moveTo(peakX, h - padding);
+        ctx.lineTo(peakX, 10);
+        ctx.strokeStyle = "rgba(168, 85, 247, 0.4)"; // Roxo sutil
+        ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+        
+        ctx.font = "bold 8px Manrope";
+        ctx.fillStyle = "#a855f7";
+        ctx.fillText("Pico Melanópico", peakX, 15);
+
+        // 1. Retina (Biologia)
+        ctx.beginPath();
+        ctx.moveTo(padding, h - padding);
+        for (let x = padding; x <= w - 10; x += 2) {
+            const progress = (x - padding) / (w - padding - 10);
+            const melCurve = (Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor) * scaleY;
+            const py = (h - padding) - (melCurve * (h - padding - 20));
+            ctx.lineTo(x, py);
+        }
+        ctx.lineTo(w - 10, h - padding);
+        ctx.fillStyle = isDark ? "rgba(14, 165, 233, 0.15)" : "rgba(14, 165, 233, 0.08)";
+        ctx.fill();
+        ctx.strokeStyle = "#0ea5e9";
+        ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+
+        // 2. LED (Física) com Gradiente de Preenchimento
+        ctx.beginPath();
+        let ledPoints = [];
+        for (let x = padding; x <= w - 10; x += 2) {
+            const progress = (x - padding) / (w - padding - 10);
+            const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
+            const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
+            const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
+            
+            const totalY = (ledBlue + ledYellow + cyanFill) * scaleY;
+            const py = (h - padding) - (totalY * (h - padding - 20));
+            ledPoints.push({x, py});
+            if (x === padding) ctx.moveTo(x, py);
+            else ctx.lineTo(x, py);
+        }
+        
+        // Área sob a curva do Espectro (Sombra suave)
+        ctx.lineTo(w - 10, h - padding);
+        ctx.lineTo(padding, h - padding);
+        ctx.closePath();
+        let gradient = ctx.createLinearGradient(0, h - padding, 0, 10);
+        gradient.addColorStop(0, isDark ? "rgba(248, 250, 252, 0.0)" : "rgba(15, 23, 42, 0.0)");
+        gradient.addColorStop(1, isDark ? "rgba(248, 250, 252, 0.1)" : "rgba(15, 23, 42, 0.05)");
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Linha Principal do Espectro
+        ctx.beginPath();
+        ctx.moveTo(ledPoints[0].x, ledPoints[0].py);
+        ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
+        ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
+
+        ctx.textAlign = "right"; ctx.font = "900 10px Manrope";
+        ctx.fillStyle = accentColor; ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : "── LED (Física Padrão)", w - 20, 20);
+        ctx.fillStyle = "#0ea5e9"; ctx.fillText(`- - Retina (${userAge} anos)`, w - 20, 35);
+    }
+};
+
+// ==========================================
+// LUXSINTAX: Engine de Importação Excel e Mapeamento Inteligente
+// ==========================================
 window.handleExcelUpload = async function(input: HTMLInputElement) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
@@ -2420,11 +2488,9 @@ window.handleExcelUpload = async function(input: HTMLInputElement) {
             const firstSheet = workbook.SheetNames[0];
             const rows = (window as any).XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
 
-            // Dicionário (Hash Map) para agrupar luminárias no mesmo ambiente
             const roomMap = new Map();
 
             rows.forEach((row: any) => {
-                // Algoritmo Fuzzy simples: Procura chaves no Excel que se pareçam com nossos dados
                 const getVal = (aliases: string[]) => {
                     const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase().includes(a)));
                     return key ? row[key] : null;
@@ -2437,24 +2503,22 @@ window.handleExcelUpload = async function(input: HTMLInputElement) {
                 const power = parseFloat(getVal(['potencia', 'potência', 'w', 'watts', 'carga'])) || 0;
                 const qty = parseInt(getVal(['qtd', 'quantidade', 'numero'])) || 1;
 
-                // A Chave Única garante que "Recepção - Térreo" seja diferente de "Recepção - 1º Andar"
                 const uniqueKey = `${floor}_${roomName}`;
 
                 if (!roomMap.has(uniqueKey)) {
                     roomMap.set(uniqueKey, {
-                        id: Date.now() + Math.random(), // Evita colisões rápidas no loop
+                        id: Date.now() + Math.random(),
                         floor: floor,
                         name: roomName,
                         area: area,
                         baseLpd: 0,
-                        typology: "", // Fica vazio para o usuário classificar na plataforma (ASHRAE)
-                        expanded: false, // Inicia fechado para não poluir a tela com tabelas gigantes
+                        typology: "", 
+                        expanded: false, 
                         fixtures: []
                     });
                 }
 
                 const roomObj = roomMap.get(uniqueKey);
-                // Se o Revit exportar a área duplicada, ou apenas na primeira linha, pegamos a maior para não perder
                 if (area > roomObj.area) roomObj.area = area;
 
                 if (power > 0) {
@@ -2467,14 +2531,13 @@ window.handleExcelUpload = async function(input: HTMLInputElement) {
                 }
             });
 
-            // Converte o Mapa em Array e joga no início da lista do projeto
             const newRooms = Array.from(roomMap.values());
             window.state.leedProject.rooms = [...newRooms, ...window.state.leedProject.rooms];
             
             window.renderLeedProject();
             
             if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
-            input.value = ""; // Limpa o input para poder subir a mesma planilha de novo se precisar
+            input.value = ""; 
 
         } catch (err) {
             console.error("[LuxSintax Excel Parser]", err);
