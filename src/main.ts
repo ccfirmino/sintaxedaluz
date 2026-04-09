@@ -18,6 +18,7 @@ import { Canvas2DEngine } from './infrastructure/canvas/Canvas2DEngine';
 import { ElectricalEngine } from './domain/electrical/ElectricalEngine';
 import { HCLEngine } from './domain/health/HCLEngine';
 import { ESGEngine } from './domain/standards/ESGEngine';
+import { ExcelParser } from './infrastructure/services/ExcelParser';
 
 /**
  * Interface de Extensão do Objeto Window para TypeScript estrito
@@ -2472,85 +2473,27 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
 };
 
 // ==========================================
-// LUXSINTAX: Engine de Importação Excel e Mapeamento Inteligente
+// LUXSINTAX: Engine de Importação Excel (Clean Architecture)
 // ==========================================
 window.handleExcelUpload = async function(input: HTMLInputElement) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
     
-    if (!(window as any).XLSX) {
-        alert("O motor de leitura de planilhas está carregando. Tente novamente em alguns segundos.");
-        return;
-    }
-
     const btnLabel = document.getElementById('lbl-excel-upload');
     if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> PROCESSANDO...';
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target!.result as ArrayBuffer);
-            const workbook = (window as any).XLSX.read(data, {type: 'array'});
-            const firstSheet = workbook.SheetNames[0];
-            const rows = (window as any).XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+    try {
+        // Delegação limpa para a camada de Infraestrutura
+        const newRooms = await ExcelParser.parseLeedRooms(file);
+        
+        window.state.leedProject.rooms = [...newRooms, ...window.state.leedProject.rooms];
+        window.renderLeedProject();
+        
+        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
+        input.value = ""; 
 
-            const roomMap = new Map();
-
-            rows.forEach((row: any) => {
-                const getVal = (aliases: string[]) => {
-                    const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase().includes(a)));
-                    return key ? row[key] : null;
-                };
-
-                const floor = getVal(['pavimento', 'andar', 'nivel', 'level']) || "Geral";
-                const roomName = getVal(['ambiente', 'sala', 'nome', 'room', 'espaco']) || "Ambiente Não Nomeado";
-                const area = parseFloat(getVal(['area', 'área', 'm2', 'm²'])) || 0;
-                const fixture = getVal(['luminaria', 'luminária', 'tipo', 'modelo', 'equipamento']) || "Luminária Importada";
-                const power = parseFloat(getVal(['potencia', 'potência', 'w', 'watts', 'carga'])) || 0;
-                const qty = parseInt(getVal(['qtd', 'quantidade', 'numero'])) || 1;
-
-                const uniqueKey = `${floor}_${roomName}`;
-
-                if (!roomMap.has(uniqueKey)) {
-                    roomMap.set(uniqueKey, {
-                        id: Date.now() + Math.random(),
-                        floor: floor,
-                        name: roomName,
-                        area: area,
-                        baseLpd: 0,
-                        typology: "", 
-                        leedCategory: "interior", // LUXSINTAX: Default para importação
-                        expanded: false, 
-                        fixtures: []
-                    });
-                }
-
-                const roomObj = roomMap.get(uniqueKey);
-                if (area > roomObj.area) roomObj.area = area;
-
-                if (power > 0) {
-                    roomObj.fixtures.push({
-                        id: Date.now() + Math.random(),
-                        label: fixture,
-                        power: power,
-                        qty: qty
-                    });
-                }
-            });
-
-            const newRooms = Array.from(roomMap.values());
-            window.state.leedProject.rooms = [...newRooms, ...window.state.leedProject.rooms];
-            
-            window.renderLeedProject();
-            
-            if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
-            input.value = ""; 
-
-        } catch (err) {
-            console.error("[LuxSintax Excel Parser]", err);
-            alert("Falha na importação. Certifique-se de que a planilha possui cabeçalhos claros (Pavimento, Ambiente, Área, Luminária, Potência).");
-            if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
-        }
-    };
-    reader.readAsArrayBuffer(file);
+    } catch (err: any) {
+        alert(err.message);
+        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
+    }
 };

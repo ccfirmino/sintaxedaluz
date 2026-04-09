@@ -56,6 +56,8 @@
 - [09/04/2026]: Sprint de BIM & Produtividade (Módulo LEED): Integração do motor `SheetJS` no ambiente de View (`index.html`). Implementação de arquitetura `ExcelParser` (Hash Map) no orquestrador (`main.ts`) permitindo upload massivo de tabelas (.xlsx). Evolução do modelo de dados do estado local adicionando propriedades `floor` (Pavimento) e `area` (m²) ao schema dinâmico de `rooms`.
 - [09/04/2026]: Evolução de Regra de Negócio (Módulo LEED): Implementação do conceito de "Context Grouping" no StandardsEngine.ts e main.ts. O sistema agora separa o cálculo de interiores, fachadas e áreas externas, aplicando a regra estrita de Anti-Trade-Off (Não-Compensação de Carga) da norma ASHRAE 90.1, e preparando a base para relatórios seccionados.
 - [09/04/2026]: Evolução de Relatórios (ReportExporter.ts): Refatoração do motor de PDF-Lib para gerar relatórios divididos em seções (Zonas LEED). Injeção de blocos dinâmicos de Subtotal que evidenciam o "Context Grouping" aprovando ou reprovando Zonas Isoladas de Fachada, Exterior e Interior.
+- [09/04/2026]: Evolução de Regra de Negócio (Módulo LEED): Expansão do algoritmo de Fuzzymatching na importação de planilhas Excel (main.ts). O sistema agora reconhece variações nominais (CÓD, ID, TAG, REF) garantindo a importação fidedigna da nomenclatura dos equipamentos especificados.
+- [09/04/2026]: Refatoração Arquitetural (Clean Architecture): Extração da lógica de leitura e normalização de planilhas do main.ts para um serviço dedicado em src/infrastructure/services/ExcelParser.ts.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
