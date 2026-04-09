@@ -1011,41 +1011,49 @@ export class Canvas2DEngine {
             ctx.fillStyle = rainbow;
             ctx.fillRect(gX, gY - gH, gW, gH);
 
-            const numPoints = 17;
-            const drawSpectralCurve = (dataArray: number[], color: string, lineWidth = 2, isDashed = false) => {
+            // LUXSINTAX: Motor Matemático Gaussiano para o Mini-Gráfico HCL (Mesma física do Painel Principal)
+            const mRatio = parseFloat(currentMRatio) || 0.52;
+            const bluePower = 0.3 + (mRatio * 0.5); 
+            const yellowPower = 1.2 - (mRatio * 0.4);
+            const isSunLike = mRatio >= 0.9;
+
+            const drawMathCurve = (type: 'melanopic' | 'photopic' | 'spd', color: string, lineWidth = 2, isDashed = false) => {
                 ctx.beginPath();
                 ctx.strokeStyle = color;
                 ctx.lineWidth = lineWidth;
                 if (isDashed) ctx.setLineDash([3, 3]); else ctx.setLineDash([]);
-                for(let i=0; i<numPoints; i++) {
-                    const px = gX + (i / (numPoints - 1)) * gW;
-                    const py = gY - (dataArray[i] * gH);
-                    
-                    if (i === 0) {
-                        ctx.moveTo(px, py);
-                    } else {
-                        const prevPx = gX + ((i - 1) / (numPoints - 1)) * gW;
-                        const prevPy = gY - (dataArray[i - 1] * gH);
-                        const cp1x = prevPx + (px - prevPx) / 2;
-                        const cp1y = prevPy;
-                        const cp2x = prevPx + (px - prevPx) / 2;
-                        const cp2y = py;
-                        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, px, py);
+                
+                const steps = 40;
+                for(let i=0; i<=steps; i++) {
+                    const progress = i / steps;
+                    const px = gX + progress * gW;
+                    let val = 0;
+
+                    if (type === 'melanopic') {
+                        val = Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8;
+                    } else if (type === 'photopic') {
+                        val = Math.exp(-Math.pow(progress - 0.5, 2) / 0.04) * 0.9;
+                    } else if (type === 'spd') {
+                        const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
+                        const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
+                        const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
+                        val = ledBlue + ledYellow + cyanFill;
                     }
+                    
+                    // Escala para caber no mini box (fator normalizador 0.7)
+                    val = Math.min(1.0, val * 0.7); 
+                    const py = gY - (val * gH);
+                    
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
                 }
                 ctx.stroke();
                 ctx.setLineDash([]);
             };
 
-            const spdData = win.HCLEngine.spds[currentMRatio] || win.HCLEngine.spds["0.52"];
-            
-            // LUXSINTAX: Prevenção de quebra caso as curvas biológicas não estejam carregadas
-            const melCurve = win.HCLEngine.melanopic || [0,0,0,0.05,0.2,0.5,0.9,1.0,0.7,0.3,0.1,0.05,0,0,0,0,0];
-            const photCurve = win.HCLEngine.photopic || [0,0,0,0.02,0.1,0.4,0.8,1.0,0.8,0.4,0.1,0.02,0,0,0,0,0];
-
-            drawSpectralCurve(melCurve, "#a855f7", 1.5, true);
-            drawSpectralCurve(photCurve, "#fbbf24", 1.5, true);
-            drawSpectralCurve(spdData, isDark ? "#f8fafc" : "#0f172a", 2.5);
+            drawMathCurve('melanopic', "#a855f7", 1.5, true);
+            drawMathCurve('photopic', "#fbbf24", 1.5, true);
+            drawMathCurve('spd', isDark ? "#f8fafc" : "#0f172a", 2.5);
 
             ctx.font = "bold 8px Manrope";
             

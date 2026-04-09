@@ -431,14 +431,7 @@
                                     </div>
 
                                     <div class="mb-6 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                        
--help z-50">
-                                            <span class="border-b border-dashed border-cyan-300 dark:border-cyan-700 pb-0.5" data-i18n="lbl_source_type">ESPECTRO / CCT</span>
-                                            <div class="absolute bottom-full left-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4">
-                                                <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Razão Melanópica (M/P)</h4>
-                                                <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Mede o impacto não-visual da luz. O pico de absorção biológica humana ocorre nos tons de azul (480nm).</p>
-                                            </div>
-                                        </label>
+                                        <label title="Define a aparência cromática e influencia diretamente o balanço circadiano e a razão melanópica (M/P)." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-2 cursor-help border-b border-dashed border-slate-400 w-max" data-i18n="lbl_source_type">ESPECTRO / CCT</label>
                                         <select id="v-mRatio" onchange="window.state.vertical.mRatio = parseFloat(this.value); window.updateCalculations();" class="w-full bg-white dark:bg-slate-700 text-[10px] font-bold py-1.5 px-2 rounded border border-slate-200 dark:border-slate-600 outline-none mt-1 cursor-pointer">
                                             <option value="0.45">LED 2700K (M/P: 0.45)</option>
                                             <option value="0.52" selected>LED 3000K (M/P: 0.52)</option>
