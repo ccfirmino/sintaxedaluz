@@ -325,7 +325,7 @@
 
                     <div id="visual-tools" class="grid grid-cols-1 md:grid-cols-12 gap-8 w-full transition-opacity duration-300 hidden">
                         <div class="md:col-span-4 lg:col-span-3 flex flex-col gap-6">
-                            <div class="glass-panel p-4 sm:p-6 rounded-2xl relative h-auto md:sticky top-24">
+                            <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
                                     <div id="calc-mode-selector" class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
                                         <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">INTENSIDADE</button>
@@ -372,7 +372,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                                    <div class="grid grid-cols-2 gap-4 mb-6">
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_height">ALTURA (H)</label><div class="flex items-baseline gap-1"><input type="number" id="p-height" value="3.0" min="0.5" max="20" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-height" min="0.5" max="20" step="0.1" value="3.0"></div>
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_plane">PLANO (wp)</label><div class="flex items-baseline gap-1"><input type="number" id="p-plane" value="0.75" min="0" max="5" step="0.05"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-plane" min="0" max="5" step="0.05" value="0.75"></div>
                                     </div>
@@ -426,8 +426,7 @@
 
                                     <div class="mode-standard-only mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_beam">ABERTURA DO FACHO</label><div class="flex items-baseline gap-1"><input type="number" id="v-beam" value="30" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-beam" min="5" max="120" step="1" value="30"></div>
 
-                                    
-
+                                    <div class="grid grid-cols-2 gap-4 mb-6">
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label id="lbl-v-tilt" class="text-[10px] text-slate-500 font-bold whitespace-nowrap transition-colors" title="Orientação (Tilt)"><span data-i18n="lbl_tilt">TILT</span> <span id="warn-v-tilt" class="hidden text-[8px] bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded ml-2 animate-pulse border border-red-200 dark:border-red-800">⚠️ >30º</span></label><div class="flex items-baseline gap-1"><input type="number" id="v-tilt" value="30" min="0" max="90"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-tilt" min="0" max="90" step="1" value="30"></div>
                                         <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap uppercase" title="Rotação Azimutal (Spin)">SPIN</label><div class="flex items-baseline gap-1"><input type="number" id="v-spin" value="180" min="0" max="360" step="15"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-v-spin" min="0" max="360" step="15" value="180"></div>
                                     </div>
@@ -545,8 +544,8 @@
                                                 <option value="0.60" data-i18n="opt_maint_60">Sujo / Industrial (0.60)</option>
                                                                     </select>
                                                                 </div> </div> </div> </div> </div> <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-6">
-                                                    <div class="glass-panel p-3 sm:p-6 rounded-2xl flex flex-col relative w-full h-[60vh] md:h-[75vh] min-h-[400px] md:min-h-[500px] max-h-[800px]">
-                                    <div class="flex justify-between items-center mb-4 sm:mb-6 border-b border-slate-200 pb-4 w-full">
+                                                    <div class="glass-panel p-6 rounded-2xl flex flex-col relative w-full h-[75vh] min-h-[500px] max-h-[800px]">
+                                    <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4 w-full">
                                         
                                         <div class="flex items-center gap-4">
                                             <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
