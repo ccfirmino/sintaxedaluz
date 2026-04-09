@@ -1807,7 +1807,8 @@ window.updateAuditUI = function() {
         if (csEl) csEl.innerText = bioResult.cs.toFixed(2);
 
         if (window.drawCircadianChart) {
-            window.drawCircadianChart(bioResult.medi, s.timeOfDay, bioResult.isCritical);
+            // LUXSINTAX: Passando o contexto inteiro para o Gráfico reagir à física
+            window.drawCircadianChart(bioResult, s);
         }
         if (alertBox && alertEl) {
             if (bioResult.isCritical || bioResult.isWarning) {
@@ -2239,21 +2240,19 @@ window.updateCalculations = function() {
     oldUpdate();
     if (window.currentTool === 'esg' && window.updateEsgUI) window.updateEsgUI();
 };
-// LUXSINTAX: Super Canvas HCL (Ritmo 24H + Espectro SPD com Reatividade de Tema)
-window.drawCircadianChart = function(medi: number, timeOfDay: string, isCritical: boolean) {
+// LUXSINTAX: Super Canvas HCL (Neurociência Aplicada + Espectro Reativo)
+window.drawCircadianChart = function(bioResult: any, state: any) {
     const canvas = document.getElementById('circadianChart') as HTMLCanvasElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const win = window as any;
     const isDark = document.documentElement.classList.contains('dark');
-    const viewMode = win.state?.hclViewMode || 'clock';
+    const viewMode = window.state?.hclViewMode || 'clock';
 
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.parentElement!.getBoundingClientRect();
     
-    // Dimensões corrigidas para caber no container com padding
     canvas.width = (rect.width - 32) * dpr;
     canvas.height = (rect.height - 32) * dpr;
     ctx.scale(dpr, dpr);
@@ -2262,7 +2261,7 @@ window.drawCircadianChart = function(medi: number, timeOfDay: string, isCritical
 
     ctx.clearRect(0, 0, w, h);
 
-    // Design Tokens Dinâmicos
+    // Design Tokens Dinâmicos baseados no Tema
     const textColor = isDark ? "#94a3b8" : "#64748b";     
     const gridColor = isDark ? "#334155" : "#e2e8f0";     
     const accentColor = isDark ? "#f8fafc" : "#0f172a";   
@@ -2270,21 +2269,19 @@ window.drawCircadianChart = function(medi: number, timeOfDay: string, isCritical
 
     if (viewMode === 'clock') {
         // ==========================================
-        // MODO 1: RELÓGIO BIOLÓGICO DE 24 HORAS
+        // MODO 1: RITMO 24H (Reativo ao CS e Lente)
         // ==========================================
         const cx = w / 2;
         const cy = h / 2;
         const radius = Math.min(w, h) / 2.6;
 
-        // Anel do Relógio
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.strokeStyle = gridColor;
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Marcações
-        ctx.font = "bold 10px Inter, sans-serif";
+        ctx.font = "bold 10px Manrope";
         ctx.fillStyle = textColor;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -2314,79 +2311,77 @@ window.drawCircadianChart = function(medi: number, timeOfDay: string, isCritical
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Posição do Usuário
+        // Lógica Físico-Dinâmica da Posição
         let userHour = 12;
-        if(timeOfDay === 'morning') userHour = 9;
-        else if(timeOfDay === 'afternoon') userHour = 15;
-        else if(timeOfDay === 'night') userHour = 22;
+        if(state.timeOfDay === 'morning') userHour = 9;
+        else if(state.timeOfDay === 'afternoon') userHour = 15;
+        else if(state.timeOfDay === 'night') userHour = 22;
 
+        // O CS (Circadian Stimulus) puxa o ponto em direção ao centro (Supressão)
+        const suppressionPull = (bioResult.cs || 0) * 40; 
         const userAngle = (userHour / 24) * Math.PI * 2 - Math.PI / 2;
-        const dotX = cx + Math.cos(userAngle) * radius;
-        const dotY = cy + Math.sin(userAngle) * radius;
+        const dynamicRadius = radius - suppressionPull;
+        
+        const dotX = cx + Math.cos(userAngle) * dynamicRadius;
+        const dotY = cy + Math.sin(userAngle) * dynamicRadius;
 
-        // Ponto e Linha para o centro
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo(dotX, dotY);
-        ctx.strokeStyle = isCritical ? "rgba(239, 68, 68, 0.5)" : "rgba(16, 185, 129, 0.5)";
+        ctx.strokeStyle = bioResult.isCritical ? "rgba(239, 68, 68, 0.5)" : "rgba(16, 185, 129, 0.5)";
         ctx.lineWidth = 2;
         ctx.stroke();
 
         ctx.beginPath();
         ctx.arc(dotX, dotY, 6, 0, Math.PI * 2);
-        ctx.fillStyle = isCritical ? "#ef4444" : "#10b981"; 
+        ctx.fillStyle = bioResult.isCritical ? "#ef4444" : (bioResult.isWarning ? "#f59e0b" : "#10b981"); 
         ctx.fill();
         ctx.strokeStyle = accentColor;
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Rótulo Central
-        ctx.font = "bold 12px Inter, sans-serif";
+        ctx.font = "900 12px Manrope";
         ctx.fillStyle = accentColor;
-        ctx.fillText(isCritical ? 'Risco Biológico' : 'Sincronizado', cx, cy - 6);
-        ctx.font = "10px Inter, sans-serif";
+        ctx.fillText(bioResult.isCritical ? 'Risco Biológico' : (bioResult.isWarning ? 'Alerta Moderado' : 'Sincronizado'), cx, cy - 6);
+        ctx.font = "bold 9px Manrope";
         ctx.fillStyle = textColor;
-        ctx.fillText(`Exposição: ${userHour}h`, cx, cy + 10);
+        ctx.fillText(`CS alcançado: ${(bioResult.cs || 0).toFixed(2)}`, cx, cy + 10);
 
     } else {
         // ==========================================
-        // MODO 2: COMPARADOR DE ESPECTRO (SPD)
+        // MODO 2: ESPECTRO SPD (Reativo a TM-30 e Lente/Idade)
         // ==========================================
         const padding = 35;
         
-        // Eixos X e Y
         ctx.beginPath();
-        ctx.moveTo(padding, h - padding);
-        ctx.lineTo(w - 10, h - padding); 
-        ctx.moveTo(padding, h - padding);
-        ctx.lineTo(padding, 10); 
-        ctx.strokeStyle = gridColor;
-        ctx.lineWidth = 1;
-        ctx.stroke();
+        ctx.moveTo(padding, h - padding); ctx.lineTo(w - 10, h - padding); 
+        ctx.moveTo(padding, h - padding); ctx.lineTo(padding, 10); 
+        ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.stroke();
 
-        // Legendas dos Eixos
-        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.font = "bold 9px Manrope";
         ctx.fillStyle = textColor;
         ctx.textAlign = "center";
         ctx.fillText("400nm (Azul)", padding + 30, h - 15);
         ctx.fillText("700nm (Vermelho)", w - 40, h - 15);
         
         ctx.save();
-        ctx.translate(15, h / 2);
-        ctx.rotate(-Math.PI / 2);
+        ctx.translate(15, h / 2); ctx.rotate(-Math.PI / 2);
         ctx.fillText("Energia Relativa", 0, 0);
         ctx.restore();
 
-        const mRatio = win.state?.audit?.mRatio || 0.52;
-        const bluePower = 0.3 + (mRatio * 0.5); 
-        const yellowPower = 1.2 - (mRatio * 0.4);
+        const mRatio = state.mRatio || 0.52;
+        const isSunLike = document.getElementById('audit-tm30') && (document.getElementById('audit-tm30') as HTMLSelectElement).value === 'sunlike';
+        const userAge = parseInt((document.getElementById('audit-age') as HTMLInputElement)?.value) || 30;
+        
+        // Simulação do Envelhecimento do Cristalino (Filtro Amarelo Biológico)
+        const lensFactor = userAge > 25 ? Math.max(0.3, 1.0 - (userAge - 25) * 0.015) : 1.0;
 
-        // 1. Curva Sensibilidade Melanópica (A biologia)
+        // 1. Retina (Biologia): Se a idade sobe, a absorção do azul cai drasticamente.
         ctx.beginPath();
         ctx.moveTo(padding, h - padding);
         for (let x = padding; x <= w - 10; x += 2) {
             const progress = (x - padding) / (w - padding - 10);
-            const melCurve = Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8;
+            const melCurve = Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor; // Age Impact!
             const py = (h - padding) - (melCurve * (h - padding - 20));
             ctx.lineTo(x, py);
         }
@@ -2394,32 +2389,31 @@ window.drawCircadianChart = function(medi: number, timeOfDay: string, isCritical
         ctx.fillStyle = isDark ? "rgba(14, 165, 233, 0.15)" : "rgba(14, 165, 233, 0.08)";
         ctx.fill();
         ctx.strokeStyle = "#0ea5e9";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
+        ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
 
-        // 2. Espectro do LED (A física)
+        // 2. LED (Física): Se for SunLike, preenchemos o "Cyanosis Dip" (falha no ciano).
+        let bluePower = 0.3 + (mRatio * 0.5); 
+        let yellowPower = 1.2 - (mRatio * 0.4);
+        
         ctx.beginPath();
         for (let x = padding; x <= w - 10; x += 2) {
             const progress = (x - padding) / (w - padding - 10);
+            
             const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
             const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
-            const totalY = Math.min(1, ledBlue + ledYellow);
             
+            // Cyanosis Dip Filler (TM-30 Premium Quality)
+            const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
+            
+            const totalY = Math.min(1, ledBlue + ledYellow + cyanFill);
             const py = (h - padding) - (totalY * (h - padding - 20));
             if (x === padding) ctx.moveTo(x, py);
             else ctx.lineTo(x, py);
         }
-        ctx.strokeStyle = accentColor;
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
+        ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
 
-        // Legenda
-        ctx.textAlign = "right";
-        ctx.fillStyle = accentColor;
-        ctx.fillText("── LED (Física)", w - 20, 20);
-        ctx.fillStyle = "#0ea5e9";
-        ctx.fillText("- - Retina (Biologia)", w - 20, 35);
+        ctx.textAlign = "right"; ctx.font = "900 10px Manrope";
+        ctx.fillStyle = accentColor; ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : "── LED (Física Padrão)", w - 20, 20);
+        ctx.fillStyle = "#0ea5e9"; ctx.fillText(`- - Retina (${userAge} anos)`, w - 20, 35);
     }
 };

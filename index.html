@@ -598,8 +598,8 @@
                                             </div>
 
                                             <div id="glare-toggle-wrapper" class="hidden flex items-center gap-2 bg-red-50 p-1.5 rounded-lg dark:bg-red-950/30 border border-red-200 dark:border-red-800 shadow-sm">
-                                                <label class="flex items-center gap-2 cursor-pointer relative group px-2">
-                                                    <span class="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider border-b border-dashed border-red-300 dark:border-red-700 pb-0.5">GLARE >65º</span>
+                                                <label class="flex items-center gap-2 cursor-pointer relative group px-2" title="Risco de ofuscamento direto. A norma recomenda evitar fachos acima de 65º em relação à vertical para proteger o campo de visão.">
+                                                    <span class="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider border-b border-dashed border-red-300 dark:border-red-700 pb-0.5 cursor-help">GLARE >65º</span>
                                                     <div class="relative">
                                                         <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
                                                         <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="glare-toggle-bg"></div>
@@ -899,95 +899,79 @@
                             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                                 <div class="lg:col-span-5 space-y-6 bg-slate-50 dark:bg-slate-800/50 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm relative group">
                                     <h4 class="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest border-b border-slate-200 dark:border-slate-700 pb-2 mb-4">Variáveis Biológicas</h4>
-                                    <div class="space-y-6">
-                                        <div class="relative group/tooltip">
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max" data-i18n="hcl_ev">Lux Vertical no Olho (Ev)</label>
-                                            <input type="number" id="audit-visual-lux" value="500" min="10" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right">
+                                    
+                                    <div class="space-y-5">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <div class="w-1/2">
+                                                <label title="Lux medido na altura do olho (E_vert)." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Lux Vertical (Ev)</label>
+                                                <input type="number" id="audit-visual-lux" value="500" min="10" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right">
+                                            </div>
+                                            <div class="w-1/2">
+                                                <label title="A opacidade do cristalino afeta a absorção de luz azul." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Idade (Anos)</label>
+                                                <input type="number" id="audit-age" value="30" min="10" max="90" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right">
+                                            </div>
                                         </div>
+
                                         <div>
                                             <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="lbl_source_type">Espectro da Fonte (CCT)</label>
-                                            <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors mb-4">
+                                            <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
                                                 <option value="0.45">2700K (M/P: 0.45)</option>
                                                 <option value="0.52" selected>3000K (M/P: 0.52)</option>
                                                 <option value="0.68">4000K (M/P: 0.68)</option>
                                                 <option value="0.92">5000K (M/P: 0.92)</option>
                                                 <option value="1.10">6500K (M/P: 1.10)</option>
                                             </select>
-
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 relative group cursor-help w-max">
-                                                <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Qualidade Cromática (TM-30)</span>
-                                                <div class="absolute bottom-full left-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4 z-50">
-                                                    <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Métricas de Fidelidade</h4>
-                                                    <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Avalia a capacidade do LED de reproduzir as cores de forma real (Rf) e saturada (Rg). LEDs de alta fidelidade imitam o espectro natural, beneficiando o bem-estar e a percepção do espaço.</p>
-                                                </div>
-                                            </label>
-                                            <select id="audit-tm30" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
-                                                <option value="cri80" selected>LED Padrão (Rf 78 / Rg 95)</option>
-                                                <option value="cri90">Alta Fidelidade (Rf 90 / Rg 100)</option>
-                                                <option value="sunlike">Full Spectrum / SunLike (Rf 96)</option>
-                                            </select>
                                         </div>
-
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 relative group cursor-help w-max">
-                                                    <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Idade do Usuário</span>
-                                                    <div class="absolute bottom-full left-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4 z-50">
-                                                        <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Amarelecimento do Cristalino</h4>
-                                                        <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Com a idade, o olho atua como um filtro amarelo, bloqueando até 50% da luz azul-ciano (480nm). O cálculo de m-EDI compensará essa perda de transmitância retinal.</p>
-                                                    </div>
-                                                </label>
-                                                <div class="flex items-center gap-2">
-                                                    <input type="number" id="audit-age" value="30" min="10" max="90" step="1" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-center transition-colors">
-                                                    <span class="text-[10px] font-bold text-slate-500">Anos</span>
-                                                </div>
+                                        
+                                        <div class="flex items-center justify-between gap-4">
+                                            <div class="w-1/2">
+                                                <label title="Capacidade do LED de reproduzir cores reais." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Qualidade (TM-30)</label>
+                                                <select id="audit-tm30" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-2.5 text-[10px] font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer uppercase">
+                                                    <option value="cri80" selected>Padrão (Rf 78)</option>
+                                                    <option value="cri90">Alta Fid. (Rf 90)</option>
+                                                    <option value="sunlike">SunLike (Rf 96)</option>
+                                                </select>
                                             </div>
-                                            <div>
-                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 relative group cursor-help w-max">
-                                                    <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Driver (Flicker)</span>
-                                                    <div class="absolute bottom-full right-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4 z-50">
-                                                        <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Modulação Temporal (TLM)</h4>
-                                                        <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">O flicker invisível anula os ganhos de concentração do ciclo circadiano, gerando estresse neurológico e enxaqueca. O índice SVM mede este risco estroboscópico.</p>
-                                                    </div>
-                                                </label>
-                                                <select id="audit-flicker" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-3 text-[10px] font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors uppercase">
-                                                    <option value="low" selected>Premium (SVM &lt; 0.4)</option>
-                                                    <option value="medium">Standard (Aceitável)</option>
-                                                    <option value="high">Baixo Custo (Risco)</option>
+                                            <div class="w-1/2">
+                                                <label title="O flicker invisível anula os ganhos de concentração (SVM)." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Modulação (TLM)</label>
+                                                <select id="audit-flicker" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-2.5 text-[10px] font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer uppercase">
+                                                    <option value="low" selected>Flicker Free</option>
+                                                    <option value="medium">Aceitável</option>
+                                                    <option value="high">Risco / Baixo</option>
                                                 </select>
                                             </div>
                                         </div>
+
                                         <div>
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="hcl_use">Uso do Espaço</label>
-                                            <select id="audit-use-type" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
-                                                <option value="office" data-i18n="opt_use_office">Trabalho / Foco</option>
-                                                <option value="residential" data-i18n="opt_use_res">Residencial / Lazer</option>
-                                                <option value="hospital" data-i18n="opt_use_hosp">Clínico / Saúde</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="hcl_time">Horário de Exposição</label>
-                                            <select id="audit-time" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
-                                                <option value="morning" data-i18n="opt_time_day">Diurno (08h - 17h)</option>
-                                                <option value="night" data-i18n="opt_time_night">Noturno (Após 18h)</option>
-                                            </select>
+                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="hcl_use">Uso / Horário</label>
+                                            <div class="flex gap-2">
+                                                <select id="audit-use-type" onchange="window.updateCalculations()" class="w-1/2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
+                                                    <option value="office" data-i18n="opt_use_office">Trabalho</option>
+                                                    <option value="residential" data-i18n="opt_use_res">Residencial</option>
+                                                    <option value="hospital" data-i18n="opt_use_hosp">Saúde</option>
+                                                </select>
+                                                <select id="audit-time" onchange="window.updateCalculations()" class="w-1/2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors">
+                                                    <option value="morning" data-i18n="opt_time_day">Dia (08h-17h)</option>
+                                                    <option value="night" data-i18n="opt_time_night">Noite (>18h)</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="lg:col-span-7 flex flex-col gap-6">
-                                    <div class="bg-starlight p-8 rounded-3xl shadow-xl flex flex-col h-full relative overflow-hidden border border-purple-900/30">
-                                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/40 via-starlight to-starlight pointer-events-none"></div>
+                                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl flex flex-col h-full relative overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors">
+                                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-50 via-transparent to-transparent dark:from-purple-900/20 dark:via-transparent dark:to-transparent pointer-events-none"></div>
                                         
-                                        <div class="relative z-10 flex justify-between items-start mb-6">
+                                        <div class="relative z-10 flex justify-between items-start mb-6 border-b border-slate-200 dark:border-slate-800 pb-4">
                                             <div>
-                                                <p class="text-xs text-purple-400 font-black uppercase tracking-[0.2em] mb-1" data-i18n="hcl_medi">Estímulo Melanópico (m-EDI)</p>
-                                                <h2 class="text-5xl font-black text-white"><span id="audit-medi-val">260</span> <span class="text-lg font-normal text-slate-400">lx</span></h2>
+                                                <p class="text-xs text-purple-600 dark:text-purple-400 font-black uppercase tracking-[0.2em] mb-1" data-i18n="hcl_medi">Estímulo Melanópico (m-EDI)</p>
+                                                <h2 class="text-5xl font-black text-starlight dark:text-white"><span id="audit-medi-val">0</span> <span class="text-lg font-normal text-slate-400">lx</span></h2>
                                             </div>
                                             <div id="audit-cs-container" class="text-right">
-                                                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1">Circadian Stimulus (CS)</p>
-                                                <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-                                                    <span id="audit-cs-val" class="text-xl font-black text-tech-cyan">0.35</span>
+                                                <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">Circadian Stimulus (CS)</p>
+                                                <div class="bg-slate-100 dark:bg-white/5 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10">
+                                                    <span id="audit-cs-val" class="text-xl font-black text-tech-cyan">0.00</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -1087,21 +1071,21 @@
                                 </div>
 
                                 <div class="lg:col-span-7 flex flex-col gap-6">
-                                    <div class="bg-starlight p-8 rounded-3xl shadow-xl flex flex-col justify-center h-full relative overflow-hidden">
-                                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/40 via-starlight to-starlight pointer-events-none"></div>
+                                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl flex flex-col justify-center h-full relative overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors">
+                                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-50 via-transparent to-transparent dark:from-emerald-900/20 dark:via-transparent dark:to-transparent pointer-events-none"></div>
                                         <div class="relative z-10 text-center mb-8">
-                                            <p class="text-xs text-slate-400 font-black uppercase tracking-[0.2em] mb-2" data-i18n="esg_save_yr">Economia Financeira (Ano)</p>
-                                            <h2 id="esg-money-val" class="text-5xl font-black text-emerald-400">R$ 0,00</h2>
+                                            <p class="text-xs text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.2em] mb-2" data-i18n="esg_save_yr">Economia Financeira (Ano)</p>
+                                            <h2 id="esg-money-val" class="text-5xl font-black text-emerald-600 dark:text-emerald-400">R$ 0,00</h2>
                                         </div>
                                         
                                         <div class="relative z-10 grid grid-cols-2 gap-6 px-4">
-                                            <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-center">
-                                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1" data-i18n="esg_pb">Payback (Retorno)</p>
-                                                <p class="text-2xl font-black text-white"><span id="esg-payback-val">0.0</span> <span class="text-sm font-normal text-slate-300">meses</span></p>
+                                            <div class="bg-slate-50 dark:bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-slate-200 dark:border-white/10 text-center">
+                                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1" data-i18n="esg_pb">Payback (Retorno)</p>
+                                                <p class="text-2xl font-black text-starlight dark:text-white"><span id="esg-payback-val">0.0</span> <span class="text-sm font-normal text-slate-400 dark:text-slate-300">meses</span></p>
                                             </div>
-                                            <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-center">
-                                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1" data-i18n="esg_roi">ROI (5 Anos)</p>
-                                                <p class="text-2xl font-black text-white"><span id="esg-roi-val">0</span><span class="text-sm font-normal text-slate-300">%</span></p>
+                                            <div class="bg-slate-50 dark:bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-slate-200 dark:border-white/10 text-center">
+                                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1" data-i18n="esg_roi">ROI (5 Anos)</p>
+                                                <p class="text-2xl font-black text-starlight dark:text-white"><span id="esg-roi-val">0</span><span class="text-sm font-normal text-slate-400 dark:text-slate-300">%</span></p>
                                             </div>
                                         </div>
 
