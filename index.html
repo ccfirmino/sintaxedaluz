@@ -380,13 +380,7 @@
                                     <div id="group-spacing" class="mb-6 group hidden animate-fade-in"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap">ESPAÇAMENTO</label><div class="flex items-baseline gap-1"><input type="number" id="p-spacing" value="2.0" min="0.5" max="10" step="0.1"><span class="text-[9px] text-slate-500 font-bold unit-m-ft">M</span></div></div><input type="range" id="range-p-spacing" min="0.5" max="10" step="0.1" value="2.0"></div>
 
                                     <div class="mb-6 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                        <label class="text-[9px] text-tech-cyan font-black uppercase tracking-widest mb-2 flex items-center w-max relative group cursor-help z-50">
-                                            <span class="border-b border-dashed border-cyan-300 dark:border-cyan-700 pb-0.5" data-i18n="lbl_source_type">ESPECTRO / CCT</span>
-                                            <div class="absolute bottom-full left-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4">
-                                                <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Temperatura de Cor (CCT)</h4>
-                                                <p class="text-slate-400 text-[9px] leading-relaxed normal-case font-medium">Define a aparência cromática da luz (quente/fria) e influencia diretamente o balanço circadiano e a razão melanópica (M/P).</p>
-                                            </div>
-                                        </label>
+                                        <label title="Define a aparência cromática e influencia diretamente o balanço circadiano e a razão melanópica (M/P)." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-2 cursor-help border-b border-dashed border-slate-400 w-max" data-i18n="lbl_source_type">ESPECTRO / CCT</label>
                                         <select id="p-mRatio" onchange="window.state.ponto.mRatio = parseFloat(this.value); window.updateCalculations();" class="w-full bg-white dark:bg-slate-700 text-[10px] font-bold py-1.5 px-2 rounded border border-slate-200 dark:border-slate-600 outline-none mt-1 cursor-pointer">
                                             <option value="0.45">LED 2700K (M/P: 0.45)</option>
                                             <option value="0.52" selected>LED 3000K (M/P: 0.52)</option>
@@ -437,7 +431,8 @@
                                     </div>
 
                                     <div class="mb-6 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                        <label class="text-[9px] text-tech-cyan font-black uppercase tracking-widest mb-2 flex items-center w-max relative group cursor-help z-50">
+                                        
+-help z-50">
                                             <span class="border-b border-dashed border-cyan-300 dark:border-cyan-700 pb-0.5" data-i18n="lbl_source_type">ESPECTRO / CCT</span>
                                             <div class="absolute bottom-full left-0 mb-3 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 cursor-default pointer-events-none p-4">
                                                 <h4 class="text-white font-black text-[10px] uppercase tracking-widest mb-1">Razão Melanópica (M/P)</h4>
@@ -592,6 +587,28 @@
                                                         <input type="checkbox" id="v-glareZone" onchange="window.toggleGlareZone(this.checked)" class="sr-only">
                                                         <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="glare-toggle-bg"></div>
                                                         <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="glare-toggle-dot"></div>
+                                                    </div>
+                                                </label>
+                                            </div>
+
+                                            <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-purple-50 p-1.5 rounded-lg dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 shadow-sm">
+                                                <label class="flex items-center gap-2 cursor-pointer relative group px-2" title="Sobrepõe o mapa de calor da luz melanópica estimulante.">
+                                                    <span class="text-[9px] text-purple-600 dark:text-purple-400 font-black uppercase tracking-wider border-b border-dashed border-purple-300 dark:border-purple-700 pb-0.5 cursor-help">HCL / CIRCADIANO</span>
+                                                    <div class="relative">
+                                                        <input type="checkbox" id="v-hclZone" onchange="window.toggleHCL(this.checked)" class="sr-only">
+                                                        <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="hcl-toggle-bg"></div>
+                                                        <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="hcl-toggle-dot"></div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            
+                                            <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-purple-50 p-1.5 rounded-lg dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 shadow-sm">
+                                                <label class="flex items-center gap-2 cursor-pointer relative group px-2" title="Sobrepõe o mapa de calor da luz melanópica estimulante.">
+                                                    <span class="text-[9px] text-purple-600 dark:text-purple-400 font-black uppercase tracking-wider border-b border-dashed border-purple-300 dark:border-purple-700 pb-0.5 cursor-help">HCL / CIRCADIANO</span>
+                                                    <div class="relative">
+                                                        <input type="checkbox" id="v-hclZone" onchange="window.toggleHCL(this.checked)" class="sr-only">
+                                                        <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="hcl-toggle-bg"></div>
+                                                        <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="hcl-toggle-dot"></div>
                                                     </div>
                                                 </label>
                                             </div>

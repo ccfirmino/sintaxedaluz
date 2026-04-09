@@ -2377,14 +2377,28 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         // Simulação do Envelhecimento do Cristalino (Filtro Amarelo Biológico)
         const lensFactor = userAge > 25 ? Math.max(0.3, 1.0 - (userAge - 25) * 0.015) : 1.0;
 
-        // Auto-scaling: Descobrir o pico máximo para não cortar o gráfico
         let bluePower = 0.3 + (mRatio * 0.5); 
         let yellowPower = 1.2 - (mRatio * 0.4);
-        let maxPeak = Math.max(bluePower, yellowPower, 0.8 * lensFactor);
-        const scaleY = (maxPeak > 1.2) ? (1.2 / maxPeak) : 1.0; // Normalizador dinâmico
+
+        // Auto-scaling robusto: Verifica o ponto mais alto da curva para normalizar o eixo Y
+        let maxPeak = 0.1;
+        for (let x = padding; x <= w - 10; x += 2) {
+            const progress = (x - padding) / (w - padding - 10);
+            const lb = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
+            const ly = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
+            const cf = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
+            const total = lb + ly + cf;
+            if (total > maxPeak) maxPeak = total;
+        }
+        
+        // Garantimos que a curva da Retina também não estoure a escala
+        if (0.8 * lensFactor > maxPeak) maxPeak = 0.8 * lensFactor;
+
+        // Fator de escala dinâmico (adicionamos 10% de margem no topo de respiro visual)
+        const scaleY = 1 / (maxPeak * 1.1);
 
         // Linha Guia Didática: 480nm (Pico Circadiano)
-        const peakX = padding + ((w - padding - 10) * 0.25); // 480nm estimado aos 25% da curva
+        const peakX = padding + ((w - padding - 10) * 0.25); // 480nm estimado
         ctx.beginPath();
         ctx.moveTo(peakX, h - padding);
         ctx.lineTo(peakX, 10);
@@ -2400,7 +2414,7 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         ctx.moveTo(padding, h - padding);
         for (let x = padding; x <= w - 10; x += 2) {
             const progress = (x - padding) / (w - padding - 10);
-            const melCurve = Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor * scaleY;
+            const melCurve = (Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor) * scaleY;
             const py = (h - padding) - (melCurve * (h - padding - 20));
             ctx.lineTo(x, py);
         }
@@ -2415,11 +2429,11 @@ window.drawCircadianChart = function(bioResult: any, state: any) {
         let ledPoints = [];
         for (let x = padding; x <= w - 10; x += 2) {
             const progress = (x - padding) / (w - padding - 10);
-            const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower * scaleY;
-            const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower * scaleY;
-            const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) * scaleY : 0;
+            const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
+            const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
+            const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
             
-            const totalY = Math.min(1, ledBlue + ledYellow + cyanFill);
+            const totalY = (ledBlue + ledYellow + cyanFill) * scaleY;
             const py = (h - padding) - (totalY * (h - padding - 20));
             ledPoints.push({x, py});
             if (x === padding) ctx.moveTo(x, py);
