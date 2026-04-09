@@ -15,7 +15,9 @@ export interface LeedFixture {
 }
 
 export interface LeedRoom {
-    area: number;
+    area?: number; // Opcional, pois áreas lineares usam 'length'
+    length?: number; // Novo: para cálculos lineares de fachada/exterior
+    unit?: 'W/m²' | 'W/m'; // Novo: Define a métrica física
     baseLpd: number;
     leedCategory?: string; // LUXSINTAX: Discriminador de Zona (Interior/Fachada/Exterior)
     fixtures: LeedFixture[];
@@ -24,6 +26,7 @@ export interface LeedRoom {
 export interface LeedProject {
     target: string;
     customReduction?: number;
+    lightingZone?: 'LZ0' | 'LZ1' | 'LZ2' | 'LZ3' | 'LZ4'; // Novo: Zona de Iluminação Externa
     rooms: LeedRoom[];
 }
 
@@ -71,9 +74,26 @@ export class StandardsEngine {
             exterior: { watts: 0, allowed: 0, area: 0 }
         };
 
+        // LUXSINTAX: Injeção da Potência Base Externa (Base Allowance ASHRAE 90.1)
+        if (project.lightingZone && project.lightingZone !== 'LZ0') {
+            const baseAllowances: Record<string, number> = { LZ1: 400, LZ2: 600, LZ3: 750, LZ4: 1300 };
+            const baseW = baseAllowances[project.lightingZone] || 0;
+            categories.exterior.allowed += baseW;
+            allowedWatts += baseW;
+        }
+
         project.rooms.forEach(r => {
             const cat = r.leedCategory || 'interior';
-            const roomAllowedWatts = (r.baseLpd || 0) * targetFactor * r.area;
+            
+            // LUXSINTAX: Matemática Híbrida (Área vs Linear)
+            let measurement = 0;
+            if (r.unit === 'W/m' && r.length) {
+                measurement = r.length;
+            } else if (r.area) {
+                measurement = r.area;
+            }
+
+            const roomAllowedWatts = (r.baseLpd || 0) * targetFactor * measurement;
             let roomWatts = 0;
             
             r.fixtures.forEach(f => roomWatts += (f.power * f.qty));
@@ -81,10 +101,14 @@ export class StandardsEngine {
             if (categories[cat]) {
                 categories[cat].watts += roomWatts;
                 categories[cat].allowed += roomAllowedWatts;
-                categories[cat].area += r.area;
+                if (r.unit !== 'W/m') {
+                    categories[cat].area += (r.area || 0); // Só soma m² real
+                }
             }
 
-            totalArea += r.area;
+            if (r.unit !== 'W/m') {
+                totalArea += (r.area || 0);
+            }
             allowedWatts += roomAllowedWatts;
             totalWatts += roomWatts;
         });

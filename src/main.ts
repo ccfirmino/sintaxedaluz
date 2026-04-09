@@ -12,7 +12,7 @@ import { ReportExporter } from './infrastructure/export/ReportExporter';
 import { Photometric3DEngine } from './infrastructure/three/Photometric3DEngine';
 import { i18nDictionary } from './presentation/i18n/Dictionary';
 import { normsDatabase } from './domain/standards/Nbr8995Database';
-import { lpdBaselines } from './domain/standards/AshraeDatabase';
+import { lpdBaselines, exteriorLpdBaselines } from './domain/standards/AshraeDatabase';
 import { AuthManager } from './auth/AuthManager';
 import { Canvas2DEngine } from './infrastructure/canvas/Canvas2DEngine';
 import { ElectricalEngine } from './domain/electrical/ElectricalEngine';
@@ -78,6 +78,7 @@ window.state = {
 window.i18n = i18nDictionary;
 window.normsDatabase = normsDatabase;
 window.lpdBaselines = lpdBaselines;
+window.exteriorLpdBaselines = exteriorLpdBaselines;
 window.AuthManager = AuthManager;
 window.FalseColorEngine = FalseColorEngine;
 window.Canvas2DEngine = Canvas2DEngine;
@@ -1314,12 +1315,36 @@ window.removeLeedRoom = function(roomId: number) {
 window.updateLeedRoomData = function(roomId: number, field: string, value: any) {
     const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (room) {
-        if (field === 'name' || field === 'typology' || field === 'floor' || field === 'leedCategory') room[field] = value;
-        else room[field] = parseFloat(value) || 0;
+        if (['name', 'typology', 'floor', 'leedCategory', 'unit'].includes(field)) {
+            room[field] = value;
+        } else if (field === 'measurement') {
+            if (room.unit === 'W/m') room.length = parseFloat(value) || 0;
+            else room.area = parseFloat(value) || 0;
+        } else {
+            room[field] = parseFloat(value) || 0;
+        }
+        
+        if (field === 'unit') {
+            if (value === 'W/m') { room.length = room.area || 0; delete room.area; }
+            else { room.area = room.length || 0; delete room.length; }
+            window.renderLeedProject();
+            return;
+        }
         
         if (field === 'typology') {
             const baseline = window.lpdBaselines.find((b: any) => b.type === value);
-            if (baseline) room.baseLpd = baseline.base;
+            const extBaseline = window.exteriorLpdBaselines ? window.exteriorLpdBaselines.find((b: any) => b.type === value) : null;
+            
+            if (baseline) {
+                room.baseLpd = baseline.base;
+                room.unit = 'W/m²';
+            } else if (extBaseline) {
+                const z = window.state.leedProject.lightingZone || 'LZ3';
+                room.baseLpd = extBaseline.zoneAllowances[z] || 0;
+                room.unit = extBaseline.unit;
+            }
+            window.renderLeedProject();
+            return;
         }
         
         // LUXSINTAX: Atualização Visual Silenciosa em Tempo Real
@@ -1366,7 +1391,8 @@ window.updateLeedRoomUI = function(roomId: number) {
     if (!room) return;
     
     const roomTotalWatts = room.fixtures.reduce((sum: number, f: any) => sum + (f.power * f.qty), 0);
-    const roomLpd = room.area > 0 ? roomTotalWatts / room.area : 0;
+    const measurement = room.unit === 'W/m' ? (room.length || 0) : (room.area || 0);
+    const roomLpd = measurement > 0 ? roomTotalWatts / measurement : 0;
     const isOverLimit = room.baseLpd > 0 && roomLpd > room.baseLpd;
     
     const wEl = document.getElementById(`room-w-${roomId}`);
@@ -1438,6 +1464,16 @@ window.renderLeedProject = function() {
 
                 <div class="w-full lg:w-auto border-l border-slate-300 dark:border-slate-700 pl-6 hidden lg:flex items-end gap-2 transition-colors">
                     <div>
+                        <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Lighting Zone</label>
+                        <select onchange="window.state.leedProject.lightingZone = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-white border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold transition-colors">
+                            <option value="LZ0" ${s.lightingZone === 'LZ0' ? 'selected' : ''}>LZ0 (Natural)</option>
+                            <option value="LZ1" ${s.lightingZone === 'LZ1' ? 'selected' : ''}>LZ1 (Rural)</option>
+                            <option value="LZ2" ${s.lightingZone === 'LZ2' ? 'selected' : ''}>LZ2 (Residencial)</option>
+                            <option value="LZ3" ${s.lightingZone === 'LZ3' || !s.lightingZone ? 'selected' : ''}>LZ3 (Comercial)</option>
+                            <option value="LZ4" ${s.lightingZone === 'LZ4' ? 'selected' : ''}>LZ4 (Urbano)</option>
+                        </select>
+                    </div>
+                    <div>
                         <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Meta ASHRAE 90.1</label>
                         <select onchange="window.updateLeedTargetMode(this.value)" class="bg-white dark:bg-slate-800 text-luminous-gold border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold transition-colors">
                             <option value="baseline" ${s.target === 'baseline' ? 'selected' : ''}>ASHRAE Base (0%)</option>
@@ -1468,7 +1504,8 @@ window.renderLeedProject = function() {
 
     html += s.rooms.map((room: any) => {
         const roomTotalWatts = room.fixtures.reduce((sum: number, f: any) => sum + (f.power * f.qty), 0);
-        const roomLpd = room.area > 0 ? roomTotalWatts / room.area : 0;
+        const measurement = room.unit === 'W/m' ? (room.length || 0) : (room.area || 0);
+        const roomLpd = measurement > 0 ? roomTotalWatts / measurement : 0;
         const isOverLimit = room.baseLpd > 0 && roomLpd > room.baseLpd;
         const borderClass = isOverLimit ? 'border-red-500 dark:border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-slate-200 dark:border-slate-700';
         const titleColor = isOverLimit ? 'text-red-500 dark:text-red-500' : 'text-starlight dark:text-white';
@@ -1490,8 +1527,11 @@ window.renderLeedProject = function() {
                     
                     <div class="flex items-center gap-2 flex-shrink-0">
                         <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 h-[34px] rounded border border-slate-200 dark:border-slate-600 shadow-sm">
-                            <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest hidden sm:block">ÁREA (m²):</label>
-                            <input type="number" value="${room.area}" oninput="window.updateLeedRoomData(${room.id}, 'area', this.value)" class="w-12 text-right bg-transparent text-[11px] font-black text-starlight dark:text-white outline-none focus:text-luminous-gold">
+                            <select onchange="window.updateLeedRoomData(${room.id}, 'unit', this.value)" class="text-[9px] font-black text-slate-500 bg-transparent outline-none cursor-pointer uppercase tracking-widest pl-1">
+                                <option value="W/m²" ${room.unit !== 'W/m' ? 'selected' : ''}>ÁREA (m²)</option>
+                                <option value="W/m" ${room.unit === 'W/m' ? 'selected' : ''}>COMPR. (m)</option>
+                            </select>
+                            <input type="number" value="${room.unit === 'W/m' ? (room.length || 0) : (room.area || 0)}" oninput="window.updateLeedRoomData(${room.id}, 'measurement', this.value)" class="w-12 text-right bg-transparent text-[11px] font-black text-starlight dark:text-white outline-none focus:text-luminous-gold">
                         </div>
                         
                         <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 h-[34px] rounded border border-slate-200 dark:border-slate-600 shadow-sm">
@@ -1502,7 +1542,16 @@ window.renderLeedProject = function() {
                             </select>
                             <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[140px] md:w-[220px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
                                 <option value="" disabled ${!room.typology ? 'selected' : ''}>TIPOLOGIA ASHRAE...</option>
-                                ${window.lpdBaselines.map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
+                                <optgroup label="Interiores (W/m²)">
+                                    ${window.lpdBaselines.map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="Exteriores & Fachadas">
+                                    ${window.exteriorLpdBaselines ? window.exteriorLpdBaselines.map((b: any) => {
+                                        const z = window.state.leedProject.lightingZone || 'LZ3';
+                                        const limit = b.zoneAllowances ? b.zoneAllowances[z] : 0;
+                                        return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${limit} ${b.unit})</option>`;
+                                    }).join('') : ''}
+                                </optgroup>
                             </select>
                         </div>
                     </div>

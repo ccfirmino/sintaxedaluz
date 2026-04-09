@@ -71,7 +71,11 @@ export const i18nDictionary = {
         opt_use_office: "Trabalho / Foco", opt_use_res: "Residencial / Lazer", opt_use_hosp: "Clínico / Saúde",
         opt_time_day: "Diurno (08h - 17h)", opt_time_night: "Noturno (Após 18h)",
         esg_input: "Dados de Entrada", esg_base_w: "Carga Atual (W)", esg_prop_w: "Carga Nova (W)", esg_capex: "Custo Instalação (R$)", esg_tariff: "Tarifa (R$/kWh)", esg_hrs: "Uso Diário (Horas)", esg_days: "Dias/Ano", esg_ac: "Incluir Bônus Ar Condicionado",
-        esg_save_yr: "Economia Financeira (Ano)", esg_pb: "Payback (Retorno)", esg_roi: "ROI (5 Anos)", esg_save_e: "Economia de Energia", esg_impact: "Impacto Ambiental"
+        esg_save_yr: "Economia Financeira (Ano)", esg_pb: "Payback (Retorno)", esg_roi: "ROI (5 Anos)", esg_save_e: "Economia de Energia", esg_impact: "Impacto Ambiental",
+        // LUXSINTAX: Chaves Avançadas (CFO Mode, Zonas ASHRAE, Relatórios Híbridos)
+        esg_cfo_title: "Premissas Financeiras (CFO Mode)", esg_inflation: "Inflação Energia (a.a.)", esg_discount: "Taxa Desconto/SELIC", esg_years: "Anos de Análise LCC",
+        leed_lz0: "LZ0 (Natural)", leed_lz1: "LZ1 (Rural)", leed_lz2: "LZ2 (Residencial)", leed_lz3: "LZ3 (Comercial)", leed_lz4: "LZ4 (Urbano)",
+        pdf_measure: "MEDIDA", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Área)", pdf_target_lpd: "ALVO LPD"
     },
     en: {
         nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "TOPOLOGY<br>& DRIVERS", tab_esg: "FEASIBILITY<br>& ROI",
@@ -144,6 +148,10 @@ export const i18nDictionary = {
         opt_use_office: "Work / Focus", opt_use_res: "Residential / Leisure", opt_use_hosp: "Clinical / Healthcare",
         opt_time_day: "Daytime (08h - 17h)", opt_time_night: "Nighttime (After 18h)",
         esg_input: "Input Data", esg_base_w: "Current Load (W)", esg_prop_w: "New Load (W)", esg_capex: "Installation Cost", esg_tariff: "Tariff", esg_hrs: "Daily Usage (Hours)", esg_days: "Days/Year", esg_ac: "Include AC Bonus",
-        esg_save_yr: "Financial Savings (Yearly)", esg_pb: "Payback (Return)", esg_roi: "ROI (5 Years)", esg_save_e: "Energy Savings", esg_impact: "Environmental Impact"
+        esg_save_yr: "Financial Savings (Yearly)", esg_pb: "Payback (Return)", esg_roi: "ROI (5 Years)", esg_save_e: "Energy Savings", esg_impact: "Environmental Impact",
+        // LUXSINTAX: Advanced Keys (CFO Mode, ASHRAE Zones, Hybrid Reports)
+        esg_cfo_title: "Financial Assumptions (CFO Mode)", esg_inflation: "Energy Inflation (p.a.)", esg_discount: "Discount Rate (WACC)", esg_years: "LCC Analysis Years",
+        leed_lz0: "LZ0 (Natural)", leed_lz1: "LZ1 (Rural)", leed_lz2: "LZ2 (Residential)", leed_lz3: "LZ3 (Commercial)", leed_lz4: "LZ4 (Urban)",
+        pdf_measure: "MEASURE", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Area)", pdf_target_lpd: "TARGET LPD"
     }
 };

@@ -426,11 +426,17 @@ export class ReportExporter {
                 const r = catRooms[i];
                 if (cy < 80) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
 
+                // LUXSINTAX: Suporte à Matemática Híbrida no Relatório PDF
+                const isLinear = r.unit === 'W/m';
+                const measureVal = isLinear ? (r.length || 0) : (r.area || 0);
+                const measureLabel = isLinear ? 'm (Linear)' : 'm² (Área)';
+                const unitLabel = isLinear ? 'W/m' : 'W/m²';
+
                 let roomWatts = r.fixtures.reduce((acc: number, f: any) => acc + (f.power * f.qty), 0);
-                let roomAllowed = r.area * (r.baseLpd || 0) * targetFactor;
+                let roomAllowed = measureVal * (r.baseLpd || 0) * targetFactor;
 
                 page.drawText(`${globalRoomIndex}. ${r.name.toUpperCase()}`, { x: 50, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
-                page.drawText(`${t('pdf_area')} ${r.area} m² | ${t('pdf_leed_lpd_target')} ${((r.baseLpd || 0) * targetFactor).toFixed(1)} W/m²`, { x: 250, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+                page.drawText(`MEDIDA: ${measureVal} ${measureLabel}  |  ALVO LPD: ${((r.baseLpd || 0) * targetFactor).toFixed(1)} ${unitLabel}`, { x: 250, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
                 cy -= 12;
 
                 for (let f of r.fixtures) {
