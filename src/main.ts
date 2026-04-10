@@ -1830,28 +1830,75 @@ window.updateAuditUI = function() {
         // LUXSINTAX: Atualização do Score de Performance Humana (UI Base)
         const tm30ScoreEl = document.getElementById('audit-tm30-score');
         const tm30StatusEl = document.getElementById('audit-tm30-status');
+        let rfValue = 78;
         if (tm30ScoreEl && tm30StatusEl) {
-            if (s.tm30 === 'cri80') { tm30ScoreEl.innerText = 'Rf 78 / Rg 95'; tm30StatusEl.innerText = 'Básico'; tm30StatusEl.className = 'text-[9px] text-amber-400 font-bold uppercase mt-1'; }
-            else if (s.tm30 === 'cri90') { tm30ScoreEl.innerText = 'Rf 90 / Rg 100'; tm30StatusEl.innerText = 'Excelente'; tm30StatusEl.className = 'text-[9px] text-leed-green font-bold uppercase mt-1'; }
-            else { tm30ScoreEl.innerText = 'Rf 96 / Rg 100'; tm30StatusEl.innerText = 'SunLike / Premium'; tm30StatusEl.className = 'text-[9px] text-tech-cyan font-bold uppercase mt-1'; }
+            if (s.tm30 === 'cri80') { tm30ScoreEl.innerText = 'Rf 78 / Rg 95'; tm30StatusEl.innerText = 'Básico'; tm30StatusEl.className = 'text-[9px] text-amber-400 font-bold uppercase mt-1'; rfValue = 78; }
+            else if (s.tm30 === 'cri90') { tm30ScoreEl.innerText = 'Rf 90 / Rg 100'; tm30StatusEl.innerText = 'Excelente'; tm30StatusEl.className = 'text-[9px] text-leed-green font-bold uppercase mt-1'; rfValue = 90; }
+            else { tm30ScoreEl.innerText = 'Rf 96 / Rg 100'; tm30StatusEl.innerText = 'SunLike / Premium'; tm30StatusEl.className = 'text-[9px] text-tech-cyan font-bold uppercase mt-1'; rfValue = 96; }
         }
 
         const tlmScoreEl = document.getElementById('audit-tlm-score');
         const tlmStatusEl = document.getElementById('audit-tlm-status');
+        let isFlickerLow = false;
         if (tlmScoreEl && tlmStatusEl) {
-            if (s.flicker === 'low') { tlmScoreEl.innerText = 'SVM < 0.4'; tlmStatusEl.innerText = 'Seguro / Foco'; tlmStatusEl.className = 'text-[9px] text-tech-cyan font-bold uppercase mt-1'; }
-            else if (s.flicker === 'medium') { tlmScoreEl.innerText = 'SVM < 1.0'; tlmStatusEl.innerText = 'Aceitável'; tlmStatusEl.className = 'text-[9px] text-amber-400 font-bold uppercase mt-1'; }
-            else { tlmScoreEl.innerText = 'SVM > 1.0'; tlmStatusEl.innerText = 'Risco Enxaqueca'; tlmStatusEl.className = 'text-[9px] text-red-500 font-bold uppercase mt-1 animate-pulse'; }
+            if (s.flicker === 'low') { tlmScoreEl.innerText = 'SVM < 0.4'; tlmStatusEl.innerText = 'Seguro / Foco'; tlmStatusEl.className = 'text-[9px] text-tech-cyan font-bold uppercase mt-1'; isFlickerLow = true; }
+            else if (s.flicker === 'medium') { tlmScoreEl.innerText = 'SVM < 1.0'; tlmStatusEl.innerText = 'Aceitável'; tlmStatusEl.className = 'text-[9px] text-amber-400 font-bold uppercase mt-1'; isFlickerLow = false; }
+            else { tlmScoreEl.innerText = 'SVM > 1.0'; tlmStatusEl.innerText = 'Risco Enxaqueca'; tlmStatusEl.className = 'text-[9px] text-red-500 font-bold uppercase mt-1 animate-pulse'; isFlickerLow = false; }
         }
 
+        // --- LUXSINTAX: Injeção do WELL Performance Score ---
+        const wellScore = window.HCLEngine.calculateHumanPerformanceScore(bioResult.medi, bioResult.cs, rfValue, isFlickerLow);
+        const wellScoreEl = document.getElementById('audit-well-score');
+        const wellScoreBar = document.getElementById('well-score-bar');
+        const statusBadge = document.getElementById('audit-status-badge');
+        
+        if (wellScoreEl) {
+            wellScoreEl.innerText = wellScore.toFixed(1);
+            if (wellScore >= 8) wellScoreEl.className = 'text-4xl font-black text-leed-green';
+            else if (wellScore >= 5) wellScoreEl.className = 'text-4xl font-black text-amber-500';
+            else wellScoreEl.className = 'text-4xl font-black text-red-500';
+        }
+        
+        if (wellScoreBar) {
+            wellScoreBar.style.width = `${(wellScore / 10) * 100}%`;
+            if (wellScore >= 8) wellScoreBar.className = 'h-full bg-leed-green transition-all duration-1000';
+            else if (wellScore >= 5) wellScoreBar.className = 'h-full bg-amber-500 transition-all duration-1000';
+            else wellScoreBar.className = 'h-full bg-red-500 transition-all duration-1000';
+        }
+
+        if (statusBadge) {
+            statusBadge.innerText = bioResult.statusTag || 'AVALIANDO...';
+            if (bioResult.isCritical) statusBadge.className = 'inline-block px-3 py-1 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded text-[10px] font-black tracking-widest uppercase mb-3 animate-pulse border border-red-200 dark:border-red-800';
+            else if (bioResult.isWarning) statusBadge.className = 'inline-block px-3 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 rounded text-[10px] font-black tracking-widest uppercase mb-3 border border-amber-200 dark:border-amber-800';
+            else statusBadge.className = 'inline-block px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 rounded text-[10px] font-black tracking-widest uppercase mb-3 border border-green-200 dark:border-green-800';
+        }
+
+        // --- LUXSINTAX: HUD de Envelhecimento e Transmissão Ótica ---
         const ageScoreEl = document.getElementById('audit-age-score');
         const ageStatusEl = document.getElementById('audit-age-status');
+        const hudOverlay = document.getElementById('age-hud-overlay');
+        const hudAgeVal = document.getElementById('hud-age-val');
+        const hudTransVal = document.getElementById('hud-trans-val');
+
+        const transPct = Math.round(bioResult.lensFactor * 100);
+
         if (ageScoreEl && ageStatusEl) {
-            // Estimativa visual simples (será sobrescrita pela física real do HCLEngine)
-            const transmission = Math.max(10, 100 - (s.age - 20) * 1.2).toFixed(0);
-            ageScoreEl.innerText = `${transmission}% Visível`;
-            ageStatusEl.innerText = s.age > 50 ? 'Compensação Ativa' : 'Lente Jovem';
-            ageStatusEl.className = s.age > 50 ? 'text-[9px] text-luminous-gold font-bold uppercase mt-1' : 'text-[9px] text-slate-300 font-bold uppercase mt-1';
+            ageScoreEl.innerText = `${transPct}% Transmissão`;
+            ageStatusEl.innerText = s.age > 45 ? 'Cristalino Amarelado' : 'Lente Transparente';
+            ageStatusEl.className = s.age > 45 ? 'text-[9px] text-luminous-gold font-bold uppercase mt-1' : 'text-[9px] text-slate-300 font-bold uppercase mt-1';
+        }
+
+        if (hudOverlay && hudAgeVal && hudTransVal) {
+            hudAgeVal.innerText = `${s.age}a`;
+            hudTransVal.innerText = `${transPct}%`;
+            
+            if (s.age > 45) {
+                hudTransVal.className = 'text-xs font-bold text-amber-400';
+                hudOverlay.style.opacity = '1';
+            } else {
+                hudTransVal.className = 'text-xs font-bold text-tech-cyan';
+                hudOverlay.style.opacity = '1'; 
+            }
         }
 
         if (mediEl) mediEl.innerText = Math.round(bioResult.medi).toString();
@@ -1865,9 +1912,9 @@ window.updateAuditUI = function() {
         const csEl = document.getElementById('audit-cs-val');
         if (csEl) csEl.innerText = bioResult.cs.toFixed(2);
 
-        if (window.drawCircadianChart) {
-            // LUXSINTAX: Passando o contexto inteiro para o Gráfico reagir à física
-            window.drawCircadianChart(bioResult, s);
+        if (window.Canvas2DEngine && window.Canvas2DEngine.drawCircadianChart) {
+            // LUXSINTAX: Delegação estrita para a infraestrutura de Canvas (Clean Architecture)
+            window.Canvas2DEngine.drawCircadianChart(bioResult, s);
         }
         if (alertBox && alertEl) {
             if (bioResult.isCritical || bioResult.isWarning) {
@@ -2334,233 +2381,7 @@ window.updateCalculations = function() {
     oldUpdate();
     if (window.currentTool === 'esg' && window.updateEsgUI) window.updateEsgUI();
 };
-// LUXSINTAX: Super Canvas HCL (Neurociência Aplicada + Espectro Reativo)
-window.drawCircadianChart = function(bioResult: any, state: any) {
-    const canvas = document.getElementById('circadianChart') as HTMLCanvasElement;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const isDark = document.documentElement.classList.contains('dark');
-    const viewMode = window.state?.hclViewMode || 'clock';
-
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement!.getBoundingClientRect();
-    
-    canvas.width = (rect.width - 32) * dpr;
-    canvas.height = (rect.height - 32) * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width - 32;
-    const h = rect.height - 32;
-
-    ctx.clearRect(0, 0, w, h);
-
-    // Design Tokens Dinâmicos baseados no Tema
-    const textColor = isDark ? "#94a3b8" : "#64748b";     
-    const gridColor = isDark ? "#334155" : "#e2e8f0";     
-    const accentColor = isDark ? "#f8fafc" : "#0f172a";   
-    const primaryColor = isDark ? "#a855f7" : "#9333ea";  
-
-    if (viewMode === 'clock') {
-        // ==========================================
-        // MODO 1: RITMO 24H (Reativo ao CS e Lente)
-        // ==========================================
-        const cx = w / 2;
-        const cy = h / 2;
-        const radius = Math.min(w, h) / 2.6;
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.strokeStyle = gridColor;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.font = "bold 10px Manrope";
-        ctx.fillStyle = textColor;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        const hours = [0, 6, 12, 18];
-        const labels = ["24h", "06h", "12h", "18h"];
-        for (let i = 0; i < hours.length; i++) {
-            const angle = (hours[i] / 24) * Math.PI * 2 - Math.PI / 2;
-            const tx = cx + Math.cos(angle) * (radius + 18);
-            const ty = cy + Math.sin(angle) * (radius + 18);
-            ctx.fillText(labels[i], tx, ty);
-        }
-
-        // Curva Natural de Melatonina
-        ctx.beginPath();
-        for(let hr = 0; hr <= 24; hr += 0.5) {
-            const angle = (hr / 24) * Math.PI * 2 - Math.PI / 2;
-            const melLevel = Math.max(0, Math.cos((hr - 3) * Math.PI / 12)); 
-            const r = radius - 8 + (melLevel * 25);
-            const px = cx + Math.cos(angle) * r;
-            const py = cy + Math.sin(angle) * r;
-            if(hr === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.strokeStyle = primaryColor;
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // LUXSINTAX: A Nova Crono-Simulação!
-        // Chama a jornada baseada no perfil escolhido para desenhar o Gêmeo Digital da Melatonina
-        const shift = (state.useType === 'hospital' || state.timeOfDay === 'night') ? 'nocturnal' : 'diurnal';
-        const journey = window.HCLEngine.simulateCircadianJourney(state.visualLux, state.mRatio, state.age, shift);
-
-        // Desenha a "Sombra" da exposição real do usuário contornando as 24 horas
-        ctx.beginPath();
-        journey.forEach((point: any, idx: number) => {
-            const angle = (point.hour / 24) * Math.PI * 2 - Math.PI / 2;
-            
-            // O CS (0 a 0.7) puxa a curva em direção ao centro. Quanto maior o CS, maior a supressão de melatonina (raio menor).
-            const suppression = point.actualCS * 40; 
-            
-            // Replicamos o raio base natural e subtraímos a supressão artificial do LED
-            const naturalMel = Math.max(0, Math.cos((point.hour - 3) * Math.PI / 12));
-            const r = (radius - 8 + (naturalMel * 25)) - suppression;
-
-            const px = cx + Math.cos(angle) * r;
-            const py = cy + Math.sin(angle) * r;
-
-            if (idx === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        });
-        ctx.closePath();
-        
-        // Define o alerta visual da linha inteira baseado no estado atual
-        ctx.strokeStyle = bioResult.isCritical ? "rgba(239, 68, 68, 0.9)" : (bioResult.isWarning ? "rgba(245, 158, 11, 0.9)" : "rgba(16, 185, 129, 0.9)");
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        
-        // Preenchimento Suave da Área Sob a Curva
-        ctx.fillStyle = bioResult.isCritical ? "rgba(239, 68, 68, 0.15)" : (bioResult.isWarning ? "rgba(245, 158, 11, 0.15)" : "rgba(16, 185, 129, 0.15)");
-        ctx.fill();
-
-        // Feedback Visual no Centro
-        ctx.font = "900 12px Manrope";
-        ctx.fillStyle = accentColor;
-        ctx.fillText(bioResult.isCritical ? 'Risco Biológico' : (bioResult.isWarning ? 'Alerta Moderado' : 'Sincronizado'), cx, cy - 6);
-        ctx.font = "bold 9px Manrope";
-        ctx.fillStyle = textColor;
-        ctx.fillText(`CS alcançado: ${(bioResult.cs || 0).toFixed(2)}`, cx, cy + 10);
-
-    } else {
-        // ==========================================
-        // MODO 2: ESPECTRO SPD (Reativo a TM-30 e Lente/Idade)
-        // ==========================================
-        const padding = 35;
-        
-        ctx.beginPath();
-        ctx.moveTo(padding, h - padding); ctx.lineTo(w - 10, h - padding); 
-        ctx.moveTo(padding, h - padding); ctx.lineTo(padding, 10); 
-        ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.stroke();
-
-        ctx.font = "bold 9px Manrope";
-        ctx.fillStyle = textColor;
-        ctx.textAlign = "center";
-        ctx.fillText("380nm (UV)", padding + 20, h - 10);
-        ctx.fillText("480nm", padding + ((w - padding - 10) * 0.25), h - 10);
-        ctx.fillText("780nm (IR)", w - 30, h - 10);
-        
-        ctx.save();
-        ctx.translate(15, h / 2); ctx.rotate(-Math.PI / 2);
-        ctx.fillText("Intensidade Relativa (%)", 0, 0);
-        ctx.restore();
-
-        const mRatio = state.mRatio || 0.52;
-        const isSunLike = document.getElementById('audit-tm30') && (document.getElementById('audit-tm30') as HTMLSelectElement).value === 'sunlike';
-        const userAge = parseInt((document.getElementById('audit-age') as HTMLInputElement)?.value) || 30;
-        
-        // Simulação do Envelhecimento do Cristalino (Filtro Amarelo Biológico)
-        const lensFactor = userAge > 25 ? Math.max(0.3, 1.0 - (userAge - 25) * 0.015) : 1.0;
-
-        let bluePower = 0.3 + (mRatio * 0.5); 
-        let yellowPower = 1.2 - (mRatio * 0.4);
-
-        // Auto-scaling robusto: Verifica o ponto mais alto da curva para normalizar o eixo Y
-        let maxPeak = 0.1;
-        for (let x = padding; x <= w - 10; x += 2) {
-            const progress = (x - padding) / (w - padding - 10);
-            const lb = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
-            const ly = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
-            const cf = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
-            const total = lb + ly + cf;
-            if (total > maxPeak) maxPeak = total;
-        }
-        
-        // Garantimos que a curva da Retina também não estoure a escala
-        if (0.8 * lensFactor > maxPeak) maxPeak = 0.8 * lensFactor;
-
-        // Fator de escala dinâmico (adicionamos 10% de margem no topo de respiro visual)
-        const scaleY = 1 / (maxPeak * 1.1);
-
-        // Linha Guia Didática: 480nm (Pico Circadiano)
-        const peakX = padding + ((w - padding - 10) * 0.25); // 480nm estimado
-        ctx.beginPath();
-        ctx.moveTo(peakX, h - padding);
-        ctx.lineTo(peakX, 10);
-        ctx.strokeStyle = "rgba(168, 85, 247, 0.4)"; // Roxo sutil
-        ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
-        
-        ctx.font = "bold 8px Manrope";
-        ctx.fillStyle = "#a855f7";
-        ctx.fillText("Pico Melanópico", peakX, 15);
-
-        // 1. Retina (Biologia)
-        ctx.beginPath();
-        ctx.moveTo(padding, h - padding);
-        for (let x = padding; x <= w - 10; x += 2) {
-            const progress = (x - padding) / (w - padding - 10);
-            const melCurve = (Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor) * scaleY;
-            const py = (h - padding) - (melCurve * (h - padding - 20));
-            ctx.lineTo(x, py);
-        }
-        ctx.lineTo(w - 10, h - padding);
-        ctx.fillStyle = isDark ? "rgba(14, 165, 233, 0.15)" : "rgba(14, 165, 233, 0.08)";
-        ctx.fill();
-        ctx.strokeStyle = "#0ea5e9";
-        ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
-
-        // 2. LED (Física) com Gradiente de Preenchimento
-        ctx.beginPath();
-        let ledPoints = [];
-        for (let x = padding; x <= w - 10; x += 2) {
-            const progress = (x - padding) / (w - padding - 10);
-            const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
-            const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
-            const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
-            
-            const totalY = (ledBlue + ledYellow + cyanFill) * scaleY;
-            const py = (h - padding) - (totalY * (h - padding - 20));
-            ledPoints.push({x, py});
-            if (x === padding) ctx.moveTo(x, py);
-            else ctx.lineTo(x, py);
-        }
-        
-        // Área sob a curva do Espectro (Sombra suave)
-        ctx.lineTo(w - 10, h - padding);
-        ctx.lineTo(padding, h - padding);
-        ctx.closePath();
-        let gradient = ctx.createLinearGradient(0, h - padding, 0, 10);
-        gradient.addColorStop(0, isDark ? "rgba(248, 250, 252, 0.0)" : "rgba(15, 23, 42, 0.0)");
-        gradient.addColorStop(1, isDark ? "rgba(248, 250, 252, 0.1)" : "rgba(15, 23, 42, 0.05)");
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // Linha Principal do Espectro
-        ctx.beginPath();
-        ctx.moveTo(ledPoints[0].x, ledPoints[0].py);
-        ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
-        ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
-
-        ctx.textAlign = "right"; ctx.font = "900 10px Manrope";
-        ctx.fillStyle = accentColor; ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : "── LED (Física Padrão)", w - 20, 20);
-        ctx.fillStyle = "#0ea5e9"; ctx.fillText(`- - Retina (${userAge} anos)`, w - 20, 35);
-    }
-};
+// LUXSINTAX: Super Canvas HCL movido para Canvas2DEngine.ts (Clean Architecture)
 
 // ==========================================
 // LUXSINTAX: Engine de Importação Excel (Clean Architecture)

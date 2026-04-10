@@ -1070,3 +1070,261 @@ export class Canvas2DEngine {
         }
     }
 }
+
+    // ==========================================
+    // LUXSINTAX: Super Canvas HCL (Neurociência Aplicada + Espectro Reativo)
+    // Movido do main.ts para respeitar a Clean Architecture
+    // ==========================================
+    public static drawCircadianChart(bioResult: any, state: any) {
+        const canvas = document.getElementById('circadianChart') as HTMLCanvasElement;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const win = window as any;
+        const viewMode = win.state?.hclViewMode || 'clock';
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.parentElement!.getBoundingClientRect();
+        
+        canvas.width = (rect.width - 32) * dpr;
+        canvas.height = (rect.height - 32) * dpr;
+        ctx.scale(dpr, dpr);
+        const w = rect.width - 32;
+        const h = rect.height - 32;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Design Tokens Dinâmicos baseados no Tema
+        const textColor = isDark ? "#94a3b8" : "#64748b";     
+        const gridColor = isDark ? "#334155" : "#e2e8f0";     
+        const accentColor = isDark ? "#f8fafc" : "#0f172a";   
+        const primaryColor = isDark ? "#a855f7" : "#9333ea";  
+
+        if (viewMode === 'clock') {
+            const cx = w / 2;
+            const cy = h / 2;
+            const radius = Math.min(w, h) / 2.6;
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.font = "bold 10px Manrope";
+            ctx.fillStyle = textColor;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            const hours = [0, 6, 12, 18];
+            const labels = ["24h", "06h", "12h", "18h"];
+            for (let i = 0; i < hours.length; i++) {
+                const angle = (hours[i] / 24) * Math.PI * 2 - Math.PI / 2;
+                const tx = cx + Math.cos(angle) * (radius + 18);
+                const ty = cy + Math.sin(angle) * (radius + 18);
+                ctx.fillText(labels[i], tx, ty);
+            }
+
+            ctx.beginPath();
+            for(let hr = 0; hr <= 24; hr += 0.5) {
+                const angle = (hr / 24) * Math.PI * 2 - Math.PI / 2;
+                const melLevel = Math.max(0, Math.cos((hr - 3) * Math.PI / 12)); 
+                const r = radius - 8 + (melLevel * 25);
+                const px = cx + Math.cos(angle) * r;
+                const py = cy + Math.sin(angle) * r;
+                if(hr === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.strokeStyle = primaryColor;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const shift = (state.useType === 'hospital' || state.timeOfDay === 'night') ? 'nocturnal' : 'diurnal';
+            const journey = win.HCLEngine.simulateCircadianJourney(state.visualLux, state.mRatio, state.age, shift);
+
+            const drawZone = (startHr: number, endHr: number, color: string) => {
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, (startHr / 24) * Math.PI * 2 - Math.PI / 2, (endHr / 24) * Math.PI * 2 - Math.PI / 2);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 6;
+                ctx.stroke();
+            };
+            drawZone(8, 18, "rgba(16, 185, 129, 0.2)"); 
+            drawZone(18, 22, "rgba(59, 130, 246, 0.2)"); 
+
+            ctx.beginPath();
+            journey.forEach((point: any, idx: number) => {
+                const angle = (point.hour / 24) * Math.PI * 2 - Math.PI / 2;
+                const suppression = point.actualCS * 40; 
+                const naturalMel = Math.max(0, Math.cos((point.hour - 3) * Math.PI / 12));
+                const r = (radius - 8 + (naturalMel * 25)) - suppression;
+
+                const px = cx + Math.cos(angle) * r;
+                const py = cy + Math.sin(angle) * r;
+
+                if (idx === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            });
+            ctx.closePath();
+            
+            ctx.strokeStyle = bioResult.isCritical ? "rgba(239, 68, 68, 0.9)" : (bioResult.isWarning ? "rgba(245, 158, 11, 0.9)" : "rgba(16, 185, 129, 0.9)");
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = bioResult.isCritical ? "rgba(239, 68, 68, 0.15)" : (bioResult.isWarning ? "rgba(245, 158, 11, 0.15)" : "rgba(16, 185, 129, 0.15)");
+            ctx.fill();
+
+            journey.forEach((point: any) => {
+                if (point.isConflict) {
+                    const angle = (point.hour / 24) * Math.PI * 2 - Math.PI / 2;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius + 5, angle - 0.1, angle + 0.1);
+                    ctx.strokeStyle = "rgba(239, 68, 68, 0.8)"; 
+                    ctx.lineWidth = 12;
+                    ctx.stroke();
+                }
+            });
+
+            ctx.font = "900 12px Manrope";
+            ctx.fillStyle = accentColor;
+            ctx.fillText(bioResult.isCritical ? 'Risco Biológico' : (bioResult.isWarning ? 'Alerta Moderado' : 'Sincronizado'), cx, cy - 6);
+            ctx.font = "bold 9px Manrope";
+            ctx.fillStyle = textColor;
+            ctx.fillText(`CS alcançado: ${(bioResult.cs || 0).toFixed(2)}`, cx, cy + 10);
+
+        } else {
+            const padding = 35;
+            
+            ctx.beginPath();
+            ctx.moveTo(padding, h - padding); ctx.lineTo(w - 10, h - padding); 
+            ctx.moveTo(padding, h - padding); ctx.lineTo(padding, 10); 
+            ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.stroke();
+
+            ctx.font = "bold 9px Manrope";
+            ctx.fillStyle = textColor;
+            ctx.textAlign = "center";
+            ctx.fillText("380nm (UV)", padding + 20, h - 10);
+            ctx.fillText("480nm", padding + ((w - padding - 10) * 0.25), h - 10);
+            ctx.fillText("780nm (IR)", w - 30, h - 10);
+            
+            ctx.save();
+            ctx.translate(15, h / 2); ctx.rotate(-Math.PI / 2);
+            ctx.fillText("Intensidade Relativa (%)", 0, 0);
+            ctx.restore();
+
+            const mRatio = state.mRatio || 0.52;
+            const isSunLike = document.getElementById('audit-tm30') && (document.getElementById('audit-tm30') as HTMLSelectElement).value === 'sunlike';
+            const userAge = parseInt((document.getElementById('audit-age') as HTMLInputElement)?.value) || 30;
+            
+            const lensFactor = userAge > 25 ? Math.max(0.3, 1.0 - (userAge - 25) * 0.015) : 1.0;
+
+            let bluePower = 0.3 + (mRatio * 0.5); 
+            let yellowPower = 1.2 - (mRatio * 0.4);
+
+            let maxPeak = 0.1;
+            for (let x = padding; x <= w - 10; x += 2) {
+                const progress = (x - padding) / (w - padding - 10);
+                const lb = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
+                const ly = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
+                const cf = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
+                const total = lb + ly + cf;
+                if (total > maxPeak) maxPeak = total;
+            }
+            
+            if (0.8 * lensFactor > maxPeak) maxPeak = 0.8 * lensFactor;
+
+            const scaleY = 1 / (maxPeak * 1.1);
+
+            const peakX = padding + ((w - padding - 10) * 0.25); 
+            ctx.beginPath();
+            ctx.moveTo(peakX, h - padding);
+            ctx.lineTo(peakX, 10);
+            ctx.strokeStyle = "rgba(168, 85, 247, 0.4)"; 
+            ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+            
+            ctx.font = "bold 8px Manrope";
+            ctx.fillStyle = "#a855f7";
+            ctx.fillText("Pico Melanópico", peakX, 15);
+
+            ctx.beginPath();
+            ctx.moveTo(padding, h - padding);
+            for (let x = padding; x <= w - 10; x += 2) {
+                const progress = (x - padding) / (w - padding - 10);
+                const melCurve = (Math.exp(-Math.pow(progress - 0.25, 2) / 0.02) * 0.8 * lensFactor) * scaleY;
+                const py = (h - padding) - (melCurve * (h - padding - 20));
+                ctx.lineTo(x, py);
+            }
+            ctx.lineTo(w - 10, h - padding);
+            ctx.fillStyle = isDark ? "rgba(14, 165, 233, 0.15)" : "rgba(14, 165, 233, 0.08)";
+            ctx.fill();
+            ctx.strokeStyle = "#0ea5e9";
+            ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+
+            ctx.beginPath();
+            let ghostPoints = [];
+            let ledPoints = [];
+            
+            for (let x = padding; x <= w - 10; x += 2) {
+                const progress = (x - padding) / (w - padding - 10);
+                const ledBlue = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
+                const ledYellow = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
+                const cyanFill = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
+                const ledTotal = ledBlue + ledYellow + cyanFill;
+                
+                const ledY = ledTotal * scaleY;
+                const pyLed = (h - padding) - (ledY * (h - padding - 20));
+                ledPoints.push({x, py: pyLed});
+                
+                const melanopicMask = Math.exp(-Math.pow(progress - 0.25, 2) / 0.015);
+                const ghostValue = ledTotal * melanopicMask * lensFactor;
+
+                const ghostY = ghostValue * scaleY;
+                const pyGhost = (h - padding) - (ghostY * (h - padding - 20));
+                ghostPoints.push({x, py: pyGhost});
+                
+                if (x === padding) ctx.moveTo(x, pyGhost);
+                else ctx.lineTo(x, pyGhost);
+            }
+            
+            ctx.lineTo(w - 10, h - padding);
+            ctx.lineTo(padding, h - padding);
+            ctx.closePath();
+            ctx.fillStyle = "rgba(6, 182, 212, 0.4)"; 
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(ghostPoints[0].x, ghostPoints[0].py);
+            ghostPoints.forEach(p => ctx.lineTo(p.x, p.py));
+            ctx.strokeStyle = "#06b6d4";
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([2, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.beginPath();
+            ctx.moveTo(ledPoints[0].x, ledPoints[0].py);
+            ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
+            ctx.lineTo(w - 10, h - padding);
+            ctx.lineTo(padding, h - padding);
+            ctx.closePath();
+            
+            let gradient = ctx.createLinearGradient(0, h - padding, 0, 10);
+            gradient.addColorStop(0, isDark ? "rgba(248, 250, 252, 0.0)" : "rgba(15, 23, 42, 0.0)");
+            gradient.addColorStop(1, isDark ? "rgba(248, 250, 252, 0.1)" : "rgba(15, 23, 42, 0.05)");
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(ledPoints[0].x, ledPoints[0].py);
+            ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
+            ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
+
+            ctx.textAlign = "right"; ctx.font = "900 10px Manrope";
+            ctx.fillStyle = accentColor; ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : "── LED (Física Padrão)", w - 20, 20);
+            ctx.fillStyle = "#06b6d4"; ctx.fillText(`- - Fantasma Melanópico (${userAge} anos)`, w - 20, 35);
+            ctx.fillStyle = "#0ea5e9"; ctx.fillText(`- - Retina Visão Fotópica`, w - 20, 50);
+        }
+    }
+}

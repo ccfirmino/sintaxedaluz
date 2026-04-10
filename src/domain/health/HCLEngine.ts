@@ -1,138 +1,130 @@
 // src/domain/health/HCLEngine.ts
 
 export const HCLEngine = {
+    export const HCLEngine = {
     /**
-     * Fator de Transmitância do Cristalino (Correção por Idade)
-     * O cristalino humano atua como um filtro amarelo que se intensifica com a idade,
-     * bloqueando especificamente os comprimentos de onda curtos (azul/ciano - 480nm).
+     * Curva de Sensibilidade Melanópica (V'λ mel) - Normalizada no pico de 480nm.
+     * Representa o "Fantasma do Ciano" para sobreposição no SPD.
      */
-    calculateLensTransmission: (age: number) => {
-        if (age <= 20) return 1.0;
-        // Queda aproximada de 1.2% ao ano após os 20 anos na região melanópica.
-        return Math.max(0.3, 1.0 - (age - 20) * 0.012);
+    getMelanopicActionCurve: () => {
+        return [
+            { nm: 380, val: 0.0001 }, { nm: 400, val: 0.002 }, { nm: 420, val: 0.018 },
+            { nm: 440, val: 0.115 }, { nm: 460, val: 0.649 }, { nm: 480, val: 1.000 }, // PICO CIANO
+            { nm: 500, val: 0.764 }, { nm: 520, val: 0.286 }, { nm: 540, val: 0.071 },
+            { nm: 560, val: 0.015 }, { nm: 580, val: 0.003 }, { nm: 600, val: 0.001 }
+        ];
     },
 
     /**
-     * Modelo LRC (Lighting Research Center) - Estímulo Circadiano
-     * Curva não-linear de saturação biológica humana.
+     * Fator de Transmitância do Cristalino (Modelo Pokorny/Sagawa corrigido)
      */
+    calculateLensTransmission: (age: number) => {
+        if (age <= 20) return 1.0;
+        // Degradação exponencial da recepção de azul/ciano (480nm)
+        const loss = Math.pow(0.988, age - 20);
+        return Math.max(0.35, loss);
+    },
+
+    /**
+     * O Índice de Produtividade WELL (Score de Performance Humana)
+     * Agrega m-EDI, Qualidade Cromática e Conforto Visual.
+     */
+    calculateHumanPerformanceScore: (medi: number, cs: number, rf: number, flickerLow: boolean) => {
+        // Peso 1: Estímulo (WELL recomenda m-EDI > 250)
+        const stimulusScore = Math.min(medi / 250, 1.0) * 40;
+        // Peso 2: Qualidade Visual (TM-30 Rf)
+        const colorScore = Math.min(rf / 90, 1.0) * 30;
+        // Peso 3: Estabilidade Neural (Flicker)
+        const stabilityScore = flickerLow ? 30 : 5;
+        
+        return Math.round(stimulusScore + colorScore + stabilityScore) / 10;
+    },
+
     calculateCircadianStimulus: (medi: number) => {
-        // Aproximação do CS baseada no m-EDI. 
-        // A biologia humana satura a supressão de melatonina em um CS de 0.7.
         let cs = 0.7 * (1 - Math.pow(1 + Math.pow(medi / 300, 1.2), -1));
         return Math.min(Math.max(cs, 0), 0.7);
     },
 
-    /**
-     * Avalia o impacto biológico da luz com base no ciclo circadiano e na neurociência.
-     * @param visualLux Nível de iluminância visual no plano do olho (Lux)
-     * @param mRatio Razão Melanópica (M/P) da fonte de luz
-     * @param useType Tipo de ambiente (office, hospital, residential)
-     * @param timeOfDay Horário de exposição (morning, afternoon, night)
-     * @param age Idade do observador (para correção de transmitância da lente)
-     */
     evaluateCircadianImpact: (visualLux: number, mRatio: number, useType: string, timeOfDay: string, age: number = 30) => {
-        // 1. Correção Etária (A Lente Biológica)
         const lensFactor = HCLEngine.calculateLensTransmission(age);
-        
-        // 2. Cálculo da métrica oficial m-EDI corrigida pela idade
         const medi = visualLux * mRatio * lensFactor;
-
-        // 3. Estímulo Circadiano (CS) derivado da dose
         const cs = HCLEngine.calculateCircadianStimulus(medi);
         
         let isOptimal = false;
         let isWarning = false;
         let isCritical = false;
+        let statusTag = "NEUTRO";
         let message = "";
 
         if (timeOfDay === 'night') {
             if (mRatio >= 0.68 || medi > 100) { 
                 isCritical = true;
-                message = `Risco Biológico Severo: O uso de espectros frios (M/P: ${mRatio.toFixed(2)}) à noite causa supressão drástica de melatonina. (Lente biológica ajustada para ${age} anos: ${Math.round(lensFactor*100)}% de passagem visual).`;
+                statusTag = "CONFLITO SEVERO";
+                message = `Risco Biológico: Luz fria (M/P: ${mRatio.toFixed(2)}) à noite detectada. Supressão de melatonina iminente para usuário de ${age} anos.`;
             } else if (medi > 50) {
                 isWarning = true;
-                message = `Alerta de Sono: m-EDI biológico de ${Math.round(medi)} à noite ultrapassa o limite (máx. 50). Risco de atraso no pico do hormônio do sono.`;
+                statusTag = "ALERTA FADIGA";
+                message = `Higiene do Sono: m-EDI (${Math.round(medi)}) acima do limite noturno.`;
             } else {
                 isOptimal = true;
-                message = `Conforto Noturno Ideal: Nível melanópico (${Math.round(medi)}) respeita a fisiologia. (Estímulo CS seguro: ${cs.toFixed(2)})`;
+                statusTag = "ZONA DE REPOUSO";
+                message = `Ideal: Espectro seguro para relaxamento e regeneração.`;
             }
         } else {
-            // Período Diurno (Manhã/Tarde)
-            if (useType === 'office' || useType === 'hospital') {
-                if (medi >= 250 && cs >= 0.3) {
-                    isOptimal = true;
-                    message = `Alta Performance: m-EDI de ${Math.round(medi)} e CS de ${cs.toFixed(2)} atende à certificação WELL v2. O ambiente estimula ativamente o foco, compensando a barreira ocular de ${age} anos.`;
-                } else {
-                    isWarning = true;
-                    message = `Ambiente "Adormecido": m-EDI de ${Math.round(medi)} (CS: ${cs.toFixed(2)}) é insuficiente para o estado de alerta de um usuário de ${age} anos (Meta: ≥ 250). Aumente a iluminância no plano visual.`;
-                }
-            } else {
+            if (medi >= 250 && cs >= 0.3) {
                 isOptimal = true;
-                message = `Estímulo Diurno Adequado: Nível de ${Math.round(medi)} m-EDI atende a uma rotina residencial saudável para a faixa etária selecionada.`;
+                statusTag = "ALTA PERFORMANCE";
+                message = `Sincronia WELL: Estímulo melanópico robusto para foco e vigor.`;
+            } else {
+                isWarning = true;
+                statusTag = "ESTÍMULO BAIXO";
+                message = `Ambiente Hiponímico: Risco de sonolência diurna (Meta: 250 m-EDI).`;
             }
         }
 
-        return { medi, cs, lensFactor, isOptimal, isWarning, isCritical, message };
+        return { medi, cs, lensFactor, isOptimal, isWarning, isCritical, statusTag, message };
     },
 
-    /**
-     * LUXSINTAX: Crono-Simulação da Jornada Circadiana (Gêmeo Digital Biológico)
-     * Simula a exposição do usuário à fonte de luz ao longo de 24h para traçar a curva de Estímulo Circadiano.
-     * @param baseVisualLux Nível de iluminância padrão do projeto.
-     * @param mRatio Espectro da luminária escolhida.
-     * @param age Idade do usuário (Filtro do Cristalino).
-     * @param shiftType Turno de trabalho ('diurnal' para escritório comercial, 'nocturnal' para plantões/hospitais).
-     */
     simulateCircadianJourney: (baseVisualLux: number, mRatio: number, age: number, shiftType: string = 'diurnal') => {
         const journey = [];
         const lensFactor = HCLEngine.calculateLensTransmission(age);
         
-        // Simulação hora a hora (0h às 23h)
         for (let hour = 0; hour < 24; hour++) {
             let activeLux = 0;
             let idealCS = 0;
+            let zoneLabel = "Sono";
 
             if (shiftType === 'diurnal') {
-                // Cenário: Escritório Comercial Padrão (Trabalho das 08h às 18h)
                 if (hour >= 8 && hour < 18) {
                     activeLux = baseVisualLux;
-                    idealCS = 0.3; // Meta WELL v2: CS >= 0.3 durante o dia para promover o alerta
+                    idealCS = 0.3;
+                    zoneLabel = "Janela de Alerta";
                 } else if (hour >= 18 && hour < 22) {
-                    activeLux = baseVisualLux * 0.15; // Estimativa de luz residual / residencial
-                    idealCS = 0.1; // Meta de transição: CS deve cair para não inibir melatonina
-                } else {
-                    activeLux = 0; // Dormindo
-                    idealCS = 0.0;
+                    activeLux = baseVisualLux * 0.15;
+                    idealCS = 0.1;
+                    zoneLabel = "Preparação";
                 }
-            } else if (shiftType === 'nocturnal') {
-                // Cenário: Enfermaria / Call Center (Plantão Noturno das 19h às 07h)
+            } else {
                 if (hour >= 19 || hour < 7) {
                     activeLux = baseVisualLux;
-                    idealCS = 0.3; // Exige supressão de melatonina para evitar erro humano por fadiga
-                } else if (hour >= 8 && hour < 14) {
-                    activeLux = 0; // Período de sono diurno obrigatório
-                    idealCS = 0.0;
-                } else {
-                    activeLux = baseVisualLux * 0.2; // Transição
-                    idealCS = 0.1;
+                    idealCS = 0.3;
+                    zoneLabel = "Plantão";
                 }
             }
 
-            // A matemática física do impacto
             const medi = activeLux * mRatio * lensFactor;
             const actualCS = activeLux > 0 ? HCLEngine.calculateCircadianStimulus(medi) : 0;
-
-            // Tolerância: O CS real pode ser maior que o ideal no período de alerta, 
-            // mas não deve passar do limite (0.1) no período de sono/preparação.
-            const isCompliant = actualCS >= idealCS && (idealCS > 0.1 || actualCS <= 0.1);
+            
+            // Lógica do Mapa de Fadiga: Conflito se o CS real é alto quando deveria ser baixo
+            const isConflict = (hour >= 21 || hour < 6) && actualCS > 0.1;
 
             journey.push({
                 hour,
                 activeLux,
                 actualCS,
                 idealCS,
-                isCompliant
+                zoneLabel,
+                isConflict
             });
         }
         return journey;

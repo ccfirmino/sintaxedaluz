@@ -67,6 +67,9 @@
 - [09/04/2026]: Evolução de Compliance no Exportador PDF (ReportExporter.ts): Injeção de tipagem dinâmica para unidades físicas híbridas (m² vs m Linear). O relatório gerado agora respeita perfeitamente as normativas ASHRAE 90.1 para cálculos de fachada, prevenindo erros em auditorias LEED devido a conversões indevidas de área.
 - [09/04/2026]: Evolução de i18n (Dictionary.ts): Mapeamento cruzado e injeção de dicionário (PT/EN) para as features Enterprise recém-adicionadas: CFO Mode (ESG), Zonas ASHRAE (LZ0-LZ4) e suporte a terminologias de cálculo de fachada híbrido (Área vs Linear). A plataforma consolida seu status de arquitetura 100% Bilíngue.
 - [09/04/2026]: Refinamento de UX/UI (Módulo LEED): Implementação de algoritmo de ordenação alfabética in-memory (`localeCompare`) no orquestrador `main.ts` para as tipologias ASHRAE 90.1, facilitando a busca de ambientes pelo usuário sem mutar a estrutura do banco de dados (SSOT).
+- [2026/04/10]: Injeção do algoritmo WELL Performance Score no HCLEngine.ts e expansão da UI de Auditoria para suporte ao HUD de Envelhecimento e Mapa de Fadiga.
+- [2026/04/10]: Integração final do HUD de Envelhecimento Ótico e WELL Performance Score no main.ts. Atualização do Canvas2DEngine.ts para renderizar o Mapa de Fadiga (Zonas Biológicas 24h) e o Fantasma do Ciano (Máscara Melanópica no SPD).
+- [2026-04-10] REFACTOR: Dívida técnica mitigada. Migração total do método drawCircadianChart do orquestrador (main.ts) para o motor responsável pela renderização (Canvas2DEngine.ts), respeitando o pilar da Clean Architecture.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
