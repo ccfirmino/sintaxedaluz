@@ -183,19 +183,70 @@ window.redrawAllCanvases = () => {
 };
 
 // LUXSINTAX: Controlador do Super Canvas HCL
-window.setHCLViewMode = (mode: 'clock' | 'spd') => {
+window.setHCLViewMode = function(mode: 'clock' | 'spd') {
     window.state.hclViewMode = mode;
     const btnClock = document.getElementById('btn-hcl-clock');
     const btnSpd = document.getElementById('btn-hcl-spd');
     
     if (btnClock && btnSpd) {
-        const activeClass = "flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-white dark:bg-white/20 text-starlight dark:text-white shadow-sm transition-all";
-        const inactiveClass = "flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all";
-        
-        btnClock.className = mode === 'clock' ? activeClass : inactiveClass;
-        btnSpd.className = mode === 'spd' ? activeClass : inactiveClass;
+        if (mode === 'clock') {
+            btnClock.className = 'flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-white dark:bg-white/20 text-starlight dark:text-white shadow-sm transition-all';
+            btnSpd.className = 'flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all';
+        } else {
+            btnSpd.className = 'flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-white dark:bg-white/20 text-starlight dark:text-white shadow-sm transition-all';
+            btnClock.className = 'flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all';
+        }
     }
-    window.redrawAllCanvases();
+    window.updateCalculations();
+};
+
+// LUXSINTAX: Orquestração do Switch e Limpeza do IES (Aba Auditoria)
+window.setAuditMode = function(mode: 'manual' | 'ies') {
+    const btnManual = document.getElementById('btn-audit-manual');
+    const btnIes = document.getElementById('btn-audit-ies');
+    const iesBlock = document.getElementById('audit-ies-block');
+    const cctBlock = document.getElementById('audit-cct-block');
+    
+    if (btnManual && btnIes && iesBlock && cctBlock) {
+        if (mode === 'manual') {
+            btnManual.className = 'px-3 py-1 text-[9px] font-black uppercase rounded-md bg-white dark:bg-slate-600 text-starlight dark:text-white shadow-sm transition-all';
+            btnIes.className = 'px-3 py-1 text-[9px] font-black uppercase rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all';
+            iesBlock.classList.add('hidden');
+            cctBlock.classList.remove('hidden');
+        } else {
+            btnIes.className = 'px-3 py-1 text-[9px] font-black uppercase rounded-md bg-white dark:bg-slate-600 text-starlight dark:text-white shadow-sm transition-all';
+            btnManual.className = 'px-3 py-1 text-[9px] font-black uppercase rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all';
+            iesBlock.classList.remove('hidden');
+            
+            // Trava CCT apenas se houver IES com Ratio detectado
+            if (window.state.audit.mRatio !== 0.52 && window.state.audit.iesFileName) {
+                cctBlock.classList.add('hidden');
+            } else {
+                cctBlock.classList.remove('hidden');
+            }
+        }
+    }
+};
+
+window.clearAuditIES = function() {
+    window.state.audit.iesData = null;
+    window.state.audit.iesFileName = '';
+    window.state.audit.mRatio = 0.52; // Retorno ao padrão
+    
+    const statusA = document.getElementById('a-ies-status');
+    const btnClear = document.getElementById('a-ies-clear');
+    const cctBlock = document.getElementById('audit-cct-block');
+    const selectRatio = document.getElementById('audit-mratio') as HTMLSelectElement;
+    
+    if (statusA) {
+        statusA.innerText = 'Nenhum arquivo.';
+        statusA.classList.remove('text-luminous-gold', 'text-amber-500');
+    }
+    if (btnClear) btnClear.classList.add('hidden');
+    if (cctBlock) cctBlock.classList.remove('hidden');
+    if (selectRatio) selectRatio.value = '0.52';
+    
+    window.updateCalculations();
 };
 
 /**
@@ -924,15 +975,35 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
                     });
                 }
                 
-                // LUXSINTAX: Interceptação visual específica para a aba de Auditoria
+                // LUXSINTAX: Interceptação visual e Trava de Segurança CCT para a Aba de Auditoria
                 if (targetKey === 'audit') {
                     const statusA = document.getElementById('a-ies-status');
+                    const btnClear = document.getElementById('a-ies-clear');
+                    const cctBlock = document.getElementById('audit-cct-block');
+                    
                     if (statusA) {
                         statusA.innerText = `Lido: ${file.name} (M/P: ${detectedRatio || 'N/D'})`;
                         statusA.classList.add('text-luminous-gold');
+                        statusA.classList.remove('text-amber-500');
                     }
+                    if (btnClear) {
+                        btnClear.classList.remove('hidden');
+                    }
+                    if (cctBlock) {
+                        if (detectedRatio) {
+                            cctBlock.classList.add('hidden'); // Oculta e trava o CCT manual
+                        } else {
+                            cctBlock.classList.remove('hidden'); // Destrava pedindo ajuda ao usuário
+                            if (statusA) {
+                                statusA.innerText = `Lido: ${file.name} (Sem CCT. Preencha abaixo)`;
+                                statusA.classList.add('text-amber-500');
+                                statusA.classList.remove('text-luminous-gold');
+                            }
+                        }
+                    }
+                    
                     window.updateCalculations();
-                    return; // Retorno antecipado (Não executa recálculo do Grid/Ponto)
+                    return; // Retorno antecipado (Não avança pro motor 3D/Grid das outras abas)
                 }
 
                 let targetFlux = parsed.totalFlux || 0;
@@ -1892,12 +1963,21 @@ window.updateAuditUI = function() {
             else { tlmScoreEl.innerText = 'SVM > 1.0'; tlmStatusEl.innerText = 'Risco Enxaqueca'; tlmStatusEl.className = 'text-[9px] text-red-500 font-bold uppercase mt-1 animate-pulse'; isFlickerLow = false; }
         }
 
-        // --- LUXSINTAX: Injeção do WELL Performance Score ---
-        const wellScore = window.HCLEngine.calculateHumanPerformanceScore(bioResult.medi, bioResult.cs, rfValue, isFlickerLow);
+        // --- LUXSINTAX: Injeção do WELL Performance Score e Raio-X Breakdown ---
+        const stimulusScore = Math.min(bioResult.medi / 250, 1.0) * 40;
+        const colorScore = Math.min(rfValue / 90, 1.0) * 30;
+        const stabilityScore = isFlickerLow ? 30 : 5;
+        const wellScore = Math.round(stimulusScore + colorScore + stabilityScore) / 10;
+        
         const wellScoreEl = document.getElementById('audit-well-score');
         const wellScoreBar = document.getElementById('well-score-bar');
         const statusBadge = document.getElementById('audit-status-badge');
+        const wellScoreCard = document.getElementById('well-score-card');
         
+        if (wellScoreCard) {
+            wellScoreCard.title = `💡 Raio-X da Nota WELL:\n• Estímulo (m-EDI): ${(stimulusScore/10).toFixed(1)} / 4.0\n• Cor (TM-30): ${(colorScore/10).toFixed(1)} / 3.0\n• Estabilidade Neural (TLM): ${(stabilityScore/10).toFixed(1)} / 3.0`;
+        }
+
         if (wellScoreEl) {
             wellScoreEl.innerText = wellScore.toFixed(1);
             if (wellScore >= 8) wellScoreEl.className = 'text-4xl font-black text-leed-green';

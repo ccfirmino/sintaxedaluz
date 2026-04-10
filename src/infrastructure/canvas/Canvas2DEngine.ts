@@ -1112,7 +1112,7 @@ export class Canvas2DEngine {
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            ctx.font = "bold 10px Manrope";
+            ctx.font = "bold 12px Manrope";
             ctx.fillStyle = textColor;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -1186,12 +1186,19 @@ export class Canvas2DEngine {
                 }
             });
 
-            ctx.font = "900 12px Manrope";
+            ctx.font = "900 14px Manrope";
             ctx.fillStyle = accentColor;
             ctx.fillText(bioResult.isCritical ? 'Risco Biológico' : (bioResult.isWarning ? 'Alerta Moderado' : 'Sincronizado'), cx, cy - 6);
-            ctx.font = "bold 9px Manrope";
+            ctx.font = "bold 11px Manrope";
             ctx.fillStyle = textColor;
-            ctx.fillText(`CS alcançado: ${(bioResult.cs || 0).toFixed(2)}`, cx, cy + 10);
+            ctx.fillText(`CS alcançado: ${(bioResult.cs || 0).toFixed(2)}`, cx, cy + 12);
+
+            // LUXSINTAX: Legenda Geométrica do Mapa de Fadiga
+            ctx.font = "bold 10px Manrope";
+            ctx.fillStyle = "rgba(16, 185, 129, 0.9)";
+            ctx.fillText("■ Janela de Alerta", cx - 60, h - 10);
+            ctx.fillStyle = "rgba(59, 130, 246, 0.9)";
+            ctx.fillText("■ Prep. para Sono", cx + 60, h - 10);
 
         } else {
             const padding = 35;
@@ -1201,7 +1208,7 @@ export class Canvas2DEngine {
             ctx.moveTo(padding, h - padding); ctx.lineTo(padding, 10); 
             ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.stroke();
 
-            ctx.font = "bold 9px Manrope";
+            ctx.font = "bold 11px Manrope";
             ctx.fillStyle = textColor;
             ctx.textAlign = "center";
             ctx.fillText("380nm (UV)", padding + 20, h - 10);
@@ -1320,10 +1327,22 @@ export class Canvas2DEngine {
             ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
             ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
 
-            ctx.textAlign = "right"; ctx.font = "900 10px Manrope";
-            ctx.fillStyle = accentColor; ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : "── LED (Física Padrão)", w - 20, 20);
-            ctx.fillStyle = "#06b6d4"; ctx.fillText(`- - Fantasma Melanópico (${userAge} anos)`, w - 20, 35);
-            ctx.fillStyle = "#0ea5e9"; ctx.fillText(`- - Retina Visão Fotópica`, w - 20, 50);
+            // LUXSINTAX: Sombras Blur para Máximo Contraste em Qualquer Tema e Fontes Maiores
+            ctx.save();
+            ctx.shadowColor = isDark ? "rgba(0, 0, 0, 0.9)" : "rgba(255, 255, 255, 0.9)";
+            ctx.shadowBlur = 6;
+            ctx.textAlign = "right"; 
+            ctx.font = "900 12px Manrope";
+            
+            ctx.fillStyle = accentColor; 
+            ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : "── LED (Física Padrão)", w - 20, 25);
+            
+            ctx.fillStyle = "#06b6d4"; 
+            ctx.fillText(`- - Fantasma Melanópico (${userAge} anos)`, w - 20, 45);
+            
+            ctx.fillStyle = "#0ea5e9"; 
+            ctx.fillText(`- - Retina Visão Fotópica`, w - 20, 65);
+            ctx.restore();
         }
     }
 }

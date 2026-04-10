@@ -72,6 +72,7 @@
 - [2026/04/10]: Integração final do HUD de Envelhecimento Ótico e WELL Performance Score no main.ts. Atualização do Canvas2DEngine.ts para renderizar o Mapa de Fadiga (Zonas Biológicas 24h) e o Fantasma do Ciano (Máscara Melanópica no SPD).
 - [2026/04/10] REFACTOR: Dívida técnica mitigada. Migração total do método drawCircadianChart do orquestrador (main.ts) para o motor responsável pela renderização (Canvas2DEngine.ts), respeitando o pilar da Clean Architecture.
 - [2026/04/10] UI/UX TWEAK: Correção fina no layout da Auditoria Circadiana. Refatoração do i18n para suportar tooltips dinâmicos e melhorias de leitura com o HUD de idade. Implementação do Uploader IES local para leitura e injeção do Razão Melanópica automática na Aba Circadiana.
+- [2026/04/10] REFACTOR UX: Inversão visual da Lei de Fitts na aba de Auditoria. Implementação de Switch Manual/IES e trava segura de CCT. Adição de sombras de contraste no Canvas, aumento da tipografia base e integração do "Raio-X Didático" flutuante sobre a nota WELL para evidenciar o peso da métrica TLM.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
