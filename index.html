@@ -129,14 +129,15 @@
         html.dark .dark\:bg-deep-blue { background-color: #0c1326 !important; }
         html.dark .dark\:border-deep-border { border-color: #0f172a !important; }
         
-        /* 2. Redundância de Segurança: Ataca os IDs diretos das caixas de parâmetros */
+        /* 2. Redundância de Segurança: Ataca os IDs diretos das caixas de parâmetros e do Canvas */
         html.dark #audit-mratio, 
         html.dark #audit-visual-lux, 
         html.dark #audit-age, 
         html.dark #audit-tm30, 
         html.dark #audit-flicker, 
         html.dark #audit-use-type, 
-        html.dark #audit-time {
+        html.dark #audit-time,
+        html.dark #hcl-canvas-wrapper {
             background-color: #0c1326 !important;
             border-color: #0f172a !important;
         }
@@ -1017,7 +1018,7 @@
                                             </button>
                                         </div>
 
-                                        <div class="relative z-10 flex-grow w-full min-h-[300px] mb-6 rounded-xl border border-slate-200 dark:border-[#0f172a] bg-white dark:bg-deep-blue p-4 shadow-inner transition-colors">
+                                        <div id="hcl-canvas-wrapper" class="relative z-10 flex-grow w-full min-h-[300px] mb-6 rounded-xl border border-slate-200 dark:border-[#0f172a] bg-white dark:bg-[#0c1326] p-4 shadow-inner transition-colors">
                                             <div id="age-hud-overlay" class="absolute top-4 left-4 z-20 bg-white/90 dark:bg-starlight/90 text-starlight dark:text-white p-3 rounded-lg border border-slate-200 dark:border-white/10 backdrop-blur-md opacity-0 transition-opacity shadow-sm">
                                                 <p class="text-[8px] font-black uppercase tracking-widest text-luminous-gold mb-1" data-i18n="hud_opt_sim">Simulação Óptica</p>
                                                 <div class="flex items-center gap-3">
