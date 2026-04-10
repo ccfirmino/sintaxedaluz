@@ -1069,7 +1069,6 @@ export class Canvas2DEngine {
             ctx.restore();
         }
     }
-}
 
     // ==========================================
     // LUXSINTAX: Super Canvas HCL (Neurociência Aplicada + Espectro Reativo)
