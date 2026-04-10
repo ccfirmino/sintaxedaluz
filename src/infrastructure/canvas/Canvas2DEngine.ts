@@ -1271,6 +1271,7 @@ export class Canvas2DEngine {
             ctx.beginPath();
             let ghostPoints = [];
             let ledPoints = [];
+            let photopicPoints = [];
             
             for (let x = padding; x <= w - 10; x += 2) {
                 const progress = (x - padding) / (w - padding - 10);
@@ -1283,12 +1284,19 @@ export class Canvas2DEngine {
                 const pyLed = (h - padding) - (ledY * (h - padding - 20));
                 ledPoints.push({x, py: pyLed});
                 
+                // Fantasma Melanópico (Pico ~480nm)
                 const melanopicMask = Math.exp(-Math.pow(progress - 0.25, 2) / 0.015);
                 const ghostValue = ledTotal * melanopicMask * lensFactor;
-
                 const ghostY = ghostValue * scaleY;
                 const pyGhost = (h - padding) - (ghostY * (h - padding - 20));
                 ghostPoints.push({x, py: pyGhost});
+
+                // Retina Fotópica (V-Lambda Pico ~555nm / Verde Limão)
+                const photopicMask = Math.exp(-Math.pow(progress - 0.44, 2) / 0.02);
+                const photopicValue = ledTotal * photopicMask;
+                const photopicY = photopicValue * scaleY;
+                const pyPhotopic = (h - padding) - (photopicY * (h - padding - 20));
+                photopicPoints.push({x, py: pyPhotopic});
                 
                 if (x === padding) ctx.moveTo(x, pyGhost);
                 else ctx.lineTo(x, pyGhost);
@@ -1309,6 +1317,17 @@ export class Canvas2DEngine {
             ctx.stroke();
             ctx.setLineDash([]);
 
+            // LUXSINTAX: Render da Curva Fotópica para Contraste Extremo
+            ctx.beginPath();
+            ctx.moveTo(photopicPoints[0].x, photopicPoints[0].py);
+            photopicPoints.forEach(p => ctx.lineTo(p.x, p.py));
+            ctx.strokeStyle = "#84cc16"; // Lime Green
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([2, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Render do LED Padrão
             ctx.beginPath();
             ctx.moveTo(ledPoints[0].x, ledPoints[0].py);
             ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
@@ -1327,7 +1346,7 @@ export class Canvas2DEngine {
             ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
             ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
 
-            // LUXSINTAX: Sombras Blur para Máximo Contraste em Qualquer Tema e Fontes Maiores
+            // LUXSINTAX: Legendas com Sombras e Cores em Alto Contraste
             ctx.save();
             ctx.shadowColor = isDark ? "rgba(0, 0, 0, 0.9)" : "rgba(255, 255, 255, 0.9)";
             ctx.shadowBlur = 6;
@@ -1340,7 +1359,7 @@ export class Canvas2DEngine {
             ctx.fillStyle = "#06b6d4"; 
             ctx.fillText(`- - Fantasma Melanópico (${userAge} anos)`, w - 20, 45);
             
-            ctx.fillStyle = "#0ea5e9"; 
+            ctx.fillStyle = "#84cc16"; // Match Lime Green
             ctx.fillText(`- - Retina Visão Fotópica`, w - 20, 65);
             ctx.restore();
         }
