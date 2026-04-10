@@ -208,14 +208,17 @@ window.setAuditMode = function(mode: 'manual' | 'ies') {
     const cctBlock = document.getElementById('audit-cct-block');
     
     if (btnManual && btnIes && iesBlock && cctBlock) {
+        const activeClass = 'px-3 py-1 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white shadow-sm transition-all';
+        const inactiveClass = 'px-3 py-1 text-[9px] font-black uppercase rounded-md text-slate-500 dark:text-slate-500 hover:text-luminous-gold dark:hover:text-luminous-gold transition-all';
+
         if (mode === 'manual') {
-            btnManual.className = 'px-3 py-1 text-[9px] font-black uppercase rounded-md bg-white dark:bg-slate-600 text-starlight dark:text-white shadow-sm transition-all';
-            btnIes.className = 'px-3 py-1 text-[9px] font-black uppercase rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all';
+            btnManual.className = activeClass;
+            btnIes.className = inactiveClass;
             iesBlock.classList.add('hidden');
             cctBlock.classList.remove('hidden');
         } else {
-            btnIes.className = 'px-3 py-1 text-[9px] font-black uppercase rounded-md bg-white dark:bg-slate-600 text-starlight dark:text-white shadow-sm transition-all';
-            btnManual.className = 'px-3 py-1 text-[9px] font-black uppercase rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all';
+            btnIes.className = activeClass;
+            btnManual.className = inactiveClass;
             iesBlock.classList.remove('hidden');
             
             // Trava CCT apenas se houver IES com Ratio detectado
@@ -2043,13 +2046,15 @@ window.updateAuditUI = function() {
             window.Canvas2DEngine.drawCircadianChart(bioResult, s);
         }
         if (alertBox && alertEl) {
-            if (bioResult.isCritical || bioResult.isWarning) {
-                alertBox.classList.remove('hidden');
-                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold ${bioResult.isCritical ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`;
+            alertBox.classList.remove('hidden');
+            if (bioResult.isCritical) {
+                alertBox.className = 'mt-4 p-3 rounded-lg text-[10px] font-bold bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800/50';
+                alertEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${bioResult.message}`;
+            } else if (bioResult.isWarning) {
+                alertBox.className = 'mt-4 p-3 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/50';
                 alertEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${bioResult.message}`;
             } else {
-                alertBox.classList.remove('hidden');
-                alertBox.className = `mt-4 p-3 rounded-lg text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200`;
+                alertBox.className = 'mt-4 p-3 rounded-lg text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800/50';
                 alertEl.innerHTML = `<i class="fas fa-brain mr-1"></i> ${bioResult.message}`;
             }
         }
