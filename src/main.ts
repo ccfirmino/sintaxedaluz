@@ -76,6 +76,33 @@ window.state = {
 
 // 3. PONTE DE INFRAESTRUTURA
 window.i18n = i18nDictionary;
+
+// LUXSINTAX: Injeção de Dicionário Dinâmico para a Tríade Biológica e Tooltips
+if (window.i18n) {
+    if (!window.i18n.pt) window.i18n.pt = {};
+    if (!window.i18n.en) window.i18n.en = {};
+    Object.assign(window.i18n.pt, {
+        hdr_audit: "Auditoria Circadiana", audit_sub: "Laboratório de Neurociência: Avaliação do ciclo de melatonina e certificação WELL v2.",
+        bio_vars: "Variáveis Biológicas", lux_vert: "Lux Vertical (Ev)", age_yrs: "Idade (Anos)", spec_cct: "Espectro da Fonte (CCT)",
+        qual_tm30: "Qualidade (TM-30)", mod_tlm: "Modulação (TLM)", hcl_status: "Status Circadiano", hcl_score: "WELL Performance Score", 
+        hcl_fatigue: "Mapa de Fadiga", hcl_ghost: "Fantasma do Ciano", hud_opt_sim: "Simulação Óptica", lens: "Lente", trans: "Transmissão", lbl_load_ies_opt: "OU EXTRAIR DE IES/LDT",
+        opt_tm30_80: "Padrão (Rf 78)", opt_tm30_90: "Alta Fid. (Rf 90)", opt_tm30_sun: "SunLike (Rf 96)",
+        opt_tlm_low: "Flicker Free", opt_tlm_med: "Aceitável", opt_tlm_high: "Risco / Baixo",
+        tip_lux_vert: "Lux medido na altura do olho (E_vert).", tip_age: "A opacidade do cristalino afeta a absorção de luz azul.",
+        tip_tm30: "Capacidade do LED de reproduzir cores reais.", tip_tlm: "O flicker invisível anula os ganhos de concentração (SVM)."
+    });
+    Object.assign(window.i18n.en, {
+        hdr_audit: "Circadian Audit", audit_sub: "Neuroscience Lab: Melatonin cycle evaluation and WELL v2 certification.",
+        bio_vars: "Biological Variables", lux_vert: "Vertical Lux (Ev)", age_yrs: "Age (Years)", spec_cct: "Source Spectrum (CCT)",
+        qual_tm30: "Quality (TM-30)", mod_tlm: "Modulation (TLM)", hcl_status: "Circadian Status", hcl_score: "WELL Performance Score",
+        hcl_fatigue: "Fatigue Map", hcl_ghost: "Cyan Phantom", hud_opt_sim: "Optical Simulation", lens: "Lens", trans: "Transmission", lbl_load_ies_opt: "OR EXTRACT FROM IES/LDT",
+        opt_tm30_80: "Standard (Rf 78)", opt_tm30_90: "High Fid. (Rf 90)", opt_tm30_sun: "SunLike (Rf 96)",
+        opt_tlm_low: "Flicker Free", opt_tlm_med: "Acceptable", opt_tlm_high: "Risk / Low",
+        tip_lux_vert: "Lux measured at eye level (E_vert).", tip_age: "Lens opacity affects blue light absorption.",
+        tip_tm30: "LED's ability to reproduce real colors.", tip_tlm: "Invisible flicker negates concentration gains (SVM)."
+    });
+}
+
 window.normsDatabase = normsDatabase;
 window.lpdBaselines = lpdBaselines;
 window.exteriorLpdBaselines = exteriorLpdBaselines;
@@ -277,6 +304,12 @@ window.toggleLanguage = function() {
         const key = el.getAttribute('data-i18n-placeholder'); 
         if (key && window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
             (el as HTMLInputElement).placeholder = window.i18n[window.currentLang][key]; 
+        } 
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => { 
+        const key = el.getAttribute('data-i18n-title'); 
+        if (key && window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
+            (el as HTMLElement).title = window.i18n[window.currentLang][key]; 
         } 
     });
     window.updateInputsForLanguage();
@@ -833,9 +866,11 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
 
                 const targetKey = window.currentTool;
                 
-                // Primeiro mudamos o modo (isso limpa estados antigos com segurança)
-                window.calcMode = 'ies';
-                window.updateCalcMode('ies');
+                // LUXSINTAX: Se for a ferramenta de Auditoria, não ativamos o fluxo 3D fotométrico global
+                if (targetKey !== 'audit') {
+                    window.calcMode = 'ies';
+                    window.updateCalcMode('ies');
+                }
 
                 // Depois injetamos os dados novos
                 window.state[targetKey].iesData = parsed;
@@ -883,10 +918,21 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
 
                 if (detectedRatio) {
                     window.state[targetKey].mRatio = detectedRatio;
-                    ['p-mRatio', 'v-mRatio'].forEach(id => {
+                    ['p-mRatio', 'v-mRatio', 'audit-mratio'].forEach(id => {
                         const dropdown = document.getElementById(id) as HTMLSelectElement;
                         if (dropdown) dropdown.value = String(detectedRatio);
                     });
+                }
+                
+                // LUXSINTAX: Interceptação visual específica para a aba de Auditoria
+                if (targetKey === 'audit') {
+                    const statusA = document.getElementById('a-ies-status');
+                    if (statusA) {
+                        statusA.innerText = `Lido: ${file.name} (M/P: ${detectedRatio || 'N/D'})`;
+                        statusA.classList.add('text-luminous-gold');
+                    }
+                    window.updateCalculations();
+                    return; // Retorno antecipado (Não executa recálculo do Grid/Ponto)
                 }
 
                 let targetFlux = parsed.totalFlux || 0;

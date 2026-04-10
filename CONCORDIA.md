@@ -1,3 +1,4 @@
+
 # Manifesto de Sincronia - Projeto Lighting SaaS
 
 ## Estado Atual da Arquitetura
@@ -69,7 +70,8 @@
 - [09/04/2026]: Refinamento de UX/UI (Módulo LEED): Implementação de algoritmo de ordenação alfabética in-memory (`localeCompare`) no orquestrador `main.ts` para as tipologias ASHRAE 90.1, facilitando a busca de ambientes pelo usuário sem mutar a estrutura do banco de dados (SSOT).
 - [2026/04/10]: Injeção do algoritmo WELL Performance Score no HCLEngine.ts e expansão da UI de Auditoria para suporte ao HUD de Envelhecimento e Mapa de Fadiga.
 - [2026/04/10]: Integração final do HUD de Envelhecimento Ótico e WELL Performance Score no main.ts. Atualização do Canvas2DEngine.ts para renderizar o Mapa de Fadiga (Zonas Biológicas 24h) e o Fantasma do Ciano (Máscara Melanópica no SPD).
-- [2026-04-10] REFACTOR: Dívida técnica mitigada. Migração total do método drawCircadianChart do orquestrador (main.ts) para o motor responsável pela renderização (Canvas2DEngine.ts), respeitando o pilar da Clean Architecture.
+- [2026/04/10] REFACTOR: Dívida técnica mitigada. Migração total do método drawCircadianChart do orquestrador (main.ts) para o motor responsável pela renderização (Canvas2DEngine.ts), respeitando o pilar da Clean Architecture.
+- [2026/04/10] UI/UX TWEAK: Correção fina no layout da Auditoria Circadiana. Refatoração do i18n para suportar tooltips dinâmicos e melhorias de leitura com o HUD de idade. Implementação do Uploader IES local para leitura e injeção do Razão Melanópica automática na Aba Circadiana.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
