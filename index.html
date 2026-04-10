@@ -124,6 +124,23 @@
         html.dark .glass-panel { background: rgba(30, 41, 59, 0.95) !important; border-color: #334155 !important; }
         
         /* LUXSINTAX FIX: Blindagem Absoluta de Contraste UI */
+        
+        /* 1. Força a cor do Midnight Blue nas classes do Tailwind que falharam no CDN */
+        html.dark .dark\:bg-deep-blue { background-color: #0c1326 !important; }
+        html.dark .dark\:border-deep-border { border-color: #0f172a !important; }
+        
+        /* 2. Redundância de Segurança: Ataca os IDs diretos das caixas de parâmetros */
+        html.dark #audit-mratio, 
+        html.dark #audit-visual-lux, 
+        html.dark #audit-age, 
+        html.dark #audit-tm30, 
+        html.dark #audit-flicker, 
+        html.dark #audit-use-type, 
+        html.dark #audit-time {
+            background-color: #0c1326 !important;
+            border-color: #0f172a !important;
+        }
+
         html.dark .text-starlight { color: #ffffff !important; }
         html.dark .text-dim-gray { color: #cbd5e1 !important; }
         html.dark .text-slate-500 { color: #94a3b8 !important; }
