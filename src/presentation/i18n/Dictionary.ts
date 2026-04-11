@@ -2,7 +2,7 @@
 
 export const i18nDictionary = {
     pt: {
-        nav_home: "INÍCIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "PONTO A PONTO<br>HORIZONTAL", tab_vert: "PONTO A PONTO<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "TOPOLOGIA<br>& DRIVERS", tab_esg: "VIABILIDADE<br>& ROI",
+        nav_home: "INÍCIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "PONTO A PONTO<br>HORIZONTAL", tab_vert: "PONTO A PONTO<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "TOPOLOGIA<br>& DRIVERS", tab_esg: "VIABILIDADE E ROI",
         pil_eng: "1. Engenharia & Física", pil_health: "2. Saúde (HCL)", pil_esg: "3. Viabilidade & ESG", pil_market: "4. Mercado",
         tab_smart: "BUSCA<br>INTELIGENTE", tag_soon: "EM BREVE",
         calc_params: "Parâmetros da Fonte", lbl_intensity: "INTENSIDADE (CD)", lbl_photometry: "FOTOMETRIA", lbl_ies: "IES / LDT", lbl_ies_upload: "CARREGAR .IES / .LDT", lbl_height: "ALTURA DA FONTE (H)", lbl_plane: "PLANO DE TRABALHO (HP)", lbl_beam: "ABERTURA DO FACHO", lbl_tilt: "ORIENTAÇÃO (TILT)",
@@ -90,7 +90,7 @@ export const i18nDictionary = {
         esg_highly_viable: "Projeto Altamente Viável! VPL positivo de", esg_surpassing: "superando o custo de capital.", esg_months: "meses", esg_years_label: "Anos"
     },
     en: {
-        nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "TOPOLOGY<br>& DRIVERS", tab_esg: "FEASIBILITY<br>& ROI",
+        nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "TOPOLOGY<br>& DRIVERS", tab_esg: "FEASIBILITY & ROI",
         pil_eng: "1. Engineering & Physics", pil_health: "2. Health (HCL)", pil_esg: "3. Feasibility & ESG", pil_market: "4. Market",
         tab_smart: "SMART<br>SPECIFIER", tag_soon: "COMING SOON",
         calc_params: "Source Parameters", lbl_intensity: "INTENSITY (CD)", lbl_photometry: "PHOTOMETRY", lbl_ies: "IES / LDT", lbl_ies_upload: "UPLOAD .IES / .LDT", lbl_height: "SOURCE HEIGHT (H)", lbl_plane: "WORK PLANE (HP)", lbl_beam: "BEAM ANGLE", lbl_tilt: "TILT ANGLE",

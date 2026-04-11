@@ -510,7 +510,7 @@
 
                                     <div class="grid grid-cols-2 gap-4 mb-6">
                                         <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Abertura Facho</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Temp. de Cor</label><div class="flex items-baseline gap-1"><input type="number" id="g-cct" value="3000" min="2000" max="6500" step="100"><span class="text-[9px] text-slate-500 font-bold">K</span></div></div><input type="range" id="range-g-cct" min="2000" max="6500" step="100" value="3000"></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_cct">Temp. de Cor</label><div class="flex items-baseline gap-1"><input type="number" id="g-cct" value="3000" min="2000" max="6500" step="100"><span class="text-[9px] text-slate-500 font-bold">K</span></div></div><input type="range" id="range-g-cct" min="2000" max="6500" step="100" value="3000"></div></div></div><input type="range" id="range-g-cct" min="2000" max="6500" step="100" value="3000"></div>
                                     </div>
 
                                     <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
@@ -521,18 +521,18 @@
                                     <div class="flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                                         <div class="group relative z-50">
                                             <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 flex items-center w-max cursor-help">
-                                                <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Cor do Ambiente (Rebatimento)</span>
+                                                <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5" data-i18n="lbl_reflectance">Cor do Ambiente (Rebatimento)</span>
                                             </label>
                                             <select id="g-reflectance" onchange="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
-                                                <option value="0.10">Paredes Claras (Branco/Gelo)</option>
-                                                <option value="0.05" selected>Paredes Médias (Cinza/Madeira)</option>
-                                                <option value="0.00">Paredes Escuras (Preto/Tijolo)</option>
+                                                <option value="0.10" data-i18n="opt_ref_light">Paredes Claras (Branco/Gelo)</option>
+                                                <option value="0.05" selected data-i18n="opt_ref_mid">Paredes Médias (Cinza/Madeira)</option>
+                                                <option value="0.00" data-i18n="opt_ref_dark">Paredes Escuras (Preto/Tijolo)</option>
                                             </select>
                                         </div>
                                         
                                         <div class="group relative z-40">
-                                            <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 flex items-center w-max cursor-help" data-i18n="lbl_maint_factor">
-                                                <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Fator Manutenção (FM)</span>
+                                            <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 flex items-center w-max cursor-help">
+                                                <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5" data-i18n="lbl_maint_factor">Fator Manutenção (FM)</span>
                                             </label>
                                             <select id="g-maintFactor" onchange="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
                                                 <option value="0.80" selected data-i18n="opt_maint_80">Limpo / Novo (0.80)</option>
@@ -624,7 +624,7 @@
                                                 
                                                 <div id="grid-hud-overlay" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto backdrop-blur-md shadow-xl">
                                                     <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-1 pb-2 border-b" data-i18n="hud_grid_title">SÍNTESE DA MALHA</h4>
-                                                    <div class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-3 text-center bg-slate-100 dark:bg-slate-800 rounded py-0.5">Direta + Rebatimento (GI)</div>
+                                                    <div class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-3 text-center bg-slate-100 dark:bg-slate-800 rounded py-0.5" data-i18n="hud_gi">Direta + Rebatimento (GI)</div>
                                                     <div class="space-y-2">
                                                         <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="hud_layout">Arranjo:</span><span id="hud-layout" class="text-xs font-black text-luminous-gold">--</span></div>
                                                         <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Em (LP):</span><span id="hud-em-lp" class="text-starlight dark:text-white text-xs font-black">--</span></div>
@@ -697,23 +697,23 @@
 
                                 <div id="results-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full hidden animate-fade-in-up mt-6">
                                     <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full relative">
-                                        <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Iluminância (Em)</p>
+                                        <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black" data-i18n="res_ilum">Iluminância (Em)</p>
                                         <div class="flex items-baseline gap-2">
                                             <span id="result-lux" class="text-4xl font-black text-starlight dark:text-white">0</span>
                                             <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">LUX</span>
                                         </div>
-                                        <div class="absolute top-6 right-6 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[8px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-700" title="Luz Direta + Estimativa de Rebatimento das Paredes">ILUMINAÇÃO GLOBAL</div>
+                                        <div class="absolute top-6 right-6 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[8px] font-black uppercase tracking-widest rounded border border-slate-200 dark:border-slate-700" title="Luz Direta + Estimativa de Rebatimento das Paredes" data-i18n="res_global">ILUMINAÇÃO GLOBAL</div>
                                     </div>
                                     <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
-                                        <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Ofuscamento (UGR)</p>
+                                        <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black" data-i18n="res_ugr">Ofuscamento (UGR)</p>
                                         <div class="flex items-baseline gap-2">
                                             <span id="result-ugr" class="text-4xl font-black text-starlight dark:text-white">0</span>
                                             <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">UGR</span>
-                                            <span class="ml-2 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-[8px] font-black uppercase tracking-widest rounded border border-amber-200 dark:border-amber-800">ESTIMADO</span>
+                                            <span class="ml-2 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-[8px] font-black uppercase tracking-widest rounded border border-amber-200 dark:border-amber-800" data-i18n="tag_estimated">ESTIMADO</span>
                                         </div>
                                     </div>
                                     <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl w-full">
-                                        <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black">Eficiência Energética</p>
+                                        <p class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-black" data-i18n="res_eff">Eficiência Energética</p>
                                         <div class="flex items-baseline gap-2">
                                             <span id="result-eff" class="text-4xl font-black text-starlight dark:text-white">0</span>
                                             <span class="text-sm text-slate-500 dark:text-slate-400 font-bold">LM/W</span>
@@ -729,14 +729,14 @@
                                             </div>
                                             <div class="flex-shrink-0 w-48">
                                                 <h3 class="text-sm font-black text-starlight dark:text-white uppercase tracking-widest flex items-center gap-2 mb-1" data-i18n="nbr_audit_title">Auditoria NBR 8995-1</h3>
-                                                <p id="nbr-status-text" class="text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tighter text-[9px]">Processando dados fotométricos...</p>
+                                                <p id="nbr-status-text" class="text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tighter text-[9px]" data-i18n="nbr_processing">Processando dados fotométricos...</p>
                                             </div>
                                         </div>
                                         
                                         <div id="nbr-summary-row" class="hidden flex-grow flex-col md:flex-row items-center justify-center gap-4 md:gap-8 border-t md:border-t-0 md:border-l md:border-r border-slate-200 dark:border-slate-700 py-4 md:py-0 px-2 md:px-6 mx-0 md:mx-4 w-full md:w-auto">
                                             <div class="flex items-center gap-3">
                                                 <span class="text-3xl font-black text-starlight dark:text-white"><span id="nbr-sum-lux">0</span> <span class="text-base text-slate-500 dark:text-slate-400 font-bold">lx</span></span>
-                                                <span id="nbr-sum-plane" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[9px] rounded border border-slate-300 dark:border-slate-600 font-black tracking-widest uppercase">NÍVEL MESA</span>
+                                                <span id="nbr-sum-plane" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[9px] rounded border border-slate-300 dark:border-slate-600 font-black tracking-widest uppercase" data-i18n="btn_lvl_desk">NÍVEL MESA</span>
                                             </div>
                                             <div class="hidden md:block w-px h-10 bg-slate-200 dark:bg-slate-700"></div>
                                             <div class="flex items-center gap-3">

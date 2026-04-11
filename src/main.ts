@@ -1259,13 +1259,11 @@ window.initNbrSelector = function() {
     
     if (!catSelect || !window.normsDatabase) return;
     
+    const currentCat = catSelect.value;
     const dict = window.i18n[window.currentLang] || {};
-    catSelect.innerHTML = `<option value="" disabled selected>${dict.opt_sel_cat || 'Selecione a Categoria (Ex: Escritório)...'}</option>`;
-    if (roomSelect) {
-        roomSelect.innerHTML = `<option value="" disabled selected>${dict.opt_sel_room || 'Selecione a Tarefa / Ambiente...'}</option>`;
-        roomSelect.disabled = true;
-    }
-
+    
+    catSelect.innerHTML = `<option value="" disabled ${!currentCat ? 'selected' : ''}>${dict.opt_sel_cat || 'Selecione a Categoria (Ex: Escritório)...'}</option>`;
+    
     const uniqueCats: any[] = [];
     const map = new Map();
     for (const item of window.normsDatabase) {
@@ -1277,10 +1275,20 @@ window.initNbrSelector = function() {
     
     uniqueCats.sort((a, b) => a.cat.localeCompare(b.cat)).forEach((c: any) => {
         const option = document.createElement('option');
-        option.value = c.cat; // Mantém a chave original (PT) como valor lógico da engine
+        option.value = c.cat; 
         option.text = window.currentLang === 'en' && c.catEn ? c.catEn : c.cat;
+        if (c.cat === currentCat) option.selected = true;
         catSelect.appendChild(option);
     });
+
+    if (currentCat && roomSelect) {
+        const currentRoom = roomSelect.value;
+        window.updateNbrRooms();
+        if (currentRoom) roomSelect.value = currentRoom;
+    } else if (roomSelect) {
+        roomSelect.innerHTML = `<option value="" disabled selected>${dict.opt_sel_room || 'Selecione a Tarefa / Ambiente...'}</option>`;
+        roomSelect.disabled = true;
+    }
 };
 
 window.updateNbrRooms = function() {
