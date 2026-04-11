@@ -367,17 +367,6 @@ window.toggleLanguage = function() {
         } 
     });
     window.updateInputsForLanguage();
-    
-    // LUXSINTAX: Forçar re-render dos dropdowns dinâmicos de domínio (NBR / LEED)
-    if (window.initNbrSelector) window.initNbrSelector();
-    if (window.updateNbrRooms) window.updateNbrRooms();
-    if (window.currentTool === 'leedProj' && window.renderLeedProject) window.renderLeedProject();
-    if (window.currentTool === 'query') {
-        if (window.populateCategoryFilter) window.populateCategoryFilter();
-        if (window.filterNorms) window.filterNorms();
-        if (window.updateLeedTargets) window.updateLeedTargets();
-    }
-    
     window.updateCalculations(); 
 };
 
@@ -959,8 +948,7 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
 
                 const statusEl = document.getElementById(statusId);
                 if(statusEl) {
-                    const loadedTxt = window.i18n[window.currentLang].msg_loaded || "Carregado";
-                    statusEl.innerText = `${loadedTxt}: ${file.name}`;
+                    statusEl.innerText = `Carregado: ${file.name}`;
                     statusEl.classList.add('text-luminous-gold');
                 }
 
@@ -997,8 +985,7 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
                     const cctBlock = document.getElementById('audit-cct-block');
                     
                     if (statusA) {
-                        const loadedTxt = window.i18n[window.currentLang].msg_loaded || "Carregado";
-                        statusA.innerText = `${loadedTxt}: ${file.name} (M/P: ${detectedRatio || 'N/D'})`;
+                        statusA.innerText = `Lido: ${file.name} (M/P: ${detectedRatio || 'N/D'})`;
                         statusA.classList.add('text-luminous-gold');
                         statusA.classList.remove('text-amber-500');
                     }
@@ -1011,8 +998,7 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
                         } else {
                             cctBlock.classList.remove('hidden'); // Destrava pedindo ajuda ao usuário
                             if (statusA) {
-                                const loadedTxt = window.i18n[window.currentLang].msg_loaded || "Carregado";
-                                statusA.innerText = `${loadedTxt}: ${file.name} (Sem CCT. Preencha abaixo)`;
+                                statusA.innerText = `Lido: ${file.name} (Sem CCT. Preencha abaixo)`;
                                 statusA.classList.add('text-amber-500');
                                 statusA.classList.remove('text-luminous-gold');
                             }
@@ -1259,36 +1245,19 @@ window.initNbrSelector = function() {
     
     if (!catSelect || !window.normsDatabase) return;
     
-    const currentCat = catSelect.value;
-    const dict = window.i18n[window.currentLang] || {};
-    
-    catSelect.innerHTML = `<option value="" disabled ${!currentCat ? 'selected' : ''}>${dict.opt_sel_cat || 'Selecione a Categoria (Ex: Escritório)...'}</option>`;
-    
-    const uniqueCats: any[] = [];
-    const map = new Map();
-    for (const item of window.normsDatabase) {
-        if(!map.has(item.cat)){
-            map.set(item.cat, true);
-            uniqueCats.push({ cat: item.cat, catEn: item.catEn });
-        }
-    }
-    
-    uniqueCats.sort((a, b) => a.cat.localeCompare(b.cat)).forEach((c: any) => {
-        const option = document.createElement('option');
-        option.value = c.cat; 
-        option.text = window.currentLang === 'en' && c.catEn ? c.catEn : c.cat;
-        if (c.cat === currentCat) option.selected = true;
-        catSelect.appendChild(option);
-    });
-
-    if (currentCat && roomSelect) {
-        const currentRoom = roomSelect.value;
-        window.updateNbrRooms();
-        if (currentRoom) roomSelect.value = currentRoom;
-    } else if (roomSelect) {
-        roomSelect.innerHTML = `<option value="" disabled selected>${dict.opt_sel_room || 'Selecione a Tarefa / Ambiente...'}</option>`;
+    catSelect.innerHTML = '<option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>';
+    if (roomSelect) {
+        roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
         roomSelect.disabled = true;
     }
+
+    const uniqueCats = [...new Set(window.normsDatabase.map((n: any) => n.cat))].sort() as string[];
+    uniqueCats.forEach((cat: string) => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.text = cat;
+        catSelect.appendChild(option);
+    });
 };
 
 window.updateNbrRooms = function() {
@@ -1298,8 +1267,7 @@ window.updateNbrRooms = function() {
     
     if (!selectedCat) return;
 
-    const dict = window.i18n[window.currentLang] || {};
-    roomSelect.innerHTML = `<option value="" disabled selected>${dict.opt_sel_room || 'Selecione a Tarefa / Ambiente...'}</option>`;
+    roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
     roomSelect.disabled = false;
 
     const rooms = window.normsDatabase.filter((n: any) => n.cat === selectedCat);
@@ -1309,7 +1277,7 @@ window.updateNbrRooms = function() {
         opt.dataset.lux = n.lux;
         opt.dataset.ugr = n.ugr === '-' ? '99' : String(n.ugr);
         opt.dataset.plane = n.plane || 'HP';
-        opt.innerText = window.currentLang === 'en' && n.roomEn ? n.roomEn : n.room;
+        opt.innerText = n.room;
         roomSelect.appendChild(opt);
     });
 };
@@ -1343,23 +1311,9 @@ window.applyNbrRules = function() {
 
 window.populateCategoryFilter = function() {
     const sel = document.getElementById('category-filter') as HTMLSelectElement;
-    if(!sel) return;
-    sel.innerHTML = `<option value="all">${window.currentLang === 'en' ? 'All Categories' : 'Todas as Categorias'}</option>`;
-    
-    const uniqueCats: any[] = [];
-    const map = new Map();
-    for (const item of window.normsDatabase) {
-        if(!map.has(item.cat)){
-            map.set(item.cat, true);
-            uniqueCats.push({ cat: item.cat, catEn: item.catEn });
-        }
-    }
-    uniqueCats.sort((a, b) => a.cat.localeCompare(b.cat)).forEach((c: any) => { 
-        const o = document.createElement('option'); 
-        o.value = c.cat; 
-        o.innerText = window.currentLang === 'en' && c.catEn ? c.catEn : c.cat; 
-        sel.appendChild(o); 
-    });
+    if(!sel || sel.options.length > 1) return;
+    const uniqueCats = [...new Set(window.normsDatabase.map((n: any) => n.cat))].sort() as string[];
+    uniqueCats.forEach((c: string) => { const o = document.createElement('option'); o.value=c; o.innerText=c; sel.appendChild(o); });
 };
 
 window.filterNorms = function() {
@@ -1369,17 +1323,11 @@ window.filterNorms = function() {
     
     const filtered = window.normsDatabase.filter((n: any) => {
         const matchCat = cat === 'all' || n.cat === cat;
-        const roomName = window.currentLang === 'en' && n.roomEn ? n.roomEn : n.room;
-        const catName = window.currentLang === 'en' && n.catEn ? n.catEn : n.cat;
-        const matchSearch = roomName.toLowerCase().includes(searchTerm) || catName.toLowerCase().includes(searchTerm);
+        const matchSearch = n.room.toLowerCase().includes(searchTerm) || n.cat.toLowerCase().includes(searchTerm);
         return matchCat && matchSearch;
     });
     
-    document.getElementById('nbr8995-tbody')!.innerHTML = filtered.map((n: any) => {
-        const roomName = window.currentLang === 'en' && n.roomEn ? n.roomEn : n.room;
-        const catName = window.currentLang === 'en' && n.catEn ? n.catEn : n.cat;
-        return `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${catName}</td><td class="p-4 text-slate-500 font-bold">${roomName}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`;
-    }).join('');
+    document.getElementById('nbr8995-tbody')!.innerHTML = filtered.map((n: any) => `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-slate-500 font-bold">${n.room}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`).join('');
 };
 
 window.switchQueryTab = function(t: string) {
@@ -1390,7 +1338,7 @@ window.switchQueryTab = function(t: string) {
     const searchContainer = document.getElementById('search-container');
     if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
 
-    if(t==='nbr8995') { window.populateCategoryFilter(); window.filterNorms(); }
+    if(t==='nbr8995') window.filterNorms();
     if(t==='nbr5101') window.calc5101();
     if(t==='leed') window.updateLeedTargets();
 };
@@ -1421,10 +1369,7 @@ window.updateLeedTargets = function() {
     const area = parseFloat((document.getElementById('leed-area-input') as HTMLInputElement).value) || 0;
     const red = window.currentLeedTarget === 'gold' ? 0.20 : (window.currentLeedTarget === 'platinum' ? 0.30 : (window.currentLeedTarget === 'silver' ? 0.10 : 0.05));
     document.getElementById('leed-reduction-display')!.innerText = (red*100).toFixed(0)+'%';
-    document.getElementById('leed-lpd-body')!.innerHTML = window.lpdBaselines.map((b: any) => {
-        const typeName = window.currentLang === 'en' && b.typeEn ? b.typeEn : b.type;
-        return `<tr class="border-b border-slate-100"><td class="p-3 text-starlight font-bold">${typeName}</td><td class="p-3 text-center text-slate-500 font-mono">${b.base}</td><td class="p-3 text-center text-luminous-gold font-black">${(b.base*(1-red)).toFixed(2)}</td><td class="p-3 text-right text-tech-cyan font-black">${(b.base*(1-red)*area).toFixed(0)} W</td></tr>`;
-    }).join('');
+    document.getElementById('leed-lpd-body')!.innerHTML = window.lpdBaselines.map((b: any) => `<tr class="border-b border-slate-100"><td class="p-3 text-starlight font-bold">${b.type}</td><td class="p-3 text-center text-slate-500 font-mono">${b.base}</td><td class="p-3 text-center text-luminous-gold font-black">${(b.base*(1-red)).toFixed(2)}</td><td class="p-3 text-right text-tech-cyan font-black">${(b.base*(1-red)*area).toFixed(0)} W</td></tr>`).join('');
 };
 
 window.setLeedTarget = function(t: string) { window.currentLeedTarget = t; document.querySelectorAll('.leed-level-box').forEach(b => b.classList.remove('active')); document.getElementById('lvl-'+t)?.classList.add('active'); window.updateLeedTargets(); };
@@ -1602,22 +1547,15 @@ window.updateLeedRoomUI = function(roomId: number) {
 window.updateGlobalLeedSummary = () => {
     const s = window.state.leedProject;
     const summary = window.StandardsEngine.calculateLeedCompliance(s);
-    const dict = window.i18n[window.currentLang];
-    document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W ${dict.leed_allowance || "Permitidos"}</span>`;
+    document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W Permitidos</span>`;
     document.getElementById('global-leed-lpd')!.innerHTML = `${summary.currentLpd.toFixed(2)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">W/m²</span>`;
     const statusBox = document.getElementById('global-leed-status');
-    if (statusBox) {
-        if (summary.totalArea > 0) {
-            statusBox.classList.remove('animate-pulse');
-            statusBox.innerText = summary.isCompliant ? (dict.pdf_leed_pass || "COMPLIANCE ATINGIDO (APROVADO)") : (dict.pdf_leed_fail || "REPROVADO (EXCEDE LIMITES)");
-            statusBox.className = summary.isCompliant 
-                ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" 
-                : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
-        } else {
-            statusBox.classList.add('animate-pulse');
-            statusBox.innerText = dict.leed_waiting || "AGUARDANDO DADOS";
-            statusBox.className = "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center animate-pulse";
-        }
+    if (statusBox && summary.totalArea > 0) {
+        statusBox.classList.remove('animate-pulse');
+        statusBox.innerText = summary.isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "ALERTA: CARGA EXCEDE LIMITE ASHRAE";
+        statusBox.className = summary.isCompliant 
+            ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" 
+            : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
     }
 };
 
@@ -1723,19 +1661,15 @@ window.renderLeedProject = function() {
                                 <option value="exterior" ${room.leedCategory === 'exterior' ? 'selected' : ''}>${window.currentLang === 'en' ? 'OUTDOOR' : 'EXTERNA'}</option>
                             </select>
                             <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[140px] md:w-[220px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
-                                <option value="" disabled ${!room.typology ? 'selected' : ''}>${window.currentLang === 'en' ? 'ASHRAE TYPOLOGY...' : 'TIPOLOGIA ASHRAE...'}</option>
-                                <optgroup label="${window.currentLang === 'en' ? 'Interiors' : 'Interiores'} (W/m²)">
-                                    ${[...window.lpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => {
-                                        const label = window.currentLang === 'en' && b.typeEn ? b.typeEn : b.type;
-                                        return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${label} (${b.base} W/m²)</option>`;
-                                    }).join('')}
+                                <option value="" disabled ${!room.typology ? 'selected' : ''}>TIPOLOGIA ASHRAE...</option>
+                                <optgroup label="Interiores (W/m²)">
+                                    ${[...window.lpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
                                 </optgroup>
-                                <optgroup label="${window.currentLang === 'en' ? 'Exteriors & Facades' : 'Exteriores & Fachadas'}">
+                                <optgroup label="Exteriores & Fachadas">
                                     ${window.exteriorLpdBaselines ? [...window.exteriorLpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => {
                                         const z = window.state.leedProject.lightingZone || 'LZ3';
                                         const limit = b.zoneAllowances ? b.zoneAllowances[z] : 0;
-                                        const labelExt = window.currentLang === 'en' && b.typeEn ? b.typeEn : b.type;
-                                        return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${labelExt} (${limit} ${b.unit})</option>`;
+                                        return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${limit} ${b.unit})</option>`;
                                     }).join('') : ''}
                                 </optgroup>
                             </select>
@@ -2558,25 +2492,16 @@ window.updateEsgUI = function() {
         const roiEl = document.getElementById('esg-roi-val');
         const alertEl = document.getElementById('esg-alert-msg');
         const alertBox = document.getElementById('esg-alert-box');
-        const dict = window.i18n[window.currentLang];
 
-        if(moneyEl) moneyEl.innerText = res.totalSavingsYearly.toLocaleString(window.currentLang === 'en' ? 'en-US' : 'pt-BR', { style: 'currency', currency: window.currentLang === 'en' ? 'USD' : 'BRL' });
-        if(kwhEl) kwhEl.innerText = Math.round(res.savedKwh).toLocaleString(window.currentLang === 'en' ? 'en-US' : 'pt-BR');
+        if(moneyEl) moneyEl.innerText = res.totalSavingsYearly.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        if(kwhEl) kwhEl.innerText = Math.round(res.savedKwh).toLocaleString('pt-BR');
         if(treesEl) treesEl.innerText = res.treesPlanted.toFixed(1);
-        if(pbEl) pbEl.innerHTML = res.isProfitable && s.capex > 0 ? `${res.paybackMonths.toFixed(1)} <span class="text-sm font-normal text-slate-400 dark:text-slate-300">${dict.esg_months || 'meses'}</span>` : '--';
-        if(roiEl) roiEl.innerHTML = res.isProfitable && s.capex > 0 ? `${res.roi5Years.toFixed(0)}<span class="text-sm font-normal text-slate-400 dark:text-slate-300">%</span>` : '--';
+        if(pbEl) pbEl.innerText = res.isProfitable && s.capex > 0 ? res.paybackMonths.toFixed(1) : '--';
+        if(roiEl) roiEl.innerText = res.isProfitable && s.capex > 0 ? res.roi5Years.toFixed(0) : '--';
 
         if (alertBox && alertEl) {
             alertBox.className = `relative z-10 mt-8 mx-4 p-4 rounded-xl text-xs font-bold text-center border transition-colors ${res.isProfitable ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-500/30' : 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-500/30'}`;
-            
-            let finalMsg = res.message;
-            if (res.isProfitable && dict.esg_highly_viable) {
-                finalMsg = finalMsg.replace("Projeto Altamente Viável! VPL positivo de", dict.esg_highly_viable)
-                                   .replace("superando o custo de capital.", dict.esg_surpassing)
-                                   .replace(/em (\d+) anos/, (match: string, p1: string) => window.currentLang === 'en' ? `in ${p1} ${dict.esg_years_label.toLowerCase()}` : `em ${p1} ${dict.esg_years_label.toLowerCase()}`);
-            }
-
-            alertEl.innerHTML = res.isProfitable ? `<i class="fas fa-check-circle mr-2"></i> ${finalMsg}` : `<i class="fas fa-exclamation-triangle mr-2"></i> ${res.message}`;
+            alertEl.innerHTML = res.isProfitable ? `<i class="fas fa-check-circle mr-2"></i> ${res.message}` : `<i class="fas fa-exclamation-triangle mr-2"></i> ${res.message}`;
         }
     }
 };
