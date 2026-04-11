@@ -367,6 +367,17 @@ window.toggleLanguage = function() {
         } 
     });
     window.updateInputsForLanguage();
+    
+    // LUXSINTAX: Forçar re-render dos dropdowns dinâmicos de domínio (NBR / LEED)
+    if (window.initNbrSelector) window.initNbrSelector();
+    if (window.updateNbrRooms) window.updateNbrRooms();
+    if (window.currentTool === 'leedProj' && window.renderLeedProject) window.renderLeedProject();
+    if (window.currentTool === 'query') {
+        if (window.populateCategoryFilter) window.populateCategoryFilter();
+        if (window.filterNorms) window.filterNorms();
+        if (window.updateLeedTargets) window.updateLeedTargets();
+    }
+    
     window.updateCalculations(); 
 };
 
@@ -1248,17 +1259,26 @@ window.initNbrSelector = function() {
     
     if (!catSelect || !window.normsDatabase) return;
     
-    catSelect.innerHTML = '<option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>';
+    const dict = window.i18n[window.currentLang] || {};
+    catSelect.innerHTML = `<option value="" disabled selected>${dict.opt_sel_cat || 'Selecione a Categoria (Ex: Escritório)...'}</option>`;
     if (roomSelect) {
-        roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
+        roomSelect.innerHTML = `<option value="" disabled selected>${dict.opt_sel_room || 'Selecione a Tarefa / Ambiente...'}</option>`;
         roomSelect.disabled = true;
     }
 
-    const uniqueCats = [...new Set(window.normsDatabase.map((n: any) => n.cat))].sort() as string[];
-    uniqueCats.forEach((cat: string) => {
+    const uniqueCats: any[] = [];
+    const map = new Map();
+    for (const item of window.normsDatabase) {
+        if(!map.has(item.cat)){
+            map.set(item.cat, true);
+            uniqueCats.push({ cat: item.cat, catEn: item.catEn });
+        }
+    }
+    
+    uniqueCats.sort((a, b) => a.cat.localeCompare(b.cat)).forEach((c: any) => {
         const option = document.createElement('option');
-        option.value = cat;
-        option.text = cat;
+        option.value = c.cat; // Mantém a chave original (PT) como valor lógico da engine
+        option.text = window.currentLang === 'en' && c.catEn ? c.catEn : c.cat;
         catSelect.appendChild(option);
     });
 };
@@ -1270,7 +1290,8 @@ window.updateNbrRooms = function() {
     
     if (!selectedCat) return;
 
-    roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
+    const dict = window.i18n[window.currentLang] || {};
+    roomSelect.innerHTML = `<option value="" disabled selected>${dict.opt_sel_room || 'Selecione a Tarefa / Ambiente...'}</option>`;
     roomSelect.disabled = false;
 
     const rooms = window.normsDatabase.filter((n: any) => n.cat === selectedCat);
@@ -1280,7 +1301,7 @@ window.updateNbrRooms = function() {
         opt.dataset.lux = n.lux;
         opt.dataset.ugr = n.ugr === '-' ? '99' : String(n.ugr);
         opt.dataset.plane = n.plane || 'HP';
-        opt.innerText = n.room;
+        opt.innerText = window.currentLang === 'en' && n.roomEn ? n.roomEn : n.room;
         roomSelect.appendChild(opt);
     });
 };
@@ -1314,9 +1335,23 @@ window.applyNbrRules = function() {
 
 window.populateCategoryFilter = function() {
     const sel = document.getElementById('category-filter') as HTMLSelectElement;
-    if(!sel || sel.options.length > 1) return;
-    const uniqueCats = [...new Set(window.normsDatabase.map((n: any) => n.cat))].sort() as string[];
-    uniqueCats.forEach((c: string) => { const o = document.createElement('option'); o.value=c; o.innerText=c; sel.appendChild(o); });
+    if(!sel) return;
+    sel.innerHTML = `<option value="all">${window.currentLang === 'en' ? 'All Categories' : 'Todas as Categorias'}</option>`;
+    
+    const uniqueCats: any[] = [];
+    const map = new Map();
+    for (const item of window.normsDatabase) {
+        if(!map.has(item.cat)){
+            map.set(item.cat, true);
+            uniqueCats.push({ cat: item.cat, catEn: item.catEn });
+        }
+    }
+    uniqueCats.sort((a, b) => a.cat.localeCompare(b.cat)).forEach((c: any) => { 
+        const o = document.createElement('option'); 
+        o.value = c.cat; 
+        o.innerText = window.currentLang === 'en' && c.catEn ? c.catEn : c.cat; 
+        sel.appendChild(o); 
+    });
 };
 
 window.filterNorms = function() {
@@ -1326,11 +1361,17 @@ window.filterNorms = function() {
     
     const filtered = window.normsDatabase.filter((n: any) => {
         const matchCat = cat === 'all' || n.cat === cat;
-        const matchSearch = n.room.toLowerCase().includes(searchTerm) || n.cat.toLowerCase().includes(searchTerm);
+        const roomName = window.currentLang === 'en' && n.roomEn ? n.roomEn : n.room;
+        const catName = window.currentLang === 'en' && n.catEn ? n.catEn : n.cat;
+        const matchSearch = roomName.toLowerCase().includes(searchTerm) || catName.toLowerCase().includes(searchTerm);
         return matchCat && matchSearch;
     });
     
-    document.getElementById('nbr8995-tbody')!.innerHTML = filtered.map((n: any) => `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-slate-500 font-bold">${n.room}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`).join('');
+    document.getElementById('nbr8995-tbody')!.innerHTML = filtered.map((n: any) => {
+        const roomName = window.currentLang === 'en' && n.roomEn ? n.roomEn : n.room;
+        const catName = window.currentLang === 'en' && n.catEn ? n.catEn : n.cat;
+        return `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${catName}</td><td class="p-4 text-slate-500 font-bold">${roomName}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`;
+    }).join('');
 };
 
 window.switchQueryTab = function(t: string) {
@@ -1341,7 +1382,7 @@ window.switchQueryTab = function(t: string) {
     const searchContainer = document.getElementById('search-container');
     if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
 
-    if(t==='nbr8995') window.filterNorms();
+    if(t==='nbr8995') { window.populateCategoryFilter(); window.filterNorms(); }
     if(t==='nbr5101') window.calc5101();
     if(t==='leed') window.updateLeedTargets();
 };
@@ -1372,7 +1413,10 @@ window.updateLeedTargets = function() {
     const area = parseFloat((document.getElementById('leed-area-input') as HTMLInputElement).value) || 0;
     const red = window.currentLeedTarget === 'gold' ? 0.20 : (window.currentLeedTarget === 'platinum' ? 0.30 : (window.currentLeedTarget === 'silver' ? 0.10 : 0.05));
     document.getElementById('leed-reduction-display')!.innerText = (red*100).toFixed(0)+'%';
-    document.getElementById('leed-lpd-body')!.innerHTML = window.lpdBaselines.map((b: any) => `<tr class="border-b border-slate-100"><td class="p-3 text-starlight font-bold">${b.type}</td><td class="p-3 text-center text-slate-500 font-mono">${b.base}</td><td class="p-3 text-center text-luminous-gold font-black">${(b.base*(1-red)).toFixed(2)}</td><td class="p-3 text-right text-tech-cyan font-black">${(b.base*(1-red)*area).toFixed(0)} W</td></tr>`).join('');
+    document.getElementById('leed-lpd-body')!.innerHTML = window.lpdBaselines.map((b: any) => {
+        const typeName = window.currentLang === 'en' && b.typeEn ? b.typeEn : b.type;
+        return `<tr class="border-b border-slate-100"><td class="p-3 text-starlight font-bold">${typeName}</td><td class="p-3 text-center text-slate-500 font-mono">${b.base}</td><td class="p-3 text-center text-luminous-gold font-black">${(b.base*(1-red)).toFixed(2)}</td><td class="p-3 text-right text-tech-cyan font-black">${(b.base*(1-red)*area).toFixed(0)} W</td></tr>`;
+    }).join('');
 };
 
 window.setLeedTarget = function(t: string) { window.currentLeedTarget = t; document.querySelectorAll('.leed-level-box').forEach(b => b.classList.remove('active')); document.getElementById('lvl-'+t)?.classList.add('active'); window.updateLeedTargets(); };
@@ -1671,15 +1715,19 @@ window.renderLeedProject = function() {
                                 <option value="exterior" ${room.leedCategory === 'exterior' ? 'selected' : ''}>${window.currentLang === 'en' ? 'OUTDOOR' : 'EXTERNA'}</option>
                             </select>
                             <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[140px] md:w-[220px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
-                                <option value="" disabled ${!room.typology ? 'selected' : ''}>TIPOLOGIA ASHRAE...</option>
-                                <optgroup label="Interiores (W/m²)">
-                                    ${[...window.lpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
+                                <option value="" disabled ${!room.typology ? 'selected' : ''}>${window.currentLang === 'en' ? 'ASHRAE TYPOLOGY...' : 'TIPOLOGIA ASHRAE...'}</option>
+                                <optgroup label="${window.currentLang === 'en' ? 'Interiors' : 'Interiores'} (W/m²)">
+                                    ${[...window.lpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => {
+                                        const label = window.currentLang === 'en' && b.typeEn ? b.typeEn : b.type;
+                                        return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${label} (${b.base} W/m²)</option>`;
+                                    }).join('')}
                                 </optgroup>
-                                <optgroup label="Exteriores & Fachadas">
+                                <optgroup label="${window.currentLang === 'en' ? 'Exteriors & Facades' : 'Exteriores & Fachadas'}">
                                     ${window.exteriorLpdBaselines ? [...window.exteriorLpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => {
                                         const z = window.state.leedProject.lightingZone || 'LZ3';
                                         const limit = b.zoneAllowances ? b.zoneAllowances[z] : 0;
-                                        return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${limit} ${b.unit})</option>`;
+                                        const labelExt = window.currentLang === 'en' && b.typeEn ? b.typeEn : b.type;
+                                        return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${labelExt} (${limit} ${b.unit})</option>`;
                                     }).join('') : ''}
                                 </optgroup>
                             </select>

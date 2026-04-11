@@ -262,7 +262,8 @@ export class Canvas2DEngine {
             ctx.fillStyle = "#d97706";
             ctx.font = "bold 12px Manrope";
             ctx.textAlign = "center";
-            ctx.fillText("A PROCESSAR MALHA FOTOMÉTRICA...", offsetX + roomPxW/2, offsetY + roomPxH/2);
+            const loadTxt = win.i18n?.[win.currentLang]?.lbl_processing || "A PROCESSAR MALHA FOTOMÉTRICA...";
+            ctx.fillText(loadTxt, offsetX + roomPxW/2, offsetY + roomPxH/2);
 
             // Delegação para o Web Worker (Non-blocking UI)
             const radiosityResult = await RadiosityEngine.calculateGridMatrixAsync({
@@ -975,11 +976,12 @@ export class Canvas2DEngine {
             if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(hclX, hclY, hclW, hclH, 12); ctx.stroke(); } 
             else { ctx.strokeRect(hclX, hclY, hclW, hclH); }
 
+            const dictObj = win.i18n?.[win.currentLang] || {};
             ctx.textAlign = "left";
             ctx.textBaseline = "top";
             ctx.fillStyle = "#6366f1"; 
             ctx.font = "900 10px Manrope";
-            ctx.fillText("ESPECTROFOTÔMETRO (HCL)", hclX + 15, hclY + 12);
+            ctx.fillText(dictObj.hud_spectrometer || "ESPECTROFOTÔMETRO (HCL)", hclX + 15, hclY + 12);
 
             const currentMRatio = (s.mRatio || 0.52).toFixed(2);
             let cctLabel = "3000K";
@@ -990,7 +992,7 @@ export class Canvas2DEngine {
 
             ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
             ctx.font = "bold 9px Manrope";
-            ctx.fillText(`CCT: ${cctLabel} | Razão Melanópica: ${currentMRatio}`, hclX + 15, hclY + 26);
+            ctx.fillText(`CCT: ${cctLabel} | ${dictObj.hcl_ratio || 'Razão Melanópica'}: ${currentMRatio}`, hclX + 15, hclY + 26);
 
             const gX = hclX + 25;
             const gY = hclY + 115;
@@ -1057,14 +1059,15 @@ export class Canvas2DEngine {
 
             ctx.font = "bold 8px Manrope";
             
+            const dict = win.i18n?.[win.currentLang] || {};
             ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
-            ctx.fillText("━━ SPD (Emissão do LED)", hclX + 15, hclY + 128);
+            ctx.fillText(`━━ SPD (${dict.hcl_spd || 'Emissão do LED'})`, hclX + 15, hclY + 128);
             
             ctx.fillStyle = "#fbbf24";
-            ctx.fillText("--- V(λ) Visão Fotópica", hclX + 15, hclY + 138);
+            ctx.fillText(`--- V(λ) ${dict.hcl_photopic || 'Visão Fotópica'}`, hclX + 15, hclY + 138);
             
             ctx.fillStyle = "#a855f7";
-            ctx.fillText("--- Curva Melanópica (ipRGC)", hclX + 125, hclY + 138);
+            ctx.fillText(`--- ${dict.hcl_melanopic || 'Curva Melanópica'} (ipRGC)`, hclX + 125, hclY + 138);
 
             ctx.restore();
         }
@@ -1186,19 +1189,25 @@ export class Canvas2DEngine {
                 }
             });
 
+            const dict2 = win.i18n?.[win.currentLang] || {};
             ctx.font = "900 14px Manrope";
             ctx.fillStyle = accentColor;
-            ctx.fillText(bioResult.isCritical ? 'Risco Biológico' : (bioResult.isWarning ? 'Alerta Moderado' : 'Sincronizado'), cx, cy - 6);
+            
+            let statusTxt = dict2.hcl_sync || 'Sincronizado';
+            if (bioResult.isCritical) statusTxt = dict2.hcl_risk || 'Risco Biológico';
+            else if (bioResult.isWarning) statusTxt = dict2.hcl_warn || 'Alerta Moderado';
+            
+            ctx.fillText(statusTxt, cx, cy - 6);
             ctx.font = "bold 11px Manrope";
             ctx.fillStyle = textColor;
-            ctx.fillText(`CS alcançado: ${(bioResult.cs || 0).toFixed(2)}`, cx, cy + 12);
+            ctx.fillText(`${dict2.hcl_cs_reached || 'CS alcançado'}: ${(bioResult.cs || 0).toFixed(2)}`, cx, cy + 12);
 
             // LUXSINTAX: Legenda Geométrica do Mapa de Fadiga
             ctx.font = "bold 10px Manrope";
             ctx.fillStyle = "rgba(16, 185, 129, 0.9)";
-            ctx.fillText("■ Janela de Alerta", cx - 60, h - 10);
+            ctx.fillText(`■ ${dict2.hcl_alert_win || 'Janela de Alerta'}`, cx - 60, h - 10);
             ctx.fillStyle = "rgba(59, 130, 246, 0.9)";
-            ctx.fillText("■ Prep. para Sono", cx + 60, h - 10);
+            ctx.fillText(`■ ${dict2.hcl_sleep_prep || 'Prep. para Sono'}`, cx + 60, h - 10);
 
         } else {
             const padding = 35;
@@ -1215,9 +1224,10 @@ export class Canvas2DEngine {
             ctx.fillText("480nm", padding + ((w - padding - 10) * 0.25), h - 10);
             ctx.fillText("780nm (IR)", w - 30, h - 10);
             
+            const dict3 = win.i18n?.[win.currentLang] || {};
             ctx.save();
             ctx.translate(15, h / 2); ctx.rotate(-Math.PI / 2);
-            ctx.fillText("Intensidade Relativa (%)", 0, 0);
+            ctx.fillText(dict3.hcl_rel_intensity || "Intensidade Relativa (%)", 0, 0);
             ctx.restore();
 
             const mRatio = state.mRatio || 0.52;
@@ -1252,7 +1262,7 @@ export class Canvas2DEngine {
             
             ctx.font = "bold 8px Manrope";
             ctx.fillStyle = "#a855f7";
-            ctx.fillText("Pico Melanópico", peakX, 15);
+            ctx.fillText(dict3.hcl_mel_peak || "Pico Melanópico", peakX, 15);
 
             ctx.beginPath();
             ctx.moveTo(padding, h - padding);
@@ -1354,13 +1364,13 @@ export class Canvas2DEngine {
             ctx.font = "900 12px Manrope";
             
             ctx.fillStyle = accentColor; 
-            ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : "── LED (Física Padrão)", w - 20, 25);
+            ctx.fillText(isSunLike ? "── LED (SunLike Premium)" : `── LED (${dict3.hcl_std_physics || 'Física Padrão'})`, w - 20, 25);
             
             ctx.fillStyle = "#06b6d4"; 
-            ctx.fillText(`- - Fantasma Melanópico (${userAge} anos)`, w - 20, 45);
+            ctx.fillText(`- - ${dict3.hcl_mel_ghost || 'Fantasma Melanópico'} (${userAge} ${dict3.esg_years_label?.toLowerCase() || 'anos'})`, w - 20, 45);
             
             ctx.fillStyle = "#84cc16"; // Match Lime Green
-            ctx.fillText(`- - Retina Visão Fotópica`, w - 20, 65);
+            ctx.fillText(`- - ${dict3.hcl_retina || 'Retina Visão Fotópica'}`, w - 20, 65);
             ctx.restore();
         }
     }
