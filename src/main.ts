@@ -1248,9 +1248,12 @@ window.initNbrSelector = function() {
     
     if (!catSelect || !window.normsDatabase) return;
     
-    catSelect.innerHTML = '<option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>';
+    const msgCat = window.i18n[window.currentLang]?.opt_cat_def || "Selecione a Categoria (Ex: Escritório)...";
+    const msgRoom = window.i18n[window.currentLang]?.opt_room_def || "Selecione a Tarefa / Ambiente...";
+
+    catSelect.innerHTML = `<option value="" disabled selected data-i18n="opt_cat_def">${msgCat}</option>`;
     if (roomSelect) {
-        roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
+        roomSelect.innerHTML = `<option value="" disabled selected data-i18n="opt_room_def">${msgRoom}</option>`;
         roomSelect.disabled = true;
     }
 
@@ -1272,7 +1275,8 @@ window.updateNbrRooms = function() {
     const selectedCat = catSelect.value;
     if (!selectedCat) return;
 
-    roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
+    const msgRoom = window.i18n[window.currentLang]?.opt_room_def || "Selecione a Tarefa / Ambiente...";
+    roomSelect.innerHTML = `<option value="" disabled selected data-i18n="opt_room_def">${msgRoom}</option>`;
     roomSelect.disabled = false;
     roomSelect.classList.remove('opacity-50', 'cursor-not-allowed');
 

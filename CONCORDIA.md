@@ -72,13 +72,14 @@
 - [10/04/2026] REFACTOR UX: Inversão visual da Lei de Fitts na aba de Auditoria. Implementação de Switch Manual/IES e trava segura de CCT. Adição de sombras de contraste no Canvas, aumento da tipografia base e integração do "Raio-X Didático" flutuante sobre a nota WELL para evidenciar o peso da métrica TLM.
 - [11/04/2026] UI/UX Light Mode (index.html): Correção de consistência visual no botão de Download de Relatório, substituindo classes fixas pelo sistema reativo de temas do Tailwind.
 - [11/04/2026] UI/UX 3D Engine (Photometric3DEngine.ts): Refatoração da injeção no DOM para o HUD dinâmico "Facho FWHM", aplicando classes responsivas do Tailwind para suportar perfeitamente o Modo Claro.
+- [11/04/2026] UI/UX i18n (index.html & Dictionary.ts): Refinamento da Internacionalização. Substituição de inputs de arquivo nativos por botões customizados (Label) com suporte a tradução. Injeção de chaves dinâmicas para o status de Auditoria ("AGUARDANDO") e renomeação do painel técnico para "Dados Fotométricos", garantindo 100% de cobertura bilíngue e coesão visual na aba Lúmens.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
 - src/main.ts: Ponto de entrada, orquestrador de estado global e ponte Window.
 - src/domain/: Lógica pura matemática e física (Fotometria, Elétrica, Normas, ESG).
 - src/infrastructure/: Motores de renderização (Three.js, Canvas2D) e exportação.
-- [07/04/2026]: Modularização do HTML concluída via AI Studio.
+- [DATA ATUAL]: Modularização do HTML concluída via AI Studio.
 - [07/04/2026]: Implementação do Dashboard de Auditoria & Performance e Driver Hub concluídos.
 
 ## Regras para a IA
