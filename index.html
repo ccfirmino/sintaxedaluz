@@ -416,8 +416,11 @@
                                     <div class="mode-ies-group hidden space-y-6 mb-6">
                                         <div class="group">
                                             <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="v-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-                                            <p id="v-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                            <div class="flex items-center gap-3">
+                                                <label for="v-ies-input" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-luminous-gold text-luminous-gold px-3 py-1.5 rounded-lg text-[9px] font-black uppercase cursor-pointer transition-colors shadow-sm" data-i18n="btn_choose_file">ESCOLHER ARQUIVO</label>
+                                                <input type="file" id="v-ies-input" accept=".ies, .ldt" class="hidden" onchange="window.handleIESUpload(this)">
+                                                <p id="v-ies-status" class="text-[9px] text-dim-gray italic truncate" data-i18n="msg_no_file">Nenhum arquivo carregado.</p>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="mode-direct-group mb-6 group"><div class="flex justify-between items-end mb-2"><label class="text-[10px] text-slate-500 font-bold whitespace-nowrap" data-i18n="lbl_intensity_i">INTENSIDADE (I)</label><div class="flex items-baseline gap-1"><input type="number" id="v-intensity" value="3000"><span class="text-[9px] text-slate-500 font-bold">CD</span></div></div><input type="range" id="range-v-intensity" min="0" max="20000" step="10" value="3000"></div>
@@ -477,8 +480,11 @@
                                     <div class="mode-ies-group hidden space-y-6 mb-6">
                                         <div class="group">
                                             <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
-                                            <input type="file" id="g-ies-input" accept=".ies, .ldt" onchange="window.handleIESUpload(this)" class="w-full text-dim-gray border-b border-slate-200 pb-2">
-                                            <p id="g-ies-status" class="text-[9px] text-dim-gray mt-1 italic">Nenhum arquivo carregado.</p>
+                                            <div class="flex items-center gap-3">
+                                                <label for="g-ies-input" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-luminous-gold text-luminous-gold px-3 py-1.5 rounded-lg text-[9px] font-black uppercase cursor-pointer transition-colors shadow-sm" data-i18n="btn_choose_file">ESCOLHER ARQUIVO</label>
+                                                <input type="file" id="g-ies-input" accept=".ies, .ldt" class="hidden" onchange="window.handleIESUpload(this)">
+                                                <p id="g-ies-status" class="text-[9px] text-dim-gray italic truncate" data-i18n="msg_no_file">Nenhum arquivo carregado.</p>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -647,7 +653,7 @@
                                                 </div>
 
                                                 <div id="photometric-dashboard" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4 backdrop-blur-md shadow-xl">
-                                                    <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> <span data-i18n="hdr_tech_summary">SUMÁRIO TÉCNICO</span></h4>
+                                                    <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> <span data-i18n="hdr_tech_summary">DADOS FOTOMÉTRICOS</span></h4>
                                                     <div class="text-slate-500 dark:text-slate-400 truncate mb-3 text-[10px] font-bold" id="pd-filename">arquivo.ies</div>
                                                     <div class="space-y-2">
                                                         <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
@@ -757,7 +763,7 @@
                                             </div>
                                         </div>
                                         
-                                        <div id="nbr-badge" class="px-6 py-2 rounded-full text-[12px] font-black uppercase tracking-widest border flex-shrink-0 text-center w-full md:w-48">
+                                        <div id="nbr-badge" class="px-6 py-2 rounded-full text-[12px] font-black uppercase tracking-widest border flex-shrink-0 text-center w-full md:w-48" data-i18n="msg_waiting">
                                             AGUARDANDO
                                         </div>
                                     </div>
