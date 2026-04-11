@@ -878,7 +878,8 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
 
             try {
                 const statusIds =['p-ies-status', 'v-ies-status', 'g-ies-status'];
-                statusIds.forEach(id => { const el = document.getElementById(id); if(el) { el.innerText = "Processando fotometria na nuvem..."; el.classList.remove('text-red-500'); }});
+                const msgProc = window.i18n[window.currentLang]?.msg_processing || "Processando fotometria na nuvem...";
+                statusIds.forEach(id => { const el = document.getElementById(id); if(el) { el.innerText = msgProc; el.classList.remove('text-red-500'); }});
 
                 const response = await fetch('/api/parse', {
                     method: 'POST',
@@ -890,7 +891,8 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
                 parsed = await response.json();
             } catch (err) {
                 const statusIds =['p-ies-status', 'v-ies-status', 'g-ies-status'];
-                statusIds.forEach(id => { const el = document.getElementById(id); if(el) { el.innerText = "Erro na leitura do arquivo."; el.classList.add('text-red-500'); }});
+                const msgErr = window.i18n[window.currentLang]?.msg_file_error || "Erro na leitura do arquivo.";
+                statusIds.forEach(id => { const el = document.getElementById(id); if(el) { el.innerText = msgErr; el.classList.add('text-red-500'); }});
                 return alert("Erro ao processar o arquivo. Formato inválido ou ilegível.");
             }
             
@@ -948,7 +950,8 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
 
                 const statusEl = document.getElementById(statusId);
                 if(statusEl) {
-                    statusEl.innerText = `Carregado: ${file.name}`;
+                    const msgLoaded = window.i18n[window.currentLang]?.msg_file_loaded || "Carregado:";
+                    statusEl.innerText = `${msgLoaded} ${file.name}`;
                     statusEl.classList.add('text-luminous-gold');
                 }
 

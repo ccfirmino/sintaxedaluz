@@ -465,13 +465,13 @@
                                 
                                 <div id="inputs-grid" class="hidden">
                                     <div class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-4 w-full">
-                                        <button onclick="window.setGridCalcMethod('target')" id="btn-grid-target" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm"><i class="fas fa-bullseye mr-1"></i> Alvo Lux</button>
-                                        <button onclick="window.setGridCalcMethod('manual')" id="btn-grid-manual" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all"><i class="fas fa-th mr-1"></i> Malha Manual</button>
+                                        <button onclick="window.setGridCalcMethod('target')" id="btn-grid-target" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm"><i class="fas fa-bullseye mr-1"></i> <span data-i18n="btn_target_lux">Alvo Lux</span></button>
+                                        <button onclick="window.setGridCalcMethod('manual')" id="btn-grid-manual" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all"><i class="fas fa-th mr-1"></i> <span data-i18n="btn_manual_grid">Malha Manual</span></button>
                                     </div>
 
                                     <div class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
-                                        <button onclick="window.updateCalcMode('direct')" id="btn-grid-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Ficha Técnica</button>
-                                        <button onclick="window.updateCalcMode('ies')" id="btn-grid-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">IES / LDT</button>
+                                        <button onclick="window.updateCalcMode('direct')" id="btn-grid-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_datasheet">Ficha Técnica</button>
+                                        <button onclick="window.updateCalcMode('ies')" id="btn-grid-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_ies_ldt">IES / LDT</button>
                                     </div>
 
                                     <div class="mode-ies-group hidden space-y-6 mb-6">
@@ -489,11 +489,11 @@
                                     <div id="grid-mode-manual" class="hidden mb-6 group pt-2">
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="group">
-                                                <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Colunas (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-manualCols" value="4" min="1" max="100" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div>
+                                                <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_cols_x">Colunas (X)</label><div class="flex items-baseline gap-1"><input type="number" id="g-manualCols" value="4" min="1" max="100" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div>
                                                 <input type="range" id="range-g-manualCols" min="1" max="50" step="1" value="4">
                                             </div>
                                             <div class="group">
-                                                <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase">Linhas (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-manualRows" value="3" min="1" max="100" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div>
+                                                <div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold uppercase" data-i18n="lbl_rows_y">Linhas (Y)</label><div class="flex items-baseline gap-1"><input type="number" id="g-manualRows" value="3" min="1" max="100" step="1"><span class="text-[9px] text-slate-500 font-bold">UN</span></div></div>
                                                 <input type="range" id="range-g-manualRows" min="1" max="50" step="1" value="3">
                                             </div>
                                         </div>
@@ -511,7 +511,7 @@
 
                                     <div class="grid grid-cols-2 gap-4 mb-6">
                                         <div class="mode-standard-only group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_beam">Abertura Facho</label><div class="flex items-baseline gap-1"><input type="number" id="g-beam" value="60" min="5" max="120"><span class="text-[9px] text-slate-500 font-bold">°</span></div></div><input type="range" id="range-g-beam" min="5" max="120" step="1" value="60"></div>
-                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase">Temp. de Cor</label><div class="flex items-baseline gap-1"><input type="number" id="g-cct" value="3000" min="2000" max="6500" step="100"><span class="text-[9px] text-slate-500 font-bold">K</span></div></div><input type="range" id="range-g-cct" min="2000" max="6500" step="100" value="3000"></div>
+                                        <div class="group"><div class="flex justify-between items-end mb-2"><label class="text-[9px] text-slate-500 font-bold whitespace-nowrap uppercase" data-i18n="lbl_cct_temp">Temp. de Cor</label><div class="flex items-baseline gap-1"><input type="number" id="g-cct" value="3000" min="2000" max="6500" step="100"><span class="text-[9px] text-slate-500 font-bold">K</span></div></div><input type="range" id="range-g-cct" min="2000" max="6500" step="100" value="3000"></div>
                                     </div>
 
                                     <div class="mode-standard-only grid grid-cols-2 gap-4 mb-6">
@@ -522,12 +522,12 @@
                                     <div class="flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                                         <div class="group relative z-50">
                                             <label class="text-[10px] text-slate-500 font-bold uppercase mb-2 flex items-center w-max cursor-help">
-                                                <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5">Cor do Ambiente (Rebatimento)</span>
+                                                <span class="border-b border-dashed border-slate-400 dark:border-slate-500 pb-0.5" data-i18n="lbl_room_color">Cor do Ambiente (Rebatimento)</span>
                                             </label>
                                             <select id="g-reflectance" onchange="window.updateCalculations()" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold outline-none text-starlight dark:bg-slate-700 dark:border-slate-600 cursor-pointer hover:border-luminous-gold transition-colors">
-                                                <option value="0.10">Paredes Claras (Branco/Gelo)</option>
-                                                <option value="0.05" selected>Paredes Médias (Cinza/Madeira)</option>
-                                                <option value="0.00">Paredes Escuras (Preto/Tijolo)</option>
+                                                <option value="0.10" data-i18n="opt_ref_light">Paredes Claras (Branco/Gelo)</option>
+                                                <option value="0.05" selected data-i18n="opt_ref_med">Paredes Médias (Cinza/Madeira)</option>
+                                                <option value="0.00" data-i18n="opt_ref_dark">Paredes Escuras (Preto/Tijolo)</option>
                                             </select>
                                         </div>
                                         
@@ -558,9 +558,9 @@
                                             </div>
 
                                             <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Nível Mesa</button>
-                                                <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Nível Piso</button>
-                                                <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
+                                                <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_lvl_desk">Nível Mesa</button>
+                                                <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_lvl_floor">Nível Piso</button>
+                                                <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_3d_persp">Perspectiva 3D</button>
                                             </div>
                                         </div>
 
@@ -576,7 +576,7 @@
                                                 </label>
                                                 <div class="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
                                                 <label id="lbl-toggle-isolines" class="flex items-center gap-2 cursor-pointer group px-2 transition-opacity">
-                                                    <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">ISOLINHAS</span>
+                                                    <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_isolines">ISOLINHAS</span>
                                                     <div class="relative">
                                                         <input type="checkbox" id="g-isolines" onchange="window.toggleIsolines(this.checked)" checked class="sr-only">
                                                         <div class="block bg-tech-cyan w-7 h-4 rounded-full transition-colors duration-300" id="iso-toggle-bg"></div>
@@ -585,7 +585,7 @@
                                                 </label>
                                                 
                                                 <label id="lbl-toggle-polar" class="hidden flex items-center gap-2 cursor-pointer group px-2 transition-opacity">
-                                                    <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider">CURVA POLAR</span>
+                                                    <span class="text-[9px] text-slate-500 font-black uppercase tracking-wider" data-i18n="lbl_polar_curve">CURVA POLAR</span>
                                                     <div class="relative">
                                                         <input type="checkbox" id="g-polar" onchange="window.togglePolar(this.checked)" checked class="sr-only">
                                                         <div class="block bg-luminous-gold w-7 h-4 rounded-full transition-colors duration-300" id="polar-toggle-bg"></div>
@@ -647,7 +647,7 @@
                                                 </div>
 
                                                 <div id="photometric-dashboard" class="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-xl p-4 w-52 hidden transition-all duration-300 pointer-events-auto mt-4 backdrop-blur-md shadow-xl">
-                                                    <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> SUMÁRIO TÉCNICO</h4>
+                                                    <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> <span data-i18n="hdr_tech_summary">SUMÁRIO TÉCNICO</span></h4>
                                                     <div class="text-slate-500 dark:text-slate-400 truncate mb-3 text-[10px] font-bold" id="pd-filename">arquivo.ies</div>
                                                     <div class="space-y-2">
                                                         <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
@@ -683,24 +683,24 @@
                                 <div id="nbr-selector-section" class="w-full hidden animate-fade-in-up">
                                     <div class="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-md flex flex-col md:flex-row items-center gap-4">
                                         <div class="flex-shrink-0">
-                                            <h3 class="text-[10px] font-black text-starlight dark:text-white uppercase tracking-widest flex items-center gap-2"><i class="fas fa-book text-luminous-gold"></i> Referência NBR 8995-1</h3>
+                                            <h3 class="text-[10px] font-black text-starlight dark:text-white uppercase tracking-widest flex items-center gap-2"><i class="fas fa-book text-luminous-gold"></i> <span data-i18n="nbr_audit_title">Referência NBR 8995-1</span></h3>
                                         </div>
                                         <div class="flex-grow w-full md:w-auto grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <select id="nbr-cat-select" onchange="window.updateNbrRooms()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[11px] text-starlight dark:text-white font-bold outline-none focus:border-luminous-gold transition-colors cursor-pointer">
-                                                <option value="" disabled selected>Selecione a Categoria (Ex: Escritório)...</option>
+                                                <option value="" disabled selected data-i18n="opt_cat_def">Selecione a Categoria (Ex: Escritório)...</option>
                                             </select>
                                             <select id="nbr-room-select" onchange="window.applyNbrRules()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[11px] text-starlight dark:text-white font-bold outline-none focus:border-luminous-gold transition-colors cursor-pointer" disabled>
-                                                <option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>
+                                                <option value="" disabled selected data-i18n="opt_room_def">Selecione a Tarefa / Ambiente...</option>
                                             </select>
                                         </div>
                                         <div class="flex-shrink-0 flex items-center gap-4 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
                                             <div class="text-center">
-                                                <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Alvo (Em)</div>
+                                                <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider" data-i18n="lbl_target_em">Alvo (Em)</div>
                                                 <div id="nbr-target-lux-display" class="text-sm font-black text-luminous-gold">-- lx</div>
                                             </div>
                                             <div class="w-px h-6 bg-slate-300 dark:bg-slate-600"></div>
                                             <div class="text-center">
-                                                <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">UGR Máx</div>
+                                                <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider" data-i18n="lbl_ugr_max">UGR Máx</div>
                                                 <div id="nbr-target-ugr-display" class="text-sm font-black text-luminous-gold">--</div>
                                             </div>
                                         </div>
@@ -766,19 +766,19 @@
                                 <div id="report-export-panel" class="hidden glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-700 w-full animate-fade-in-up shadow-sm mt-6">
                                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                                         <div class="auth-input-group w-full m-0">
-                                            <label class="!text-[9px] !text-slate-500 dark:!text-slate-400 block mb-1 font-black">NOME DO PROJETO</label>
+                                            <label class="!text-[9px] !text-slate-500 dark:!text-slate-400 block mb-1 font-black" data-i18n="lbl_proj_name">NOME DO PROJETO</label>
                                             <input type="text" id="g-projectName" value="Projeto LuxSintax" oninput="window.state.grid.projectName = this.value" placeholder="Ex: Corporativo X" class="w-full bg-transparent border-b border-slate-300 dark:border-slate-600 !py-2 !text-xs !font-bold text-starlight dark:text-white outline-none focus:border-luminous-gold transition-colors">
                                         </div>
                                         <div class="auth-input-group w-full m-0">
-                                            <label class="!text-[9px] !text-slate-500 dark:!text-slate-400 block mb-1 font-black">AMBIENTE</label>
+                                            <label class="!text-[9px] !text-slate-500 dark:!text-slate-400 block mb-1 font-black" data-i18n="lbl_proj_room">AMBIENTE</label>
                                             <input type="text" id="g-roomName" value="Ambiente Teste" oninput="window.state.grid.roomName = this.value" placeholder="Ex: Open Space" class="w-full bg-transparent border-b border-slate-300 dark:border-slate-600 !py-2 !text-xs !font-bold text-starlight dark:text-white outline-none focus:border-luminous-gold transition-colors">
                                         </div>
                                         <div class="auth-input-group w-full m-0">
-                                            <label class="!text-[9px] !text-slate-500 dark:!text-slate-400 block mb-1 font-black">RESPONSÁVEL</label>
+                                            <label class="!text-[9px] !text-slate-500 dark:!text-slate-400 block mb-1 font-black" data-i18n="lbl_proj_author">RESPONSÁVEL</label>
                                             <input type="text" id="g-authorName" value="Lux Designer" oninput="window.state.grid.authorName = this.value" placeholder="Seu Nome/Empresa" class="w-full bg-transparent border-b border-slate-300 dark:border-slate-600 !py-2 !text-xs !font-bold text-starlight dark:text-white outline-none focus:border-luminous-gold transition-colors">
                                         </div>
-                                        <button onclick="window.handleGenerateReport()" class="w-full h-[42px] bg-starlight text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-md border border-slate-700 dark:bg-luminous-gold dark:hover:bg-amber-600 dark:border-amber-700 flex items-center justify-center gap-2">
-                                            <i class="fas fa-file-pdf text-red-500 dark:text-white"></i> DOWNLOAD RELATÓRIO
+                                        <button onclick="window.handleGenerateReport()" class="w-full h-[42px] bg-white text-starlight rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 hover:text-luminous-gold hover:border-luminous-gold transition-all shadow-sm border border-slate-200 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center gap-2">
+                                            <i class="fas fa-file-pdf text-red-500"></i> <span data-i18n="btn_download_rep">DOWNLOAD RELATÓRIO</span>
                                         </button>
                                     </div>
                                 </div>

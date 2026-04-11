@@ -122,8 +122,8 @@ export class Photometric3DEngine {
             const dummyState = state || { beam: 90, iesData: iesData };
             const beamObj = Photometrics.getEffectiveBeam(dummyState.iesData, dummyState.beam);
             const textLabel = beamObj.isOval ? `${Math.round(beamObj.c0)}° x ${Math.round(beamObj.c90)}°` : `${Math.round(beamObj.c0)}°`;
-            overlay.innerHTML = `<div class="bg-slate-900/80 backdrop-blur border border-luminous-gold/50 text-luminous-gold px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest uppercase shadow-lg">Facho FWHM: ${textLabel}</div>`;
-            overlay.style.display = 'block';
+            overlay.innerHTML = `<div class="bg-white/90 dark:bg-slate-900/80 backdrop-blur border border-slate-200 dark:border-luminous-gold/50 text-slate-700 dark:text-luminous-gold px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest uppercase shadow-sm dark:shadow-lg">Facho FWHM: ${textLabel}</div>`;
+            overlay.style.display = 'block';
         } else {
             overlay.style.display = 'none';
         }
