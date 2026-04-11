@@ -361,14 +361,39 @@ window.toggleLanguage = function() {
         } 
     });
     document.querySelectorAll('[data-i18n-title]').forEach(el => { 
-        const key = el.getAttribute('data-i18n-title'); 
-        if (key && window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
-            (el as HTMLElement).title = window.i18n[window.currentLang][key]; 
-        } 
-    });
-    window.updateInputsForLanguage();
-    window.updateCalculations(); 
-};
+            const key = el.getAttribute('data-i18n-title'); 
+            if (key && window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
+                (el as HTMLElement).title = window.i18n[window.currentLang][key]; 
+            } 
+        });
+        window.updateInputsForLanguage();
+        
+        // LUXSINTAX: Sincroniza dinamicamente as dropdowns da NBR 8995-1 sem perder o valor selecionado
+        const catSelect = document.getElementById('nbr-cat-select') as HTMLSelectElement;
+        const roomSelect = document.getElementById('nbr-room-select') as HTMLSelectElement;
+        const catFilter = document.getElementById('category-filter') as HTMLSelectElement;
+        
+        const oldCat = catSelect ? catSelect.value : null;
+        const oldRoom = roomSelect ? roomSelect.value : null;
+        const oldFilter = catFilter ? catFilter.value : null;
+        
+        if (window.initNbrSelector) window.initNbrSelector();
+        if (oldCat && catSelect) {
+            catSelect.value = oldCat;
+            if (window.updateNbrRooms) window.updateNbrRooms();
+            if (oldRoom && roomSelect) roomSelect.value = oldRoom;
+        }
+
+        if (catFilter && window.populateCategoryFilter) {
+            const msgAll = window.i18n[window.currentLang]?.filter_all || (window.currentLang === 'en' ? 'All Categories' : 'Todas as Categorias');
+            catFilter.innerHTML = `<option value="all" data-i18n="filter_all">${msgAll}</option>`;
+            window.populateCategoryFilter();
+            if (oldFilter) catFilter.value = oldFilter;
+        }
+        if (window.filterNorms) window.filterNorms();
+
+        window.updateCalculations(); 
+    };
 
 window.switchTool = function(toolId: string) {
     window.currentTool = toolId;
@@ -1257,11 +1282,20 @@ window.initNbrSelector = function() {
         roomSelect.disabled = true;
     }
 
-    const uniqueCats = [...new Set(window.normsDatabase.map((n: any) => n.cat))].sort() as string[];
+    const isEn = window.currentLang === 'en';
+    const uniqueCatsMap = new Map();
+    
+    window.normsDatabase.forEach((n: any) => {
+        if (!uniqueCatsMap.has(n.cat)) {
+            uniqueCatsMap.set(n.cat, (isEn && n.cat_en) ? n.cat_en : n.cat);
+        }
+    });
+
+    const uniqueCats = Array.from(uniqueCatsMap.keys()).sort();
     uniqueCats.forEach((cat: string) => {
         const option = document.createElement('option');
-        option.value = cat;
-        option.text = cat;
+        option.value = cat; // O Value continua em PT como chave única primária (SSOT)
+        option.text = uniqueCatsMap.get(cat);
         catSelect.appendChild(option);
     });
 };
@@ -1280,7 +1314,9 @@ window.updateNbrRooms = function() {
     roomSelect.disabled = false;
     roomSelect.classList.remove('opacity-50', 'cursor-not-allowed');
 
+    const isEn = window.currentLang === 'en';
     const rooms = window.normsDatabase.filter((n: any) => n.cat === selectedCat);
+    
     rooms.forEach((n: any) => {
         const opt = document.createElement('option');
         opt.value = n.room;
@@ -1288,7 +1324,7 @@ window.updateNbrRooms = function() {
         opt.setAttribute('data-lux', String(n.lux || 0));
         opt.setAttribute('data-ugr', n.ugr === '-' ? '99' : String(n.ugr || 99));
         opt.setAttribute('data-plane', n.plane || 'HP');
-        opt.innerText = n.room;
+        opt.innerText = (isEn && n.room_en) ? n.room_en : n.room;
         roomSelect.appendChild(opt);
     });
 };
@@ -1333,22 +1369,42 @@ window.applyNbrRules = function() {
 window.populateCategoryFilter = function() {
     const sel = document.getElementById('category-filter') as HTMLSelectElement;
     if(!sel || sel.options.length > 1) return;
-    const uniqueCats = [...new Set(window.normsDatabase.map((n: any) => n.cat))].sort() as string[];
-    uniqueCats.forEach((c: string) => { const o = document.createElement('option'); o.value=c; o.innerText=c; sel.appendChild(o); });
+    
+    const isEn = window.currentLang === 'en';
+    const uniqueCatsMap = new Map();
+    window.normsDatabase.forEach((n: any) => {
+        if (!uniqueCatsMap.has(n.cat)) {
+            uniqueCatsMap.set(n.cat, (isEn && n.cat_en) ? n.cat_en : n.cat);
+        }
+    });
+    
+    const uniqueCats = Array.from(uniqueCatsMap.keys()).sort();
+    uniqueCats.forEach((c: string) => { 
+        const o = document.createElement('option'); 
+        o.value = c; 
+        o.innerText = uniqueCatsMap.get(c); 
+        sel.appendChild(o); 
+    });
 };
 
 window.filterNorms = function() {
     const cat = (document.getElementById('category-filter') as HTMLSelectElement).value;
     const searchInput = document.getElementById('search-filter') as HTMLInputElement;
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const isEn = window.currentLang === 'en';
     
     const filtered = window.normsDatabase.filter((n: any) => {
         const matchCat = cat === 'all' || n.cat === cat;
-        const matchSearch = n.room.toLowerCase().includes(searchTerm) || n.cat.toLowerCase().includes(searchTerm);
+        const searchSource = isEn ? `${n.cat_en} ${n.room_en}`.toLowerCase() : `${n.cat} ${n.room}`.toLowerCase();
+        const matchSearch = searchSource.includes(searchTerm);
         return matchCat && matchSearch;
     });
     
-    document.getElementById('nbr8995-tbody')!.innerHTML = filtered.map((n: any) => `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${n.cat}</td><td class="p-4 text-slate-500 font-bold">${n.room}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`).join('');
+    document.getElementById('nbr8995-tbody')!.innerHTML = filtered.map((n: any) => {
+        const catLabel = (isEn && n.cat_en) ? n.cat_en : n.cat;
+        const roomLabel = (isEn && n.room_en) ? n.room_en : n.room;
+        return `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-100"><td class="p-4 font-black text-luminous-gold text-xs uppercase">${catLabel}</td><td class="p-4 text-slate-500 font-bold">${roomLabel}</td><td class="p-4 text-center font-black text-starlight bg-slate-50">${n.lux}</td><td class="p-4 text-center text-slate-400">${n.ugr}</td><td class="p-4 text-center text-slate-400">${n.ra}</td></tr>`;
+    }).join('');
 };
 
 window.switchQueryTab = function(t: string) {
