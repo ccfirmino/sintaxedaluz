@@ -75,7 +75,19 @@ export const i18nDictionary = {
         // LUXSINTAX: Chaves Avançadas (CFO Mode, Zonas ASHRAE, Relatórios Híbridos)
         esg_cfo_title: "Premissas Financeiras (CFO Mode)", esg_inflation: "Inflação Energia (a.a.)", esg_discount: "Taxa Desconto/SELIC", esg_years: "Anos de Análise LCC",
         leed_lz0: "LZ0 (Natural)", leed_lz1: "LZ1 (Rural)", leed_lz2: "LZ2 (Residencial)", leed_lz3: "LZ3 (Comercial)", leed_lz4: "LZ4 (Urbano)",
-        pdf_measure: "MEDIDA", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Área)", pdf_target_lpd: "ALVO LPD"
+        pdf_measure: "MEDIDA", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Área)", pdf_target_lpd: "ALVO LPD",
+        // LUXSINTAX: Atualizações Lote 2 (Traduções Solicitadas)
+        btn_target_lux: "Alvo Lux", btn_manual_grid: "Malha Manual", btn_tech_sheet: "Ficha Técnica", btn_ies_ldt: "IES / LDT",
+        msg_loaded: "Carregado", lbl_cct: "Temp. de Cor", lbl_reflectance: "Cor do Ambiente (Rebatimento)",
+        lbl_isolines: "ISOLINHAS", hud_tech_summary: "SUMÁRIO TÉCNICO", ref_nbr: "Referência NBR 8995-1", lbl_target_em: "Alvo (Em)",
+        opt_sel_cat: "Selecione a Categoria...", opt_sel_room: "Selecione a Tarefa / Ambiente...",
+        lbl_proj_name: "NOME DO PROJETO", lbl_room_name: "AMBIENTE", lbl_author: "RESPONSÁVEL",
+        lbl_cols: "Colunas (X)", lbl_rows: "Linhas (Y)", btn_single_src: "Fonte Única", btn_beam_study: "Estudo de Facho", btn_hcl: "HCL / CIRCADIANO",
+        hud_spectrometer: "Espectrômetro (HCL)", top_unilateral: "Alimentação Unilateral", top_uni_desc: "Cabo conectado em apenas uma extremidade da fita LED. Recomendado para baixas quedas de tensão.",
+        hcl_fatigue: "Mapa de Fadiga", hcl_ghost: "Fantasma do Ciano", hcl_risk_high: "Ambiente Hiponímico: Risco de sonolência diurna (Meta: 250 m-EDI).",
+        leed_waiting: "AGUARDANDO DADOS", lbl_save_report: "Salvar e Relatório",
+        esg_disclaimer: "* Padrões baseados em métricas conservadoras. Alterá-los recalculará o VPL.",
+        esg_highly_viable: "Projeto Altamente Viável! VPL positivo de", esg_surpassing: "superando o custo de capital.", esg_months: "meses", esg_years_label: "Anos"
     },
     en: {
         nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "TOPOLOGY<br>& DRIVERS", tab_esg: "FEASIBILITY<br>& ROI",
@@ -152,6 +164,18 @@ export const i18nDictionary = {
         // LUXSINTAX: Advanced Keys (CFO Mode, ASHRAE Zones, Hybrid Reports)
         esg_cfo_title: "Financial Assumptions (CFO Mode)", esg_inflation: "Energy Inflation (p.a.)", esg_discount: "Discount Rate (WACC)", esg_years: "LCC Analysis Years",
         leed_lz0: "LZ0 (Natural)", leed_lz1: "LZ1 (Rural)", leed_lz2: "LZ2 (Residential)", leed_lz3: "LZ3 (Commercial)", leed_lz4: "LZ4 (Urban)",
-        pdf_measure: "MEASURE", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Area)", pdf_target_lpd: "TARGET LPD"
+        pdf_measure: "MEASURE", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Area)", pdf_target_lpd: "TARGET LPD",
+        // LUXSINTAX: Atualizações Lote 2 (Traduções Solicitadas)
+        btn_target_lux: "Target Lux", btn_manual_grid: "Manual Grid", btn_tech_sheet: "Tech Sheet", btn_ies_ldt: "IES / LDT",
+        msg_loaded: "Loaded", lbl_cct: "Color Temp.", lbl_reflectance: "Room Color (Reflectance)",
+        lbl_isolines: "ISOLINES", hud_tech_summary: "TECHNICAL SUMMARY", ref_nbr: "ISO/CIE 8995-1 Reference", lbl_target_em: "Target (Em)",
+        opt_sel_cat: "Select Category...", opt_sel_room: "Select Task / Room...",
+        lbl_proj_name: "PROJECT NAME", lbl_room_name: "ROOM", lbl_author: "AUTHOR",
+        lbl_cols: "Columns (X)", lbl_rows: "Rows (Y)", btn_single_src: "Single Source", btn_beam_study: "Beam Study", btn_hcl: "HCL / CIRCADIAN",
+        hud_spectrometer: "Spectrometer (HCL)", top_unilateral: "Single-ended Feed", top_uni_desc: "Cable connected to only one end of the LED strip. Recommended for low voltage drops.",
+        hcl_fatigue: "Fatigue Map", hcl_ghost: "Cyan Ghost", hcl_risk_high: "Hyponymic Environment: Risk of daytime sleepiness (Target: 250 m-EDI).",
+        leed_waiting: "WAITING FOR DATA", lbl_save_report: "Save & Report",
+        esg_disclaimer: "* Standards based on conservative metrics. Changing them will recalculate the NPV.",
+        esg_highly_viable: "Highly Viable Project! Positive NPV of", esg_surpassing: "surpassing the cost of capital.", esg_months: "months", esg_years_label: "Years"
     }
 };

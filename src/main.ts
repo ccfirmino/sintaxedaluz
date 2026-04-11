@@ -948,7 +948,8 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
 
                 const statusEl = document.getElementById(statusId);
                 if(statusEl) {
-                    statusEl.innerText = `Carregado: ${file.name}`;
+                    const loadedTxt = window.i18n[window.currentLang].msg_loaded || "Carregado";
+                    statusEl.innerText = `${loadedTxt}: ${file.name}`;
                     statusEl.classList.add('text-luminous-gold');
                 }
 
@@ -985,7 +986,8 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
                     const cctBlock = document.getElementById('audit-cct-block');
                     
                     if (statusA) {
-                        statusA.innerText = `Lido: ${file.name} (M/P: ${detectedRatio || 'N/D'})`;
+                        const loadedTxt = window.i18n[window.currentLang].msg_loaded || "Carregado";
+                        statusA.innerText = `${loadedTxt}: ${file.name} (M/P: ${detectedRatio || 'N/D'})`;
                         statusA.classList.add('text-luminous-gold');
                         statusA.classList.remove('text-amber-500');
                     }
@@ -998,7 +1000,8 @@ window.handleIESUpload = async function(input: HTMLInputElement) {
                         } else {
                             cctBlock.classList.remove('hidden'); // Destrava pedindo ajuda ao usuário
                             if (statusA) {
-                                statusA.innerText = `Lido: ${file.name} (Sem CCT. Preencha abaixo)`;
+                                const loadedTxt = window.i18n[window.currentLang].msg_loaded || "Carregado";
+                                statusA.innerText = `${loadedTxt}: ${file.name} (Sem CCT. Preencha abaixo)`;
                                 statusA.classList.add('text-amber-500');
                                 statusA.classList.remove('text-luminous-gold');
                             }
@@ -1547,15 +1550,22 @@ window.updateLeedRoomUI = function(roomId: number) {
 window.updateGlobalLeedSummary = () => {
     const s = window.state.leedProject;
     const summary = window.StandardsEngine.calculateLeedCompliance(s);
-    document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W Permitidos</span>`;
+    const dict = window.i18n[window.currentLang];
+    document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W ${dict.leed_allowance || "Permitidos"}</span>`;
     document.getElementById('global-leed-lpd')!.innerHTML = `${summary.currentLpd.toFixed(2)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">W/m²</span>`;
     const statusBox = document.getElementById('global-leed-status');
-    if (statusBox && summary.totalArea > 0) {
-        statusBox.classList.remove('animate-pulse');
-        statusBox.innerText = summary.isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "ALERTA: CARGA EXCEDE LIMITE ASHRAE";
-        statusBox.className = summary.isCompliant 
-            ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" 
-            : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
+    if (statusBox) {
+        if (summary.totalArea > 0) {
+            statusBox.classList.remove('animate-pulse');
+            statusBox.innerText = summary.isCompliant ? (dict.pdf_leed_pass || "COMPLIANCE ATINGIDO (APROVADO)") : (dict.pdf_leed_fail || "REPROVADO (EXCEDE LIMITES)");
+            statusBox.className = summary.isCompliant 
+                ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" 
+                : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
+        } else {
+            statusBox.classList.add('animate-pulse');
+            statusBox.innerText = dict.leed_waiting || "AGUARDANDO DADOS";
+            statusBox.className = "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center animate-pulse";
+        }
     }
 };
 
@@ -2492,16 +2502,25 @@ window.updateEsgUI = function() {
         const roiEl = document.getElementById('esg-roi-val');
         const alertEl = document.getElementById('esg-alert-msg');
         const alertBox = document.getElementById('esg-alert-box');
+        const dict = window.i18n[window.currentLang];
 
-        if(moneyEl) moneyEl.innerText = res.totalSavingsYearly.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        if(kwhEl) kwhEl.innerText = Math.round(res.savedKwh).toLocaleString('pt-BR');
+        if(moneyEl) moneyEl.innerText = res.totalSavingsYearly.toLocaleString(window.currentLang === 'en' ? 'en-US' : 'pt-BR', { style: 'currency', currency: window.currentLang === 'en' ? 'USD' : 'BRL' });
+        if(kwhEl) kwhEl.innerText = Math.round(res.savedKwh).toLocaleString(window.currentLang === 'en' ? 'en-US' : 'pt-BR');
         if(treesEl) treesEl.innerText = res.treesPlanted.toFixed(1);
-        if(pbEl) pbEl.innerText = res.isProfitable && s.capex > 0 ? res.paybackMonths.toFixed(1) : '--';
-        if(roiEl) roiEl.innerText = res.isProfitable && s.capex > 0 ? res.roi5Years.toFixed(0) : '--';
+        if(pbEl) pbEl.innerHTML = res.isProfitable && s.capex > 0 ? `${res.paybackMonths.toFixed(1)} <span class="text-sm font-normal text-slate-400 dark:text-slate-300">${dict.esg_months || 'meses'}</span>` : '--';
+        if(roiEl) roiEl.innerHTML = res.isProfitable && s.capex > 0 ? `${res.roi5Years.toFixed(0)}<span class="text-sm font-normal text-slate-400 dark:text-slate-300">%</span>` : '--';
 
         if (alertBox && alertEl) {
             alertBox.className = `relative z-10 mt-8 mx-4 p-4 rounded-xl text-xs font-bold text-center border transition-colors ${res.isProfitable ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-500/30' : 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-500/30'}`;
-            alertEl.innerHTML = res.isProfitable ? `<i class="fas fa-check-circle mr-2"></i> ${res.message}` : `<i class="fas fa-exclamation-triangle mr-2"></i> ${res.message}`;
+            
+            let finalMsg = res.message;
+            if (res.isProfitable && dict.esg_highly_viable) {
+                finalMsg = finalMsg.replace("Projeto Altamente Viável! VPL positivo de", dict.esg_highly_viable)
+                                   .replace("superando o custo de capital.", dict.esg_surpassing)
+                                   .replace(/em (\d+) anos/, (match: string, p1: string) => window.currentLang === 'en' ? `in ${p1} ${dict.esg_years_label.toLowerCase()}` : `em ${p1} ${dict.esg_years_label.toLowerCase()}`);
+            }
+
+            alertEl.innerHTML = res.isProfitable ? `<i class="fas fa-check-circle mr-2"></i> ${finalMsg}` : `<i class="fas fa-exclamation-triangle mr-2"></i> ${res.message}`;
         }
     }
 };
