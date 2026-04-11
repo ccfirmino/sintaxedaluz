@@ -1263,20 +1263,24 @@ window.initNbrSelector = function() {
 window.updateNbrRooms = function() {
     const catSelect = document.getElementById('nbr-cat-select') as HTMLSelectElement;
     const roomSelect = document.getElementById('nbr-room-select') as HTMLSelectElement;
-    const selectedCat = catSelect.value;
     
+    if (!catSelect || !roomSelect) return;
+    
+    const selectedCat = catSelect.value;
     if (!selectedCat) return;
 
     roomSelect.innerHTML = '<option value="" disabled selected>Selecione a Tarefa / Ambiente...</option>';
     roomSelect.disabled = false;
+    roomSelect.classList.remove('opacity-50', 'cursor-not-allowed');
 
     const rooms = window.normsDatabase.filter((n: any) => n.cat === selectedCat);
     rooms.forEach((n: any) => {
         const opt = document.createElement('option');
         opt.value = n.room;
-        opt.dataset.lux = n.lux;
-        opt.dataset.ugr = n.ugr === '-' ? '99' : String(n.ugr);
-        opt.dataset.plane = n.plane || 'HP';
+        // LUXSINTAX: Blindagem contra valores null/undefined usando setAttribute
+        opt.setAttribute('data-lux', String(n.lux || 0));
+        opt.setAttribute('data-ugr', n.ugr === '-' ? '99' : String(n.ugr || 99));
+        opt.setAttribute('data-plane', n.plane || 'HP');
         opt.innerText = n.room;
         roomSelect.appendChild(opt);
     });
@@ -1285,25 +1289,35 @@ window.updateNbrRooms = function() {
 window.applyNbrRules = function() {
     const roomSelect = document.getElementById('nbr-room-select') as HTMLSelectElement;
     if (!roomSelect || roomSelect.selectedIndex < 0) return;
-    
+
     const selectedOption = roomSelect.options[roomSelect.selectedIndex];
     if (!selectedOption || !selectedOption.value) return;
 
-    const tLux = parseFloat(selectedOption.dataset.lux!);
-    const tUgr = parseFloat(selectedOption.dataset.ugr!);
-    const tPlane = selectedOption.dataset.plane || 'HP';
+    // LUXSINTAX: Extração segura dos atributos de dados (Fail-fast prevention)
+    const tLux = parseFloat(selectedOption.getAttribute('data-lux') || '0');
+    const tUgr = parseFloat(selectedOption.getAttribute('data-ugr') || '99');
+    const tPlane = selectedOption.getAttribute('data-plane') || 'HP';
 
     window.currentNbrTarget = { lux: tLux, ugr: tUgr, plane: tPlane };
 
-    document.getElementById('nbr-target-lux-display')!.innerText = `${tLux} lx`;
-    document.getElementById('nbr-target-ugr-display')!.innerText = tUgr === 99 ? 'N/A' : String(tUgr);
+    const luxDisplay = document.getElementById('nbr-target-lux-display');
+    const ugrDisplay = document.getElementById('nbr-target-ugr-display');
+    
+    if (luxDisplay) luxDisplay.innerText = `${tLux} lx`;
+    if (ugrDisplay) ugrDisplay.innerText = tUgr === 99 ? 'N/A' : String(tUgr);
 
     const gridTargetLuxInput = document.getElementById('g-targetLux') as HTMLInputElement;
     const gridRangeTargetLux = document.getElementById('range-g-targetLux') as HTMLInputElement;
+    
     if (gridTargetLuxInput && gridRangeTargetLux && window.state && window.state.grid) {
         gridTargetLuxInput.value = String(tLux);
         gridRangeTargetLux.value = String(tLux);
         window.state.grid.targetLux = tLux;
+        
+        // LUXSINTAX: Força o motor para o modo "Alvo Lux" garantindo que a norma seja calculada
+        if (window.setGridCalcMethod) {
+            window.setGridCalcMethod('target');
+        }
     }
 
     window.updateCalculations();
