@@ -348,11 +348,11 @@
                         <div class="md:col-span-4 lg:col-span-3 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
-                                    <div id="calc-mode-selector" class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
-                                        <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 flex items-center justify-center h-[30px] px-2 text-[11px] font-black rounded-lg bg-luminous-gold text-white transition-all shadow-sm">cd</button>
-                                        <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="flex-1 flex items-center justify-center h-[30px] px-2 text-[11px] font-black rounded-lg text-slate-400 hover:text-luminous-gold transition-all">cd/klm</button>
-                                        <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="flex-1 flex items-center justify-center h-[30px] px-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_ies">IES / LDT</button>
-                                    </div>
+                                    <div id="calc-mode-selector" class="flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6">
+                                        <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="px-4 py-1.5 text-[10px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm">cd</button>
+                                        <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="px-4 py-1.5 text-[10px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all">cd/klm</button>
+                                        <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="px-4 py-1.5 text-[10px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_ies">IES / LDT</button>
+                                    </div>
                                 </div>
                                 
                                 <div id="inputs-ponto" class="hidden">
@@ -469,14 +469,14 @@
                                 </div>
                                 
                                 <div id="inputs-grid" class="hidden">
-                                    <div class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-4 w-full">
-                                        <button onclick="window.setGridCalcMethod('target')" id="btn-grid-target" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm"><i class="fas fa-bullseye mr-1"></i> <span data-i18n="btn_target_lux">Alvo Lux</span></button>
-                                        <button onclick="window.setGridCalcMethod('manual')" id="btn-grid-manual" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all"><i class="fas fa-th mr-1"></i> <span data-i18n="btn_manual_grid">Malha Manual</span></button>
+                                    <div class="flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-4">
+                                        <button onclick="window.setGridCalcMethod('target')" id="btn-grid-target" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm"><i class="fas fa-bullseye mr-1"></i> <span data-i18n="btn_target_lux">Alvo Lux</span></button>
+                                        <button onclick="window.setGridCalcMethod('manual')" id="btn-grid-manual" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all"><i class="fas fa-th mr-1"></i> <span data-i18n="btn_manual_grid">Malha Manual</span></button>
                                     </div>
 
-                                    <div class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
-                                        <button onclick="window.updateCalcMode('direct')" id="btn-grid-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_datasheet">Ficha Técnica</button>
-                                        <button onclick="window.updateCalcMode('ies')" id="btn-grid-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_ies_ldt">IES / LDT</button>
+                                    <div class="flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6">
+                                        <button onclick="window.updateCalcMode('direct')" id="btn-grid-direct" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_datasheet">Ficha Técnica</button>
+                                        <button onclick="window.updateCalcMode('ies')" id="btn-grid-ies" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_ies_ldt">IES / LDT</button>
                                     </div>
 
                                     <div class="mode-ies-group hidden space-y-6 mb-6">
@@ -553,22 +553,22 @@
                                     <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4 w-full">
                                         
                                         <div class="flex items-center gap-4">
-                                            <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_surf_single">Fonte Única</button>
-                                                <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_surf_array">Estudo de Facho</button>
-                                                <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_3d_persp">Perspectiva 3D</button>
+                                            <div id="surface-selector" class="hidden flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                                <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_surf_single">Fonte Única</button>
+                                                <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_surf_array">Estudo de Facho</button>
+                                                <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_3d_persp">Perspectiva 3D</button>
                                             </div>
 
-                                            <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_v_section">TECHNICAL SECTION</button>
-                                                <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_elevation">FRONT ELEVATION</button>
-                                                <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_3d">3D PERSPECTIVE</button>
-                                            </div>
+                                            <div id="vertical-selector" class="hidden flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                                <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_v_section">TECHNICAL SECTION</button>
+                                                <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_elevation">FRONT ELEVATION</button>
+                                                <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_3d">3D PERSPECTIVE</button>
+                                            </div>
 
-                                            <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_lvl_desk">Nível Mesa</button>
-                                                <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_lvl_floor">Nível Piso</button>
-                                                <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_3d_persp">Perspectiva 3D</button>
+                                            <div id="grid-selector" class="hidden flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                                <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_lvl_desk">Nível Mesa</button>
+                                                <button onclick="window.toggleGridMode('LP')" id="btn-grid-lp" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_lvl_floor">Nível Piso</button>
+                                                <button onclick="window.toggleGridMode('3D')" id="btn-grid-3d" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_3d_persp">Perspectiva 3D</button>
                                             </div>
                                         </div>
 
