@@ -348,10 +348,10 @@
                         <div class="md:col-span-4 lg:col-span-3 flex flex-col gap-6">
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
-                                    <div id="calc-mode-selector" class="flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6">
-                                        <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="px-4 py-1.5 text-[10px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm">cd</button>
-                                        <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="px-4 py-1.5 text-[10px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all">cd/klm</button>
-                                        <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="px-4 py-1.5 text-[10px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_ies">IES / LDT</button>
+                                    <div id="calc-mode-selector" class="flex w-full bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-4">
+                                        <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 py-1.5 text-[10px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm">cd</button>
+                                        <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="flex-1 py-1.5 text-[10px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all">cd/klm</button>
+                                        <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="flex-1 py-1.5 text-[10px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_ies">IES / LDT</button>
                                     </div>
                                 </div>
                                 
@@ -469,14 +469,14 @@
                                 </div>
                                 
                                 <div id="inputs-grid" class="hidden">
-                                    <div class="flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-4">
-                                        <button onclick="window.setGridCalcMethod('target')" id="btn-grid-target" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm"><i class="fas fa-bullseye mr-1"></i> <span data-i18n="btn_target_lux">Alvo Lux</span></button>
-                                        <button onclick="window.setGridCalcMethod('manual')" id="btn-grid-manual" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all"><i class="fas fa-th mr-1"></i> <span data-i18n="btn_manual_grid">Malha Manual</span></button>
+                                    <div class="flex w-full bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-3">
+                                        <button onclick="window.setGridCalcMethod('target')" id="btn-grid-target" class="flex-1 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm flex justify-center items-center"><i class="fas fa-bullseye mr-1"></i> <span data-i18n="btn_target_lux">Alvo Lux</span></button>
+                                        <button onclick="window.setGridCalcMethod('manual')" id="btn-grid-manual" class="flex-1 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all flex justify-center items-center"><i class="fas fa-th mr-1"></i> <span data-i18n="btn_manual_grid">Malha Manual</span></button>
                                     </div>
 
-                                    <div class="flex w-max bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6">
-                                        <button onclick="window.updateCalcMode('direct')" id="btn-grid-direct" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_datasheet">Ficha Técnica</button>
-                                        <button onclick="window.updateCalcMode('ies')" id="btn-grid-ies" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_ies_ldt">IES / LDT</button>
+                                    <div class="flex w-full bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-4">
+                                        <button onclick="window.updateCalcMode('direct')" id="btn-grid-direct" class="flex-1 py-1.5 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white transition-all shadow-sm flex justify-center items-center" data-i18n="btn_datasheet">Ficha Técnica</button>
+                                        <button onclick="window.updateCalcMode('ies')" id="btn-grid-ies" class="flex-1 py-1.5 text-[9px] font-black uppercase rounded-md text-slate-400 hover:text-luminous-gold transition-all flex justify-center items-center" data-i18n="btn_ies_ldt">IES / LDT</button>
                                     </div>
 
                                     <div class="mode-ies-group hidden space-y-6 mb-6">
