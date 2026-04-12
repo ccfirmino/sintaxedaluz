@@ -1002,18 +1002,18 @@ export class Canvas2DEngine {
             ctx.textBaseline = "top";
             ctx.fillStyle = "#6366f1"; 
             ctx.font = "900 10px Manrope";
-            ctx.fillText("ESPECTROFOTÔMETRO (HCL)", hclX + 15, hclY + 12);
+            ctx.fillText("SPECTROPHOTOMETER (HCL)", hclX + 15, hclY + 12);
 
-            const currentMRatio = (s.mRatio || 0.52).toFixed(2);
-            let cctLabel = "3000K";
-            if(currentMRatio === "0.45") cctLabel = "2700K";
-            if(currentMRatio === "0.68") cctLabel = "4000K";
-            if(currentMRatio === "0.92") cctLabel = "5000K";
-            if(currentMRatio === "1.10") cctLabel = "6500K";
+            const currentMRatio = (s.mRatio || 0.52).toFixed(2);
+            let cctLabel = "3000K";
+            if(currentMRatio === "0.45") cctLabel = "2700K";
+            if(currentMRatio === "0.68") cctLabel = "4000K";
+            if(currentMRatio === "0.92") cctLabel = "5000K";
+            if(currentMRatio === "1.10") cctLabel = "6500K";
 
-            ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-            ctx.font = "bold 9px Manrope";
-            ctx.fillText(`CCT: ${cctLabel} | Razão Melanópica: ${currentMRatio}`, hclX + 15, hclY + 26);
+            ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+            ctx.font = "bold 9px Manrope";
+            ctx.fillText(`CCT: ${cctLabel} | Melanopic Ratio: ${currentMRatio}`, hclX + 15, hclY + 26);
 
             const gX = hclX + 25;
             const gY = hclY + 115;
@@ -1081,13 +1081,13 @@ export class Canvas2DEngine {
             ctx.font = "bold 8px Manrope";
             
             ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
-            ctx.fillText("━━ SPD (Emissão do LED)", hclX + 15, hclY + 128);
-            
-            ctx.fillStyle = "#fbbf24";
-            ctx.fillText("--- V(λ) Visão Fotópica", hclX + 15, hclY + 138);
-            
-            ctx.fillStyle = "#a855f7";
-            ctx.fillText("--- Curva Melanópica (ipRGC)", hclX + 125, hclY + 138);
+            ctx.fillText("━━ SPD (LED Emission)", hclX + 15, hclY + 128);
+            
+            ctx.fillStyle = "#fbbf24";
+            ctx.fillText("--- V(λ) Photopic Vision", hclX + 15, hclY + 138);
+            
+            ctx.fillStyle = "#a855f7";
+            ctx.fillText("--- Melanopic Curve (ipRGC)", hclX + 125, hclY + 138);
 
             ctx.restore();
         }

@@ -349,10 +349,10 @@
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
                                     <div id="calc-mode-selector" class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
-                                        <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_mode_direct">INTENSIDADE</button>
-                                        <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_photo">FOTOMETRIA</button>
-                                        <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_ies">IES / LDT</button>
-                                    </div>
+                                        <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 px-2 py-2 text-[11px] font-black rounded-lg bg-luminous-gold text-white transition-all shadow-sm">cd</button>
+                                        <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="flex-1 px-2 py-2 text-[11px] font-black rounded-lg text-slate-400 hover:text-luminous-gold transition-all">cd/klm</button>
+                                        <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_ies">IES / LDT</button>
+                                    </div>
                                 </div>
                                 
                                 <div id="inputs-ponto" class="hidden">
@@ -560,10 +560,10 @@
                                             </div>
 
                                             <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Corte Técnico</button>
-                                                <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Elevação Frontal</button>
-                                                <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
-                                            </div>
+                                                <button onclick="window.toggleVerticalView('section')" id="btn-v-section" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_v_section">TECHNICAL SECTION</button>
+                                                <button onclick="window.toggleVerticalView('elevation')" id="btn-v-elevation" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_elevation">FRONT ELEVATION</button>
+                                                <button onclick="window.toggleVerticalView('3D')" id="btn-v-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_v_3d">3D PERSPECTIVE</button>
+                                            </div>
 
                                             <div id="grid-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                                 <button onclick="window.toggleGridMode('HP')" id="btn-grid-hp" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_lvl_desk">Nível Mesa</button>
