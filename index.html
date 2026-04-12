@@ -349,9 +349,9 @@
                             <div class="glass-panel p-6 rounded-2xl relative h-auto sticky top-24">
                                 <div class="mb-4">
                                     <div id="calc-mode-selector" class="flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm mb-6 w-full">
-                                        <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">INTENSIDADE</button>
-                                        <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">FOTOMETRIA</button>
-                                        <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">IES / LDT</button>
+                                        <button onclick="window.updateCalcMode('direct')" id="btn-mode-direct" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_mode_direct">INTENSIDADE</button>
+                                        <button onclick="window.updateCalcMode('photometric')" id="btn-mode-photo" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_photo">FOTOMETRIA</button>
+                                        <button onclick="window.updateCalcMode('ies')" id="btn-mode-ies" class="flex-1 px-2 py-2 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_mode_ies">IES / LDT</button>
                                     </div>
                                 </div>
                                 
@@ -364,11 +364,13 @@
                                     </div>
 
                                     <div class="mb-6 mode-ies-group hidden animate-fade-in">
-                                        <label class="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-2" data-i18n="lbl_load_ies">CARREGAR ARQUIVO .IES / .LDT</label>
-                                        <div class="flex items-center gap-3">
-                                            <label for="p-ies-input" class="bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-luminous-gold text-luminous-gold px-3 py-1.5 rounded text-[9px] font-black uppercase cursor-pointer transition-colors" data-i18n="btn_choose_file">ESCOLHER ARQUIVO</label>
-                                            <input type="file" id="p-ies-input" accept=".ies,.ldt" class="hidden" onchange="window.handleIESUpload(this)">
-                                            <span id="p-ies-status" class="text-[10px] font-bold text-slate-400 truncate max-w-[150px]">Nenhum arquivo carregado.</span>
+                                        <div class="group">
+                                            <label class="text-[10px] text-luminous-gold font-bold whitespace-nowrap mb-2 block" data-i18n="lbl_ies_upload">CARREGAR ARQUIVO .IES / .LDT</label>
+                                            <div class="flex items-center gap-3">
+                                                <label for="p-ies-input" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-luminous-gold text-luminous-gold px-3 py-1.5 rounded-lg text-[9px] font-black uppercase cursor-pointer transition-colors shadow-sm" data-i18n="btn_choose_file">ESCOLHER ARQUIVO</label>
+                                                <input type="file" id="p-ies-input" accept=".ies, .ldt" class="hidden" onchange="window.handleIESUpload(this)">
+                                                <p id="p-ies-status" class="text-[9px] text-dim-gray italic truncate max-w-[150px]" data-i18n="msg_no_file">Nenhum arquivo carregado.</p>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -552,9 +554,9 @@
                                         
                                         <div class="flex items-center gap-4">
                                             <div id="surface-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm">Fonte Única</button>
-                                                <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Estudo de Facho</button>
-                                                <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all">Perspectiva 3D</button>
+                                                <button onclick="window.setSurfaceMode('single')" id="btn-surf-single" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg bg-luminous-gold text-white transition-all shadow-sm" data-i18n="btn_surf_single">Fonte Única</button>
+                                                <button onclick="window.setSurfaceMode('array')" id="btn-surf-array" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_surf_array">Estudo de Facho</button>
+                                                <button onclick="window.setSurfaceMode('3D')" id="btn-surf-3d" class="px-3 py-1.5 text-[9px] font-black uppercase rounded-lg text-slate-400 hover:text-luminous-gold transition-all" data-i18n="btn_3d_persp">Perspectiva 3D</button>
                                             </div>
 
                                             <div id="vertical-selector" class="hidden flex bg-slate-100 p-1 rounded-lg dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -613,18 +615,7 @@
 
                                             <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-purple-50 p-1.5 rounded-lg dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 shadow-sm">
                                                 <label class="flex items-center gap-2 cursor-pointer relative group px-2" title="Sobrepõe o mapa de calor da luz melanópica estimulante.">
-                                                    <span class="text-[9px] text-purple-600 dark:text-purple-400 font-black uppercase tracking-wider border-b border-dashed border-purple-300 dark:border-purple-700 pb-0.5 cursor-help">HCL / CIRCADIANO</span>
-                                                    <div class="relative">
-                                                        <input type="checkbox" id="v-hclZone" onchange="window.toggleHCL(this.checked)" class="sr-only">
-                                                        <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="hcl-toggle-bg"></div>
-                                                        <div class="dot absolute left-1 top-1 bg-white w-2 h-2 rounded-full transition-transform duration-300" id="hcl-toggle-dot"></div>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                            
-                                            <div id="hcl-toggle-wrapper" class="hidden flex items-center gap-2 bg-purple-50 p-1.5 rounded-lg dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 shadow-sm">
-                                                <label class="flex items-center gap-2 cursor-pointer relative group px-2" title="Sobrepõe o mapa de calor da luz melanópica estimulante.">
-                                                    <span class="text-[9px] text-purple-600 dark:text-purple-400 font-black uppercase tracking-wider border-b border-dashed border-purple-300 dark:border-purple-700 pb-0.5 cursor-help">HCL / CIRCADIANO</span>
+                                                    <span class="text-[9px] text-purple-600 dark:text-purple-400 font-black uppercase tracking-wider border-b border-dashed border-purple-300 dark:border-purple-700 pb-0.5 cursor-help" data-i18n="lbl_hcl_circadian">HCL / CIRCADIANO</span>
                                                     <div class="relative">
                                                         <input type="checkbox" id="v-hclZone" onchange="window.toggleHCL(this.checked)" class="sr-only">
                                                         <div class="block bg-slate-200 dark:bg-slate-600 w-7 h-4 rounded-full transition-colors duration-300" id="hcl-toggle-bg"></div>
@@ -656,11 +647,11 @@
                                                     <h4 class="text-starlight dark:text-white border-slate-200 dark:border-slate-700 text-[11px] font-black tracking-widest uppercase mb-2 pb-2 border-b"><i class="fas fa-microscope mr-1 text-luminous-gold"></i> <span data-i18n="hdr_tech_summary">DADOS FOTOMÉTRICOS</span></h4>
                                                     <div class="text-slate-500 dark:text-slate-400 truncate mb-3 text-[10px] font-bold" id="pd-filename">arquivo.ies</div>
                                                     <div class="space-y-2">
-                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
-                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Nominal:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens-nom">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
-                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Fluxo Final:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens-fin">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
-                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Eficácia:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-efficacy">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm/W</span></span></div>
-                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold">Uplight:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-uplight">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">%</span></span></div>
+                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="pd_power">Potência:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-watts">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">W</span></span></div>
+                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="pd_flux_nom">Fluxo Nominal:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens-nom">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
+                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="pd_flux_fin">Fluxo Final:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-lumens-fin">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm</span></span></div>
+                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="pd_efficacy">Eficácia:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-efficacy">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">lm/W</span></span></div>
+                                                        <div class="flex justify-between items-center"><span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold" data-i18n="pd_uplight">Uplight:</span><span class="text-starlight dark:text-white text-xs font-black"><span id="pd-uplight">--</span> <span class="text-slate-500 dark:text-slate-400 text-[9px] font-bold">%</span></span></div>
                                                     </div>
                                                 </div>
                                                 
