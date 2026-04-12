@@ -591,18 +591,41 @@ export class Canvas2DEngine {
                     const currentTr = currentTilt * Math.PI / 180;
 
                     if (currentBeamObj.isOval) {
-                        this.drawAngleDim(ctx, xPos, sy, Math.round(currentBeamObj.c0), currentTilt, 40, "rgba(217, 119, 6, 0.8)", false); 
-                        this.drawAngleDim(ctx, xPos, sy, Math.round(currentBeamObj.c90), currentTilt, 55, "rgba(2, 132, 199, 0.8)", false); 
-                        const diaC0 = 2 * (s.height / Math.cos(currentTr)) * Math.tan((currentBeamObj.c0 * Math.PI / 180) / 2);
-                        const diaC90 = 2 * (s.height / Math.cos(currentTr)) * Math.tan((currentBeamObj.c90 * Math.PI / 180) / 2);
-                        const xL = (floorY - sy) * Math.tan(currentTr - (currentBeamObj.c0 * Math.PI / 180) / 2), xR = (floorY - sy) * Math.tan(currentTr + (currentBeamObj.c0 * Math.PI / 180) / 2); 
-                        this.drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${win.formatDist(diaC0)} x ${win.formatDist(diaC90)}`);
-                    } else {
-                        this.drawAngleDim(ctx, xPos, sy, Math.round(currentBeam), currentTilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                        const bC0 = Number(currentBeamObj.c0) || 0;
+                        const bC90 = Number(currentBeamObj.c90) || 0;
                         
-                        const dia = 2 * (s.height / Math.cos(currentTr)) * Math.tan(br / 2);
-                        const xL = (floorY - sy) * Math.tan(currentTr - br / 2), xR = (floorY - sy) * Math.tan(currentTr + br / 2); 
+                        if (bC0 > 0) this.drawAngleDim(ctx, xPos, sy, Math.round(bC0), currentTilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                        if (bC90 > 0) this.drawAngleDim(ctx, xPos, sy, Math.round(bC90), currentTilt, 55, "rgba(2, 132, 199, 0.8)", false); 
+                        
+                        const diaC0 = 2 * (s.height / Math.cos(currentTr)) * Math.tan((bC0 * Math.PI / 180) / 2);
+                        const diaC90 = 2 * (s.height / Math.cos(currentTr)) * Math.tan((bC90 * Math.PI / 180) / 2);
+                        const xL = (floorY - sy) * Math.tan(currentTr - (bC0 * Math.PI / 180) / 2);
+                        const xR = (floorY - sy) * Math.tan(currentTr + (bC0 * Math.PI / 180) / 2); 
+                        this.drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${win.formatDist(diaC0)} x ${win.formatDist(diaC90)}`);
+
+                        if (hEff > 0) {
+                            const diaC0_WP = 2 * (hEff / Math.cos(currentTr)) * Math.tan((bC0 * Math.PI / 180) / 2);
+                            const diaC90_WP = 2 * (hEff / Math.cos(currentTr)) * Math.tan((bC90 * Math.PI / 180) / 2);
+                            const xL_WP = (py - sy) * Math.tan(currentTr - (bC0 * Math.PI / 180) / 2);
+                            const xR_WP = (py - sy) * Math.tan(currentTr + (bC0 * Math.PI / 180) / 2);
+                            this.drawDimLine(ctx, xPos + xL_WP, py + 25, xPos + xR_WP, py + 25, `Ø ${win.formatDist(diaC0_WP)} x ${win.formatDist(diaC90_WP)}`);
+                        }
+                    } else {
+                        const bC0 = Number(currentBeam) || 0;
+                        
+                        if (bC0 > 0) this.drawAngleDim(ctx, xPos, sy, Math.round(bC0), currentTilt, 40, "rgba(217, 119, 6, 0.8)", false); 
+                        
+                        const dia = 2 * (s.height / Math.cos(currentTr)) * Math.tan((bC0 * Math.PI / 180) / 2);
+                        const xL = (floorY - sy) * Math.tan(currentTr - (bC0 * Math.PI / 180) / 2);
+                        const xR = (floorY - sy) * Math.tan(currentTr + (bC0 * Math.PI / 180) / 2); 
                         this.drawDimLine(ctx, xPos + xL, floorY + 50, xPos + xR, floorY + 50, `Ø ${win.formatDist(dia)}`);
+
+                        if (hEff > 0) {
+                            const dia_WP = 2 * (hEff / Math.cos(currentTr)) * Math.tan((bC0 * Math.PI / 180) / 2);
+                            const xL_WP = (py - sy) * Math.tan(currentTr - (bC0 * Math.PI / 180) / 2);
+                            const xR_WP = (py - sy) * Math.tan(currentTr + (bC0 * Math.PI / 180) / 2);
+                            this.drawDimLine(ctx, xPos + xL_WP, py + 25, xPos + xR_WP, py + 25, `Ø ${win.formatDist(dia_WP)}`);
+                        }
                     }
                 });
             }

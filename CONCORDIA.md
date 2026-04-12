@@ -73,6 +73,8 @@
 - [11/04/2026] UI/UX Light Mode (index.html): Correção de consistência visual no botão de Download de Relatório, substituindo classes fixas pelo sistema reativo de temas do Tailwind.
 - [11/04/2026] UI/UX 3D Engine (Photometric3DEngine.ts): Refatoração da injeção no DOM para o HUD dinâmico "Facho FWHM", aplicando classes responsivas do Tailwind para suportar perfeitamente o Modo Claro.
 - [11/04/2026] UI/UX i18n (index.html & Dictionary.ts): Refinamento da Internacionalização. Substituição de inputs de arquivo nativos por botões customizados (Label) com suporte a tradução. Injeção de chaves dinâmicas para o status de Auditoria ("AGUARDANDO") e renomeação do painel técnico para "Dados Fotométricos", garantindo 100% de cobertura bilíngue e coesão visual na aba Lúmens.
+- [12/04/2026]: Refatoração de UI/UX e i18n no módulo Ponto a Ponto Horizontal: Padronização do contraste e cores do Modo Claro no bloco de Upload IES e mapeamento completo do dicionário de traduções (Botões de Facho, Sumário Técnico e HCL).
+- [12/04/2026]: Fix: Adicionadas cotas trigonométricas da mancha de luz no Plano de Trabalho (WP) e corrigida estabilidade de renderização do ângulo do facho em Canvas2DEngine.ts.
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
