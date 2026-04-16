@@ -2699,9 +2699,39 @@ window.handleExcelUpload = async function(input: HTMLInputElement) {
 
     try {
         // Delegação limpa para a camada de Infraestrutura
-        const newRooms = await ExcelParser.parseLeedRooms(file);
+        const parsedRooms = await ExcelParser.parseLeedRooms(file);
         
-        window.state.leedProject.rooms = [...newRooms, ...window.state.leedProject.rooms];
+        // LUXSINTAX: Algoritmo de Reconciliação de Estado (Smart Merge / Upsert)
+        const existingRooms = window.state.leedProject.rooms || [];
+        
+        parsedRooms.forEach((newRoom: any) => {
+            // Cria uma assinatura única para comparar (Ex: "ss1_estacionamento")
+            const matchKey = (newRoom.floor + "_" + newRoom.name).toLowerCase().trim();
+            
+            const existingIndex = existingRooms.findIndex((r: any) => 
+                (r.floor + "_" + r.name).toLowerCase().trim() === matchKey
+            );
+            
+            if (existingIndex >= 0) {
+                // AMBIENTE EXISTE (UPDATE): Preserva inteligência humana, atualiza a física
+                const oldRoom = existingRooms[existingIndex];
+                existingRooms[existingIndex] = {
+                    ...newRoom, // Puxa área atualizada e novas luminárias do Excel
+                    id: oldRoom.id, // Protege o ID interno para não quebrar o DOM
+                    leedCategory: oldRoom.leedCategory, // Preserva escolha LEED
+                    typology: oldRoom.typology, // Preserva Tipologia ASHRAE
+                    baseLpd: oldRoom.baseLpd, // Preserva o budget normativo
+                    unit: oldRoom.unit, // Preserva métrica (W/m² ou W/m)
+                    expanded: oldRoom.expanded // Preserva estado visual do acordeão
+                };
+            } else {
+                // NOVO AMBIENTE (INSERT): Adiciona no topo da lista
+                existingRooms.unshift(newRoom);
+            }
+        });
+        
+        // Atualiza a Fonte da Verdade (SSOT)
+        window.state.leedProject.rooms = [...existingRooms];
         window.renderLeedProject();
         
         if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
