@@ -430,18 +430,17 @@ window.switchTool = function(toolId: string) {
         activeBtn.classList.add('tab-active', 'text-luminous-gold');
     }
 
-    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg' || toolId === 'dataManager');
+    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg' || toolId === 'dataManager');
         document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
-        document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
         document.getElementById('audit-tool')?.classList.toggle('hidden', toolId !== 'audit');
         document.getElementById('driver-tool')?.classList.toggle('hidden', toolId !== 'driver');
         document.getElementById('esg-tool')?.classList.toggle('hidden', toolId !== 'esg');
         document.getElementById('dataManager-tool')?.classList.toggle('hidden', toolId !== 'dataManager');
     
     const modeSelector = document.getElementById('calc-mode-selector');
-    if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj' || toolId === 'dataManager');
+    if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'dataManager');
 
-    if (toolId !== 'query' && toolId !== 'leedProj' && toolId !== 'audit' && toolId !== 'driver' && toolId !== 'dataManager') {
+    if (toolId !== 'query' && toolId !== 'audit' && toolId !== 'driver' && toolId !== 'esg' && toolId !== 'dataManager') {
         ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
             const el = document.getElementById(id); 
             if(el) el.classList.add('hidden'); 
@@ -485,8 +484,9 @@ window.switchTool = function(toolId: string) {
         window.updateCalculations();
     } else if (toolId === 'query') {
         window.switchQueryTab('nbr8995');
-    } else if (toolId === 'leedProj') {
-        window.renderLeedProject();
+    } else if (toolId === 'dataManager') {
+        window.fetchUserLeedProjects();
+        window.switchDataManagerTab('technical');
     }
 };
 
@@ -1838,7 +1838,11 @@ window.fetchUserLeedProjects = async () => {
     try {
         const tenant = window.AuthManager.getTenantContext();
         const { data, error } = await window.supabase.from('leed_projects').select('id, project_name, project_data').eq('user_id', tenant.userId).order('updated_at', { ascending: false });
-        if (!error && data) { window.userLeedProjects = data; if (window.currentTool === 'dataManager') window.renderLeedProject(); }
+        if (!error && data) { 
+            window.userLeedProjects = data; 
+            window.updateProjectHeaderUI();
+            if (window.currentTool === 'dataManager') window.renderLeedProject(); 
+        }
     } catch (err: any) { console.warn("[LuxSintax] Leitura abortada. Aguardando login."); }
 };
 
