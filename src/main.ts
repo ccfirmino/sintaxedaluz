@@ -2150,11 +2150,23 @@ window.updateAuditUI = function() {
             
             reqUnitsEl.innerText = matcher.units.toString();
             
-            if (matcher.alert) {
-                safetyBox.innerHTML = `<i class="fas fa-exclamation-circle mr-1"></i> <span>${matcher.alert}</span>`;
-                safetyBox.className = `p-3 rounded-lg text-[10px] font-bold border ${matcher.alert.includes('Physical') ? 'bg-red-50 text-red-700 border-red-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`;
+            const isEn = window.currentLang === 'en';
+            
+            if (matcher.alertType === 'physical_limit') {
+                const msg = isEn 
+                    ? `Physical Limitation: 1 unit of ${driverCap}W handles the load, but the strip length requires sectioning into at least ${requiredSplits} parallel circuits.`
+                    : `Limitação Física: 1 fonte de ${driverCap}W suporta a carga, mas o comprimento exige o corte em pelo menos ${requiredSplits} circuitos paralelos.`;
+                safetyBox.innerHTML = `<i class="fas fa-exclamation-circle mr-1"></i> <span id="driver-safety-msg">${msg}</span>`;
+                safetyBox.className = "p-3 rounded-lg text-[10px] font-bold border bg-red-50 text-red-700 border-red-200";
+            } else if (matcher.alertType === 'load_division') {
+                const msg = isEn
+                    ? `Load Division: You will need ${matcher.units} units of ${driverCap}W to safely power this circuit.`
+                    : `Divisão de Carga: Você precisará de ${matcher.units} fontes de ${driverCap}W para alimentar este circuito com segurança.`;
+                safetyBox.innerHTML = `<i class="fas fa-exclamation-circle mr-1"></i> <span id="driver-safety-msg">${msg}</span>`;
+                safetyBox.className = "p-3 rounded-lg text-[10px] font-bold border bg-amber-50 text-amber-700 border-amber-200";
             } else {
-                safetyBox.innerHTML = `<i class="fas fa-shield-alt mr-1"></i> <span>Mantenha sempre 20% de folga térmica para estender a vida útil do driver.</span>`;
+                const msg = window.i18n[window.currentLang]?.dr_safety || "Mantenha sempre 20% de folga térmica para estender a vida útil do driver.";
+                safetyBox.innerHTML = `<i class="fas fa-shield-alt mr-1"></i> <span id="driver-safety-msg" data-i18n="dr_safety">${msg}</span>`;
                 safetyBox.className = "p-3 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200";
             }
         }

@@ -857,13 +857,13 @@
                                         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
                                             <div class="flex justify-between items-end mb-3">
                                                 <div>
-                                                    <span class="text-[9px] font-black text-luminous-gold uppercase block mb-1">Recommended Power (+20%)</span>
+                                                    <span class="text-[9px] font-black text-luminous-gold uppercase block mb-1" data-i18n="dr_rec_power">Potência Recomendada (+20%)</span>
                                                     <span class="text-xl font-black text-starlight dark:text-white" id="driver-recommended-source">0.0 W</span>
                                                 </div>
                                             </div>
                                             
                                             <div class="border-t border-slate-200 dark:border-slate-700 pt-3 mt-1">
-                                                <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Target Driver Capacity</label>
+                                                <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2" data-i18n="dr_target_cap">Capacidade da Fonte Alvo</label>
                                                 <div class="flex gap-2 items-center">
                                                     <select id="dr-capacity-select" onchange="window.handleDriverSelection(this.value)" class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-2 text-[10px] font-bold outline-none focus:border-luminous-gold cursor-pointer text-starlight dark:text-white shadow-inner transition-colors">
                                                         <option value="30">30 W</option>
@@ -872,20 +872,20 @@
                                                         <option value="150">150 W</option>
                                                         <option value="200">200 W</option>
                                                         <option value="320">320 W</option>
-                                                        <option value="custom">Other / Custom...</option>
+                                                        <option value="custom" data-i18n="dr_custom_opt">Outro / Customizado...</option>
                                                     </select>
                                                     <input type="number" id="dr-capacity-custom" value="100" min="1" oninput="window.updateCalculations()" class="w-16 hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-2 text-[10px] font-bold text-right outline-none focus:border-luminous-gold transition-colors">
                                                 </div>
                                             </div>
                                             
                                             <div class="mt-3 bg-slate-100 dark:bg-slate-800 p-2 rounded-lg flex justify-between items-center border border-slate-200 dark:border-slate-700">
-                                                <span class="text-[10px] font-black text-slate-500 uppercase">Required Units:</span>
+                                                <span class="text-[10px] font-black text-slate-500 uppercase" data-i18n="dr_req_units">Unidades Necessárias:</span>
                                                 <span class="text-sm font-black text-luminous-gold" id="driver-required-units">0</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div id="driver-safety-box" class="p-3 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                        <i class="fas fa-shield-alt mr-1"></i> <span data-i18n="dr_safety">Mantenha sempre 20% de folga térmica para estender a vida útil do driver.</span>
+                                        <i class="fas fa-shield-alt mr-1"></i> <span id="driver-safety-msg" data-i18n="dr_safety">Mantenha sempre 20% de folga térmica para estender a vida útil do driver.</span>
                                     </div>
                                 </div>
 

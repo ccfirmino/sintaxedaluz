@@ -55,21 +55,20 @@ export const ElectricalEngine = {
     },
 
     /**
-     * Calcula a quantidade de drivers e alerta sobre restrições físicas (Corte da fita)
+     * Calcula a quantidade de drivers e retorna o status de Inteligência Física
      */
     calculateDriverQuantity: (recommendedPower: number, driverCapacity: number, isTopologyCritical: boolean, requiredSplits: number) => {
-        if (driverCapacity <= 0) return { units: 0, alert: "" };
+        if (driverCapacity <= 0) return { units: 0, alertType: "none" };
         
         let units = Math.ceil(recommendedPower / driverCapacity);
-        let alert = "";
+        let alertType = "none";
 
-        // Alerta de Inteligência Física vs Potência
         if (units === 1 && isTopologyCritical && requiredSplits > 1) {
-            alert = `Physical Limitation: 1 unit of ${driverCapacity}W handles the load, but the strip length requires sectioning into at least ${requiredSplits} parallel circuits.`;
+            alertType = "physical_limit";
         } else if (units > 1) {
-            alert = `Load Division: You will need ${units} units of ${driverCapacity}W to safely power this circuit.`;
+            alertType = "load_division";
         }
 
-        return { units, alert };
+        return { units, alertType };
     }
 };
