@@ -487,6 +487,8 @@ window.switchTool = function(toolId: string) {
     } else if (toolId === 'dataManager') {
         window.fetchUserLeedProjects();
         window.switchDataManagerTab('technical');
+    } else if (toolId === 'audit' || toolId === 'driver' || toolId === 'esg') {
+        window.updateCalculations();
     }
 };
 
