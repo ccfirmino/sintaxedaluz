@@ -317,6 +317,19 @@ window.togglePassword = function(id: string) {
 };
 
 window.toggleMobileMenu = function() { document.getElementById('mobile-menu')?.classList.toggle('hidden'); };
+
+window.handleDriverSelection = function(val: string) {
+    const customInput = document.getElementById('dr-capacity-custom') as HTMLInputElement;
+    if (val === 'custom') {
+        customInput.classList.remove('hidden');
+        customInput.focus();
+    } else {
+        customInput.classList.add('hidden');
+        customInput.value = val;
+    }
+    window.updateCalculations();
+};
+
 window.openTerms = function() { document.getElementById('terms-modal')?.classList.remove('hidden'); };
 window.closeTerms = function() { document.getElementById('terms-modal')?.classList.add('hidden'); };
 
@@ -2076,9 +2089,10 @@ window.updateAuditUI = function() {
     // Atualiza Card 1 (Carga e Fonte)
     const totalWattsEl = document.getElementById('driver-total-watts');
     const recSourceEl = document.getElementById('driver-recommended-source');
+    const recPower = totalPower * 1.2; // Aplica regra dos 20%
     if (totalWattsEl && recSourceEl) {
         totalWattsEl.innerText = `${totalPower.toFixed(1)} W`;
-        recSourceEl.innerText = `${(totalPower * 1.2).toFixed(1)} W`; // Aplica regra dos 20%
+        recSourceEl.innerText = `${recPower.toFixed(1)} W`; 
     }
 
     // Atualiza Card 2 (Guardião) e Card 3 (Topologia)
@@ -2122,6 +2136,27 @@ window.updateAuditUI = function() {
             topIcon.className = `text-4xl mb-4 ${result.isTopologyCritical ? 'text-red-500 animate-pulse' : 'text-leed-green'}`;
             topName.innerText = result.topologyTitle;
             topDesc.innerText = result.topologyDesc;
+        }
+
+        // Driver Matcher Logic
+        const driverInput = document.getElementById('dr-capacity-custom') as HTMLInputElement;
+        const reqUnitsEl = document.getElementById('driver-required-units');
+        const safetyBox = document.getElementById('driver-safety-box');
+        
+        if (driverInput && reqUnitsEl && safetyBox && window.ElectricalEngine.calculateDriverQuantity) {
+            const driverCap = parseFloat(driverInput.value) || 100;
+            const requiredSplits = Math.ceil(driverState.qty / result.maxContinuousRun);
+            const matcher = window.ElectricalEngine.calculateDriverQuantity(recPower, driverCap, result.isTopologyCritical, requiredSplits);
+            
+            reqUnitsEl.innerText = matcher.units.toString();
+            
+            if (matcher.alert) {
+                safetyBox.innerHTML = `<i class="fas fa-exclamation-circle mr-1"></i> <span>${matcher.alert}</span>`;
+                safetyBox.className = `p-3 rounded-lg text-[10px] font-bold border ${matcher.alert.includes('Physical') ? 'bg-red-50 text-red-700 border-red-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`;
+            } else {
+                safetyBox.innerHTML = `<i class="fas fa-shield-alt mr-1"></i> <span>Mantenha sempre 20% de folga térmica para estender a vida útil do driver.</span>`;
+                safetyBox.className = "p-3 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200";
+            }
         }
     }
 

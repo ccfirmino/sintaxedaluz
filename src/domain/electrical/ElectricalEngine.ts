@@ -6,7 +6,7 @@ export const ElectricalEngine = {
      */
     evaluateSystem: (wireDistance: number, wireGauge: number, powerPerMeter: number, stripLength: number, voltage: number) => {
         if (wireGauge <= 0 || voltage <= 0 || stripLength <= 0) {
-            return { dropV: 0, dropPercentage: 0, isWarning: false, isCritical: false, message: "Parâmetros inválidos.", topologyTitle: "--", topologyDesc: "--", topologyIcon: "fa-ban", isTopologyCritical: false };
+            return { dropV: 0, dropPercentage: 0, isWarning: false, isCritical: false, message: "Invalid parameters.", topologyTitle: "--", topologyDesc: "--", topologyIcon: "fa-ban", isTopologyCritical: false, maxContinuousRun: 5 };
         }
 
         const totalPower = powerPerMeter * stripLength;
@@ -19,14 +19,14 @@ export const ElectricalEngine = {
         
         let isWarning = false;
         let isCritical = false;
-        let message = "Operação Otimizada. Queda de tensão no cabo dentro dos limites ideais (< 3%).";
+        let message = "Optimized Operation. Voltage drop within ideal limits (< 3%).";
 
         if (dropPercentage > 5) {
             isCritical = true;
-            message = `Risco Severo (Cabo): A queda de ${dropPercentage.toFixed(1)}% causará perda drástica de fluxo luminoso. Engrosse a bitola do cabo ou aproxime a fonte da fita.`;
+            message = `Severe Risk (Cable): A ${dropPercentage.toFixed(1)}% drop will cause drastic light loss. Thicken the wire gauge or move the supply closer.`;
         } else if (dropPercentage > 3) {
             isWarning = true;
-            message = `Alerta de Performance (Cabo): Queda de ${dropPercentage.toFixed(1)}%. Pode haver leve variação de brilho no início do circuito.`;
+            message = `Performance Alert (Cable): ${dropPercentage.toFixed(1)}% drop. Minor brightness variation may occur at the start of the circuit.`;
         }
 
         // ==========================================
@@ -34,23 +34,42 @@ export const ElectricalEngine = {
         // ==========================================
         const maxContinuousRun = voltage === 12 ? 5 : 10;
         
-        let topologyTitle = "Alimentação Unilateral";
-        let topologyDesc = `Padrão Seguro: Conecte a fonte em apenas uma extremidade. A trilha da fita de ${voltage}V suporta até ${maxContinuousRun}m sem atenuação visível.`;
+        let topologyTitle = "SINGLE-ENDED FEED";
+        let topologyDesc = `Safe Standard: Connect the power supply to one end only. The ${voltage}V track supports up to ${maxContinuousRun}m without visible attenuation.`;
         let topologyIcon = "fa-arrow-right";
         let isTopologyCritical = false;
 
         if (stripLength > maxContinuousRun * 1.5) {
-            topologyTitle = "Divisão de Circuito (Paralelo)";
-            topologyDesc = `RISCO DE QUEIMA: Fitas de ${voltage}V não suportam mais que ${maxContinuousRun}m contínuos. Divida obrigatoriamente a fita em ${Math.ceil(stripLength / maxContinuousRun)} trechos ligados em paralelo à mesma fonte principal.`;
+            topologyTitle = "CIRCUIT DIVISION (PARALLEL)";
+            topologyDesc = `OVERHEATING RISK: ${voltage}V strips cannot exceed ${maxContinuousRun}m continuously. You MUST divide the strip into ${Math.ceil(stripLength / maxContinuousRun)} sections wired in parallel.`;
             topologyIcon = "fa-project-diagram";
             isTopologyCritical = true;
         } else if (stripLength > maxContinuousRun) {
-            topologyTitle = "Alimentação Bilateral";
-            topologyDesc = `ATENÇÃO: A metragem excede o limite ideal contínuo (${maxContinuousRun}m). É altamente recomendado levar o cabo da fonte para AS DUAS pontas da fita para equalizar a tensão e evitar perda de luz no meio.`;
+            topologyTitle = "DOUBLE-ENDED FEED";
+            topologyDesc = `WARNING: Length exceeds the ideal continuous limit (${maxContinuousRun}m). It is highly recommended to feed power to BOTH ends to equalize voltage.`;
             topologyIcon = "fa-arrows-alt-h";
             isTopologyCritical = true;
         }
 
-        return { dropV, dropPercentage, isWarning, isCritical, message, topologyTitle, topologyDesc, topologyIcon, isTopologyCritical };
+        return { dropV, dropPercentage, isWarning, isCritical, message, topologyTitle, topologyDesc, topologyIcon, isTopologyCritical, maxContinuousRun };
+    },
+
+    /**
+     * Calcula a quantidade de drivers e alerta sobre restrições físicas (Corte da fita)
+     */
+    calculateDriverQuantity: (recommendedPower: number, driverCapacity: number, isTopologyCritical: boolean, requiredSplits: number) => {
+        if (driverCapacity <= 0) return { units: 0, alert: "" };
+        
+        let units = Math.ceil(recommendedPower / driverCapacity);
+        let alert = "";
+
+        // Alerta de Inteligência Física vs Potência
+        if (units === 1 && isTopologyCritical && requiredSplits > 1) {
+            alert = `Physical Limitation: 1 unit of ${driverCapacity}W handles the load, but the strip length requires sectioning into at least ${requiredSplits} parallel circuits.`;
+        } else if (units > 1) {
+            alert = `Load Division: You will need ${units} units of ${driverCapacity}W to safely power this circuit.`;
+        }
+
+        return { units, alert };
     }
 };

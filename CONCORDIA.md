@@ -76,6 +76,14 @@
 - [12/04/2026]: Refatoração de UI/UX e i18n no módulo Ponto a Ponto Horizontal: Padronização do contraste e cores do Modo Claro no bloco de Upload IES e mapeamento completo do dicionário de traduções (Botões de Facho, Sumário Técnico e HCL).
 - [12/04/2026]: Fix: Adicionadas cotas trigonométricas da mancha de luz no Plano de Trabalho (WP) e corrigida estabilidade de renderização do ângulo do facho em Canvas2DEngine.ts.
 - [12/04/2026] UI/UX TWEAK (index.html): Refinamento ergonômico dos Controles Segmentados (Segmented Controls) nos módulos de Fotometria, Malha e HUD 3D. Remoção do stretch forçado (w-full/flex-1 desalinhado), calibração de padding vertical (py-2.5) para botões mais robustos e redução da margem inferior (mb-2) para agrupar visualmente os seletores aos seus respectivos sliders de parâmetros (Lei de Proximidade).
+- [16/04/2026]: Evolução de Infraestrutura (ExcelParser.ts): Expansão do algoritmo de fuzzymatching para suporte robusto a padrões orçamentários (qtd, unid, pçs) e injeção de Regex estrito para extração numérica, garantindo a exatidão na importação de quantitativos massivos.
+- [16/04/2026]: Refatoração UI/UX e Validação (Módulo LEED): Implementação do Sistema de Semaforização de Estado (Traffic Light). O motor agora intercepta ambientes com dados incompletos ou zerados (borda amarela) antes da análise ASHRAE, prevenindo falsos-positivos de eficiência (LPD).
+- [16/04/2026]: Evolução de UI e Estado (main.ts): Implementação de Agrupamento Top-Down via Acordeão por Pavimentos. Inclui totalizadores regionais de Carga e LPD, acoplados a um sistema de persistência de estado DOM (`collapsedFloors`) para manter as sessões fluídas e expansões em memória.
+- [16/04/2026]: Inteligência de Memória (State Reconciliation): Injeção de motor de Upsert (Smart Merge) no upload de arquivos Excel. Permite atualizar o luminotécnico (Potência e Quantidade) de um projeto já auditado sem sobrescrever a classificação semântica manual (Categorias LEED e ASHRAE) feita pelo arquiteto.
+- [16/04/2026]: Proteção de Dados e Escape Hatch (main.ts): Adição do controle "+ NOVO PROJETO" persistente e injeção de camada de decisão progressiva (Mesclar vs Sobrepor) durante o upload de dados, atuando como blindagem preventiva contra deleção acidental da prancheta de cálculos.
+- [16/04/2026] FEATURE: Implementação do Driver Matcher no Hub de Inteligência. Refatoração de UI para suporte a dimensionamento físico de fontes (Hybrid Component) e tradução técnica global do módulo para padrão Internacional.
+
+## Estado Atual da Árvore de Arquivos
 
 ## Estado Atual da Árvore de Arquivos
 - index.html: Apenas View (Tailwind + Estrutura).
