@@ -60,6 +60,7 @@ declare global {
 
 // 2. INICIALIZAÇÃO DE ESTADO GLOBAL
 window.state = {
+    project: { metadata: { projectName: "Novo Projeto", author: "" }, inventory: {}, rooms: [] }, // LUXSINTAX: SSOT da Planilha Mestra
     hclViewMode: 'clock', // LUXSINTAX: Estado do Segmented Control HCL
     ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, spin: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
     vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, spin: 180, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
@@ -430,17 +431,18 @@ window.switchTool = function(toolId: string) {
         activeBtn.classList.add('tab-active', 'text-luminous-gold');
     }
 
-    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg');
+    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg' || toolId === 'dataManager');
         document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
         document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
         document.getElementById('audit-tool')?.classList.toggle('hidden', toolId !== 'audit');
         document.getElementById('driver-tool')?.classList.toggle('hidden', toolId !== 'driver');
         document.getElementById('esg-tool')?.classList.toggle('hidden', toolId !== 'esg');
+        document.getElementById('dataManager-tool')?.classList.toggle('hidden', toolId !== 'dataManager');
     
     const modeSelector = document.getElementById('calc-mode-selector');
-    if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
+    if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj' || toolId === 'dataManager');
 
-    if (toolId !== 'query' && toolId !== 'leedProj' && toolId !== 'audit' && toolId !== 'driver') {
+    if (toolId !== 'query' && toolId !== 'leedProj' && toolId !== 'audit' && toolId !== 'driver' && toolId !== 'dataManager') {
         ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
             const el = document.getElementById(id); 
             if(el) el.classList.add('hidden'); 
@@ -2751,7 +2753,244 @@ window.updateCalculations = function() {
 // LUXSINTAX: Super Canvas HCL movido para Canvas2DEngine.ts (Clean Architecture)
 
 // ==========================================
-// LUXSINTAX: Engine de Importação Excel (Clean Architecture)
+// LUXSINTAX: GERENCIADOR DE DADOS (PLANILHA MESTRA & SSOT)
+// ==========================================
+window.switchDataManagerTab = function(tabId: string) {
+    ['technical', 'budget', 'dashboard'].forEach(t => {
+        document.getElementById('dm-content-' + t)?.classList.add('hidden');
+        const btn = document.getElementById('btn-dm-' + t);
+        if (btn) {
+            btn.classList.remove('text-leed-green', 'border-b-2', 'border-leed-green');
+            btn.classList.add('text-slate-400');
+        }
+    });
+    document.getElementById('dm-content-' + tabId)?.classList.remove('hidden');
+    const activeBtn = document.getElementById('btn-dm-' + tabId);
+    if (activeBtn) {
+        activeBtn.classList.remove('text-slate-400');
+        activeBtn.classList.add('text-leed-green', 'border-b-2', 'border-leed-green');
+    }
+};
+
+window.handleMasterUpload = async function(input: HTMLInputElement) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    
+    const btnLabel = input.previousElementSibling as HTMLElement;
+    const originalHtml = btnLabel.innerHTML;
+    btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> INGERINDO DADOS...';
+
+    try {
+        const parsedRooms = await ExcelParser.parseMasterSpreadsheet(file);
+        
+        // 1. Atualiza Estado Global
+        window.state.project.rooms = parsedRooms;
+        
+        // 2. Extrai e Normaliza o Inventário Único (Fuzzy Mapping -> Dicionário)
+        const inventory = new Map();
+        parsedRooms.forEach((room: any) => {
+            room.fixtures.forEach((fix: any) => {
+                if (!inventory.has(fix.code)) {
+                    inventory.set(fix.code, { ...fix });
+                }
+            });
+        });
+        window.state.project.inventory = Object.fromEntries(inventory);
+
+        // 3. Atualiza Abas do Gerenciador
+        if (window.renderTechnicalNotebook) window.renderTechnicalNotebook();
+        if (window.renderBudget) window.renderBudget();
+        if (window.renderDashboard) window.renderDashboard();
+        
+        // 4. Ponte Automática com o Motor LEED (SSOT Sincronizado)
+        window.state.leedProject.rooms = JSON.parse(JSON.stringify(parsedRooms));
+        if (window.renderLeedProject) window.renderLeedProject();
+
+        btnLabel.innerHTML = '<i class="fas fa-check mr-2"></i> DADOS SINCRONIZADOS!';
+        setTimeout(() => btnLabel.innerHTML = originalHtml, 3000);
+        
+        // Muda para a aba de Caderno Técnico automaticamente
+        window.switchDataManagerTab('technical');
+
+    } catch (err: any) {
+        alert(err.message);
+        btnLabel.innerHTML = originalHtml;
+    }
+    input.value = "";
+};
+
+window.renderTechnicalNotebook = function() {
+    const container = document.getElementById('dm-content-technical');
+    if (!container) return;
+    const rooms = window.state.project.rooms;
+    if (rooms.length === 0) return;
+
+    let html = '<div class="space-y-6">';
+    rooms.forEach((r: any) => {
+        html += `<div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h4 class="font-black text-leed-green mb-4 uppercase tracking-widest flex items-center justify-between">
+                <span><i class="fas fa-map-marker-alt mr-2"></i> ${r.floor} - ${r.name}</span>
+                <span class="text-slate-500 text-[10px] bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full">${r.area} m²</span>
+            </h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-[11px]">
+                    <thead class="text-slate-500 border-b-2 border-slate-200 dark:border-slate-700 uppercase tracking-widest">
+                        <tr><th class="pb-3 pr-4">CÓDIGO</th><th class="pb-3 pr-4">LUMINÁRIA</th><th class="pb-3 pr-4">POTÊNCIA</th><th class="pb-3 pr-4">FLUXO/CCT</th><th class="pb-3 pr-4">QTD</th><th class="pb-3 text-right">FABRICANTE</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                        ${r.fixtures.map((f: any) => `
+                            <tr class="text-starlight dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <td class="py-3 pr-4 text-tech-cyan">${f.code}</td>
+                                <td class="py-3 pr-4">${f.label}</td>
+                                <td class="py-3 pr-4">${f.power} W</td>
+                                <td class="py-3 pr-4">${f.flux ? f.flux+' lm' : '-'} / ${f.cct ? f.cct+'K' : '-'}</td>
+                                <td class="py-3 pr-4"><span class="bg-luminous-gold text-white px-2 py-0.5 rounded text-[10px]">${f.qty}</span></td>
+                                <td class="py-3 text-right text-slate-500">${f.manufacturer || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+};
+
+window.renderBudget = function() {
+    const container = document.getElementById('dm-content-budget');
+    if (!container) return;
+    const inventory = window.state.project.inventory;
+    const codes = Object.keys(inventory);
+    if (codes.length === 0) return;
+
+    const totals: any = {};
+    window.state.project.rooms.forEach((r: any) => {
+        r.fixtures.forEach((f: any) => {
+            if (!totals[f.code]) totals[f.code] = 0;
+            totals[f.code] += f.qty;
+        });
+    });
+
+    let totalCapex = 0;
+    let missingCosts = 0;
+
+    let html = '<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm"><table class="w-full text-left text-xs"><thead class="bg-slate-100 dark:bg-slate-800 text-slate-500 font-black tracking-widest uppercase border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4">CÓDIGO E DESCRIÇÃO</th><th class="p-4 text-center">QUANTIDADE</th><th class="p-4 text-right">CUSTO UNIT. (R$)</th><th class="p-4 text-right">SUBTOTAL</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-800">';
+    
+    codes.forEach(code => {
+        const item = inventory[code];
+        const qty = totals[code] || 0;
+        const price = item.unitPrice || 0;
+        const sub = qty * price;
+        totalCapex += sub;
+        if (price === 0) missingCosts++;
+
+        html += `<tr class="font-bold text-starlight dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${price === 0 ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}">
+            <td class="p-4 border-l-4 ${price === 0 ? 'border-amber-400' : 'border-transparent'}">
+                <span class="text-tech-cyan">${code}</span><br>
+                <span class="text-[10px] text-slate-500">${item.label}</span>
+            </td>
+            <td class="p-4 text-center"><span class="bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full text-[10px]">${qty}</span></td>
+            <td class="p-4 text-right">
+                <div class="inline-flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 shadow-inner">
+                    <span class="text-slate-400 text-[10px] mr-2">R$</span>
+                    <input type="number" value="${price}" onchange="window.updateInventoryPrice('${code}', this.value)" class="w-20 text-right bg-transparent outline-none focus:text-luminous-gold font-black">
+                </div>
+            </td>
+            <td class="p-4 text-right text-leed-green text-sm">${sub.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</td>
+        </tr>`;
+    });
+    html += `</tbody></table></div>`;
+
+    if (missingCosts > 0) {
+        html = `<div class="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl text-xs font-bold flex items-center gap-3 shadow-sm animate-fade-in"><i class="fas fa-exclamation-triangle text-xl"></i> <div>Faltam os preços unitários de ${missingCosts} item(ns). Preencha na tabela abaixo para consolidar o orçamento total. O CAPEX é vital para a aba Viabilidade ESG.</div></div>` + html;
+    }
+
+    // LUXSINTAX: Ponte Direta para o motor ESG/VPL. Atualiza automaticamente o CAPEX lá.
+    if (window.state.esg) {
+        window.state.esg.capex = totalCapex;
+        const capexInput = document.getElementById('esg-capex') as HTMLInputElement;
+        if (capexInput) capexInput.value = String(totalCapex);
+    }
+
+    html += `<div class="mt-8 flex justify-end"><div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 min-w-[300px] text-right shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-l from-green-50 to-transparent dark:from-green-900/10 pointer-events-none"></div>
+        <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2 relative z-10">CAPEX TOTAL (INSTALAÇÃO)</p>
+        <p class="text-3xl font-black text-leed-green relative z-10">${totalCapex.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
+    </div></div>`;
+
+    container.innerHTML = html;
+};
+
+window.updateInventoryPrice = function(code: string, newPrice: string) {
+    const val = parseFloat(newPrice) || 0;
+    if (window.state.project.inventory[code]) {
+        window.state.project.inventory[code].unitPrice = val;
+    }
+    window.state.project.rooms.forEach((r: any) => {
+        r.fixtures.forEach((f: any) => {
+            if (f.code === code) f.unitPrice = val;
+        });
+    });
+    window.renderBudget();
+    if (window.updateEsgUI) window.updateEsgUI();
+};
+
+window.renderDashboard = function() {
+    const container = document.getElementById('dm-content-dashboard');
+    if (!container) return;
+    
+    const inventory = window.state.project.inventory;
+    
+    let totalQty = 0;
+    let avgCctSum = 0;
+    let cctCount = 0;
+    let totalPower = 0;
+    let totalArea = 0;
+
+    window.state.project.rooms.forEach((r: any) => {
+        totalArea += (r.area || 0);
+        r.fixtures.forEach((f: any) => {
+            totalQty += f.qty;
+            totalPower += (f.power * f.qty);
+            if (f.cct && f.cct > 0) {
+                avgCctSum += (f.cct * f.qty);
+                cctCount += f.qty;
+            }
+        });
+    });
+
+    const lpdMedio = totalArea > 0 ? (totalPower / totalArea).toFixed(2) : '0.00';
+    const cctMedio = cctCount > 0 ? Math.round(avgCctSum / cctCount) : '-';
+
+    container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-cube mr-1"></i> Luminárias (Qtd)</p>
+                <p class="text-3xl font-black text-tech-cyan">${totalQty}</p>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-bolt mr-1"></i> Carga Total (W)</p>
+                <p class="text-3xl font-black text-luminous-gold">${totalPower.toFixed(0)} <span class="text-sm font-bold text-slate-400">W</span></p>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-expand-arrows-alt mr-1"></i> Densidade (LPD)</p>
+                <p class="text-3xl font-black text-leed-green">${lpdMedio} <span class="text-sm font-bold text-slate-400">W/m²</span></p>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-temperature-high mr-1"></i> Espectro Médio</p>
+                <p class="text-3xl font-black text-purple-500">${cctMedio} <span class="text-sm font-bold text-slate-400">K</span></p>
+            </div>
+        </div>
+        <div class="mt-8 p-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl bg-white dark:bg-slate-900/50">
+            <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">INTEGRAÇÃO ECOSSISTEMA</h4>
+            <p class="text-xs text-slate-500 font-bold max-w-2xl mx-auto">Sua prancheta está sincronizada. Os dados de Potência (W), Área (m²) e Custo Unitário (R$) já alimentam automaticamente a aba de Viabilidade ESG (CAPEX) e a aba de Certificação LEED (LPD). Navegue pelos pilares acima para visualizar os relatórios profundos.</p>
+        </div>
+    `;
+};
+
+// ==========================================
+// LUXSINTAX: Engine de Importação Excel (Clean Architecture - Fallback Antigo LEED)
 // ==========================================
 window.handleExcelUpload = async function(input: HTMLInputElement) {
     if (!input.files || !input.files[0]) return;
