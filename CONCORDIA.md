@@ -82,16 +82,14 @@
 - [16/04/2026]: Inteligência de Memória (State Reconciliation): Injeção de motor de Upsert (Smart Merge) no upload de arquivos Excel. Permite atualizar o luminotécnico (Potência e Quantidade) de um projeto já auditado sem sobrescrever a classificação semântica manual (Categorias LEED e ASHRAE) feita pelo arquiteto.
 - [16/04/2026]: Proteção de Dados e Escape Hatch (main.ts): Adição do controle "+ NOVO PROJETO" persistente e injeção de camada de decisão progressiva (Mesclar vs Sobrepor) durante o upload de dados, atuando como blindagem preventiva contra deleção acidental da prancheta de cálculos.
 - [16/04/2026] FEATURE: Implementação do Driver Matcher no Hub de Inteligência. Refatoração de UI para suporte a dimensionamento físico de fontes (Hybrid Component) e tradução técnica global do módulo para padrão Internacional.
+- [16/04/2026] UX/UI ARCHITECTURE: Refatoração da Home (`index.html`). Reorganização dos 4 pilares centrais: "Física & Engenharia", "Bem-Estar & Certificações", "Inteligência de Negócio" e "Ecossistema". Injeção da estrutura base para a aba "Gerenciador de Projetos" (Planilha Mestra).
+- [16/04/2026] DECISÃO ARQUITETURAL: Aprovação do padrão "Project Store" (`window.state.project`) no `main.ts` para atuar como centralizador de estado (Data Agnosticism). A Planilha Mestra, após ingestão e Fuzzy Matching no `ExcelParser.ts`, alimentará um dicionário global (SSOT), permitindo que os módulos de Especificação, Orçamento (CAPEX) e LEED consumam os mesmos dados sem redundância de I/O.
 
 ## Estado Atual da Árvore de Arquivos
-
-## Estado Atual da Árvore de Arquivos
-- index.html: Apenas View (Tailwind + Estrutura).
-- src/main.ts: Ponto de entrada, orquestrador de estado global e ponte Window.
-- src/domain/: Lógica pura matemática e física (Fotometria, Elétrica, Normas, ESG).
-- src/infrastructure/: Motores de renderização (Three.js, Canvas2D) e exportação.
-- [DATA ATUAL]: Modularização do HTML concluída via AI Studio.
-- [07/04/2026]: Implementação do Dashboard de Auditoria & Performance e Driver Hub concluídos.
+- `index.html`: Apenas View (Tailwind + Estrutura). Proibido conter lógica de negócio.
+- `src/main.ts`: Orquestrador. Detém o `window.state` e gerencia o fluxo unidirecional de dados entre a infraestrutura de ingestão e os motores de domínio.
+- `src/domain/`: Lógica pura, matemática, física e normativas (Fotometria, Elétrica, HCL, ESG, LEED).
+- `src/infrastructure/`: Motores de renderização (Three.js, Canvas2D), `ReportExporter.ts` e `ExcelParser.ts` (responsável pelo Fuzzy Matching e validação Zod da Planilha Mestra).
 
 ## Regras para a IA
 1. Antes de sugerir código, verifique se a convenção de `organization_id` está mantida.
