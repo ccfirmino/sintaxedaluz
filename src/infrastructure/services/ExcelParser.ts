@@ -59,7 +59,14 @@ export class ExcelParser {
                         const rawPower = getVal(['potencia', 'potência', 'w', 'watts', 'carga']);
                         const power = typeof rawPower === 'string' ? parseFloat(rawPower.replace(',', '.')) : (parseFloat(rawPower) || 0);
                         
-                        const qty = parseInt(getVal(['qtd', 'quantidade', 'numero'])) || 1;
+                        // LUXSINTAX: Fuzzy matcher rigoroso para Quantidade (evita colunas de número do ambiente)
+                        const rawQty = getVal(['qtd', 'quantidade', 'quant', 'qtde']);
+                        let qty = 1;
+                        if (rawQty !== null && rawQty !== undefined) {
+                            const cleanQty = String(rawQty).replace(/[^0-9]/g, '');
+                            const parsedQty = parseInt(cleanQty, 10);
+                            if (!isNaN(parsedQty) && parsedQty > 0) qty = parsedQty;
+                        }
 
                         const uniqueKey = `${floor}_${roomName}`;
 
