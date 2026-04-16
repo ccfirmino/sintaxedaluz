@@ -1747,9 +1747,14 @@ window.renderLeedProject = function() {
         else if (hasYellow) { floorStatusColor = 'text-amber-500 border-amber-300'; floorBgColor = 'bg-amber-50 dark:bg-amber-900/10'; }
         else { floorStatusColor = 'text-leed-green border-green-300'; floorBgColor = 'bg-green-50 dark:bg-green-900/10'; }
 
+        // LUXSINTAX: Persistência de Estado Estrutural do Acordeão
+        if (!window.state.leedProject.collapsedFloors) window.state.leedProject.collapsedFloors = {};
+        const isCollapsed = window.state.leedProject.collapsedFloors[floorName] === true;
+        const safeFloorId = floorName.replace(/[^a-zA-Z0-9]/g, '_');
+
         html += `
         <div class="mb-6 animate-fade-in-up">
-            <div onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron-icon').classList.toggle('rotate-180');" class="flex justify-between items-center cursor-pointer p-4 rounded-xl border ${floorStatusColor} ${floorBgColor} shadow-sm transition-colors mb-4">
+            <div onclick="window.state.leedProject.collapsedFloors['${floorName}'] = !window.state.leedProject.collapsedFloors['${floorName}']; document.getElementById('floor-content-${safeFloorId}').classList.toggle('hidden'); document.getElementById('floor-icon-${safeFloorId}').classList.toggle('rotate-180');" class="flex justify-between items-center cursor-pointer p-4 rounded-xl border ${floorStatusColor} ${floorBgColor} shadow-sm transition-colors mb-4">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-layer-group opacity-50"></i>
                     <h3 class="font-black tracking-widest uppercase text-sm">PAVIMENTO: ${floorName} <span class="ml-2 text-[10px] bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-full font-bold opacity-70">${floorRooms.length} ambientes</span></h3>
@@ -1763,10 +1768,10 @@ window.renderLeedProject = function() {
                         <div class="text-[9px] uppercase font-bold opacity-60 tracking-widest">LPD Médio</div>
                         <div class="font-black text-sm">${floorLpd} W/m²</div>
                     </div>
-                    <i class="fas fa-chevron-up chevron-icon transition-transform opacity-50"></i>
+                    <i id="floor-icon-${safeFloorId}" class="fas fa-chevron-up transition-transform opacity-50 ${isCollapsed ? 'rotate-180' : ''}"></i>
                 </div>
             </div>
-            <div class="space-y-4 pl-0 md:pl-4 border-l-2 border-transparent md:border-slate-200 dark:md:border-slate-700 transition-all">
+            <div id="floor-content-${safeFloorId}" class="space-y-4 pl-0 md:pl-4 border-l-2 border-transparent md:border-slate-200 dark:md:border-slate-700 transition-all ${isCollapsed ? 'hidden' : ''}">
         `;
 
         html += floorRooms.map((room: any) => {

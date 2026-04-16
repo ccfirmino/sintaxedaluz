@@ -59,8 +59,8 @@ export class ExcelParser {
                         const rawPower = getVal(['potencia', 'potência', 'w', 'watts', 'carga']);
                         const power = typeof rawPower === 'string' ? parseFloat(rawPower.replace(',', '.')) : (parseFloat(rawPower) || 0);
                         
-                        // LUXSINTAX: Fuzzy matcher rigoroso para Quantidade (evita colunas de número do ambiente)
-                        const rawQty = getVal(['qtd', 'quantidade', 'quant', 'qtde']);
+                        // LUXSINTAX: Fuzzy matcher expandido para Padrões Brasileiros de Orçamentação
+                        const rawQty = getVal(['qtd', 'quantidade', 'quant', 'qtde', 'unid', 'unidades', 'peca', 'peça', 'pcs', 'pçs']);
                         let qty = 1;
                         if (rawQty !== null && rawQty !== undefined) {
                             const cleanQty = String(rawQty).replace(/[^0-9]/g, '');
