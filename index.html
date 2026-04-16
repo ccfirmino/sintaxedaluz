@@ -786,7 +786,7 @@
 
                     <div id="dataManager-tool" class="w-full animate-fade-in-up col-span-12 hidden">
                         <div class="glass-panel p-8 rounded-2xl bg-white dark:bg-slate-900 transition-colors duration-300 shadow-xl">
-                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
+                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
                                 <div>
                                     <h3 class="text-xl text-leed-green font-black tracking-widest flex items-center gap-2 uppercase">
                                         <i class="fas fa-project-diagram"></i> <span>GERENCIADOR DE PROJETOS</span>
@@ -798,10 +798,25 @@
                                         <i class="fas fa-file-excel mr-2"></i> Importar Planilha Mestra
                                     </label>
                                     <input type="file" id="master-excel-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="window.handleMasterUpload(this)">
-                                    
-                                    <button onclick="window.addLeedRoom()" class="bg-leed-green text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-800 transition-all shadow-lg whitespace-nowrap">
-                                        <i class="fas fa-plus mr-2"></i> Novo Ambiente
-                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-8 flex flex-col lg:flex-row items-center gap-4 justify-between transition-colors shadow-inner">
+                                <div class="w-full lg:w-1/3">
+                                    <label class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
+                                    <input type="text" id="global-project-name" value="Novo Projeto" oninput="window.state.project.metadata.projectName = this.value" class="bg-transparent border-b border-slate-300 dark:border-slate-600 text-starlight dark:text-white font-black text-sm w-full focus:border-luminous-gold outline-none py-1 transition-colors">
+                                </div>
+                                
+                                <div class="w-full lg:w-auto flex-grow flex items-end gap-2">
+                                    <div class="flex-grow max-w-sm">
+                                        <label class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Meus Projetos Salvos</label>
+                                        <select id="global-load-select" onchange="if(this.value === 'NEW') window.createNewLeedProject(); else window.loadSpecificLeedProject();" class="w-full bg-white dark:bg-slate-900 text-starlight dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 font-bold text-[10px] uppercase outline-none cursor-pointer focus:border-luminous-gold transition-colors shadow-sm">
+                                            <option value="" disabled selected>Selecionar...</option>
+                                            <option value="NEW" class="text-luminous-gold font-black">+ NOVO PROJETO DO ZERO</option>
+                                        </select>
+                                    </div>
+                                    <button onclick="window.deleteSpecificLeedProject()" class="bg-white dark:bg-slate-900 hover:bg-red-50 dark:hover:bg-red-900/50 text-slate-400 hover:text-red-500 dark:text-slate-500 w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-600 shadow-sm" title="Excluir da Nuvem"><i class="fas fa-trash"></i></button>
+                                    <button onclick="window.saveLeedProject()" id="btn-global-save" class="bg-starlight dark:bg-slate-700 hover:bg-luminous-gold dark:hover:bg-luminous-gold text-white px-4 h-9 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2"><i class="fas fa-cloud-upload-alt"></i> <span>Salvar</span></button>
                                 </div>
                             </div>
 

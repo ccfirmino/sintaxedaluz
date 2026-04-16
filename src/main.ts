@@ -1601,29 +1601,10 @@ window.renderLeedProject = function() {
     if(!container) return;
     const s = window.state.project;
     
-    const savedOptions = (window.userLeedProjects || []).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
-    
     let html = `
-            <div class="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg border border-slate-200 dark:border-slate-800 transition-colors">
-                <div class="flex-grow w-full lg:w-auto">
-                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
-                    <input type="text" value="${s.metadata.projectName}" oninput="window.state.project.metadata.projectName = this.value" class="bg-transparent border-b border-slate-300 dark:border-slate-700 text-starlight dark:text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1 transition-colors">
-                </div>
-                
-                <div class="w-full lg:w-auto">
-                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">PROJETO SALVO</label>
-                    <div class="flex items-center gap-2">
-                        <select id="load-leed-select" onchange="if(this.value === 'NEW') window.createNewLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 font-bold text-[10px] uppercase outline-none w-full lg:w-48 cursor-pointer focus:border-luminous-gold transition-colors">
-                            <option value="" disabled selected>Selecionar...</option>
-                            <option value="NEW" class="text-luminous-gold font-black">+ NOVO PROJETO</option>
-                            ${savedOptions}
-                        </select>
-                        <button onclick="window.loadSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-starlight dark:text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Carregar"><i class="fas fa-folder-open"></i></button>
-                        <button onclick="window.deleteSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/50 text-slate-500 hover:text-red-500 dark:text-slate-400 w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Excluir"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-
-                <div class="w-full lg:w-auto border-l border-slate-300 dark:border-slate-700 pl-6 hidden lg:flex items-end gap-2 transition-colors">
+            <div class="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+                <div class="flex flex-wrap items-end gap-4 w-full lg:w-auto">
+                    <div class="hidden lg:block">
                     <div>
                         <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Lighting Zone</label>
                         <select onchange="window.state.project.lightingZone = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-white border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold transition-colors">
@@ -1871,36 +1852,60 @@ window.createNewLeedProject = () => {
     window.renderLeedProject();
 };
 
+window.updateProjectHeaderUI = () => {
+    const s = window.state.project;
+    const nameInput = document.getElementById('global-project-name') as HTMLInputElement;
+    if (nameInput) nameInput.value = s.metadata.projectName || 'Novo Projeto';
+
+    const select = document.getElementById('global-load-select') as HTMLSelectElement;
+    if (select) {
+        const savedOptions = (window.userLeedProjects || []).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
+        select.innerHTML = `
+            <option value="" disabled ${!s.db_id ? 'selected' : ''}>Seus Projetos Salvos...</option>
+            <option value="NEW" class="text-luminous-gold font-black">+ NOVO PROJETO DO ZERO</option>
+            ${savedOptions}
+        `;
+    }
+};
+
 window.loadSpecificLeedProject = () => {
-    const select = document.getElementById('load-leed-select') as HTMLSelectElement;
+    const select = document.getElementById('global-load-select') as HTMLSelectElement;
     if (!select || !select.value || select.value === 'NEW') return;
     const proj = window.userLeedProjects.find((p: any) => p.id === select.value);
     if (proj) {
         try {
             let rawData = proj.project_data;
             if (typeof rawData === 'string') rawData = JSON.parse(rawData);
+            
+            // LUXSINTAX: Fallbacks de Segurança para Projetos Antigos
             if (!rawData.rooms || !Array.isArray(rawData.rooms)) rawData.rooms = [];
             if (!rawData.target) rawData.target = 'baseline';
             if (!rawData.metadata) rawData.metadata = { projectName: proj.project_name, author: "" };
+            if (!rawData.inventory) rawData.inventory = {};
             
             window.state.project = JSON.parse(JSON.stringify(rawData));
             window.state.project.db_id = proj.id;
             
-            // Re-renderiza todas as abas
+            window.updateProjectHeaderUI();
+            
             if (window.renderTechnicalNotebook) window.renderTechnicalNotebook();
             if (window.renderBudget) window.renderBudget();
             if (window.renderDashboard) window.renderDashboard();
             if (window.renderLeedProject) window.renderLeedProject();
             
-            const btn = document.getElementById('btn-save-leed');
+            const btn = document.getElementById('btn-global-save');
             if (btn) {
                 const orig = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Carregado!';
-                btn.classList.remove('bg-slate-800'); btn.classList.add('bg-leed-green');
-                setTimeout(() => { btn.innerHTML = orig; btn.classList.add('bg-slate-800'); btn.classList.remove('bg-leed-green'); }, 2500);
+                btn.classList.add('text-leed-green');
+                setTimeout(() => { 
+                    btn.innerHTML = orig; 
+                    btn.classList.remove('text-leed-green');
+                }, 2500);
             }
         } catch (err) {
-            alert("Falha ao ler as informações do projeto. Os dados podem estar corrompidos.");
+            console.error("[LuxSintax] Erro de Estrutura:", err);
+            alert("Falha ao ler as informações. A estrutura do projeto é incompatível.");
         }
     }
 };
