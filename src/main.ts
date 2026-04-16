@@ -1659,13 +1659,17 @@ window.renderLeedProject = function() {
                     <input type="text" value="${s.name}" oninput="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-300 dark:border-slate-700 text-starlight dark:text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1 transition-colors">
                 </div>
                 
-                <div class="w-full lg:w-auto flex items-center gap-2">
-                    <select id="load-leed-select" class="bg-white dark:bg-slate-800 text-starlight dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 font-bold text-[10px] uppercase outline-none w-full lg:w-48 cursor-pointer focus:border-luminous-gold transition-colors">
-                        <option value="" disabled selected>Projetos Salvos...</option>
-                        ${savedOptions}
-                    </select>
-                    <button onclick="window.loadSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-starlight dark:text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Carregar"><i class="fas fa-folder-open"></i></button>
-                    <button onclick="window.deleteSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/50 text-slate-500 hover:text-red-500 dark:text-slate-400 w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Excluir"><i class="fas fa-trash"></i></button>
+                <div class="w-full lg:w-auto">
+                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">PROJETO SALVO</label>
+                    <div class="flex items-center gap-2">
+                        <select id="load-leed-select" onchange="if(this.value === 'NEW') window.createNewLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 font-bold text-[10px] uppercase outline-none w-full lg:w-48 cursor-pointer focus:border-luminous-gold transition-colors">
+                            <option value="" disabled selected>Selecionar...</option>
+                            <option value="NEW" class="text-luminous-gold font-black">+ NOVO PROJETO</option>
+                            ${savedOptions}
+                        </select>
+                        <button onclick="window.loadSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-starlight dark:text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Carregar"><i class="fas fa-folder-open"></i></button>
+                        <button onclick="window.deleteSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/50 text-slate-500 hover:text-red-500 dark:text-slate-400 w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>
 
                 <div class="w-full lg:w-auto border-l border-slate-300 dark:border-slate-700 pl-6 hidden lg:flex items-end gap-2 transition-colors">
@@ -1960,9 +1964,21 @@ window.fetchUserLeedProjects = async () => {
     }
 };
 
+// LUXSINTAX: Criar novo projeto do zero
+window.createNewLeedProject = () => {
+    if (window.state.leedProject.rooms.length > 0) {
+        if (!confirm("Tem certeza que deseja iniciar um novo projeto? As alterações não salvas no atual serão perdidas.")) {
+            window.renderLeedProject(); // Reseta o seletor visualmente
+            return;
+        }
+    }
+    window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
+    window.renderLeedProject();
+};
+
 window.loadSpecificLeedProject = () => {
     const select = document.getElementById('load-leed-select') as HTMLSelectElement;
-    if (!select || !select.value) return;
+    if (!select || !select.value || select.value === 'NEW') return;
     const proj = window.userLeedProjects.find((p: any) => p.id === select.value);
     if (proj) {
         try {
@@ -1995,7 +2011,7 @@ window.loadSpecificLeedProject = () => {
 
 window.deleteSpecificLeedProject = async () => {
     const select = document.getElementById('load-leed-select') as HTMLSelectElement;
-    if (!select || !select.value) return alert("Por favor, selecione um projeto na lista primeiro para deletar.");
+    if (!select || !select.value || select.value === 'NEW') return alert("Por favor, selecione um projeto salvo na lista primeiro para deletar.");
     const proj = window.userLeedProjects.find((p: any) => p.id === select.value);
     if (!proj) return;
     if (!confirm(`TEM CERTEZA? O projeto "${proj.project_name}" será apagado permanentemente da nuvem.`)) return;
@@ -2694,6 +2710,16 @@ window.handleExcelUpload = async function(input: HTMLInputElement) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
     
+    // LUXSINTAX: Proteção de Estado (Confirmação de Sobreposição vs Mesclagem)
+    let shouldMerge = true;
+    if (window.state.leedProject.rooms && window.state.leedProject.rooms.length > 0) {
+        shouldMerge = confirm("Projeto atual detectado.\n\nClique em [OK] para MESCLAR a nova planilha (preservando suas edições manuais atuais).\nClique em [CANCELAR] para SOBREPOR tudo (começar um projeto novo do zero com esta planilha).");
+        if (!shouldMerge) {
+            // Limpa o projeto atual caso o usuário escolha sobrepor
+            window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
+        }
+    }
+
     const btnLabel = document.getElementById('lbl-excel-upload');
     if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> PROCESSANDO...';
 
