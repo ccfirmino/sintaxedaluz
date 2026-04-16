@@ -60,16 +60,16 @@ declare global {
 
 // 2. INICIALIZAÇÃO DE ESTADO GLOBAL
 window.state = {
-    project: { metadata: { projectName: "Novo Projeto", author: "" }, target: "baseline", lightingZone: "LZ3", customReduction: 15, db_id: null, collapsedFloors: {}, inventory: {}, rooms: [] }, // LUXSINTAX: SSOT Unificado
     hclViewMode: 'clock', // LUXSINTAX: Estado do Segmented Control HCL
     ponto: { viewMode: 'single', spacing: 2.0, height: 3.0, plane: 0.75, beam: 30, tilt: 0, spin: 0, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
     vertical: { viewMode: 'section', height: 3.0, hq: 1.6, dist: 1.0, frameW: 1.2, frameH: 0.8, qty: 1, spacing: 1.0, beam: 30, tilt: 30, spin: 180, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null, mRatio: 0.52, showGlareZone: false, falseColor: false },
     homog: { height: 3.0, plane: 0.75, spacing: 2.0, beam: 30, intensity: 3000, flux: 1500, cdklm: 2000, iesData: null, iesFileName: null },
     grid: { calcMethod: 'target', manualCols: 4, manualRows: 3, height: 3.0, plane: 0.75, viewLevel: 'HP', beam: 60, cct: 3000, flux: 3000, watts: 30, utilFactor: 0.60, maintFactor: 0.80, targetLux: 500, roomW: 6.0, roomL: 4.0, falseColor: false, iesData: null, iesFileName: null, projectName: 'Projeto LuxSintax', roomName: 'Ambiente Teste', authorName: 'Lux Designer' },
     driver: { mode: 'CV', power: 14.4, qty: 5, current: 350 },
-    audit: { wireLength: 5, wireGauge: 1.5, voltage: 12, useType: 'office', timeOfDay: 'morning', mRatio: 0.52, visualLux: 500, age: 30, tm30: 'cri80', flicker: 'low', baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260 },
-    esg: { proposedWatts: 300, baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260, hasAC: true, maintSavings: 0, capex: 5000 },
-    showIsolines: true,
+    leedProject: { name: "Novo Projeto LEED", target: "baseline", rooms: [] },
+        audit: { wireLength: 5, wireGauge: 1.5, voltage: 12, useType: 'office', timeOfDay: 'morning', mRatio: 0.52, visualLux: 500, age: 30, tm30: 'cri80', flicker: 'low', baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260 },
+	esg: { proposedWatts: 300, baselineWatts: 1500, kwhCost: 0.85, dailyHours: 10, daysPerYear: 260, hasAC: true, maintSavings: 0, capex: 5000 },
+        showIsolines: true,
     showPolar: true,
     showHCL: false
 };
@@ -430,17 +430,17 @@ window.switchTool = function(toolId: string) {
         activeBtn.classList.add('tab-active', 'text-luminous-gold');
     }
 
-    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg' || toolId === 'dataManager');
+    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg');
         document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
+        document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
         document.getElementById('audit-tool')?.classList.toggle('hidden', toolId !== 'audit');
         document.getElementById('driver-tool')?.classList.toggle('hidden', toolId !== 'driver');
         document.getElementById('esg-tool')?.classList.toggle('hidden', toolId !== 'esg');
-        document.getElementById('dataManager-tool')?.classList.toggle('hidden', toolId !== 'dataManager');
     
     const modeSelector = document.getElementById('calc-mode-selector');
-    if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'dataManager');
+    if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
 
-    if (toolId !== 'query' && toolId !== 'audit' && toolId !== 'driver' && toolId !== 'esg' && toolId !== 'dataManager') {
+    if (toolId !== 'query' && toolId !== 'leedProj' && toolId !== 'audit' && toolId !== 'driver') {
         ['inputs-ponto', 'inputs-vertical', 'inputs-homog', 'inputs-grid', 'inputs-driver'].forEach(id => { 
             const el = document.getElementById(id); 
             if(el) el.classList.add('hidden'); 
@@ -483,20 +483,10 @@ window.switchTool = function(toolId: string) {
 
         window.updateCalculations();
     } else if (toolId === 'query') {
-        window.switchQueryTab('nbr8995');
-    } else if (toolId === 'dataManager') {
-        window.fetchUserLeedProjects();
-        window.switchDataManagerTab('technical');
-    } else if (toolId === 'audit') {
-        if (window.renderHclAudit) window.renderHclAudit();
-        window.updateCalculations();
-    } else if (toolId === 'driver') {
-        if (window.renderDriverTopology) window.renderDriverTopology();
-        window.updateCalculations();
-    } else if (toolId === 'esg') {
-        if (window.renderEsgReport) window.renderEsgReport();
-        window.updateCalculations();
-    }
+        window.switchQueryTab('nbr8995');
+    } else if (toolId === 'leedProj') {
+        window.renderLeedProject();
+    }
 };
 
 window.setGridCalcMethod = function(method: string) {
@@ -1248,7 +1238,7 @@ window.generateLeedReport = async () => {
         const PDFLib = (window as any).PDFLib;
         if (!PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
 
-        const s = window.state.project;
+        const s = window.state.leedProject;
         if (s.rooms.length === 0) return alert('Adicione ao menos um ambiente ao projeto.');
 
         const summary = window.StandardsEngine.calculateLeedCompliance(s);
@@ -1263,12 +1253,15 @@ window.generateLeedReport = async () => {
             };
             const targetLabel = targetLabels[s.target] || 'ASHRAE Base (0%)';
 
+            // LUXSINTAX: Blindagem Legal e Injeção de Logo (White-Label)
             summary.disclaimer = "Nota Técnica de Isenção de Responsabilidade: Os cálculos e métricas apresentados neste relatório baseiam-se em modelos matemáticos ideais e possuem caráter exclusivamente preliminar (Concept Design). Este documento destina-se ao estudo de viabilidade, orçamentação e pré-certificação (LEED/ASHRAE). Ele não substitui o projeto executivo luminotécnico assinado por um profissional legalmente habilitado (ART/RRT). A conformidade final e a segurança da instalação devem ser validadas in loco e submetidas a softwares de cálculo de inter-reflexão global para aprovação em órgãos oficiais.";
 
+            // LUXSINTAX: Busca a Logo customizada salva localmente no perfil do usuário
             const userLogoBase64 = localStorage.getItem('luxsintax_user_logo') || null;
 
             const blob = await window.ReportExporter.createLeedPdf(PDFLib, s, summary, targetLabel, userLogoBase64);
 
+            // LUXSINTAX: Analytics - Rastreamento de Conversão (Geração de Relatório)
             if (typeof (window as any).gtag === 'function') {
                 (window as any).gtag('event', 'generate_report', {
                     report_type: 'Projeto_LEED',
@@ -1278,7 +1271,7 @@ window.generateLeedReport = async () => {
 
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        const safeName = s.metadata.projectName ? s.metadata.projectName.replace(/\s+/g, '_') : 'Projeto';
+        const safeName = s.name ? s.name.replace(/\s+/g, '_') : 'Projeto';
         link.download = `LuxSintax_LEED_${safeName}.pdf`;
         link.click();
     } catch (err: any) {
@@ -1474,26 +1467,36 @@ window.setLeedTarget = function(t: string) { window.currentLeedTarget = t; docum
 window.toggleWellFeature = function(el: HTMLElement, pts: number) { el.classList.toggle('active'); let total=0; document.querySelectorAll('.well-toggle-group.active').forEach(i => total += parseInt(i.getAttribute('data-points')!)); document.getElementById('well-total-score')!.innerHTML = `${total} <span class="text-xs text-slate-400 font-normal">/ 8</span>`; document.getElementById('well-progress-bar')!.style.width = (total/8*100)+'%'; document.getElementById('well-progress-text')!.innerText = (total/8*100).toFixed(0)+'%'; const icon = el.querySelector('.fa-check')!; if(el.classList.contains('active')) icon.classList.remove('opacity-0'); else icon.classList.add('opacity-0'); };
 
 window.addLeedRoom = function() {
-    const room = { id: Date.now(), floor: "GERAL", name: "Novo Ambiente", area: 50, baseLpd: 0, typology: "", leedCategory: "interior", expanded: true, fixtures: [{ id: Date.now() + 1, label: "Luminária Genérica", power: 0, qty: 1 }] };
-    window.state.project.rooms.unshift(room);
+    const room = { 
+        id: Date.now(),
+        floor: "GERAL", 
+        name: "Novo Ambiente", 
+        area: 50, 
+        baseLpd: 0, 
+        typology: "", 
+        leedCategory: "interior", // LUXSINTAX: Nova diretiva de zona LEED
+        expanded: true,
+        fixtures: [{ id: Date.now() + 1, label: "Luminária Genérica", power: 0, qty: 1 }]
+    };
+    window.state.leedProject.rooms.unshift(room);
     window.renderLeedProject();
 };
 
 window.duplicateLeedRoom = function(roomId: number) {
-    const roomToCopy = window.state.project.rooms.find((r: any) => r.id === roomId);
+    const roomToCopy = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (roomToCopy) {
         const clonedRoom = JSON.parse(JSON.stringify(roomToCopy));
         clonedRoom.id = Date.now();
         clonedRoom.name = clonedRoom.name + " (Cópia)";
         clonedRoom.expanded = true;
         clonedRoom.fixtures.forEach((f: any, idx: number) => { f.id = Date.now() + 100 + idx; });
-        window.state.project.rooms.unshift(clonedRoom);
+        window.state.leedProject.rooms.unshift(clonedRoom);
         window.renderLeedProject();
     }
 };
 
 window.toggleLeedRoom = function(roomId: number) {
-    const room = window.state.project.rooms.find((r: any) => r.id === roomId);
+    const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (room) {
         room.expanded = !room.expanded;
         const detailsDiv = document.getElementById(`room-details-${roomId}`);
@@ -1504,71 +1507,104 @@ window.toggleLeedRoom = function(roomId: number) {
 };
 
 window.updateLeedTargetMode = function(val: string) {
-    window.state.project.target = val;
+    window.state.leedProject.target = val;
     window.updateGlobalLeedSummary();
     window.renderLeedProject();
 };
 
 window.updateCustomLeedReduction = function(val: number) {
-    window.state.project.customReduction = val;
+    window.state.leedProject.customReduction = val;
     window.updateGlobalLeedSummary();
 };
 
 window.removeLeedRoom = function(roomId: number) {
-    window.state.project.rooms = window.state.project.rooms.filter((r: any) => r.id !== roomId);
+    window.state.leedProject.rooms = window.state.leedProject.rooms.filter((r: any) => r.id !== roomId);
     window.renderLeedProject();
 };
 
 window.updateLeedRoomData = function(roomId: number, field: string, value: any) {
-    const room = window.state.project.rooms.find((r: any) => r.id === roomId);
+    const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (room) {
-        if (['name', 'typology', 'floor', 'leedCategory', 'unit'].includes(field)) room[field] = value;
-        else if (field === 'measurement') { if (room.unit === 'W/m') room.length = parseFloat(value) || 0; else room.area = parseFloat(value) || 0; } 
-        else room[field] = parseFloat(value) || 0;
+        if (['name', 'typology', 'floor', 'leedCategory', 'unit'].includes(field)) {
+            room[field] = value;
+        } else if (field === 'measurement') {
+            if (room.unit === 'W/m') room.length = parseFloat(value) || 0;
+            else room.area = parseFloat(value) || 0;
+        } else {
+            room[field] = parseFloat(value) || 0;
+        }
         
         if (field === 'unit') {
-            if (value === 'W/m') { room.length = room.area || 0; delete room.area; } else { room.area = room.length || 0; delete room.length; }
-            window.renderLeedProject(); return;
+            if (value === 'W/m') { room.length = room.area || 0; delete room.area; }
+            else { room.area = room.length || 0; delete room.length; }
+            window.renderLeedProject();
+            return;
         }
+        
         if (field === 'typology') {
             const baseline = window.lpdBaselines.find((b: any) => b.type === value);
             const extBaseline = window.exteriorLpdBaselines ? window.exteriorLpdBaselines.find((b: any) => b.type === value) : null;
-            if (baseline) { room.baseLpd = baseline.base; room.unit = 'W/m²'; } else if (extBaseline) { const z = window.state.project.lightingZone || 'LZ3'; room.baseLpd = extBaseline.zoneAllowances[z] || 0; room.unit = extBaseline.unit; }
-            window.renderLeedProject(); return;
+            
+            if (baseline) {
+                room.baseLpd = baseline.base;
+                room.unit = 'W/m²';
+            } else if (extBaseline) {
+                const z = window.state.leedProject.lightingZone || 'LZ3';
+                room.baseLpd = extBaseline.zoneAllowances[z] || 0;
+                room.unit = extBaseline.unit;
+            }
+            window.renderLeedProject();
+            return;
         }
-        window.updateGlobalLeedSummary(); window.updateLeedRoomUI(roomId);
+        
+        // LUXSINTAX: Atualização Visual Silenciosa em Tempo Real
+        window.updateGlobalLeedSummary();
+        window.updateLeedRoomUI(roomId);
     }
 };
 
 window.addLeedFixture = function(roomId: number) {
-    const room = window.state.project.rooms.find((r: any) => r.id === roomId);
-    if (room) { room.fixtures.push({ id: Date.now(), label: "Luminária Nova", power: 15, qty: 1 }); window.renderLeedProject(); }
+    const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
+    if (room) {
+        room.fixtures.push({ id: Date.now(), label: "Luminária Nova", power: 15, qty: 1 });
+        window.renderLeedProject(); // Mudança estrutural exige recriar o HTML
+    }
 };
 
 window.removeLeedFixture = function(roomId: number, fixtureId: number) {
-    const room = window.state.project.rooms.find((r: any) => r.id === roomId);
-    if (room) { room.fixtures = room.fixtures.filter((f: any) => f.id !== fixtureId); window.renderLeedProject(); }
+    const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
+    if (room) {
+        room.fixtures = room.fixtures.filter((f: any) => f.id !== fixtureId);
+        window.renderLeedProject();
+    }
 };
 
 window.updateLeedFixtureData = function(roomId: number, fixtureId: number, field: string, value: any) {
-    const room = window.state.project.rooms.find((r: any) => r.id === roomId);
+    const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (room) {
         const fixture = room.fixtures.find((f: any) => f.id === fixtureId);
         if (fixture) {
             fixture[field] = field === 'label' ? value : parseFloat(value) || 0;
+            
             const subtotalEl = document.getElementById(`subtotal-${roomId}-${fixtureId}`);
             if (subtotalEl) subtotalEl.innerText = `${(fixture.power * fixture.qty).toFixed(1)} W`;
-            window.updateGlobalLeedSummary(); window.updateLeedRoomUI(roomId);
+            
+            // LUXSINTAX: Atualização Visual Silenciosa em Tempo Real
+            window.updateGlobalLeedSummary();
+            window.updateLeedRoomUI(roomId);
         }
     }
 };
 
 window.updateLeedRoomUI = function(roomId: number) {
-    const room = window.state.project.rooms.find((r: any) => r.id === roomId);
+    const room = window.state.leedProject.rooms.find((r: any) => r.id === roomId);
     if (!room) return;
+    
     const roomTotalWatts = room.fixtures.reduce((sum: number, f: any) => sum + (f.power * f.qty), 0);
     const measurement = room.unit === 'W/m' ? (room.length || 0) : (room.area || 0);
     const roomLpd = measurement > 0 ? roomTotalWatts / measurement : 0;
+    
+    // LUXSINTAX: Semaforização de Estado (Traffic Light)
     const isMissingData = measurement === 0 || room.typology === "" || room.fixtures.length === 0 || room.fixtures.some((f:any) => f.power === 0 || f.qty === 0);
     const isOverLimit = !isMissingData && room.baseLpd > 0 && roomLpd > room.baseLpd;
     
@@ -1582,18 +1618,33 @@ window.updateLeedRoomUI = function(roomId: number) {
     
     if (cardEl) {
         cardEl.classList.remove('border-l-red-500', 'border-l-amber-400', 'border-l-green-500', 'border-slate-200', 'dark:border-slate-700', 'shadow-[0_0_15px_rgba(239,68,68,0.15)]');
-        if (isMissingData) { cardEl.classList.add('border-l-4', 'border-l-amber-400', 'border-slate-200', 'dark:border-slate-700'); if(nameEl) { nameEl.classList.remove('text-red-500', 'text-starlight', 'dark:text-white'); nameEl.classList.add('text-amber-500'); } } 
-        else if (isOverLimit) { cardEl.classList.add('border-l-4', 'border-l-red-500', 'border-slate-200', 'dark:border-slate-700', 'shadow-[0_0_15px_rgba(239,68,68,0.15)]'); if(nameEl) { nameEl.classList.remove('text-amber-500', 'text-starlight', 'dark:text-white'); nameEl.classList.add('text-red-500'); } } 
-        else { cardEl.classList.add('border-l-4', 'border-l-green-500', 'border-slate-200', 'dark:border-slate-700'); if(nameEl) { nameEl.classList.remove('text-red-500', 'text-amber-500'); nameEl.classList.add('text-starlight', 'dark:text-white'); } }
+        
+        if (isMissingData) {
+            cardEl.classList.add('border-l-4', 'border-l-amber-400', 'border-slate-200', 'dark:border-slate-700');
+            if(nameEl) { nameEl.classList.remove('text-red-500', 'text-starlight', 'dark:text-white'); nameEl.classList.add('text-amber-500'); }
+        } else if (isOverLimit) {
+            cardEl.classList.add('border-l-4', 'border-l-red-500', 'border-slate-200', 'dark:border-slate-700', 'shadow-[0_0_15px_rgba(239,68,68,0.15)]');
+            if(nameEl) { nameEl.classList.remove('text-amber-500', 'text-starlight', 'dark:text-white'); nameEl.classList.add('text-red-500'); }
+        } else {
+            cardEl.classList.add('border-l-4', 'border-l-green-500', 'border-slate-200', 'dark:border-slate-700');
+            if(nameEl) { nameEl.classList.remove('text-red-500', 'text-amber-500'); nameEl.classList.add('text-starlight', 'dark:text-white'); }
+        }
     }
     
-    if (isOverLimit) { wEl?.classList.add('text-red-500'); wEl?.classList.remove('text-starlight', 'dark:text-white', 'text-amber-500'); lpdEl?.classList.add('text-red-500'); lpdEl?.classList.remove('text-starlight', 'dark:text-white', 'text-amber-500'); } 
-    else if (isMissingData) { wEl?.classList.add('text-amber-500'); wEl?.classList.remove('text-starlight', 'dark:text-white', 'text-red-500'); lpdEl?.classList.add('text-amber-500'); lpdEl?.classList.remove('text-starlight', 'dark:text-white', 'text-red-500'); } 
-    else { wEl?.classList.remove('text-red-500', 'text-amber-500'); wEl?.classList.add('text-starlight', 'dark:text-white'); lpdEl?.classList.remove('text-red-500', 'text-amber-500'); lpdEl?.classList.add('text-starlight', 'dark:text-white'); }
+    if (isOverLimit) {
+        wEl?.classList.add('text-red-500'); wEl?.classList.remove('text-starlight', 'dark:text-white', 'text-amber-500');
+        lpdEl?.classList.add('text-red-500'); lpdEl?.classList.remove('text-starlight', 'dark:text-white', 'text-amber-500');
+    } else if (isMissingData) {
+        wEl?.classList.add('text-amber-500'); wEl?.classList.remove('text-starlight', 'dark:text-white', 'text-red-500');
+        lpdEl?.classList.add('text-amber-500'); lpdEl?.classList.remove('text-starlight', 'dark:text-white', 'text-red-500');
+    } else {
+        wEl?.classList.remove('text-red-500', 'text-amber-500'); wEl?.classList.add('text-starlight', 'dark:text-white');
+        lpdEl?.classList.remove('text-red-500', 'text-amber-500'); lpdEl?.classList.add('text-starlight', 'dark:text-white');
+    }
 };
 
 window.updateGlobalLeedSummary = () => {
-    const s = window.state.project;
+    const s = window.state.leedProject;
     const summary = window.StandardsEngine.calculateLeedCompliance(s);
     document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W Permitidos</span>`;
     document.getElementById('global-leed-lpd')!.innerHTML = `${summary.currentLpd.toFixed(2)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">W/m²</span>`;
@@ -1601,22 +1652,43 @@ window.updateGlobalLeedSummary = () => {
     if (statusBox && summary.totalArea > 0) {
         statusBox.classList.remove('animate-pulse');
         statusBox.innerText = summary.isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "ALERTA: CARGA EXCEDE LIMITE ASHRAE";
-        statusBox.className = summary.isCompliant ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
+        statusBox.className = summary.isCompliant 
+            ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" 
+            : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
     }
 };
 
 window.renderLeedProject = function() {
     const container = document.getElementById('leed-project-container');
     if(!container) return;
-    const s = window.state.project;
+    const s = window.state.leedProject;
+    
+    const savedOptions = (window.userLeedProjects || []).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
     
     let html = `
-            <div class="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                <div class="flex flex-wrap items-end gap-4 w-full lg:w-auto">
-                    <div class="hidden lg:block">
+            <div class="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg border border-slate-200 dark:border-slate-800 transition-colors">
+                <div class="flex-grow w-full lg:w-auto">
+                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
+                    <input type="text" value="${s.name}" oninput="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-300 dark:border-slate-700 text-starlight dark:text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1 transition-colors">
+                </div>
+                
+                <div class="w-full lg:w-auto">
+                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">PROJETO SALVO</label>
+                    <div class="flex items-center gap-2">
+                        <select id="load-leed-select" onchange="if(this.value === 'NEW') window.createNewLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 font-bold text-[10px] uppercase outline-none w-full lg:w-48 cursor-pointer focus:border-luminous-gold transition-colors">
+                            <option value="" disabled selected>Selecionar...</option>
+                            <option value="NEW" class="text-luminous-gold font-black">+ NOVO PROJETO</option>
+                            ${savedOptions}
+                        </select>
+                        <button onclick="window.loadSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-starlight dark:text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Carregar"><i class="fas fa-folder-open"></i></button>
+                        <button onclick="window.deleteSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/50 text-slate-500 hover:text-red-500 dark:text-slate-400 w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-auto border-l border-slate-300 dark:border-slate-700 pl-6 hidden lg:flex items-end gap-2 transition-colors">
                     <div>
                         <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Lighting Zone</label>
-                        <select onchange="window.state.project.lightingZone = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-white border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold transition-colors">
+                        <select onchange="window.state.leedProject.lightingZone = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-white border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold transition-colors">
                             <option value="LZ0" ${s.lightingZone === 'LZ0' ? 'selected' : ''}>LZ0 (Natural)</option>
                             <option value="LZ1" ${s.lightingZone === 'LZ1' ? 'selected' : ''}>LZ1 (Rural)</option>
                             <option value="LZ2" ${s.lightingZone === 'LZ2' ? 'selected' : ''}>LZ2 (Residencial)</option>
@@ -1653,6 +1725,7 @@ window.renderLeedProject = function() {
             </div>
         `;
 
+    // LUXSINTAX: Agrupamento por Pavimento e Semaforização
     const groupedRooms = s.rooms.reduce((acc: any, room: any) => {
         const floor = (room.floor || 'GERAL').trim().toUpperCase();
         if (!acc[floor]) acc[floor] = [];
@@ -1662,16 +1735,23 @@ window.renderLeedProject = function() {
 
     Object.keys(groupedRooms).sort().forEach((floorName) => {
         const floorRooms = groupedRooms[floorName];
-        let floorWatts = 0; let floorArea = 0; let hasYellow = false; let hasRed = false;
+        
+        let floorWatts = 0;
+        let floorArea = 0;
+        let hasYellow = false;
+        let hasRed = false;
 
         floorRooms.forEach((r: any) => {
             const measurement = r.unit === 'W/m' ? (r.length || 0) : (r.area || 0);
             const rWatts = r.fixtures.reduce((s:number, f:any) => s + (f.power * f.qty), 0);
             const rLpd = measurement > 0 ? rWatts / measurement : 0;
+            
             const isMissingData = measurement === 0 || r.typology === "" || r.fixtures.length === 0 || r.fixtures.some((f:any) => f.power === 0 || f.qty === 0);
             const isOverLimit = !isMissingData && r.baseLpd > 0 && rLpd > r.baseLpd;
+            
             if (isMissingData) hasYellow = true;
             if (isOverLimit) hasRed = true;
+            
             floorWatts += rWatts;
             if (r.unit !== 'W/m') floorArea += measurement;
         });
@@ -1684,13 +1764,14 @@ window.renderLeedProject = function() {
         else if (hasYellow) { floorStatusColor = 'text-amber-500 border-amber-300'; floorBgColor = 'bg-amber-50 dark:bg-amber-900/10'; }
         else { floorStatusColor = 'text-leed-green border-green-300'; floorBgColor = 'bg-green-50 dark:bg-green-900/10'; }
 
-        if (!window.state.project.collapsedFloors) window.state.project.collapsedFloors = {};
-        const isCollapsed = window.state.project.collapsedFloors[floorName] === true;
+        // LUXSINTAX: Persistência de Estado Estrutural do Acordeão
+        if (!window.state.leedProject.collapsedFloors) window.state.leedProject.collapsedFloors = {};
+        const isCollapsed = window.state.leedProject.collapsedFloors[floorName] === true;
         const safeFloorId = floorName.replace(/[^a-zA-Z0-9]/g, '_');
 
         html += `
         <div class="mb-6 animate-fade-in-up">
-            <div onclick="window.state.project.collapsedFloors['${floorName}'] = !window.state.project.collapsedFloors['${floorName}']; document.getElementById('floor-content-${safeFloorId}').classList.toggle('hidden'); document.getElementById('floor-icon-${safeFloorId}').classList.toggle('rotate-180');" class="flex justify-between items-center cursor-pointer p-4 rounded-xl border ${floorStatusColor} ${floorBgColor} shadow-sm transition-colors mb-4">
+            <div onclick="window.state.leedProject.collapsedFloors['${floorName}'] = !window.state.leedProject.collapsedFloors['${floorName}']; document.getElementById('floor-content-${safeFloorId}').classList.toggle('hidden'); document.getElementById('floor-icon-${safeFloorId}').classList.toggle('rotate-180');" class="flex justify-between items-center cursor-pointer p-4 rounded-xl border ${floorStatusColor} ${floorBgColor} shadow-sm transition-colors mb-4">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-layer-group opacity-50"></i>
                     <h3 class="font-black tracking-widest uppercase text-sm">PAVIMENTO: ${floorName} <span class="ml-2 text-[10px] bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-full font-bold opacity-70">${floorRooms.length} ambientes</span></h3>
@@ -1714,6 +1795,7 @@ window.renderLeedProject = function() {
             const roomTotalWatts = room.fixtures.reduce((sum: number, f: any) => sum + (f.power * f.qty), 0);
             const measurement = room.unit === 'W/m' ? (room.length || 0) : (room.area || 0);
             const roomLpd = measurement > 0 ? roomTotalWatts / measurement : 0;
+            
             const isMissingData = measurement === 0 || room.typology === "" || room.fixtures.length === 0 || room.fixtures.some((f:any) => f.power === 0 || f.qty === 0);
             const isOverLimit = !isMissingData && room.baseLpd > 0 && roomLpd > room.baseLpd;
             
@@ -1721,14 +1803,22 @@ window.renderLeedProject = function() {
             let titleColor = 'text-starlight dark:text-white';
             let statusIcon = '<i class="fas fa-check-circle text-green-500" title="OK"></i>';
             
-            if (isMissingData) { borderClass = 'border-l-4 border-l-amber-400 border-slate-200 dark:border-slate-700'; titleColor = 'text-amber-500'; statusIcon = '<i class="fas fa-exclamation-circle text-amber-400" title="Dados Incompletos"></i>'; } 
-            else if (isOverLimit) { borderClass = 'border-l-4 border-l-red-500 border-slate-200 dark:border-slate-700 shadow-[0_0_15px_rgba(239,68,68,0.15)]'; titleColor = 'text-red-500 dark:text-red-500'; statusIcon = '<i class="fas fa-times-circle text-red-500" title="Limite Excedido"></i>'; }
+            if (isMissingData) {
+                borderClass = 'border-l-4 border-l-amber-400 border-slate-200 dark:border-slate-700';
+                titleColor = 'text-amber-500';
+                statusIcon = '<i class="fas fa-exclamation-circle text-amber-400" title="Dados Incompletos"></i>';
+            } else if (isOverLimit) {
+                borderClass = 'border-l-4 border-l-red-500 border-slate-200 dark:border-slate-700 shadow-[0_0_15px_rgba(239,68,68,0.15)]';
+                titleColor = 'text-red-500 dark:text-red-500';
+                statusIcon = '<i class="fas fa-times-circle text-red-500" title="Limite Excedido"></i>';
+            }
             
             const expanded = room.expanded !== false;
             
-            return `
+            let roomHtml = `
                 <div id="room-card-${room.id}" class="bg-slate-50 dark:bg-slate-800/30 p-3 lg:p-4 rounded-xl border ${borderClass} transition-all">
                     <div class="flex flex-wrap items-center gap-3 w-full">
+                        
                         <div class="flex items-center gap-3 flex-grow min-w-[200px]">
                             <button onclick="window.toggleLeedRoom(${room.id})" class="text-slate-400 hover:text-luminous-gold w-6 h-6 flex-shrink-0 flex items-center justify-center rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shadow-sm transition-colors" title="Expandir/Recolher">
                                 <i id="icon-toggle-${room.id}" class="fas ${expanded ? 'fa-minus' : 'fa-plus'} text-[10px]"></i>
@@ -1741,6 +1831,7 @@ window.renderLeedProject = function() {
                                 <input type="text" id="room-name-${room.id}" value="${room.name}" oninput="window.updateLeedRoomData(${room.id}, 'name', this.value)" class="text-xs font-black ${titleColor} bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold transition-colors w-full pb-1 uppercase outline-none truncate mt-[-2px]">
                             </div>
                         </div>
+                        
                         <div class="flex items-center gap-2 flex-shrink-0">
                             <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 h-[34px] rounded border border-slate-200 dark:border-slate-600 shadow-sm">
                                 <select onchange="window.updateLeedRoomData(${room.id}, 'unit', this.value)" class="text-[9px] font-black text-slate-500 bg-transparent outline-none cursor-pointer uppercase tracking-widest pl-1">
@@ -1749,11 +1840,12 @@ window.renderLeedProject = function() {
                                 </select>
                                 <input type="number" value="${room.unit === 'W/m' ? (room.length || 0) : (room.area || 0)}" oninput="window.updateLeedRoomData(${room.id}, 'measurement', this.value)" class="w-12 text-right bg-transparent text-[11px] font-black text-starlight dark:text-white outline-none focus:text-luminous-gold">
                             </div>
+                            
                             <div class="flex items-center gap-1.5 bg-white dark:bg-slate-700 px-2 h-[34px] rounded border border-slate-200 dark:border-slate-600 shadow-sm">
                                 <select onchange="window.updateLeedRoomData(${room.id}, 'leedCategory', this.value)" class="custom-select w-[90px] md:w-[120px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase border-r border-slate-200 dark:border-slate-600 pr-2 mr-2">
-                                    <option value="interior" ${room.leedCategory === 'interior' || !room.leedCategory ? 'selected' : ''}>INTERIOR</option>
-                                    <option value="facade" ${room.leedCategory === 'facade' ? 'selected' : ''}>FACHADA</option>
-                                    <option value="exterior" ${room.leedCategory === 'exterior' ? 'selected' : ''}>EXTERNA</option>
+                                    <option value="interior" ${room.leedCategory === 'interior' || !room.leedCategory ? 'selected' : ''}>${window.currentLang === 'en' ? 'INTERIOR' : 'INTERIOR'}</option>
+                                    <option value="facade" ${room.leedCategory === 'facade' ? 'selected' : ''}>${window.currentLang === 'en' ? 'FACADE' : 'FACHADA'}</option>
+                                    <option value="exterior" ${room.leedCategory === 'exterior' ? 'selected' : ''}>${window.currentLang === 'en' ? 'OUTDOOR' : 'EXTERNA'}</option>
                                 </select>
                                 <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[140px] md:w-[220px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
                                     <option value="" disabled ${!room.typology ? 'selected' : ''}>TIPOLOGIA ASHRAE...</option>
@@ -1762,7 +1854,7 @@ window.renderLeedProject = function() {
                                     </optgroup>
                                     <optgroup label="Exteriores & Fachadas">
                                         ${window.exteriorLpdBaselines ? [...window.exteriorLpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => {
-                                            const z = window.state.project.lightingZone || 'LZ3';
+                                            const z = window.state.leedProject.lightingZone || 'LZ3';
                                             const limit = b.zoneAllowances ? b.zoneAllowances[z] : 0;
                                             return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${limit} ${b.unit})</option>`;
                                         }).join('') : ''}
@@ -1770,6 +1862,7 @@ window.renderLeedProject = function() {
                                 </select>
                             </div>
                         </div>
+                        
                         <div class="flex items-center gap-2 flex-shrink-0 ml-0 xl:ml-auto w-full xl:w-auto justify-end mt-2 xl:mt-0">
                             <div class="flex items-center gap-2 bg-white dark:bg-slate-700 px-3 h-[34px] rounded border border-slate-200 dark:border-slate-600 shadow-sm">
                                 <div class="text-[10px] font-bold"><span class="text-slate-400">W:</span> <span id="room-w-${room.id}" class="${titleColor} font-black">${roomTotalWatts.toFixed(1)}</span></div>
@@ -1780,6 +1873,7 @@ window.renderLeedProject = function() {
                             <button onclick="window.removeLeedRoom(${room.id})" class="text-slate-400 hover:text-red-500 transition-colors w-8 h-[34px] flex items-center justify-center rounded hover:bg-red-50 dark:hover:bg-red-900/20 border border-transparent hover:border-red-200 dark:hover:border-red-800" title="Excluir Ambiente"><i class="fas fa-trash text-[12px]"></i></button>
                         </div>
                     </div>
+
                     <div id="room-details-${room.id}" class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 transition-all" style="display: ${expanded ? 'block' : 'none'};">
                         <table class="w-full text-xs mb-4">
                             <thead class="text-slate-400 uppercase font-black border-b border-slate-200 dark:border-slate-700 text-[9px] tracking-widest">
@@ -1800,8 +1894,11 @@ window.renderLeedProject = function() {
                         <button onclick="window.addLeedFixture(${room.id})" class="text-[9px] font-black text-luminous-gold hover:text-amber-700 uppercase tracking-widest transition-colors inline-flex items-center gap-1 py-1 px-2 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded"><i class="fas fa-plus-circle"></i> Adicionar Luminária</button>
                     </div>
                 </div>`;
+                
+            return roomHtml;
         }).join('');
-        html += `</div></div>`;
+        
+        html += `</div></div>`; // Fecha accordion e a seção do pavimento
     });
 
     container.innerHTML = html;
@@ -1810,33 +1907,49 @@ window.renderLeedProject = function() {
 
 window.userLeedProjects = [];
 
+// ==========================================
+// LUXSINTAX: FUNÇÕES DE BASE DE DADOS SEGURAS
+// ==========================================
+
 window.saveLeedProject = async () => {
     try {
         let tenant;
-        try { tenant = window.AuthManager.getTenantContext(); } catch (securityError) { return alert("Acesso Negado: Você precisa estar logado para salvar o projeto."); }
+        try {
+            tenant = window.AuthManager.getTenantContext();
+        } catch (securityError) {
+            console.error(securityError);
+            return alert("Acesso Negado: Você precisa estar logado e com sessão válida para salvar o projeto.");
+        }
 
         const btn = document.getElementById('btn-save-leed');
         const originalText = btn ? btn.innerHTML : '';
         if(btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Salvando...';
 
-        const cleanData = JSON.parse(JSON.stringify(window.state.project));
+        const cleanData = JSON.parse(JSON.stringify(window.state.leedProject));
 
         const payload: any = {
-            user_id: tenant.userId, 
-            project_name: window.state.project.metadata.projectName,
+            user_id: tenant.userId, // Uso do ID criptograficamente validado pela nossa regra de negócio Zod
+            project_name: window.state.leedProject.name,
             project_data: cleanData,
             updated_at: new Date()
         };
 
-        if (window.state.project.db_id) payload.id = window.state.project.db_id;
+        if (window.state.leedProject.db_id) {
+            payload.id = window.state.leedProject.db_id;
+        }
 
         const { data, error } = await window.supabase.from('leed_projects').upsert(payload).select().single(); 
+        
         if (error) throw error;
         
-        if(data) window.state.project.db_id = data.id;
+        if(data) window.state.leedProject.db_id = data.id;
         await window.fetchUserLeedProjects(); 
 
-        if(btn) { btn.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!'; setTimeout(() => btn.innerHTML = originalText, 2000); }
+        if(btn) {
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!';
+            setTimeout(() => btn.innerHTML = originalText, 2000);
+        }
+
     } catch (err) {
         console.error("[LuxSintax] Erro de persistência:", err);
         alert("Falha ao salvar o projeto.");
@@ -1845,80 +1958,66 @@ window.saveLeedProject = async () => {
 
 window.fetchUserLeedProjects = async () => {
     try {
+        // Busca de dados amarrada exclusivamente ao contexto do utilizador ativo
         const tenant = window.AuthManager.getTenantContext();
-        const { data, error } = await window.supabase.from('leed_projects').select('id, project_name, project_data').eq('user_id', tenant.userId).order('updated_at', { ascending: false });
-        if (!error && data) { 
-            window.userLeedProjects = data; 
-            window.updateProjectHeaderUI();
-            if (window.currentTool === 'dataManager') window.renderLeedProject(); 
+        
+        const { data, error } = await window.supabase
+            .from('leed_projects')
+            .select('id, project_name, project_data')
+            .eq('user_id', tenant.userId) // Garantia Multi-tenant via Aplicação
+            .order('updated_at', { ascending: false });
+            
+        if (!error && data) {
+            window.userLeedProjects = data;
+            if (window.currentTool === 'leedProj') window.renderLeedProject();
         }
-    } catch (err: any) { console.warn("[LuxSintax] Leitura abortada. Aguardando login."); }
+    } catch (err: any) {
+        // Silencioso: Se não há TenantContext (ex: utilizador anónimo), não executa a busca
+        console.warn("[LuxSintax] Leitura abortada. Aguardando login do utilizador.");
+    }
 };
 
+// LUXSINTAX: Criar novo projeto do zero
 window.createNewLeedProject = () => {
-    if (window.state.project.rooms.length > 0) {
+    if (window.state.leedProject.rooms.length > 0) {
         if (!confirm("Tem certeza que deseja iniciar um novo projeto? As alterações não salvas no atual serão perdidas.")) {
-            window.renderLeedProject(); return;
+            window.renderLeedProject(); // Reseta o seletor visualmente
+            return;
         }
     }
-    window.state.project = { metadata: { projectName: "Novo Projeto", author: "" }, target: "baseline", lightingZone: "LZ3", customReduction: 15, db_id: null, collapsedFloors: {}, inventory: {}, rooms: [] };
+    window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
     window.renderLeedProject();
 };
 
-window.updateProjectHeaderUI = () => {
-    const s = window.state.project;
-    const nameInput = document.getElementById('global-project-name') as HTMLInputElement;
-    if (nameInput) nameInput.value = s.metadata.projectName || 'Novo Projeto';
-
-    const select = document.getElementById('global-load-select') as HTMLSelectElement;
-    if (select) {
-        const savedOptions = (window.userLeedProjects || []).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
-        select.innerHTML = `
-            <option value="" disabled ${!s.db_id ? 'selected' : ''}>Seus Projetos Salvos...</option>
-            <option value="NEW" class="text-luminous-gold font-black">+ NOVO PROJETO DO ZERO</option>
-            ${savedOptions}
-        `;
-    }
-};
-
 window.loadSpecificLeedProject = () => {
-    const select = document.getElementById('global-load-select') as HTMLSelectElement;
+    const select = document.getElementById('load-leed-select') as HTMLSelectElement;
     if (!select || !select.value || select.value === 'NEW') return;
     const proj = window.userLeedProjects.find((p: any) => p.id === select.value);
     if (proj) {
         try {
             let rawData = proj.project_data;
             if (typeof rawData === 'string') rawData = JSON.parse(rawData);
-            
-            // LUXSINTAX: Fallbacks de Segurança para Projetos Antigos
             if (!rawData.rooms || !Array.isArray(rawData.rooms)) rawData.rooms = [];
             if (!rawData.target) rawData.target = 'baseline';
-            if (!rawData.metadata) rawData.metadata = { projectName: proj.project_name, author: "" };
-            if (!rawData.inventory) rawData.inventory = {};
-            
-            window.state.project = JSON.parse(JSON.stringify(rawData));
-            window.state.project.db_id = proj.id;
-            
-            window.updateProjectHeaderUI();
-            
-            if (window.renderTechnicalNotebook) window.renderTechnicalNotebook();
-            if (window.renderBudget) window.renderBudget();
-            if (window.renderDashboard) window.renderDashboard();
-            if (window.renderLeedProject) window.renderLeedProject();
-            
-            const btn = document.getElementById('btn-global-save');
+            if (!rawData.name) rawData.name = proj.project_name;
+            window.state.leedProject = JSON.parse(JSON.stringify(rawData));
+            window.state.leedProject.db_id = proj.id;
+            window.renderLeedProject();
+            const btn = document.getElementById('btn-save-leed');
             if (btn) {
                 const orig = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Carregado!';
-                btn.classList.add('text-leed-green');
-                setTimeout(() => { 
-                    btn.innerHTML = orig; 
-                    btn.classList.remove('text-leed-green');
+                btn.classList.remove('bg-slate-800');
+                btn.classList.add('bg-leed-green');
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.classList.add('bg-slate-800');
+                    btn.classList.remove('bg-leed-green');
                 }, 2500);
             }
         } catch (err) {
-            console.error("[LuxSintax] Erro de Estrutura:", err);
-            alert("Falha ao ler as informações. A estrutura do projeto é incompatível.");
+            console.error("[LuxSintax] Erro ao processar dados salvos:", err);
+            alert("Falha ao ler as informações do projeto. Os dados podem estar corrompidos.");
         }
     }
 };
@@ -1936,11 +2035,12 @@ window.deleteSpecificLeedProject = async () => {
         const { error } = await window.supabase.from('leed_projects').delete().eq('id', proj.id);
         if (error) throw error;
         window.userLeedProjects = window.userLeedProjects.filter((p: any) => p.id !== proj.id);
-        if (window.state.project.db_id === proj.id) {
-            window.state.project = { metadata: { projectName: "Novo Projeto", author: "" }, target: "baseline", lightingZone: "LZ3", customReduction: 15, db_id: null, collapsedFloors: {}, inventory: {}, rooms: [] };
+        if (window.state.leedProject.db_id === proj.id) {
+            window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms:[] };
         }
         window.renderLeedProject();
     } catch (err) {
+        console.error("[LuxSintax] Erro ao deletar:", err);
         alert("Falha ao deletar o projeto. Verifique sua conexão.");
         window.renderLeedProject();
     }
@@ -2651,350 +2751,67 @@ window.updateCalculations = function() {
 // LUXSINTAX: Super Canvas HCL movido para Canvas2DEngine.ts (Clean Architecture)
 
 // ==========================================
+// LUXSINTAX: Engine de Importação Excel (Clean Architecture)
 // ==========================================
-// LUXSINTAX: GERENCIADOR DE PROJETOS UNIFICADO (SSOT)
-// ==========================================
-window.switchDataManagerTab = function(tabId: string) {
-    ['technical', 'budget', 'leed', 'dashboard'].forEach(t => {
-        document.getElementById('dm-content-' + t)?.classList.add('hidden');
-        const btn = document.getElementById('btn-dm-' + t);
-        if (btn) {
-            btn.classList.remove('text-leed-green', 'border-b-2', 'border-leed-green');
-            btn.classList.add('text-slate-400');
-        }
-    });
-    document.getElementById('dm-content-' + tabId)?.classList.remove('hidden');
-    const activeBtn = document.getElementById('btn-dm-' + tabId);
-    if (activeBtn) {
-        activeBtn.classList.remove('text-slate-400');
-        activeBtn.classList.add('text-leed-green', 'border-b-2', 'border-leed-green');
-    }
-    
-    // Renderiza a aba ativa para garantir sincronia visual
-    if (tabId === 'technical' && window.renderTechnicalNotebook) window.renderTechnicalNotebook();
-    if (tabId === 'budget' && window.renderBudget) window.renderBudget();
-    if (tabId === 'dashboard' && window.renderDashboard) window.renderDashboard();
-    if (tabId === 'leed' && window.renderLeedProject) window.renderLeedProject();
-};
-
-window.handleMasterUpload = async function(input: HTMLInputElement) {
+window.handleExcelUpload = async function(input: HTMLInputElement) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
     
+    // LUXSINTAX: Proteção de Estado (Confirmação de Sobreposição vs Mesclagem)
     let shouldMerge = true;
-    if (window.state.project.rooms && window.state.project.rooms.length > 0) {
-        shouldMerge = confirm("Projeto atual detectado.\n\nClique em [OK] para MESCLAR a nova planilha (preservando edições manuais de Orçamento/LEED).\nClique em [CANCELAR] para SOBREPOR tudo (começar um projeto do zero).");
+    if (window.state.leedProject.rooms && window.state.leedProject.rooms.length > 0) {
+        shouldMerge = confirm("Projeto atual detectado.\n\nClique em [OK] para MESCLAR a nova planilha (preservando suas edições manuais atuais).\nClique em [CANCELAR] para SOBREPOR tudo (começar um projeto novo do zero com esta planilha).");
         if (!shouldMerge) {
-            window.state.project.rooms = [];
-            window.state.project.inventory = {};
+            // Limpa o projeto atual caso o usuário escolha sobrepor
+            window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
         }
     }
 
-    const btnLabel = input.previousElementSibling as HTMLElement;
-    const originalHtml = btnLabel.innerHTML;
-    btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> INGERINDO...';
+    const btnLabel = document.getElementById('lbl-excel-upload');
+    if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> PROCESSANDO...';
 
     try {
-        const parsedRooms = await ExcelParser.parseMasterSpreadsheet(file);
-        const existingRooms = window.state.project.rooms || [];
+        // Delegação limpa para a camada de Infraestrutura
+        const parsedRooms = await ExcelParser.parseLeedRooms(file);
+        
+        // LUXSINTAX: Algoritmo de Reconciliação de Estado (Smart Merge / Upsert)
+        const existingRooms = window.state.leedProject.rooms || [];
         
         parsedRooms.forEach((newRoom: any) => {
+            // Cria uma assinatura única para comparar (Ex: "ss1_estacionamento")
             const matchKey = (newRoom.floor + "_" + newRoom.name).toLowerCase().trim();
-            const existingIndex = existingRooms.findIndex((r: any) => (r.floor + "_" + r.name).toLowerCase().trim() === matchKey);
             
-            if (existingIndex >= 0 && shouldMerge) {
+            const existingIndex = existingRooms.findIndex((r: any) => 
+                (r.floor + "_" + r.name).toLowerCase().trim() === matchKey
+            );
+            
+            if (existingIndex >= 0) {
+                // AMBIENTE EXISTE (UPDATE): Preserva inteligência humana, atualiza a física
                 const oldRoom = existingRooms[existingIndex];
                 existingRooms[existingIndex] = {
-                    ...newRoom, 
-                    id: oldRoom.id, 
-                    leedCategory: oldRoom.leedCategory, 
-                    typology: oldRoom.typology, 
-                    baseLpd: oldRoom.baseLpd, 
-                    unit: oldRoom.unit, 
-                    expanded: oldRoom.expanded 
+                    ...newRoom, // Puxa área atualizada e novas luminárias do Excel
+                    id: oldRoom.id, // Protege o ID interno para não quebrar o DOM
+                    leedCategory: oldRoom.leedCategory, // Preserva escolha LEED
+                    typology: oldRoom.typology, // Preserva Tipologia ASHRAE
+                    baseLpd: oldRoom.baseLpd, // Preserva o budget normativo
+                    unit: oldRoom.unit, // Preserva métrica (W/m² ou W/m)
+                    expanded: oldRoom.expanded // Preserva estado visual do acordeão
                 };
             } else {
+                // NOVO AMBIENTE (INSERT): Adiciona no topo da lista
                 existingRooms.unshift(newRoom);
             }
         });
         
-        window.state.project.rooms = [...existingRooms];
+        // Atualiza a Fonte da Verdade (SSOT)
+        window.state.leedProject.rooms = [...existingRooms];
+        window.renderLeedProject();
         
-        const inventory = new Map();
-        existingRooms.forEach((room: any) => {
-            room.fixtures.forEach((fix: any) => {
-                const existingPrice = window.state.project.inventory[fix.code]?.unitPrice;
-                if (!inventory.has(fix.code)) {
-                    inventory.set(fix.code, { ...fix, unitPrice: existingPrice || fix.unitPrice });
-                }
-            });
-        });
-        window.state.project.inventory = Object.fromEntries(inventory);
-
-        btnLabel.innerHTML = '<i class="fas fa-check mr-2"></i> SUCESSO!';
-        setTimeout(() => btnLabel.innerHTML = originalHtml, 3000);
-        
-        // Atualiza UI e vai para a aba Caderno Técnico
-        window.switchDataManagerTab('technical');
+        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
+        input.value = ""; 
 
     } catch (err: any) {
         alert(err.message);
-        btnLabel.innerHTML = originalHtml;
+        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
     }
-    input.value = "";
-};
-
-window.renderTechnicalNotebook = function() {
-    const container = document.getElementById('dm-content-technical');
-    if (!container) return;
-    const rooms = window.state.project.rooms;
-    if (rooms.length === 0) {
-        container.innerHTML = `
-            <div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50">
-                <i class="fas fa-table text-4xl mb-4 opacity-50"></i>
-                <p class="text-sm font-black uppercase tracking-widest text-slate-500">Inicie seu projeto</p>
-                <p class="text-xs font-bold mt-2">Clique em "Novo Ambiente" para começar do zero ou faça o upload da "Planilha Mestra".</p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = '<div class="space-y-6">';
-    rooms.forEach((r: any) => {
-        html += `<div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-            <h4 class="font-black text-leed-green mb-4 uppercase tracking-widest flex items-center justify-between">
-                <span><i class="fas fa-map-marker-alt mr-2"></i> ${r.floor} - ${r.name}</span>
-                <span class="text-slate-500 text-[10px] bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full">${r.area} m²</span>
-            </h4>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[11px]">
-                    <thead class="text-slate-500 border-b-2 border-slate-200 dark:border-slate-700 uppercase tracking-widest">
-                        <tr><th class="pb-3 pr-4">CÓDIGO</th><th class="pb-3 pr-4">LUMINÁRIA</th><th class="pb-3 pr-4">POTÊNCIA</th><th class="pb-3 pr-4">FLUXO/CCT</th><th class="pb-3 pr-4">QTD</th><th class="pb-3 text-right">FABRICANTE</th></tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                        ${r.fixtures.map((f: any) => `
-                            <tr class="text-starlight dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                <td class="py-3 pr-4 text-tech-cyan">${f.code || 'LUM-XX'}</td>
-                                <td class="py-3 pr-4">${f.label}</td>
-                                <td class="py-3 pr-4">${f.power} W</td>
-                                <td class="py-3 pr-4">${f.flux ? f.flux+' lm' : '-'} / ${f.cct ? f.cct+'K' : '-'}</td>
-                                <td class="py-3 pr-4"><span class="bg-luminous-gold text-white px-2 py-0.5 rounded text-[10px]">${f.qty}</span></td>
-                                <td class="py-3 text-right text-slate-500">${f.manufacturer || '-'}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        </div>`;
-    });
-    html += '</div>';
-    container.innerHTML = html;
-};
-
-window.renderBudget = function() {
-    const container = document.getElementById('dm-content-budget');
-    if (!container) return;
-    const inventory = window.state.project.inventory;
-    const codes = Object.keys(inventory);
-    if (codes.length === 0) {
-        container.innerHTML = `<div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i class="fas fa-coins text-4xl mb-4 opacity-50"></i><p class="text-sm font-black uppercase tracking-widest text-slate-500">Orçamento Vazio</p></div>`;
-        return;
-    }
-
-    const totals: any = {};
-    window.state.project.rooms.forEach((r: any) => {
-        r.fixtures.forEach((f: any) => {
-            const code = f.code || 'LUM-XX';
-            if (!totals[code]) totals[code] = 0;
-            totals[code] += f.qty;
-        });
-    });
-
-    let totalCapex = 0;
-    let missingCosts = 0;
-
-    let html = '<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm"><table class="w-full text-left text-xs"><thead class="bg-slate-100 dark:bg-slate-800 text-slate-500 font-black tracking-widest uppercase border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4">CÓDIGO E DESCRIÇÃO</th><th class="p-4 text-center">QUANTIDADE</th><th class="p-4 text-right">CUSTO UNIT. (R$)</th><th class="p-4 text-right">SUBTOTAL</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-800">';
-    
-    codes.forEach(code => {
-        const item = inventory[code];
-        const qty = totals[code] || 0;
-        const price = item.unitPrice || 0;
-        const sub = qty * price;
-        totalCapex += sub;
-        if (price === 0) missingCosts++;
-
-        html += `<tr class="font-bold text-starlight dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${price === 0 ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}">
-            <td class="p-4 border-l-4 ${price === 0 ? 'border-amber-400' : 'border-transparent'}">
-                <span class="text-tech-cyan">${code}</span><br>
-                <span class="text-[10px] text-slate-500">${item.label}</span>
-            </td>
-            <td class="p-4 text-center"><span class="bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full text-[10px]">${qty}</span></td>
-            <td class="p-4 text-right">
-                <div class="inline-flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 shadow-inner">
-                    <span class="text-slate-400 text-[10px] mr-2">R$</span>
-                    <input type="number" value="${price}" onchange="window.updateInventoryPrice('${code}', this.value)" class="w-20 text-right bg-transparent outline-none focus:text-luminous-gold font-black">
-                </div>
-            </td>
-            <td class="p-4 text-right text-leed-green text-sm">${sub.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</td>
-        </tr>`;
-    });
-    html += `</tbody></table></div>`;
-
-    if (missingCosts > 0) {
-        html = `<div class="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl text-xs font-bold flex items-center gap-3 shadow-sm animate-fade-in"><i class="fas fa-exclamation-triangle text-xl"></i> <div>Faltam os preços unitários de ${missingCosts} item(ns). Preencha na tabela abaixo para consolidar o orçamento total. O CAPEX é vital para a aba Viabilidade ESG.</div></div>` + html;
-    }
-
-    if (window.state.esg) {
-        window.state.esg.capex = totalCapex;
-        const capexInput = document.getElementById('esg-capex') as HTMLInputElement;
-        if (capexInput) capexInput.value = String(totalCapex);
-    }
-
-    html += `<div class="mt-8 flex justify-end"><div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 min-w-[300px] text-right shadow-xl relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-l from-green-50 to-transparent dark:from-green-900/10 pointer-events-none"></div>
-        <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2 relative z-10">CAPEX TOTAL (INSTALAÇÃO)</p>
-        <p class="text-3xl font-black text-leed-green relative z-10">${totalCapex.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
-    </div></div>`;
-
-    container.innerHTML = html;
-};
-
-window.updateInventoryPrice = function(code: string, newPrice: string) {
-    const val = parseFloat(newPrice) || 0;
-    if (window.state.project.inventory[code]) window.state.project.inventory[code].unitPrice = val;
-    window.state.project.rooms.forEach((r: any) => { r.fixtures.forEach((f: any) => { if (f.code === code) f.unitPrice = val; }); });
-    window.renderBudget();
-    if (window.updateEsgUI) window.updateEsgUI();
-};
-
-window.renderDashboard = function() {
-    const container = document.getElementById('dm-content-dashboard');
-    if (!container) return;
-    
-    let totalQty = 0;
-    let avgCctSum = 0;
-    let cctCount = 0;
-    let totalPower = 0;
-    let totalArea = 0;
-
-    window.state.project.rooms.forEach((r: any) => {
-        totalArea += (r.area || 0);
-        r.fixtures.forEach((f: any) => {
-            totalQty += f.qty;
-            totalPower += (f.power * f.qty);
-            if (f.cct && f.cct > 0) {
-                avgCctSum += (f.cct * f.qty);
-                cctCount += f.qty;
-            }
-        });
-    });
-
-    if (totalQty === 0) {
-        container.innerHTML = `<div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i class="fas fa-chart-pie text-4xl mb-4 opacity-50"></i><p class="text-sm font-black uppercase tracking-widest text-slate-500">Dashboard Vazio</p></div>`;
-        return;
-    }
-
-    const lpdMedio = totalArea > 0 ? (totalPower / totalArea).toFixed(2) : '0.00';
-    const cctMedio = cctCount > 0 ? Math.round(avgCctSum / cctCount) : '-';
-
-    container.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-cube mr-1"></i> Luminárias (Qtd)</p>
-                <p class="text-3xl font-black text-tech-cyan">${totalQty}</p>
-            </div>
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-bolt mr-1"></i> Carga Total (W)</p>
-                <p class="text-3xl font-black text-luminous-gold">${totalPower.toFixed(0)} <span class="text-sm font-bold text-slate-400">W</span></p>
-            </div>
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-expand-arrows-alt mr-1"></i> Densidade (LPD)</p>
-                <p class="text-3xl font-black text-leed-green">${lpdMedio} <span class="text-sm font-bold text-slate-400">W/m²</span></p>
-            </div>
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-temperature-high mr-1"></i> Espectro Médio</p>
-                <p class="text-3xl font-black text-purple-500">${cctMedio} <span class="text-sm font-bold text-slate-400">K</span></p>
-            </div>
-        </div>
-        <div class="mt-8 p-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl bg-white dark:bg-slate-900/50">
-            <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">INTEGRAÇÃO ECOSSISTEMA</h4>
-            <p class="text-xs text-slate-500 font-bold max-w-2xl mx-auto">Sua prancheta está sincronizada. Os dados de Potência (W), Área (m²) e Custo Unitário (R$) já alimentam automaticamente a aba de Viabilidade ESG (CAPEX) e a aba de Certificação LEED (LPD). Navegue pelas abas para visualizar os relatórios profundos.</p>
-        </div>
-    `;
-};
-
-// ==========================================
-// LUXSINTAX: RESTAURAÇÃO DOS MÓDULOS DE UI 
-// ==========================================
-
-window.renderDriverTopology = () => {
-    const container = document.getElementById('driver-content');
-    if (!container) return;
-    const rooms = window.state.project.rooms || [];
-    
-    if (rooms.length === 0) {
-        container.innerHTML = `<div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i class="fas fa-microchip text-4xl mb-4 opacity-50"></i><p class="text-sm font-black uppercase tracking-widest text-slate-500">Aguardando Dados</p><p class="text-xs font-bold mt-2">Adicione ambientes no Gerenciador de Projetos para mapear a topologia.</p></div>`;
-        return;
-    }
-    
-    let html = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
-    rooms.forEach((r: any) => {
-        const load = r.fixtures.reduce((acc: number, f: any) => acc + (f.power * f.qty), 0);
-        html += `
-            <div class="p-6 border border-slate-100 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 shadow-sm transition-colors">
-                <p class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-2">${r.name}</p>
-                <div class="flex justify-between items-end">
-                    <div><p class="text-2xl font-black text-starlight dark:text-white">${load.toFixed(1)} <span class="text-xs">W</span></p><p class="text-[9px] text-slate-400 font-bold uppercase">Carga Total do Ambiente</p></div>
-                    <div class="text-right"><p class="text-sm font-black text-luminous-gold uppercase">Topologia Linear</p><p class="text-[9px] text-slate-400 font-bold uppercase">Recomendado</p></div>
-                </div>
-            </div>`;
-    });
-    html += `</div>`;
-    container.innerHTML = html;
-};
-
-window.renderHclAudit = () => {
-    const container = document.getElementById('audit-content');
-    if (!container) return;
-    const rooms = window.state.project.rooms || [];
-    
-    if (rooms.length === 0) {
-        container.innerHTML = `<div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i class="fas fa-brain text-4xl mb-4 opacity-50"></i><p class="text-sm font-black uppercase tracking-widest text-slate-500">Aguardando Dados</p><p class="text-xs font-bold mt-2">Adicione ambientes no Gerenciador de Projetos para analisar o ciclo circadiano.</p></div>`;
-        return;
-    }
-    
-    container.innerHTML = `
-        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 p-6 rounded-xl mb-6 shadow-sm">
-            <p class="text-xs text-amber-800 dark:text-amber-400 font-bold"><i class="fas fa-info-circle mr-2"></i> Relatório de Auditoria HCL referenciado na norma WELL v2 (Feature L03).</p>
-        </div>
-        <div class="space-y-4">
-            ${rooms.map((r: any) => `
-                <div class="flex justify-between items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg shadow-sm transition-colors">
-                    <span class="font-bold text-slate-600 dark:text-slate-300 uppercase text-xs">${r.name}</span>
-                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-black rounded-full uppercase">Passou (EML > 150)</span>
-                </div>
-            `).join('')}
-        </div>`;
-};
-
-window.renderEsgReport = () => {
-    const container = document.getElementById('esg-content');
-    if (!container) return;
-    const isProfitable = window.state.esg && window.state.esg.capex > 0;
-    
-    container.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="glass-panel p-6 border-l-4 border-l-leed-green dark:bg-slate-800 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Payback Estimado</p>
-                <p class="text-3xl font-black text-starlight dark:text-white">${isProfitable ? '1.8' : '--'} <span class="text-sm">Anos</span></p>
-            </div>
-            <div class="glass-panel p-6 border-l-4 border-l-blue-500 dark:bg-slate-800 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Redução CO2</p>
-                <p class="text-3xl font-black text-starlight dark:text-white">12.4 <span class="text-sm">ton/ano</span></p>
-            </div>
-            <div class="glass-panel p-6 border-l-4 border-l-amber-500 dark:bg-slate-800 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Economia Projetada</p>
-                <p class="text-3xl font-black text-starlight dark:text-white">150 <span class="text-sm">MWh</span></p>
-            </div>
-        </div>`;
 };
