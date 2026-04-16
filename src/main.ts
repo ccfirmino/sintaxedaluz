@@ -2868,65 +2868,75 @@ window.updateInventoryPrice = function(code: string, newPrice: string) {
 };
 
 window.renderDashboard = function() {
-    const container = document.getElementById('dm-content-dashboard');
-    if (!container) return;
-    
-    let totalQty = 0;
-    let avgCctSum = 0;
-    let cctCount = 0;
-    let totalPower = 0;
-    let totalArea = 0;
+    const container = document.getElementById('dm-content-dashboard');
+    if (!container) return;
+    
+    let totalQty = 0;
+    let avgCctSum = 0;
+    let cctCount = 0;
+    let totalPower = 0;
+    let totalArea = 0;
 
-    window.state.project.rooms.forEach((r: any) => {
-        totalArea += (r.area || 0);
-        r.fixtures.forEach((f: any) => {
-            totalQty += f.qty;
-            totalPower += (f.power * f.qty);
-            if (f.cct && f.cct > 0) {
-                avgCctSum += (f.cct * f.qty);
-                cctCount += f.qty;
-            }
-        });
-    });
+    window.state.project.rooms.forEach((r: any) => {
+        totalArea += (r.area || 0);
+        r.fixtures.forEach((f: any) => {
+            totalQty += f.qty;
+            totalPower += (f.power * f.qty);
+            if (f.cct && f.cct > 0) {
+                avgCctSum += (f.cct * f.qty);
+                cctCount += f.qty;
+            }
+        });
+    });
 
-    if (totalQty === 0) {
-        container.innerHTML = `<div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i class="fas fa-chart-pie text-4xl mb-4 opacity-50"></i><p class="text-sm font-black uppercase tracking-widest text-slate-500">Dashboard Vazio</p></div>`;
-        return;
-    }
+    if (totalQty === 0) {
+        container.innerHTML = `<div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i class="fas fa-chart-pie text-4xl mb-4 opacity-50"></i><p class="text-sm font-black uppercase tracking-widest text-slate-500">Dashboard Vazio</p></div>`;
+        return;
+    }
 
-    const lpdMedio = totalArea > 0 ? (totalPower / totalArea).toFixed(2) : '0.00';
-    const cctMedio = cctCount > 0 ? Math.round(avgCctSum / cctCount) : '-';
+    const lpdMedio = totalArea > 0 ? (totalPower / totalArea).toFixed(2) : '0.00';
+    const cctMedio = cctCount > 0 ? Math.round(avgCctSum / cctCount) : '-';
 
-    container.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-cube mr-1"></i> Luminárias (Qtd)</p>
-                <p class="text-3xl font-black text-tech-cyan">${totalQty}</p>
-            </div>
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-bolt mr-1"></i> Carga Total (W)</p>
-                <p class="text-3xl font-black text-luminous-gold">${totalPower.toFixed(0)} <span class="text-sm font-bold text-slate-400">W</span></p>
-            </div>
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-expand-arrows-alt mr-1"></i> Densidade (LPD)</p>
-                <p class="text-3xl font-black text-leed-green">${lpdMedio} <span class="text-sm font-bold text-slate-400">W/m²</span></p>
-            </div>
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-temperature-high mr-1"></i> Espectro Médio</p>
-                <p class="text-3xl font-black text-purple-500">${cctMedio} <span class="text-sm font-bold text-slate-400">K</span></p>
-            </div>
-        </div>
-        // ==========================================
+    container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-cube mr-1"></i> Luminárias (Qtd)</p>
+                <p class="text-3xl font-black text-tech-cyan">${totalQty}</p>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-bolt mr-1"></i> Carga Total (W)</p>
+                <p class="text-3xl font-black text-luminous-gold">${totalPower.toFixed(0)} <span class="text-sm font-bold text-slate-400">W</span></p>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-expand-arrows-alt mr-1"></i> Densidade (LPD)</p>
+                <p class="text-3xl font-black text-leed-green">${lpdMedio} <span class="text-sm font-bold text-slate-400">W/m²</span></p>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2"><i class="fas fa-temperature-high mr-1"></i> Espectro Médio</p>
+                <p class="text-3xl font-black text-purple-500">${cctMedio} <span class="text-sm font-bold text-slate-400">K</span></p>
+            </div>
+        </div>
+        <div class="mt-8 p-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl bg-white dark:bg-slate-900/50">
+            <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">INTEGRAÇÃO ECOSSISTEMA</h4>
+            <p class="text-xs text-slate-500 font-bold max-w-2xl mx-auto">Sua prancheta está sincronizada. Os dados de Potência (W), Área (m²) e Custo Unitário (R$) já alimentam automaticamente a aba de Viabilidade ESG (CAPEX) e a aba de Certificação LEED (LPD). Navegue pelas abas para visualizar os relatórios profundos.</p>
+        </div>
+    `;
+};
+
+// ==========================================
 // LUXSINTAX: RESTAURAÇÃO DOS MÓDULOS DE UI 
 // ==========================================
+
 window.renderDriverTopology = () => {
     const container = document.getElementById('driver-content');
     if (!container) return;
     const rooms = window.state.project.rooms || [];
+    
     if (rooms.length === 0) {
         container.innerHTML = `<div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i class="fas fa-microchip text-4xl mb-4 opacity-50"></i><p class="text-sm font-black uppercase tracking-widest text-slate-500">Aguardando Dados</p><p class="text-xs font-bold mt-2">Adicione ambientes no Gerenciador de Projetos para mapear a topologia.</p></div>`;
         return;
     }
+    
     let html = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
     rooms.forEach((r: any) => {
         const load = r.fixtures.reduce((acc: number, f: any) => acc + (f.power * f.qty), 0);
@@ -2947,10 +2957,12 @@ window.renderHclAudit = () => {
     const container = document.getElementById('audit-content');
     if (!container) return;
     const rooms = window.state.project.rooms || [];
+    
     if (rooms.length === 0) {
         container.innerHTML = `<div class="p-12 text-center text-slate-400 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i class="fas fa-brain text-4xl mb-4 opacity-50"></i><p class="text-sm font-black uppercase tracking-widest text-slate-500">Aguardando Dados</p><p class="text-xs font-bold mt-2">Adicione ambientes no Gerenciador de Projetos para analisar o ciclo circadiano.</p></div>`;
         return;
     }
+    
     container.innerHTML = `
         <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 p-6 rounded-xl mb-6 shadow-sm">
             <p class="text-xs text-amber-800 dark:text-amber-400 font-bold"><i class="fas fa-info-circle mr-2"></i> Relatório de Auditoria HCL referenciado na norma WELL v2 (Feature L03).</p>
@@ -2969,11 +2981,20 @@ window.renderEsgReport = () => {
     const container = document.getElementById('esg-content');
     if (!container) return;
     const isProfitable = window.state.esg && window.state.esg.capex > 0;
+    
     container.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="glass-panel p-6 border-l-4 border-l-leed-green dark:bg-slate-800 shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Payback Estimado</p><p class="text-3xl font-black text-starlight dark:text-white">${isProfitable ? '1.8' : '--'} <span class="text-sm">Anos</span></p></div>
-            <div class="glass-panel p-6 border-l-4 border-l-blue-500 dark:bg-slate-800 shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Redução CO2</p><p class="text-3xl font-black text-starlight dark:text-white">12.4 <span class="text-sm">ton/ano</span></p></div>
-            <div class="glass-panel p-6 border-l-4 border-l-amber-500 dark:bg-slate-800 shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Economia Projetada</p><p class="text-3xl font-black text-starlight dark:text-white">150 <span class="text-sm">MWh</span></p></div>
+            <div class="glass-panel p-6 border-l-4 border-l-leed-green dark:bg-slate-800 shadow-sm">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Payback Estimado</p>
+                <p class="text-3xl font-black text-starlight dark:text-white">${isProfitable ? '1.8' : '--'} <span class="text-sm">Anos</span></p>
+            </div>
+            <div class="glass-panel p-6 border-l-4 border-l-blue-500 dark:bg-slate-800 shadow-sm">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Redução CO2</p>
+                <p class="text-3xl font-black text-starlight dark:text-white">12.4 <span class="text-sm">ton/ano</span></p>
+            </div>
+            <div class="glass-panel p-6 border-l-4 border-l-amber-500 dark:bg-slate-800 shadow-sm">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Economia Projetada</p>
+                <p class="text-3xl font-black text-starlight dark:text-white">150 <span class="text-sm">MWh</span></p>
+            </div>
         </div>`;
-};
 };
