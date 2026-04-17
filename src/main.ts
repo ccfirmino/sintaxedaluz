@@ -413,9 +413,9 @@ window.toggleLanguage = function() {
         window.updateCalculations(); 
     };
 
-// LUXSINTAX: Orquestração de Abas do Project Hub (Master Data, BOQ e LEED)
+// LUXSINTAX: Orquestração de Abas do Project Hub (Master Data, BOQ, LEED, Análise)
 window.switchProjectTab = function(tabId: string) {
-    ['equipments', 'boq', 'leed'].forEach(id => {
+    ['equipments', 'boq', 'leed', 'analysis'].forEach(id => {
         const btn = document.getElementById('ptab-' + id);
         const content = document.getElementById('ptab-content-' + id);
         if (btn) {
@@ -430,7 +430,7 @@ window.switchProjectTab = function(tabId: string) {
         if (content) {
             if (id === tabId) {
                 content.classList.remove('hidden', 'block');
-                content.classList.add('flex'); // Usamos flex para habilitar o flex-col interno uniformemente
+                content.classList.add('flex'); // Habilita o flex-col interno uniformemente
             } else {
                 content.classList.add('hidden');
                 content.classList.remove('flex', 'block');
@@ -448,8 +448,9 @@ window.switchProjectTab = function(tabId: string) {
         ashraeSelect.parentElement.style.display = tabId === 'leed' ? 'block' : 'none';
     }
 
-    // Dispara a renderização analítica do Orçamento ao entrar na aba
+    // Dispara a renderização analítica específica ao entrar nas abas
     if (tabId === 'boq' && window.renderBOQ) window.renderBOQ();
+    if (tabId === 'analysis' && window.updateGlobalLeedSummary) window.updateGlobalLeedSummary();
 };
 
 window.switchTool = function(toolId: string) {
