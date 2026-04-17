@@ -413,32 +413,32 @@ window.toggleLanguage = function() {
         window.updateCalculations(); 
     };
 
-// LUXSINTAX: Orquestração de Abas do Project Hub (Master Data e LEED)
+// LUXSINTAX: Orquestração de Abas do Project Hub (Master Data, BOQ e LEED)
 window.switchProjectTab = function(tabId: string) {
-    ['equipments', 'leed'].forEach(id => {
-        const btn = document.getElementById('ptab-' + id);
-        const content = document.getElementById('ptab-content-' + id);
-        if (btn) {
-            if (id === tabId) {
-                btn.classList.remove('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
-                btn.classList.add('border-luminous-gold', 'text-luminous-gold');
-            } else {
-                btn.classList.add('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
-                btn.classList.remove('border-luminous-gold', 'text-luminous-gold');
-            }
-        }
-        if (content) {
-            if (id === tabId) {
-                content.classList.remove('hidden');
-                content.classList.add('block');
-            } else {
-                content.classList.add('hidden');
-                content.classList.remove('block');
-            }
-        }
-    });
+    ['equipments', 'boq', 'leed'].forEach(id => {
+        const btn = document.getElementById('ptab-' + id);
+        const content = document.getElementById('ptab-content-' + id);
+        if (btn) {
+            if (id === tabId) {
+                btn.classList.remove('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
+                btn.classList.add('border-luminous-gold', 'text-luminous-gold');
+            } else {
+                btn.classList.add('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
+                btn.classList.remove('border-luminous-gold', 'text-luminous-gold');
+            }
+        }
+        if (content) {
+            if (id === tabId) {
+                content.classList.remove('hidden', 'block');
+                content.classList.add('flex'); // Usamos flex para habilitar o flex-col interno uniformemente
+            } else {
+                content.classList.add('hidden');
+                content.classList.remove('flex', 'block');
+            }
+        }
+    });
 
-    // LUXSINTAX: Oculta dinamicamente as opções ASHRAE e LZ se não estiver na aba LEED
+    // Oculta dinamicamente as opções ASHRAE e LZ se não estiver na aba LEED
     const lzSelect = document.getElementById('global-lz');
     const ashraeSelect = document.getElementById('global-ashrae-target');
     if (lzSelect && lzSelect.parentElement) {
@@ -447,6 +447,9 @@ window.switchProjectTab = function(tabId: string) {
     if (ashraeSelect && ashraeSelect.parentElement) {
         ashraeSelect.parentElement.style.display = tabId === 'leed' ? 'block' : 'none';
     }
+
+    // Dispara a renderização analítica do Orçamento ao entrar na aba
+    if (tabId === 'boq' && window.renderBOQ) window.renderBOQ();
 };
 
 window.switchTool = function(toolId: string) {
@@ -1787,42 +1790,170 @@ window.renderMasterData = function() {
                 <input type="file" id="ies-master-${i}" accept=".ies, .ldt" class="hidden" onchange="window.handleMasterIESUpload(this, '${f.matchKey}')">
             </td>
         </tr>
-        <tr id="m-details-${f.matchKey}" class="hidden bg-slate-100 dark:bg-slate-950/50 shadow-inner border-b border-slate-200 dark:border-slate-800">
-            <td colspan="20" class="p-4">
-                <div class="max-w-2xl">
-                    <h5 class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-200 dark:border-slate-700 pb-1">Distribuição no Projeto (${f.label})</h5>
-                    <table class="w-full text-left">
-                        <thead class="text-[8px] text-slate-400 uppercase"><tr><th class="p-2 pl-8">Pavimento</th><th class="p-2">Ambiente</th><th class="p-2">Qtd Específica</th></tr></thead>
-                        <tbody>${subTableHtml}</tbody>
-                    </table>
-                </div>
-            </td>
-        </tr>
-        `;
-    }).join('');
+        <tr id="m-details-${f.matchKey}" class="hidden bg-slate-100 dark:bg-slate-950/50 shadow-inner border-b border-slate-200 dark:border-slate-800">
+            <td colspan="20" class="p-4">
+                <div class="max-w-2xl">
+                    <h5 class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-200 dark:border-slate-700 pb-1">Distribuição no Projeto (${f.label})</h5>
+                    <table class="w-full text-left">
+                        <thead class="text-[8px] text-slate-400 uppercase"><tr><th class="p-2 pl-8">Pavimento</th><th class="p-2">Ambiente</th><th class="p-2">Qtd Específica</th></tr></thead>
+                        <tbody>${subTableHtml}</tbody>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        `;
+    }).join('');
+
+    // Sincroniza a aba BOQ de forma reativa a qualquer mudança na Planilha Mestra
+    if (window.renderBOQ) window.renderBOQ();
 };
 
 window.updateMasterFixtureData = function(matchKey: string, field: string, value: any) {
+    const s = window.state.leedProject;
+    if (!s || !s.rooms) return;
+
+    s.rooms.forEach((room: any) => {
+        if (room.fixtures) {
+            room.fixtures.forEach((f: any) => {
+                const currentKey = (f.label || "Luminária").toLowerCase() + "_" + f.power;
+                if (currentKey === matchKey) {
+                    if (['power', 'flux', 'fluxFinal', 'cdklm', 'intensity'].includes(field)) {
+                        f[field] = parseFloat(value) || 0;
+                    } else {
+                        f[field] = value;
+                    }
+                }
+            });
+        }
+    });
+
+    window.updateGlobalLeedSummary();
+    window.renderLeedProject(); 
+    if (window.renderBOQ) window.renderBOQ();
+};
+
+// LUXSINTAX: Motor de Renderização do Orçamento Analítico (BOQ)
+window.renderBOQ = function() {
+    const tbody = document.getElementById('boq-table-body');
+    if (!tbody) return;
+    const s = window.state.leedProject;
+    
+    const uniqueFixtures = new Map();
+    if (s && s.rooms) {
+        s.rooms.forEach((room: any) => {
+            if (room.fixtures) {
+                room.fixtures.forEach((f: any) => {
+                    const safeLabel = f.label || "Luminária";
+                    const key = safeLabel.toLowerCase() + "_" + f.power;
+                    if (!uniqueFixtures.has(key)) {
+                        uniqueFixtures.set(key, { ...f, globalQty: f.qty || 1, label: safeLabel, matchKey: key, unitPrice: f.unitPrice || 0 });
+                    } else {
+                        const existing = uniqueFixtures.get(key);
+                        existing.globalQty += (f.qty || 1);
+                    }
+                });
+            }
+        });
+    }
+    
+    const fixturesArray = Array.from(uniqueFixtures.values());
+    let totalCapex = 0;
+
+    if (fixturesArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">Aguardando inserção de luminárias no projeto.</td></tr>`;
+        document.getElementById('boq-total-capex')!.innerText = 'R$ 0,00';
+        return;
+    }
+
+    tbody.innerHTML = fixturesArray.map((f: any, i: number) => {
+        const price = parseFloat(f.unitPrice) || 0;
+        const subtotal = price * f.globalQty;
+        totalCapex += subtotal;
+
+        return `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800/50">
+            <td class="p-3 font-black text-luminous-gold text-center">L${String(i+1).padStart(2, '0')}</td>
+            <td class="p-3 font-bold text-starlight dark:text-white truncate max-w-[250px]" title="${f.label}">${f.label}</td>
+            <td class="p-3 text-center font-black text-starlight dark:text-white bg-slate-100 dark:bg-slate-900 shadow-inner">${f.globalQty}</td>
+            <td class="p-3 text-right">
+                <div class="flex items-center justify-end gap-1">
+                    <span class="text-slate-400 text-[9px]">R$</span>
+                    <input type="number" value="${price > 0 ? price : ''}" onchange="window.updateBOQCost('${f.matchKey}', this.value)" class="w-24 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:border-emerald-500 outline-none text-right font-bold text-starlight dark:text-white transition-colors" placeholder="0.00">
+                </div>
+            </td>
+            <td class="p-3 text-right font-black text-emerald-600 dark:text-emerald-400">R$ ${subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        </tr>
+        `;
+    }).join('');
+
+    const capexDisplay = document.getElementById('boq-total-capex');
+    if (capexDisplay) capexDisplay.innerText = totalCapex.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // LUXSINTAX: Ponte Automática com o Módulo ESG (Capex Injection)
+    // Atualiza a Fonte da Verdade do módulo financeiro em tempo real e dispara cálculo.
+    window.state.esg.capex = totalCapex;
+    const esgCapexInput = document.getElementById('esg-capex') as HTMLInputElement;
+    if (esgCapexInput && document.activeElement !== esgCapexInput) {
+        esgCapexInput.value = String(totalCapex);
+    }
+    if (window.updateEsgUI) window.updateEsgUI();
+};
+
+window.updateBOQCost = function(matchKey: string, newCost: string) {
     const s = window.state.leedProject;
     if (!s || !s.rooms) return;
+    
+    const parsedCost = parseFloat(newCost) || 0;
 
     s.rooms.forEach((room: any) => {
         if (room.fixtures) {
             room.fixtures.forEach((f: any) => {
                 const currentKey = (f.label || "Luminária").toLowerCase() + "_" + f.power;
                 if (currentKey === matchKey) {
-                    if (['power', 'flux', 'fluxFinal', 'cdklm', 'intensity'].includes(field)) {
-                        f[field] = parseFloat(value) || 0;
-                    } else {
-                        f[field] = value;
-                    }
+                    f.unitPrice = parsedCost;
                 }
             });
         }
     });
 
-    window.updateGlobalLeedSummary();
-    window.renderLeedProject(); 
+    // Re-renderiza ambas as tabelas e o motor financeiro
+    window.renderMasterData();
+};
+
+// LUXSINTAX: Exportação de Excel (Download Nativo)
+window.exportBOQ = function() {
+    if (!(window as any).XLSX) return alert("Motor Excel não carregado. Aguarde um instante.");
+    
+    const tbody = document.getElementById('boq-table-body');
+    if (!tbody || tbody.innerText.includes('Aguardando')) return alert("Não há dados para exportar.");
+    
+    const rows: any[] = [['CÓDIGO', 'PRODUTO/DESCRIÇÃO', 'QTD TOTAL', 'CUSTO UNITÁRIO (R$)', 'SUBTOTAL (R$)']];
+    const uniqueFixtures = new Map();
+    
+    window.state.leedProject.rooms.forEach((r:any) => {
+        r.fixtures.forEach((f:any) => {
+            const key = (f.label || "Luminária").toLowerCase() + "_" + f.power;
+            if(!uniqueFixtures.has(key)) uniqueFixtures.set(key, {...f, globalQty: f.qty});
+            else uniqueFixtures.get(key).globalQty += f.qty;
+        });
+    });
+    
+    let total = 0;
+    Array.from(uniqueFixtures.values()).forEach((f:any, i) => {
+        const cost = parseFloat(f.unitPrice) || 0;
+        const sub = f.globalQty * cost;
+        total += sub;
+        rows.push([`L${String(i+1).padStart(2,'0')}`, f.label, f.globalQty, cost, sub]);
+    });
+    
+    rows.push(['', '', '', 'CAPEX TOTAL:', total]);
+    
+    const ws = (window as any).XLSX.utils.aoa_to_sheet(rows);
+    const wb = (window as any).XLSX.utils.book_new();
+    (window as any).XLSX.utils.book_append_sheet(wb, ws, "BOQ_LuxSintax");
+    
+    const safeName = window.state.leedProject.name.replace(/[^a-zA-Z0-9_]/g, '_');
+    (window as any).XLSX.writeFile(wb, `Orcamento_${safeName}_${Date.now()}.xlsx`);
 };
 
 // LUXSINTAX: Controle do Acordeão Drill-down na Planilha Mestra
