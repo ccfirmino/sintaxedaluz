@@ -46,8 +46,9 @@ declare global {
         HCLEngine: any;
         GlareEngine: any;
         leedTargets: any;
-        updateCalculations: () => void;
-        switchTool: (toolId: string) => void;
+        updateCalculations: () => void;
+        switchTool: (toolId: string) => void;
+        switchProjectTab: (tabId: string) => void;
         setHCLViewMode: (mode: 'clock' | 'spd') => void;
         redrawAllCanvases: () => void;
         updateCalcMode: (mode: string) => void;
@@ -408,8 +409,34 @@ window.toggleLanguage = function() {
         window.updateCalculations(); 
     };
 
+// LUXSINTAX: Orquestração de Abas do Project Hub (Master Data, BOQ, LEED)
+window.switchProjectTab = function(tabId: string) {
+    ['equipments', 'boq', 'leed'].forEach(id => {
+        const btn = document.getElementById('ptab-' + id);
+        const content = document.getElementById('ptab-content-' + id);
+        if (btn) {
+            if (id === tabId) {
+                btn.classList.remove('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
+                btn.classList.add('border-luminous-gold', 'text-luminous-gold');
+            } else {
+                btn.classList.add('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
+                btn.classList.remove('border-luminous-gold', 'text-luminous-gold');
+            }
+        }
+        if (content) {
+            if (id === tabId) {
+                content.classList.remove('hidden');
+                content.classList.add('block');
+            } else {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            }
+        }
+    });
+};
+
 window.switchTool = function(toolId: string) {
-    window.currentTool = toolId;
+    window.currentTool = toolId;
     
     // LUXSINTAX: Analytics - Rastreamento de Tela Virtual (SPA/PWA)
     if (typeof (window as any).gtag === 'function') {

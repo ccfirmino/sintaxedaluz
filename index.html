@@ -775,41 +775,104 @@
                     </div> 
 
                     <div id="leedProj-tool" class="w-full animate-fade-in-up col-span-12 hidden">
-                        <div class="glass-panel p-8 rounded-2xl bg-white transition-colors duration-300">
-                            <div class="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
+                        <div class="glass-panel p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 transition-colors duration-300 min-h-[600px] flex flex-col shadow-xl">
+                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
                                 <div>
-                                    <h3 class="text-xl text-leed-green font-black tracking-widest flex items-center gap-2 uppercase">
-                                        <i class="fas fa-leaf"></i> <span>GERENCIADOR DE CARGA LEED</span>
+                                    <h3 class="text-xl text-starlight dark:text-white font-black tracking-widest flex items-center gap-2 uppercase">
+                                        <i class="fas fa-folder-open text-luminous-gold"></i> <span data-i18n="proj_hub_title">Project Hub & Orçamento</span>
                                     </h3>
-                                    <p class="text-xs text-slate-500 mt-1 font-bold">Consolidação de LPD (Lighting Power Density) para o edifício completo.</p>
+                                    <p class="text-xs text-slate-500 mt-1 font-bold">Central de Equipamentos (Master Data), BOQ e Auditoria LPD/LEED.</p>
                                 </div>
-                                <div class="flex items-center gap-3">
-                                    <label for="leed-excel-input" id="lbl-excel-upload" class="bg-white dark:bg-slate-800 text-leed-green dark:text-emerald-400 border border-leed-green dark:border-emerald-700 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-50 dark:hover:bg-slate-700 transition-all shadow-sm cursor-pointer">
-                                        <i class="fas fa-file-excel mr-2"></i> Importar Excel
-                                    </label>
-                                    <input type="file" id="leed-excel-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="window.handleExcelUpload(this)">
-                                    
-                                    <button onclick="window.addLeedRoom()" class="bg-leed-green text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-green-800 transition-all shadow-lg">
-                                        <i class="fas fa-plus mr-2"></i> <span data-i18n="lbl_add_room">Adicionar Ambiente</span>
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <button onclick="window.exportProjectSpec()" class="bg-white dark:bg-slate-800 text-starlight dark:text-white px-4 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest hover:border-red-500 transition-all shadow-sm border border-slate-200 dark:border-slate-700 outline-none">
+                                        <i class="fas fa-file-pdf mr-2 text-red-500"></i> Caderno de Especificação
                                     </button>
+                                    <label for="master-excel-input" class="bg-luminous-gold text-white px-5 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-amber-700 transition-all shadow-sm cursor-pointer border border-transparent">
+                                        <i class="fas fa-file-excel mr-2"></i> Importar Planilha Mestra
+                                    </label>
+                                    <input type="file" id="master-excel-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="window.handleMasterExcelUpload(this)">
                                 </div>
                             </div>
 
-                            <div id="leed-project-container" class="space-y-8">
+                            <div class="flex gap-2 border-b border-slate-200 dark:border-slate-800 mb-6 overflow-x-auto custom-scrollbar pb-2">
+                                <button onclick="window.switchProjectTab('equipments')" id="ptab-equipments" class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-t-lg border-b-2 border-luminous-gold text-luminous-gold transition-colors whitespace-nowrap outline-none"><i class="fas fa-lightbulb mr-2"></i>Master Data</button>
+                                <button onclick="window.switchProjectTab('boq')" id="ptab-boq" class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors whitespace-nowrap outline-none"><i class="fas fa-list-ol mr-2"></i>BOQ Espacial</button>
+                                <button onclick="window.switchProjectTab('leed')" id="ptab-leed" class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors whitespace-nowrap outline-none"><i class="fas fa-leaf mr-2 text-leed-green"></i>Compliance LEED</button>
                             </div>
 
-                            <div class="mt-12 p-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-8 shadow-2xl transition-colors">
-                                <div class="text-center md:text-left">
-                                    <div class="text-[10px] text-slate-500 dark:text-slate-400 font-black tracking-[0.2em] mb-2 uppercase">Carga Total do Projeto</div>
-                                    <div id="global-leed-watts" class="text-4xl font-black text-starlight dark:text-white">0 <span class="text-lg font-light text-slate-500 dark:text-slate-400">Watts</span></div>
+                            <div id="project-content-area" class="flex-grow relative">
+                                <div id="ptab-content-equipments" class="w-full h-full animate-fade-in block">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Catálogo de Luminárias e Acessórios</h4>
+                                        <button onclick="window.addEquipment()" class="text-[10px] bg-slate-100 dark:bg-slate-800 text-starlight dark:text-white border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg font-black uppercase hover:border-luminous-gold transition-colors outline-none"><i class="fas fa-plus mr-1"></i> Novo Item</button>
+                                    </div>
+                                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                        <table class="w-full text-left border-collapse bg-white dark:bg-slate-900 min-w-[800px]">
+                                            <thead class="bg-slate-50 dark:bg-slate-800 text-[9px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                                                <tr>
+                                                    <th class="p-3">ID / Ref</th>
+                                                    <th class="p-3">Especificação Técnica</th>
+                                                    <th class="p-3">Fabricante</th>
+                                                    <th class="p-3 text-center">Potência (W)</th>
+                                                    <th class="p-3 text-center">Fluxo (lm)</th>
+                                                    <th class="p-3 text-center">CCT (K)</th>
+                                                    <th class="p-3 text-right">Custo Un. (R$)</th>
+                                                    <th class="p-3 text-center">Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="equipment-table-body" class="text-xs text-starlight dark:text-slate-300 font-medium divide-y divide-slate-100 dark:divide-slate-800/50">
+                                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                                    <td class="p-3 font-black text-luminous-gold">L01</td>
+                                                    <td class="p-3">Downlight Embutir Recuado <span class="block text-[9px] text-slate-400 font-bold mt-0.5">Acabamento: Branco Fosco | Lente 36º | IRC >90</span></td>
+                                                    <td class="p-3">Lumini</td>
+                                                    <td class="p-3 text-center font-bold">12W</td>
+                                                    <td class="p-3 text-center">1100lm</td>
+                                                    <td class="p-3 text-center">3000K</td>
+                                                    <td class="p-3 text-right font-bold text-emerald-600 dark:text-emerald-400">R$ 245,00</td>
+                                                    <td class="p-3 text-center text-slate-400">
+                                                        <button class="hover:text-luminous-gold mx-1 outline-none"><i class="fas fa-edit"></i></button>
+                                                        <button class="hover:text-red-500 mx-1 outline-none"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                                <div class="h-12 w-[1px] bg-slate-300 dark:bg-slate-700 hidden md:block"></div>
-                                <div class="text-center md:text-left">
-                                    <div class="text-[10px] text-slate-500 dark:text-slate-400 font-black tracking-[0.2em] mb-2 uppercase">LPD Médio</div>
-                                    <div id="global-leed-lpd" class="text-4xl font-black text-leed-green">0.00 <span class="text-lg font-light text-slate-500 dark:text-slate-400">W/m²</span></div>
+
+                                <div id="ptab-content-boq" class="w-full h-full animate-fade-in hidden">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Alocação Espacial (Quantitativos)</h4>
+                                    </div>
+                                    <div class="p-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20">
+                                        <i class="fas fa-cubes text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
+                                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Visão Matricial de Ambientes x Equipamentos.</p>
+                                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Conecte a planiha mestra para preencher a matriz.</p>
+                                    </div>
                                 </div>
-                                <div id="global-leed-status" class="bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest animate-pulse">
-                                    AGUARDANDO DADOS
+
+                                <div id="ptab-content-leed" class="w-full h-full animate-fade-in hidden">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="text-sm font-black text-leed-green uppercase tracking-widest flex items-center gap-2"><i class="fas fa-leaf"></i> Auditoria de Carga LPD (ASHRAE 90.1)</h4>
+                                        <button onclick="window.addLeedRoom()" class="text-[10px] bg-leed-green text-white px-4 py-2 rounded-lg font-black uppercase hover:bg-green-800 transition-colors shadow-sm outline-none"><i class="fas fa-plus mr-1"></i> Adicionar Zona</button>
+                                    </div>
+                                    
+                                    <div id="leed-project-container" class="space-y-4 mb-6">
+                                    </div>
+
+                                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 shadow-inner">
+                                        <div class="text-center md:text-left">
+                                            <div class="text-[9px] text-slate-500 dark:text-slate-400 font-black tracking-widest mb-1 uppercase">Potência Instalada (Opex/HVAC)</div>
+                                            <div id="global-leed-watts" class="text-3xl font-black text-starlight dark:text-white">0 <span class="text-sm font-light text-slate-500">W</span> <span class="text-sm font-light text-slate-400 mx-1">|</span> <span class="text-sm font-bold text-tech-cyan" title="Carga Térmica Estimada (1W = 3.41 BTU/h)">0 BTU/h</span></div>
+                                        </div>
+                                        <div class="h-8 w-[1px] bg-slate-300 dark:bg-slate-700 hidden md:block"></div>
+                                        <div class="text-center md:text-left">
+                                            <div class="text-[9px] text-slate-500 dark:text-slate-400 font-black tracking-widest mb-1 uppercase">LPD Global da Edificação</div>
+                                            <div id="global-leed-lpd" class="text-3xl font-black text-leed-green">0.00 <span class="text-sm font-light text-slate-500">W/m²</span></div>
+                                        </div>
+                                        <div id="global-leed-status" class="bg-leed-green/10 border border-leed-green/30 px-6 py-3 rounded-xl text-leed-green font-black text-xs tracking-widest uppercase">
+                                            Aguardando Zonas...
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
