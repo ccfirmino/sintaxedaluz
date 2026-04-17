@@ -51,6 +51,8 @@ declare global {
         switchProjectTab: (tabId: string) => void;
         renderMasterData: () => void;
         switchProjectTab: (tabId: string) => void;
+        renderMasterData: () => void;
+        switchProjectTab: (tabId: string) => void;
         setHCLViewMode: (mode: 'clock' | 'spd') => void;
         redrawAllCanvases: () => void;
         updateCalcMode: (mode: string) => void;
