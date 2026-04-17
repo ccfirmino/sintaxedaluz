@@ -44,92 +44,120 @@ const MasterProjectExportSchema = z.array(MasterRoomSchema);
 
 export class ExcelParser {
     /**
-     * Extrai, normaliza e VALIDA os dados de ambientes e luminárias de um buffer Excel.
-     * Utiliza dicionário bilíngue (PT/EN) e Fuzzy Matching para Ingestão de Planilha Mestra.
+     * Extrai APENAS o cabeçalho da planilha (Necessário para o Wizard de Mapeamento - Fase 1)
      */
-    static async parseMasterSpreadsheet(file: File): Promise<any[]> {
+    static async extractHeaders(file: File): Promise<string[]> {
         return new Promise((resolve, reject) => {
-            if (!(window as any).XLSX) {
-                return reject(new Error("Motor XLSX não carregado. Tente novamente em alguns segundos."));
-            }
-
+            if (!(window as any).XLSX) return reject(new Error("Motor XLSX não carregado."));
             const reader = new FileReader();
-            
             reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target!.result as ArrayBuffer);
                     const workbook = (window as any).XLSX.read(data, {type: 'array'});
                     const firstSheet = workbook.SheetNames[0];
-                    const rows = (window as any).XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+                    const rows = (window as any).XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], { header: 1 });
+                    if (rows.length > 0) resolve(rows[0] as string[]);
+                    else resolve([]);
+                } catch (err) {
+                    reject(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    }
 
-                    const roomMap = new Map();
+    /**
+     * Extrai, normaliza e VALIDA os dados de ambientes e luminárias de um buffer Excel.
+     * Suporta Dicionário Híbrido: Memória do Usuário (Nível 3) + Fuzzy Matching (Nível 1).
+     */
+    static async parseMasterSpreadsheet(file: File, customMapping: Record<string, string> = {}): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            if (!(window as any).XLSX) {
+                return reject(new Error("Motor XLSX não carregado. Tente novamente em alguns segundos."));
+            }
 
-                    // Motor de Limpeza Numérica Universal (Trata R$ 1.500,50 e $ 1,500.50)
-                    const parseUniversalNumber = (val: any) => {
-                        if (val === null || val === undefined || val === '') return null;
-                        if (typeof val === 'number') return val;
-                        const str = String(val).toLowerCase();
-                        const cleanStr = str.replace(/[^0-9.,-]/g, '');
-                        if (!cleanStr) return null;
-                        
-                        let normalized = cleanStr;
-                        if (cleanStr.includes(',') && cleanStr.includes('.')) {
-                            if (cleanStr.lastIndexOf(',') > cleanStr.lastIndexOf('.')) {
-                                normalized = cleanStr.replace(/\./g, '').replace(',', '.');
-                            } else {
-                                normalized = cleanStr.replace(/,/g, '');
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target!.result as ArrayBuffer);
+                    const workbook = (window as any).XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.SheetNames[0];
+                    const rows = (window as any).XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+
+                    const roomMap = new Map();
+
+                    // Motor de Limpeza Numérica Universal (Trata R$ 1.500,50 e $ 1,500.50)
+                    const parseUniversalNumber = (val: any) => {
+                        if (val === null || val === undefined || val === '') return null;
+                        if (typeof val === 'number') return val;
+                        const str = String(val).toLowerCase();
+                        const cleanStr = str.replace(/[^0-9.,-]/g, '');
+                        if (!cleanStr) return null;
+                        
+                        let normalized = cleanStr;
+                        if (cleanStr.includes(',') && cleanStr.includes('.')) {
+                            if (cleanStr.lastIndexOf(',') > cleanStr.lastIndexOf('.')) {
+                                normalized = cleanStr.replace(/\./g, '').replace(',', '.');
+                            } else {
+                                normalized = cleanStr.replace(/,/g, '');
+                            }
+                        } else if (cleanStr.includes(',')) {
+                            normalized = cleanStr.replace(',', '.');
+                        }
+                        const parsed = parseFloat(normalized);
+                        return isNaN(parsed) ? null : parsed;
+                    };
+
+                    rows.forEach((row: any) => {
+                        const getVal = (fieldKey: string, aliases: string[]) => {
+                            // ETL Nível 3: Verifica se existe mapeamento persistido pelo usuário
+                            if (customMapping && customMapping[fieldKey] && row[customMapping[fieldKey]] !== undefined) {
+                                return row[customMapping[fieldKey]];
                             }
-                        } else if (cleanStr.includes(',')) {
-                            normalized = cleanStr.replace(',', '.');
-                        }
-                        const parsed = parseFloat(normalized);
-                        return isNaN(parsed) ? null : parsed;
-                    };
+                            // ETL Nível 1: Dicionário Hardcoded de Fuzzy Matching
+                            const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase().includes(a)));
+                            return key ? row[key] : null;
+                        };
 
-                    rows.forEach((row: any) => {
-                        const getVal = (aliases: string[]) => {
-                            const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase().includes(a)));
-                            return key ? row[key] : null;
-                        };
+                        // 1. Dicionário Base (Estrutura)
+                        const floor = getVal('floor', ['pavimento', 'andar', 'nivel', 'level', 'floor']) || "Geral";
+                        const roomName = getVal('roomName', ['ambiente', 'sala', 'nome', 'room', 'espaco', 'space', 'area']) || "Ambiente Não Nomeado";
+                        const code = getVal('code', ['cód', 'cod', 'código', 'id', 'tag', 'ref', 'code', 'type mark']) || "LUM-XX";
+                        const description = getVal('label', ['luminaria', 'luminária', 'modelo', 'equipamento', 'descrição', 'description', 'fixture', 'produto', 'tipo']) || "Luminária Importada";
+                        
+                        // 2. Dicionário Numérico Base (Força números)
+                        const rawPower = getVal('power', ['potencia', 'potência', 'w', 'watts', 'carga', 'power', 'wattage', 'load']);
+                        const power = parseUniversalNumber(rawPower) || 0;
+                        
+                        const rawQty = getVal('qty', ['qtd', 'qt', 'quantidade', 'quant', 'qtde', 'unid', 'unidades', 'peca', 'peça', 'pcs', 'pçs', 'qty', 'quantity', 'amount']);
+                        let qty = 1;
+                        if (rawQty !== null && rawQty !== undefined) {
+                            const cleanQty = parseUniversalNumber(rawQty);
+                            if (cleanQty && cleanQty > 0) qty = Math.floor(cleanQty);
+                        }
 
-                        // 1. Dicionário Base (Estrutura)
-                        const floor = getVal(['pavimento', 'andar', 'nivel', 'level', 'floor']) || "Geral";
-                        const roomName = getVal(['ambiente', 'sala', 'nome', 'room', 'espaco', 'space', 'area']) || "Ambiente Não Nomeado";
-                        const code = getVal(['cód', 'cod', 'código', 'id', 'tag', 'ref', 'code', 'type mark']) || "LUM-XX";
-                        const description = getVal(['luminaria', 'luminária', 'modelo', 'equipamento', 'descrição', 'description', 'fixture']) || "Luminária Importada";
-                        
-                        // 2. Dicionário Numérico Base (Força números)
-                        const rawPower = getVal(['potencia', 'potência', 'w', 'watts', 'carga', 'power', 'wattage', 'load']);
-                        const power = parseUniversalNumber(rawPower) || 0;
-                        
-                        const rawQty = getVal(['qtd', 'qt', 'quantidade', 'quant', 'qtde', 'unid', 'unidades', 'peca', 'peça', 'pcs', 'pçs', 'qty', 'quantity', 'amount']);
-                        let qty = 1;
-                        if (rawQty !== null && rawQty !== undefined) {
-                            const cleanQty = parseUniversalNumber(rawQty);
-                            if (cleanQty && cleanQty > 0) qty = Math.floor(cleanQty);
-                        }
+                        const currentArea = parseUniversalNumber(getVal('area', ['area', 'área', 'm2', 'm²'])) || 0;
 
-                        const currentArea = parseUniversalNumber(getVal(['area', 'área', 'm2', 'm²'])) || 0;
+                        // 3. Dicionário Avançado (Física & Fotometria)
+                        let cct = parseUniversalNumber(getVal('cct', ['cct', 'temperatura', 'cor', 'kelvin', 'k', 'tonalidade', 'temp', 'tc', 'color temperature']));
+                        if (cct !== null && cct < 100 && cct > 0) cct = cct * 1000; // Trata "3k" ou "3.0" -> 3000
 
-                        // 3. Dicionário Avançado (Física & Fotometria)
-                        let cct = parseUniversalNumber(getVal(['cct', 'temperatura', 'cor', 'kelvin', 'k', 'tonalidade', 'temp', 'tc', 'color temperature']));
-                        if (cct !== null && cct < 100 && cct > 0) cct = cct * 1000; // Trata "3k" ou "3.0" -> 3000
+                        const flux = parseUniversalNumber(getVal('flux', ['fluxo', 'lúmens', 'lumens', 'lm', 'emissão', 'luminoso', 'flux', 'output']));
+                        const efficacy = parseUniversalNumber(getVal('efficacy', ['eficiência', 'eficiencia', 'lm/w', 'rendimento', 'efficacy', 'efficiency']));
+                        const cri = parseUniversalNumber(getVal('cri', ['irc', 'cri', 'r9', 'reprodução', 'reproducao', 'índice', 'color rendering']));
+                        const beamAngle = parseUniversalNumber(getVal('beamAngle', ['facho', 'abertura', 'ângulo', 'angulo', 'graus', '°', 'feixe', 'beam', 'spread']));
 
-                        const flux = parseUniversalNumber(getVal(['fluxo', 'lúmens', 'lumens', 'lm', 'emissão', 'luminoso', 'flux', 'output']));
-                        const efficacy = parseUniversalNumber(getVal(['eficiência', 'eficiencia', 'lm/w', 'rendimento', 'efficacy', 'efficiency']));
-                        const cri = parseUniversalNumber(getVal(['irc', 'cri', 'r9', 'reprodução', 'reproducao', 'índice', 'color rendering']));
-                        const beamAngle = parseUniversalNumber(getVal(['facho', 'abertura', 'ângulo', 'angulo', 'graus', '°', 'feixe', 'beam', 'spread']));
-
-                        // 4. Dicionário Avançado (Mercado & Custos)
-                        const unitPrice = parseUniversalNumber(getVal(['custo', 'valor', 'preço', 'preco', 'r$', 'unitário', 'unitario', 'orçamento', 'compra', 'cost', 'price', '$', 'usd']));
-                        
-                        // 5. Descritivos Textuais
-                        const mounting = getVal(['tipo', 'aplicação', 'montagem', 'instalação', 'família', 'type', 'mounting', 'application']);
-                        const lightSource = getVal(['fonte', 'lâmpada', 'lampada', 'led', 'bulbo', 'soquete', 'source', 'lamp', 'bulb']);
-                        const finish = getVal(['acabamento', 'pintura', 'cor da peça', 'material', 'finish', 'housing']);
-                        const controlGear = getVal(['driver', 'reator', 'equipamento auxiliar', 'dimerização', 'dali', 'gear', 'ballast', 'dimming']);
-                        const manufacturer = getVal(['fabricante', 'marca', 'fornecedor', 'loja', 'manufacturer', 'brand', 'vendor', 'make']);
-                        const link = getVal(['link', 'url', 'site', 'página', 'catálogo', 'catalog', 'webpage']);
+                        // 4. Dicionário Avançado (Mercado & Custos)
+                        const unitPrice = parseUniversalNumber(getVal('unitPrice', ['custo', 'valor', 'preço', 'preco', 'r$', 'unitário', 'unitario', 'orçamento', 'compra', 'cost', 'price', '$', 'usd']));
+                        
+                        // 5. Descritivos Textuais
+                        const mounting = getVal('mounting', ['aplicação', 'montagem', 'instalação', 'família', 'type', 'mounting', 'application', 'tipologia']);
+                        const lightSource = getVal('lightSource', ['fonte', 'lâmpada', 'lampada', 'led', 'bulbo', 'soquete', 'source', 'lamp', 'bulb']);
+                        const finish = getVal('finish', ['acabamento', 'pintura', 'cor da peça', 'material', 'finish', 'housing']);
+                        const controlGear = getVal('controlGear', ['driver', 'reator', 'equipamento auxiliar', 'dimerização', 'dali', 'gear', 'ballast', 'dimming', 'auxiliar']);
+                        const manufacturer = getVal('manufacturer', ['fabricante', 'marca', 'fornecedor', 'loja', 'manufacturer', 'brand', 'vendor', 'make']);
+                        const link = getVal('link', ['link', 'url', 'site', 'página', 'catálogo', 'catalog', 'webpage']);
 
                         const uniqueKey = `${floor}_${roomName}`;
 

@@ -2984,18 +2984,19 @@ window.updateCalculations = function() {
 // LUXSINTAX: Super Canvas HCL movido para Canvas2DEngine.ts (Clean Architecture)
 
 // ==========================================
-// LUXSINTAX: Engine de Importação Excel (Clean Architecture)
+// LUXSINTAX: Engine de Importação Excel (Clean Architecture - ETL Nível 3)
 // ==========================================
+
+window.pendingExcelFile = null;
+
 window.handleExcelUpload = async function(input: HTMLInputElement) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
     
-    // LUXSINTAX: Proteção de Estado (Confirmação de Sobreposição vs Mesclagem)
     let shouldMerge = true;
     if (window.state.leedProject.rooms && window.state.leedProject.rooms.length > 0) {
-        shouldMerge = confirm("Projeto atual detectado.\n\nClique em [OK] para MESCLAR a nova planilha (preservando suas edições manuais atuais).\nClique em [CANCELAR] para SOBREPOR tudo (começar um projeto novo do zero com esta planilha).");
+        shouldMerge = confirm("Projeto atual detectado.\n\n[OK] para MESCLAR a nova planilha.\n[CANCELAR] para SOBREPOR tudo (começar do zero).");
         if (!shouldMerge) {
-            // Limpa o projeto atual caso o usuário escolha sobrepor
             window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
         }
     }
@@ -3004,47 +3005,159 @@ window.handleExcelUpload = async function(input: HTMLInputElement) {
     if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> PROCESSANDO...';
 
     try {
-        // Delegação limpa para a camada de Infraestrutura
-        const parsedRooms = await ExcelParser.parseLeedRooms(file);
+        // Busca a "Memória" do Usuário
+        const savedMapping = JSON.parse(localStorage.getItem('luxsintax_excel_mapping') || '{}');
         
-        // LUXSINTAX: Algoritmo de Reconciliação de Estado (Smart Merge / Upsert)
-        const existingRooms = window.state.leedProject.rooms || [];
+        // Tentativa de Parse Híbrido
+        const parsedRooms = await ExcelParser.parseMasterSpreadsheet(file, savedMapping);
         
-        parsedRooms.forEach((newRoom: any) => {
-            // Cria uma assinatura única para comparar (Ex: "ss1_estacionamento")
-            const matchKey = (newRoom.floor + "_" + newRoom.name).toLowerCase().trim();
+        // Heurística de Validação: O parser falhou em identificar as colunas primárias?
+        // Se a luminária ficou com Potência zero ou nome genérico, o mapeamento falhou.
+        const isMissingCritical = parsedRooms.some(r => r.fixtures.some((f: any) => f.power === 0 || f.label === "Luminária Importada"));
+
+        if (isMissingCritical) {
+            // Aborta a inserção e chama o Wizard de Mapeamento
+            const headers = await ExcelParser.extractHeaders(file);
+            window.pendingExcelFile = file;
+            window.renderMappingWizard(headers);
+            document.getElementById('excel-mapping-modal')?.classList.remove('hidden');
             
-            const existingIndex = existingRooms.findIndex((r: any) => 
-                (r.floor + "_" + r.name).toLowerCase().trim() === matchKey
-            );
-            
-            if (existingIndex >= 0) {
-                // AMBIENTE EXISTE (UPDATE): Preserva inteligência humana, atualiza a física
-                const oldRoom = existingRooms[existingIndex];
-                existingRooms[existingIndex] = {
-                    ...newRoom, // Puxa área atualizada e novas luminárias do Excel
-                    id: oldRoom.id, // Protege o ID interno para não quebrar o DOM
-                    leedCategory: oldRoom.leedCategory, // Preserva escolha LEED
-                    typology: oldRoom.typology, // Preserva Tipologia ASHRAE
-                    baseLpd: oldRoom.baseLpd, // Preserva o budget normativo
-                    unit: oldRoom.unit, // Preserva métrica (W/m² ou W/m)
-                    expanded: oldRoom.expanded // Preserva estado visual do acordeão
-                };
-            } else {
-                // NOVO AMBIENTE (INSERT): Adiciona no topo da lista
-                existingRooms.unshift(newRoom);
-            }
-        });
-        
-        // Atualiza a Fonte da Verdade (SSOT)
-        window.state.leedProject.rooms = [...existingRooms];
-        window.renderLeedProject();
-        
-        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
+            if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> Importar Mestra';
+            input.value = ""; 
+            return;
+        }
+
+        // Fluxo Otimizado (Sucesso de Primeira)
+        window.processParsedExcel(parsedRooms);
+        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> Importar Mestra';
         input.value = ""; 
 
     } catch (err: any) {
         alert(err.message);
-        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> IMPORTAR EXCEL';
+        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> Importar Mestra';
+    }
+};
+
+// Responsável por injetar os dados aprovados no State e renderizar
+window.processParsedExcel = function(parsedRooms: any[]) {
+    const existingRooms = window.state.leedProject.rooms || [];
+    
+    parsedRooms.forEach((newRoom: any) => {
+        const matchKey = (newRoom.floor + "_" + newRoom.name).toLowerCase().trim();
+        const existingIndex = existingRooms.findIndex((r: any) => (r.floor + "_" + r.name).toLowerCase().trim() === matchKey);
+        
+        if (existingIndex >= 0) {
+            const oldRoom = existingRooms[existingIndex];
+            existingRooms[existingIndex] = {
+                ...newRoom,
+                id: oldRoom.id,
+                leedCategory: oldRoom.leedCategory,
+                typology: oldRoom.typology,
+                baseLpd: oldRoom.baseLpd,
+                unit: oldRoom.unit,
+                expanded: oldRoom.expanded
+            };
+        } else {
+            existingRooms.unshift(newRoom);
+        }
+    });
+    
+    window.state.leedProject.rooms = [...existingRooms];
+    window.renderLeedProject();
+};
+
+window.renderMappingWizard = function(headers: string[]) {
+    const container = document.getElementById('mapping-rows-container');
+    if (!container) return;
+    
+    // Lista de Propriedades Base do LuxSintax
+    const systemFields = [
+        { id: 'ignore', label: '-- Ignorar Coluna --' },
+        { id: 'label', label: 'Nome / Tipo do Equipamento' },
+        { id: 'power', label: 'Potência (Watts)' },
+        { id: 'qty', label: 'Quantidade' },
+        { id: 'roomName', label: 'Ambiente' },
+        { id: 'floor', label: 'Pavimento / Andar' },
+        { id: 'code', label: 'Código (Ex: LUM-01)' },
+        { id: 'cct', label: 'Temperatura Cor (CCT)' },
+        { id: 'flux', label: 'Fluxo Luminoso (lm)' },
+        { id: 'unitPrice', label: 'Custo Unitário (R$)' },
+        { id: 'manufacturer', label: 'Fabricante / Marca' }
+    ];
+
+    const savedMapping = JSON.parse(localStorage.getItem('luxsintax_excel_mapping') || '{}');
+    
+    let html = '';
+    headers.forEach((header) => {
+        if (!header) return;
+        let selectedId = 'ignore';
+        const hLower = header.toLowerCase();
+        
+        // Reverte o mapa para preencher a UI com as escolhas antigas
+        const savedMatch = Object.keys(savedMapping).find(k => savedMapping[k] === header);
+        if (savedMatch) {
+            selectedId = savedMatch;
+        } else {
+            // Heurística de sugestão visual
+            if (hLower.includes('pot') || hLower.includes('w') || hLower.includes('carga')) selectedId = 'power';
+            else if (hLower.includes('desc') || hLower.includes('prod') || hLower.includes('tipo')) selectedId = 'label';
+            else if (hLower.includes('amb') || hLower.includes('sala')) selectedId = 'roomName';
+            else if (hLower.includes('pav') || hLower.includes('andar')) selectedId = 'floor';
+            else if (hLower.includes('qtd') || hLower.includes('quant')) selectedId = 'qty';
+            else if (hLower.includes('cust') || hLower.includes('preç') || hLower.includes('valor')) selectedId = 'unitPrice';
+        }
+
+        html += `
+            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                <div class="w-1/2 font-bold text-xs text-starlight dark:text-white truncate" title="${header}">
+                    <i class="fas fa-columns text-slate-400 mr-2"></i> ${header}
+                </div>
+                <div class="w-1/2">
+                    <select class="mapping-select w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-xs font-bold text-tech-cyan outline-none focus:border-tech-cyan" data-header="${header}">
+                        ${systemFields.map(f => `<option value="${f.id}" ${f.id === selectedId ? 'selected' : ''}>${f.label}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+};
+
+window.cancelExcelMapping = function() {
+    document.getElementById('excel-mapping-modal')?.classList.add('hidden');
+    window.pendingExcelFile = null;
+};
+
+window.confirmExcelMapping = async function(event: any) {
+    if (!window.pendingExcelFile) return;
+    const btn = event.currentTarget as HTMLElement;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mapeando...';
+
+    try {
+        const selects = document.querySelectorAll('.mapping-select');
+        const newMapping: Record<string, string> = {};
+        
+        selects.forEach(el => {
+            const sel = el as HTMLSelectElement;
+            if (sel.value !== 'ignore') {
+                newMapping[sel.value] = sel.getAttribute('data-header') || '';
+            }
+        });
+
+        // 1. Salva a preferência (O sistema "aprende")
+        localStorage.setItem('luxsintax_excel_mapping', JSON.stringify(newMapping));
+
+        // 2. Reprocessa o arquivo com o dicionário do usuário ativado
+        const parsedRooms = await ExcelParser.parseMasterSpreadsheet(window.pendingExcelFile, newMapping);
+        window.processParsedExcel(parsedRooms);
+
+        document.getElementById('excel-mapping-modal')?.classList.add('hidden');
+        window.pendingExcelFile = null;
+    } catch (err: any) {
+        alert("Erro na importação: " + err.message);
+    } finally {
+        btn.innerHTML = originalText;
     }
 };
