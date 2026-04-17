@@ -295,24 +295,29 @@
             <div class="max-w-[1800px] mx-auto flex flex-col items-center">
                 
                 <div class="w-full flex flex-col xl:flex-row gap-4 sm:gap-6 mb-8 relative z-10 fade-in-up overflow-x-auto pb-4 custom-scrollbar">
-                    <div class="flex-none w-full xl:w-auto xl:flex-[2.5] bg-white/50 dark:bg-slate-800/30 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm backdrop-blur-sm">
+                    <div class="flex-none w-full xl:w-auto xl:flex-[2] bg-white/50 dark:bg-slate-800/30 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm backdrop-blur-sm">
                         <h3 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1 flex items-center gap-2"><i class="fas fa-ruler-combined"></i> <span data-i18n="pil_eng">1. Engenharia & Física</span></h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 h-[calc(100%-28px)]">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 h-[calc(100%-28px)]">
                             <button onclick="window.switchTool('grid')" id="tab-grid" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-th text-lg mb-1"></i><span data-i18n="tab_grid">MÉTODO<br>LÚMENS</span></button>
                             <button onclick="window.switchTool('ponto')" id="tab-ponto" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-layer-group text-lg mb-1"></i><span data-i18n="tab_horiz">PONTO A PONTO<br>HORIZONTAL</span></button>
                             <button onclick="window.switchTool('vertical')" id="tab-vertical" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-grip-lines-vertical text-lg mb-1"></i><span data-i18n="tab_vert">PONTO A PONTO<br>VERTICAL</span></button>
                             <button onclick="window.switchTool('driver')" id="tab-driver" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-microchip text-lg mb-1"></i><span data-i18n="tab_driver">TOPOLOGIA<br>& DRIVERS</span></button>
-                            <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
                         </div>
                     </div>
 
-                    <div class="flex-none w-full sm:w-1/2 xl:w-[160px] bg-purple-50/50 dark:bg-purple-900/10 p-4 rounded-2xl border border-purple-100 dark:border-purple-800/30 shadow-sm backdrop-blur-sm">
-                        <h3 class="text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3 ml-1 flex items-center gap-2"><i class="fas fa-heartbeat"></i> <span data-i18n="pil_health">2. Saúde (HCL)</span></h3>
-                        <div class="h-[calc(100%-28px)]">
-                            <button onclick="window.switchTool('audit')" id="tab-audit" class="mode-tab-btn w-full !h-[90px] min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap !border-purple-200 dark:!border-purple-800/50 hover:!bg-purple-50 dark:hover:!bg-purple-900/20">
-                                <i class="fas fa-brain text-lg mb-1 text-purple-500"></i>
-                                <span data-i18n="tab_audit">AUDITORIA<br>CIRCADIANA</span>
-                            </button>
+                    <div class="flex-none w-full sm:w-1/2 xl:w-auto xl:flex-1 bg-purple-50/50 dark:bg-purple-900/10 p-4 rounded-2xl border border-purple-100 dark:border-purple-800/30 shadow-sm backdrop-blur-sm">
+                        <h3 class="text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3 ml-1 flex items-center gap-2"><i class="fas fa-book-medical"></i> <span data-i18n="pil_health">2. Compliance & Saúde</span></h3>
+                        <div class="grid grid-cols-2 gap-3 h-[calc(100%-28px)]">
+                            <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
+                            <button onclick="window.switchTool('audit')" id="tab-audit" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-brain text-lg mb-1"></i><span data-i18n="tab_audit">AUDITORIA<br>CIRCADIANA</span></button>
+                        </div>
+                    </div>
+
+                    <div class="flex-none w-full sm:w-1/2 xl:w-auto xl:flex-1 bg-green-50/50 dark:bg-green-900/10 p-4 rounded-2xl border border-green-100 dark:border-green-800/30 shadow-sm backdrop-blur-sm">
+                        <h3 class="text-[10px] font-black text-leed-green uppercase tracking-widest mb-3 ml-1 flex items-center gap-2"><i class="fas fa-chart-line"></i> <span data-i18n="pil_esg">3. Viabilidade & ESG</span></h3>
+                        <div class="grid grid-cols-2 gap-3 h-[calc(100%-28px)]">
+                            <button onclick="window.switchTool('leedProj')" id="tab-leedProj" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[9px] sm:text-[10px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-leaf text-lg mb-1"></i><span data-i18n="tab_leed_proj">PROJETO<br>LEED</span></button>
+                            <button onclick="window.switchTool('esg')" id="tab-esg" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[9px] sm:text-[10px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-hand-holding-usd text-lg mb-1"></i><span data-i18n="tab_esg">VIABILIDADE<br>& ROI</span></button>
                         </div>
                     </div>
 
