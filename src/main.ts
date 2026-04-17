@@ -1692,16 +1692,106 @@ window.updateLeedRoomUI = function(roomId: number) {
 window.updateGlobalLeedSummary = () => {
     const s = window.state.leedProject;
     const summary = window.StandardsEngine.calculateLeedCompliance(s);
-    document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">/ ${summary.allowedWatts.toFixed(1)} W Permitidos</span>`;
-    document.getElementById('global-leed-lpd')!.innerHTML = `${summary.currentLpd.toFixed(2)} <span class="text-lg font-light text-slate-500 dark:text-slate-400">W/m²</span>`;
+    
+    // 1. Atualização do Dashboard Global (LEED / Carga)
+    const btuTotal = summary.totalWatts * 3.41214; // Conversão de Watts para BTU/h
+    document.getElementById('global-leed-watts')!.innerHTML = `${summary.totalWatts.toFixed(1)} <span class="text-sm font-light text-slate-500">W</span> <span class="text-sm font-light text-slate-400 mx-1">|</span> <span class="text-sm font-bold text-tech-cyan" title="Carga Térmica Estimada (1W = 3.41 BTU/h)">${Math.round(btuTotal).toLocaleString('pt-BR')} BTU/h</span>`;
+    document.getElementById('global-leed-lpd')!.innerHTML = `${summary.currentLpd.toFixed(2)} <span class="text-sm font-light text-slate-500">W/m²</span>`;
+    
     const statusBox = document.getElementById('global-leed-status');
     if (statusBox && summary.totalArea > 0) {
         statusBox.classList.remove('animate-pulse');
         statusBox.innerText = summary.isCompliant ? "COMPLIANCE ATINGIDO (APROVADO)" : "ALERTA: CARGA EXCEDE LIMITE ASHRAE";
         statusBox.className = summary.isCompliant 
-            ? "bg-leed-green/20 border border-leed-green px-8 py-4 rounded-2xl text-leed-green font-black text-sm tracking-widest text-center" 
-            : "bg-red-500/20 border border-red-500 px-8 py-4 rounded-2xl text-red-500 font-black text-sm tracking-widest text-center";
+            ? "bg-leed-green/10 border border-leed-green/30 px-6 py-3 rounded-xl text-leed-green font-black text-xs tracking-widest uppercase text-center w-full md:w-auto" 
+            : "bg-red-500/10 border border-red-500/30 px-6 py-3 rounded-xl text-red-500 font-black text-xs tracking-widest uppercase text-center w-full md:w-auto";
     }
+
+    // 2. Data Visualization (Raio-X de Value Engineering e Carga)
+    const dashPanel = document.getElementById('ve-dashboard-panel');
+    if (!s.rooms || s.rooms.length === 0) {
+        if (dashPanel) dashPanel.classList.add('hidden');
+        return;
+    }
+
+    // Agregação de Dados por Tipologia (ASHRAE)
+    const typeAgg = new Map();
+    let grandTotalCost = 0;
+    let grandTotalWatts = 0;
+
+    s.rooms.forEach((room: any) => {
+        const roomType = room.typology || 'Geral';
+        if (!typeAgg.has(roomType)) typeAgg.set(roomType, { cost: 0, watts: 0 });
+        const typeData = typeAgg.get(roomType);
+
+        room.fixtures?.forEach((f: any) => {
+            const qty = f.qty || 1;
+            const w = f.power || 0;
+            const cost = parseFloat(f.unitPrice) || 0;
+            
+            typeData.watts += (w * qty);
+            typeData.cost += (cost * qty);
+            
+            grandTotalWatts += (w * qty);
+            grandTotalCost += (cost * qty);
+        });
+    });
+
+    if (dashPanel) {
+        if (grandTotalWatts === 0 && grandTotalCost === 0) {
+            dashPanel.classList.add('hidden');
+        } else {
+            dashPanel.classList.remove('hidden');
+        }
+    }
+
+    // Geração Dinâmica das Barras Gráficas
+    const colors = ['bg-luminous-gold', 'bg-tech-cyan', 'bg-emerald-500', 'bg-purple-500', 'bg-rose-500', 'bg-amber-400', 'bg-blue-500', 'bg-slate-500'];
+    let colorIdx = 0;
+
+    let costBarsHtml = '';
+    let thermalBarsHtml = '';
+    let costLegendHtml = '';
+    let thermalLegendHtml = '';
+
+    // Ordena as tipologias pelo maior custo (Decrescente)
+    const sortedTypes = Array.from(typeAgg.entries()).sort((a, b) => b[1].cost - a[1].cost);
+
+    sortedTypes.forEach(([type, data]) => {
+        const cClass = colors[colorIdx % colors.length];
+        colorIdx++;
+
+        const costPct = grandTotalCost > 0 ? (data.cost / grandTotalCost) * 100 : 0;
+        const thermalPct = grandTotalWatts > 0 ? (data.watts / grandTotalWatts) * 100 : 0;
+
+        if (costPct > 0) {
+            costBarsHtml += `<div class="h-full ${cClass} transition-all duration-1000 border-r border-white/20 dark:border-starlight/20" style="width: ${costPct}%" title="${type}: ${costPct.toFixed(1)}%"></div>`;
+            costLegendHtml += `<div class="flex items-center gap-1.5 text-[9px] font-bold text-slate-500 w-max"><div class="w-2 h-2 rounded-full ${cClass}"></div> <span class="truncate max-w-[150px] uppercase" title="${type}">${type}</span> <span class="text-starlight dark:text-white">(${costPct.toFixed(1)}%)</span></div>`;
+        }
+
+        if (thermalPct > 0) {
+            thermalBarsHtml += `<div class="h-full ${cClass} transition-all duration-1000 border-r border-white/20 dark:border-starlight/20" style="width: ${thermalPct}%" title="${type}: ${thermalPct.toFixed(1)}%"></div>`;
+            thermalLegendHtml += `<div class="flex items-center gap-1.5 text-[9px] font-bold text-slate-500 w-max"><div class="w-2 h-2 rounded-full ${cClass}"></div> <span class="truncate max-w-[150px] uppercase" title="${type}">${type}</span> <span class="text-starlight dark:text-white">(${thermalPct.toFixed(1)}%)</span></div>`;
+        }
+    });
+
+    // Fallbacks para barras vazias
+    if (costBarsHtml === '') costBarsHtml = `<div class="h-full w-full bg-slate-200 dark:bg-slate-700"></div>`;
+    if (thermalBarsHtml === '') thermalBarsHtml = `<div class="h-full w-full bg-slate-200 dark:bg-slate-700"></div>`;
+    if (costLegendHtml === '') costLegendHtml = `<span class="text-[9px] text-slate-400 italic">Preencha o Custo Unitário na aba Orçamento para visualizar.</span>`;
+
+    const costBarsContainer = document.getElementById('ve-cost-bars');
+    const costLegendContainer = document.getElementById('ve-cost-legend');
+    const thermalBarsContainer = document.getElementById('ve-thermal-bars');
+    const thermalLegendContainer = document.getElementById('ve-thermal-legend');
+    const capexDisplay = document.getElementById('ve-total-capex-display');
+
+    if (costBarsContainer) costBarsContainer.innerHTML = costBarsHtml;
+    if (costLegendContainer) costLegendContainer.innerHTML = costLegendHtml;
+    if (thermalBarsContainer) thermalBarsContainer.innerHTML = thermalBarsHtml;
+    if (thermalLegendContainer) thermalLegendContainer.innerHTML = thermalLegendHtml;
+    
+    if (capexDisplay) capexDisplay.innerText = `CAPEX: ${grandTotalCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`;
 };
 
 // LUXSINTAX: Motor de Extração de Propriedades (Master Data Propagator)
@@ -2342,14 +2432,36 @@ window.fetchUserLeedProjects = async () => {
 
 // LUXSINTAX: Criar novo projeto do zero
 window.createNewLeedProject = () => {
-    if (window.state.leedProject.rooms.length > 0) {
-        if (!confirm("Tem certeza que deseja iniciar um novo projeto? As alterações não salvas no atual serão perdidas.")) {
-            window.renderLeedProject(); // Reseta o seletor visualmente
-            return;
-        }
-    }
-    window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
+    if (window.state.leedProject.rooms.length > 0) {
+        if (!confirm("Tem certeza que deseja iniciar um novo projeto? As alterações não salvas no atual serão perdidas.")) {
+            window.renderLeedProject(); // Reseta o seletor visualmente
+            return;
+        }
+    }
+    window.state.leedProject = { name: "Novo Projeto LEED", target: "baseline", rooms: [] };
+    window.renderLeedProject();
+};
+
+// LUXSINTAX: Value Engineering (Clonar Projeto Atual para Teste de Custo)
+window.cloneProjectVE = () => {
+    if (window.state.leedProject.rooms.length === 0) return alert("Adicione ambientes ao projeto atual antes de criar uma versão Value Engineering.");
+    if (!confirm("Deseja criar uma versão paralela (Value Engineering) deste projeto? O original permanecerá intacto se já foi salvo na nuvem.")) return;
+    
+    // Clonagem Profunda (Deep Copy)
+    const clonedData = JSON.parse(JSON.stringify(window.state.leedProject));
+    
+    // Adiciona o sufixo VE e remove o ID de banco de dados para forçar um INSERT como projeto novo
+    clonedData.name = (clonedData.name || "Projeto") + " - VE";
+    delete clonedData.db_id; 
+    
+    window.state.leedProject = clonedData;
+    
     window.renderLeedProject();
+    window.renderMasterData();
+    if (window.renderBOQ) window.renderBOQ();
+    window.updateGlobalLeedSummary();
+    
+    alert(`Projeto clonado para "${clonedData.name}". Lembre-se de clicar no botão "Salvar" para gravar esta nova versão na nuvem.`);
 };
 
 window.loadSpecificLeedProject = () => {

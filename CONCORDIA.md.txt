@@ -99,6 +99,8 @@
 - [17/04/2026] UX/UI ARCHITECTURE (Fase 2 - ERP Hub): Inserção da aba "Orçamento (BOQ)" na estrutura do Gerenciador de Projetos. Criação do DOM para a tabela analítica de Bill of Quantities com campos para Custo Unitário e rodapé flutuante para totalização de CAPEX, preparando a ponte estrutural para automação do módulo ESG.
 - [17/04/2026] LOGIC & STATE (Fase 2 - ERP Hub): Implementação do Motor de Orçamentação (\renderBOQ`). Criação de "Ponte Silenciosa" com o motor ESG: ao inserir um custo unitário, o Total de CAPEX é injetado diretamente no State do Módulo Financeiro, automatizando o recálculo imediato de VPL, Payback e ROI. Inclusão da API SheetJS para exportação de relatório Excel (`exportBOQ`).`
 - [17/04/2026] UI/UX BUGFIX: Correção do esmagamento de layout na aba Compliance LEED. Injeção da classe 'flex-col' no contêiner principal para compatibilizar a renderização com o novo sistema de display flex do orquestrador de abas.
+- [17/04/2026] UX/UI ARCHITECTURE (Fase 4 - Data Viz & VE): Injeção do layout estrutural no 'index.html' para a visualização analítica (Dashboard de Custo e Carga Térmica por Tipologia) e do botão de clonagem de projeto (Value Engineering) no cabeçalho do Project Hub.
+- [17/04/2026] BUSINESS LOGIC (Fase 4 - Data Viz & VE): Injeção do motor matemático de Dashboards na orquestração Global ('updateGlobalLeedSummary'). O sistema agora calcula dinamicamente proporções financeiras e carga térmica (BTU/h) baseadas na tipologia ASHRAE. Adição do gatilho de clonagem ('cloneProjectVE') que limpa identificadores de banco para bifurcação segura de projetos.
 
 ## Estado Atual da Árvore de Arquivos
 - `index.html`: Apenas View (Tailwind + Estrutura). Proibido conter lógica de negócio.
