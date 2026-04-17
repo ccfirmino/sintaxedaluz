@@ -1703,59 +1703,145 @@ window.updateGlobalLeedSummary = () => {
 
 // LUXSINTAX: Motor de Extração de Propriedades (Master Data Propagator)
 window.renderMasterData = function() {
-    const tbody = document.getElementById('master-table-body');
-    if (!tbody) return;
-    const s = window.state.leedProject;
-    
-    // Varre todas as zonas do projeto e extrai os modelos únicos de luminária agregando a quantidade
-    const uniqueFixtures = new Map();
-    if (s && s.rooms) {
-        s.rooms.forEach((room: any) => {
-            if (room.fixtures) {
-                room.fixtures.forEach((f: any) => {
+    const tbody = document.getElementById('master-table-body');
+    if (!tbody) return;
+    const s = window.state.leedProject;
+    
+    // Varre todas as zonas do projeto e extrai os modelos únicos de luminária agregando a quantidade
+    const uniqueFixtures = new Map();
+    if (s && s.rooms) {
+        s.rooms.forEach((room: any) => {
+            if (room.fixtures) {
+                room.fixtures.forEach((f: any) => {
                     // Proteção contra falhas se o label for null ou undefined em projetos antigos
                     const safeLabel = f.label || "Luminária";
-                    const key = safeLabel.toLowerCase() + "_" + f.power;
-                    if (!uniqueFixtures.has(key)) {
-                        uniqueFixtures.set(key, { ...f, globalQty: f.qty || 1, label: safeLabel });
+                    const key = safeLabel.toLowerCase() + "_" + f.power;
+                    if (!uniqueFixtures.has(key)) {
+                        uniqueFixtures.set(key, { ...f, globalQty: f.qty || 1, label: safeLabel, matchKey: key });
                     } else {
                         const existing = uniqueFixtures.get(key);
                         existing.globalQty += (f.qty || 1);
                     }
-                });
-            }
-        });
-    }
-    
-    const fixturesArray = Array.from(uniqueFixtures.values());
-    if (fixturesArray.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="19" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">Nenhuma luminária especificada no projeto. Vá até a aba Compliance LEED e adicione suas zonas e equipamentos.</td></tr>`;
-        return;
-    }
+                });
+            }
+        });
+    }
+    
+    const fixturesArray = Array.from(uniqueFixtures.values());
+    if (fixturesArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="19" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">Nenhuma luminária especificada no projeto. Vá até a aba Compliance LEED e adicione suas zonas e equipamentos.</td></tr>`;
+        return;
+    }
 
-    tbody.innerHTML = fixturesArray.map((f: any, i: number) => `
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800/50">
-            <td class="p-3 font-black text-luminous-gold text-center">L${String(i+1).padStart(2, '0')}</td>
-            <td class="p-3 text-center font-bold">${f.globalQty}</td>
-            <td class="p-3">${f.typology || 'Downlight'}</td>
-            <td class="p-3 truncate max-w-[200px]">${f.label}</td>
-            <td class="p-3">${f.application || 'Geral'}</td>
-            <td class="p-3">${f.finish || 'Padrão'}</td>
-            <td class="p-3">${f.accessory || '-'}</td>
-            <td class="p-3">${f.source || 'LED'}</td>
-            <td class="p-3 text-center font-bold">${f.power}</td>
-            <td class="p-3 text-center">${f.flux || 0}</td>
-            <td class="p-3 text-center">${f.fluxFinal || f.flux || 0}</td>
-            <td class="p-3 text-center">${f.cdklm || '-'}</td>
-            <td class="p-3 text-center">${f.intensity || '-'}</td>
-            <td class="p-3 text-center">${f.cct || '3000'}</td>
-            <td class="p-3 text-center">${f.irc || '>80'}</td>
-            <td class="p-3 text-center">${f.life || '50.000h'}</td>
-            <td class="p-3">${f.driver || 'Bivolt'}</td>
-            <td class="p-3">${f.manufacturer || 'Genérico'}</td>
-            <td class="p-3 text-center text-blue-500 hover:text-blue-700 underline cursor-pointer truncate max-w-[100px]">${f.iesFileName || '-'}</td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = fixturesArray.map((f: any, i: number) => `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800/50">
+            <td class="p-2 font-black text-luminous-gold text-center">L${String(i+1).padStart(2, '0')}</td>
+            <td class="p-2 text-center font-bold">${f.globalQty}</td>
+            <td class="p-2"><input type="text" value="${f.typology || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'typology', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 truncate max-w-[200px]"><input type="text" value="${f.label || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'label', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px] font-bold text-starlight dark:text-white" placeholder="Nome"></td>
+            <td class="p-2"><input type="text" value="${f.application || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'application', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2"><input type="text" value="${f.finish || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'finish', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2"><input type="text" value="${f.accessory || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'accessory', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2"><input type="text" value="${f.source || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'source', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="number" value="${f.power || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'power', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px] font-bold text-starlight dark:text-white" placeholder="0"></td>
+            <td class="p-2 text-center"><input type="number" value="${f.flux || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'flux', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="number" value="${f.fluxFinal || f.flux || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'fluxFinal', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="number" value="${f.cdklm || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'cdklm', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="number" value="${f.intensity || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'intensity', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="text" value="${f.cct || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'cct', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="text" value="${f.irc || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'irc', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-12 text-center transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="text" value="${f.life || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'life', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2"><input type="text" value="${f.driver || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'driver', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2"><input type="text" value="${f.manufacturer || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'manufacturer', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center">
+                <label for="ies-master-${i}" id="lbl-ies-${f.matchKey}" class="cursor-pointer text-blue-500 hover:text-blue-700 underline truncate max-w-[100px] inline-block text-[9px] font-bold" title="${f.iesFileName || 'Upload'}">${f.iesFileName || 'Upload IES'}</label>
+                <input type="file" id="ies-master-${i}" accept=".ies, .ldt" class="hidden" onchange="window.handleMasterIESUpload(this, '${f.matchKey}')">
+            </td>
+        </tr>
+    `).join('');
+};
+
+window.updateMasterFixtureData = function(matchKey: string, field: string, value: any) {
+    const s = window.state.leedProject;
+    if (!s || !s.rooms) return;
+
+    s.rooms.forEach((room: any) => {
+        if (room.fixtures) {
+            room.fixtures.forEach((f: any) => {
+                const currentKey = (f.label || "Luminária").toLowerCase() + "_" + f.power;
+                if (currentKey === matchKey) {
+                    if (['power', 'flux', 'fluxFinal', 'cdklm', 'intensity'].includes(field)) {
+                        f[field] = parseFloat(value) || 0;
+                    } else {
+                        f[field] = value;
+                    }
+                }
+            });
+        }
+    });
+
+    window.updateGlobalLeedSummary();
+    window.renderLeedProject(); 
+};
+
+window.handleMasterIESUpload = async function(input: HTMLInputElement, matchKey: string) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const extension = file.name.split('.').pop()!.toLowerCase();
+    const reader = new FileReader();
+
+    const labelEl = document.getElementById('lbl-ies-' + matchKey);
+    if (labelEl) labelEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    reader.onload = async function(e) {
+        const content = e.target!.result as string;
+        try {
+            const response = await fetch('/api/parse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content, extension })
+            });
+            if (!response.ok) throw new Error("Erro no servidor");
+            const parsed = await response.json();
+
+            if (parsed && !parsed.error) {
+                const metrics = window.Photometrics.extractZonalMetrics(parsed);
+                const fFinal = metrics.calculatedFlux;
+                const fNominal = parsed.totalFlux || fFinal;
+                const pWatts = parsed.wattage || 0;
+
+                const upperName = file.name.toUpperCase();
+                const upperContent = content.toUpperCase();
+                let detectedCct = '';
+                const cctMatch = upperName.match(/(\d{3,4})K/) || upperContent.match(/(\d{3,4})K/);
+                if (cctMatch) detectedCct = cctMatch[1];
+
+                const s = window.state.leedProject;
+                s.rooms.forEach((room: any) => {
+                    if (room.fixtures) {
+                        room.fixtures.forEach((f: any) => {
+                            const currentKey = (f.label || "Luminária").toLowerCase() + "_" + f.power;
+                            if (currentKey === matchKey) {
+                                f.iesData = parsed;
+                                f.iesFileName = file.name;
+                                f.fluxFinal = fFinal;
+                                f.flux = fNominal;
+                                if (pWatts > 0) f.power = pWatts; 
+                                if (detectedCct) f.cct = detectedCct;
+                            }
+                        });
+                    }
+                });
+
+                window.updateGlobalLeedSummary();
+                window.renderLeedProject();
+            }
+        } catch (err) {
+            alert("Erro ao processar o arquivo IES.");
+            if (labelEl) labelEl.innerText = "Erro!";
+        }
+    };
+    reader.readAsText(file);
 };
 
 window.renderLeedProject = function() {
