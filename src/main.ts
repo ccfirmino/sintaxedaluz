@@ -1741,22 +1741,28 @@ window.renderMasterData = function() {
     }
 
     tbody.innerHTML = fixturesArray.map((f: any, i: number) => `
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800/50">
-            <td class="p-3 font-black text-luminous-gold">L${String(i+1).padStart(2, '0')}</td>
-            <td class="p-3"><span class="font-bold">${f.typology || 'Downlight'}</span><br><span class="text-[9px] text-slate-400">${f.application || 'Geral'}</span></td>
-            <td class="p-3 truncate max-w-[150px]">${f.label}</td>
-            <td class="p-3">${f.finish || 'Padrão'}<br><span class="text-[9px] text-slate-400">${f.accessory || '-'}</span></td>
-            <td class="p-3">${f.source || 'LED'}</td>
-            <td class="p-3 text-center"><span class="font-bold">${f.power}W</span><br><span class="text-[9px] text-slate-400">${f.driver || 'Bivolt'}</span></td>
-            <td class="p-3 text-center"><span class="font-bold">${f.flux || 0}lm</span><br><span class="text-[9px] text-slate-400">${f.cct || '3000K'} | IRC >${f.irc || 80}</span></td>
-            <td class="p-3 text-center">${f.life || '50.000h'}</td>
-            <td class="p-3">${f.manufacturer || 'Genérico'}</td>
-            <td class="p-3 text-right font-bold text-emerald-600 dark:text-emerald-400">R$ ${f.cost ? parseFloat(f.cost).toFixed(2) : '0.00'}</td>
-            <td class="p-3 text-center text-slate-400 sticky right-0 bg-white dark:bg-slate-900 shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.05)]">
-                <button class="hover:text-luminous-gold mx-1 outline-none"><i class="fas fa-edit"></i></button>
-            </td>
-        </tr>
-    `).join('');
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800/50">
+            <td class="p-3 font-black text-luminous-gold text-center">L${String(i+1).padStart(2, '0')}</td>
+            <td class="p-3 text-center font-bold">${f.qty || 1}</td>
+            <td class="p-3">${f.typology || 'Downlight'}</td>
+            <td class="p-3 truncate max-w-[200px]">${f.label}</td>
+            <td class="p-3">${f.application || 'Geral'}</td>
+            <td class="p-3">${f.finish || 'Padrão'}</td>
+            <td class="p-3">${f.accessory || '-'}</td>
+            <td class="p-3">${f.source || 'LED'}</td>
+            <td class="p-3 text-center font-bold">${f.power}</td>
+            <td class="p-3 text-center">${f.flux || 0}</td>
+            <td class="p-3 text-center">${f.fluxFinal || f.flux || 0}</td>
+            <td class="p-3 text-center">${f.cdklm || '-'}</td>
+            <td class="p-3 text-center">${f.intensity || '-'}</td>
+            <td class="p-3 text-center">${f.cct || '3000'}</td>
+            <td class="p-3 text-center">${f.irc || '>80'}</td>
+            <td class="p-3 text-center">${f.life || '50.000h'}</td>
+            <td class="p-3">${f.driver || 'Bivolt'}</td>
+            <td class="p-3">${f.manufacturer || 'Genérico'}</td>
+            <td class="p-3 text-center text-blue-500 hover:text-blue-700 underline cursor-pointer truncate max-w-[100px]">${f.iesFileName || '-'}</td>
+        </tr>
+    `).join('');
 };
 
 window.renderLeedProject = function() {
@@ -2061,21 +2067,22 @@ window.loadSpecificLeedProject = () => {
             if (!rawData.target) rawData.target = 'baseline';
             if (!rawData.name) rawData.name = proj.project_name;
             window.state.leedProject = JSON.parse(JSON.stringify(rawData));
-            window.state.leedProject.db_id = proj.id;
-            window.renderLeedProject();
-            const btn = document.getElementById('btn-save-leed');
-            if (btn) {
-                const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Carregado!';
-                btn.classList.remove('bg-slate-800');
-                btn.classList.add('bg-leed-green');
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.classList.add('bg-slate-800');
-                    btn.classList.remove('bg-leed-green');
-                }, 2500);
-            }
-        } catch (err) {
+            window.state.leedProject.db_id = proj.id;
+            window.renderLeedProject();
+            window.renderMasterData(); // LUXSINTAX FIX: Força atualização da aba Planilha Mestra após o Load
+            const btn = document.getElementById('btn-save-leed');
+            if (btn) {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Carregado!';
+                btn.classList.remove('bg-slate-800');
+                btn.classList.add('bg-leed-green');
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.classList.add('bg-slate-800');
+                    btn.classList.remove('bg-leed-green');
+                }, 2500);
+            }
+        } catch (err) {
             console.error("[LuxSintax] Erro ao processar dados salvos:", err);
             alert("Falha ao ler as informações do projeto. Os dados podem estar corrompidos.");
         }
