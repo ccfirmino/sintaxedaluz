@@ -413,9 +413,9 @@ window.toggleLanguage = function() {
         window.updateCalculations(); 
     };
 
-// LUXSINTAX: Orquestração de Abas do Project Hub (Master Data, BOQ, LEED)
+// LUXSINTAX: Orquestração de Abas do Project Hub (Master Data e LEED)
 window.switchProjectTab = function(tabId: string) {
-    ['equipments', 'boq', 'leed'].forEach(id => {
+    ['equipments', 'leed'].forEach(id => {
         const btn = document.getElementById('ptab-' + id);
         const content = document.getElementById('ptab-content-' + id);
         if (btn) {
@@ -437,32 +437,16 @@ window.switchProjectTab = function(tabId: string) {
             }
         }
     });
-};
 
-// LUXSINTAX: Orquestração de Abas Internas do Project Hub
-window.switchProjectTab = function(tabId: string) {
-    ['equipments', 'boq', 'leed'].forEach(id => {
-        const btn = document.getElementById('ptab-' + id);
-        const content = document.getElementById('ptab-content-' + id);
-        if (btn) {
-            if (id === tabId) {
-                btn.classList.remove('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
-                btn.classList.add('border-luminous-gold', 'text-luminous-gold');
-            } else {
-                btn.classList.add('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
-                btn.classList.remove('border-luminous-gold', 'text-luminous-gold');
-            }
-        }
-        if (content) {
-            if (id === tabId) {
-                content.classList.remove('hidden');
-                content.classList.add('block');
-            } else {
-                content.classList.add('hidden');
-                content.classList.remove('block');
-            }
-        }
-    });
+    // LUXSINTAX: Oculta dinamicamente as opções ASHRAE e LZ se não estiver na aba LEED
+    const lzSelect = document.getElementById('global-lz');
+    const ashraeSelect = document.getElementById('global-ashrae-target');
+    if (lzSelect && lzSelect.parentElement) {
+        lzSelect.parentElement.style.display = tabId === 'leed' ? 'block' : 'none';
+    }
+    if (ashraeSelect && ashraeSelect.parentElement) {
+        ashraeSelect.parentElement.style.display = tabId === 'leed' ? 'block' : 'none';
+    }
 };
 
 window.switchTool = function(toolId: string) {
@@ -540,10 +524,12 @@ window.switchTool = function(toolId: string) {
 
         window.updateCalculations();
     } else if (toolId === 'query') {
-        window.switchQueryTab('nbr8995');
-    } else if (toolId === 'leedProj') {
-        window.renderLeedProject();
-    }
+        window.switchQueryTab('nbr8995');
+    } else if (toolId === 'leedProj') {
+        window.renderLeedProject();
+        // LUXSINTAX FIX: Força o estado da aba inicial e a ocultação dinâmica dos filtros
+        setTimeout(() => window.switchProjectTab('equipments'), 50);
+    }
 };
 
 window.setGridCalcMethod = function(method: string) {
@@ -1717,33 +1703,40 @@ window.updateGlobalLeedSummary = () => {
 
 // LUXSINTAX: Motor de Extração de Propriedades (Master Data Propagator)
 window.renderMasterData = function() {
-    const tbody = document.getElementById('equipment-table-body');
-    if (!tbody) return;
-    const s = window.state.leedProject;
-    
-    // Varre todas as zonas do projeto e extrai os modelos únicos de luminária
-    const uniqueFixtures = new Map();
-    if (s && s.rooms) {
-        s.rooms.forEach((room: any) => {
-            if (room.fixtures) {
-                room.fixtures.forEach((f: any) => {
-                    const key = f.label.toLowerCase() + "_" + f.power;
-                    if (!uniqueFixtures.has(key)) uniqueFixtures.set(key, { ...f });
-                });
-            }
-        });
-    }
-    
-    const fixturesArray = Array.from(uniqueFixtures.values());
-    if (fixturesArray.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">Nenhuma luminária especificada no projeto. Vá até a aba Compliance LEED e adicione suas zonas e equipamentos.</td></tr>`;
-        return;
-    }
+    const tbody = document.getElementById('master-table-body');
+    if (!tbody) return;
+    const s = window.state.leedProject;
+    
+    // Varre todas as zonas do projeto e extrai os modelos únicos de luminária agregando a quantidade
+    const uniqueFixtures = new Map();
+    if (s && s.rooms) {
+        s.rooms.forEach((room: any) => {
+            if (room.fixtures) {
+                room.fixtures.forEach((f: any) => {
+                    // Proteção contra falhas se o label for null ou undefined em projetos antigos
+                    const safeLabel = f.label || "Luminária";
+                    const key = safeLabel.toLowerCase() + "_" + f.power;
+                    if (!uniqueFixtures.has(key)) {
+                        uniqueFixtures.set(key, { ...f, globalQty: f.qty || 1, label: safeLabel });
+                    } else {
+                        const existing = uniqueFixtures.get(key);
+                        existing.globalQty += (f.qty || 1);
+                    }
+                });
+            }
+        });
+    }
+    
+    const fixturesArray = Array.from(uniqueFixtures.values());
+    if (fixturesArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="19" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">Nenhuma luminária especificada no projeto. Vá até a aba Compliance LEED e adicione suas zonas e equipamentos.</td></tr>`;
+        return;
+    }
 
-    tbody.innerHTML = fixturesArray.map((f: any, i: number) => `
+    tbody.innerHTML = fixturesArray.map((f: any, i: number) => `
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800/50">
             <td class="p-3 font-black text-luminous-gold text-center">L${String(i+1).padStart(2, '0')}</td>
-            <td class="p-3 text-center font-bold">${f.qty || 1}</td>
+            <td class="p-3 text-center font-bold">${f.globalQty}</td>
             <td class="p-3">${f.typology || 'Downlight'}</td>
             <td class="p-3 truncate max-w-[200px]">${f.label}</td>
             <td class="p-3">${f.application || 'Geral'}</td>
