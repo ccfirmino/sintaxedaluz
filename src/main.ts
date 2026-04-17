@@ -1739,8 +1739,11 @@ window.renderMasterData = function() {
     tbody.innerHTML = fixturesArray.map((f: any, i: number) => {
         // LUXSINTAX: Semaforização de Completude (Data Validation)
         const isMissingData = !f.power || f.power === 0 || !f.iesFileName;
-        const rowClass = isMissingData ? 'border-l-4 border-l-amber-400 bg-amber-50/30 dark:bg-amber-900/10 hover:bg-amber-50' : 'border-l-4 border-l-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50';
-        const iconAlert = isMissingData ? `<i class="fas fa-exclamation-triangle text-amber-500 absolute -left-3 top-1/2 -translate-y-1/2 text-[10px]" title="Especificação incompleta (Falta Potência ou IES)"></i>` : '';
+        const rowClass = isMissingData ? 'bg-amber-50/30 dark:bg-amber-900/10 hover:bg-amber-50' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50';
+        
+        // CSS Fix: Bordas em <tr> são inconsistentes. Injetamos o indicador dentro da <td> com position absolute.
+        const borderIndicator = isMissingData ? `<div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-400" title="Especificação incompleta"></div>` : '';
+        const iconAlert = isMissingData ? `<i class="fas fa-exclamation-triangle text-amber-500 absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px]" title="Falta Potência ou IES"></i>` : '';
 
         // Montagem da Subtabela (Drill-down)
         const subTableHtml = f.instances.map((inst: any) => `
@@ -1752,10 +1755,11 @@ window.renderMasterData = function() {
         `).join('');
 
         return `
-        <tr class="transition-colors border-b border-slate-100 dark:border-slate-800/50 ${rowClass} relative">
-            <td class="p-2 text-center">
+        <tr class="transition-colors border-b border-slate-100 dark:border-slate-800/50 ${rowClass}">
+            <td class="p-2 text-center relative min-w-[3rem]">
+                ${borderIndicator}
                 ${iconAlert}
-                <button onclick="window.toggleMasterDetails('${f.matchKey}')" class="text-slate-400 hover:text-luminous-gold transition-colors outline-none w-5 h-5 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm"><i id="m-icon-${f.matchKey}" class="fas fa-plus text-[8px]"></i></button>
+                <button onclick="window.toggleMasterDetails('${f.matchKey}')" class="text-slate-400 hover:text-luminous-gold transition-colors outline-none w-5 h-5 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm relative z-10 ml-4"><i id="m-icon-${f.matchKey}" class="fas fa-plus text-[8px]"></i></button>
             </td>
             <td class="p-2 font-black text-luminous-gold text-center">L${String(i+1).padStart(2, '0')}</td>
             <td class="p-2 text-center font-bold text-starlight dark:text-white bg-slate-100 dark:bg-slate-900 shadow-inner rounded-md">${f.globalQty}</td>
