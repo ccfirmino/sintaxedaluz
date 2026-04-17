@@ -49,6 +49,8 @@ declare global {
         updateCalculations: () => void;
         switchTool: (toolId: string) => void;
         switchProjectTab: (tabId: string) => void;
+        renderMasterData: () => void;
+        switchProjectTab: (tabId: string) => void;
         setHCLViewMode: (mode: 'clock' | 'spd') => void;
         redrawAllCanvases: () => void;
         updateCalcMode: (mode: string) => void;
@@ -410,6 +412,32 @@ window.toggleLanguage = function() {
     };
 
 // LUXSINTAX: Orquestração de Abas do Project Hub (Master Data, BOQ, LEED)
+window.switchProjectTab = function(tabId: string) {
+    ['equipments', 'boq', 'leed'].forEach(id => {
+        const btn = document.getElementById('ptab-' + id);
+        const content = document.getElementById('ptab-content-' + id);
+        if (btn) {
+            if (id === tabId) {
+                btn.classList.remove('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
+                btn.classList.add('border-luminous-gold', 'text-luminous-gold');
+            } else {
+                btn.classList.add('border-transparent', 'text-slate-400', 'hover:text-slate-600', 'dark:hover:text-slate-200');
+                btn.classList.remove('border-luminous-gold', 'text-luminous-gold');
+            }
+        }
+        if (content) {
+            if (id === tabId) {
+                content.classList.remove('hidden');
+                content.classList.add('block');
+            } else {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            }
+        }
+    });
+};
+
+// LUXSINTAX: Orquestração de Abas Internas do Project Hub
 window.switchProjectTab = function(tabId: string) {
     ['equipments', 'boq', 'leed'].forEach(id => {
         const btn = document.getElementById('ptab-' + id);
@@ -1685,72 +1713,75 @@ window.updateGlobalLeedSummary = () => {
     }
 };
 
-window.renderLeedProject = function() {
-    const container = document.getElementById('leed-project-container');
-    if(!container) return;
+// LUXSINTAX: Motor de Extração de Propriedades (Master Data Propagator)
+window.renderMasterData = function() {
+    const tbody = document.getElementById('equipment-table-body');
+    if (!tbody) return;
     const s = window.state.leedProject;
     
-    const savedOptions = (window.userLeedProjects || []).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
+    // Varre todas as zonas do projeto e extrai os modelos únicos de luminária
+    const uniqueFixtures = new Map();
+    if (s && s.rooms) {
+        s.rooms.forEach((room: any) => {
+            if (room.fixtures) {
+                room.fixtures.forEach((f: any) => {
+                    const key = f.label.toLowerCase() + "_" + f.power;
+                    if (!uniqueFixtures.has(key)) uniqueFixtures.set(key, { ...f });
+                });
+            }
+        });
+    }
     
-    let html = `
-            <div class="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-lg border border-slate-200 dark:border-slate-800 transition-colors">
-                <div class="flex-grow w-full lg:w-auto">
-                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Nome do Projeto</label>
-                    <input type="text" value="${s.name}" oninput="window.state.leedProject.name = this.value" class="bg-transparent border-b border-slate-300 dark:border-slate-700 text-starlight dark:text-white font-black text-lg w-full focus:border-luminous-gold outline-none py-1 transition-colors">
-                </div>
-                
-                <div class="w-full lg:w-auto">
-                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">PROJETO SALVO</label>
-                    <div class="flex items-center gap-2">
-                        <select id="load-leed-select" onchange="if(this.value === 'NEW') window.createNewLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 font-bold text-[10px] uppercase outline-none w-full lg:w-48 cursor-pointer focus:border-luminous-gold transition-colors">
-                            <option value="" disabled selected>Selecionar...</option>
-                            <option value="NEW" class="text-luminous-gold font-black">+ NOVO PROJETO</option>
-                            ${savedOptions}
-                        </select>
-                        <button onclick="window.loadSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-starlight dark:text-white w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Carregar"><i class="fas fa-folder-open"></i></button>
-                        <button onclick="window.deleteSpecificLeedProject()" class="bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/50 text-slate-500 hover:text-red-500 dark:text-slate-400 w-9 h-9 flex items-center justify-center rounded-lg transition-colors border border-slate-200 dark:border-slate-700" title="Excluir"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
+    const fixturesArray = Array.from(uniqueFixtures.values());
+    if (fixturesArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">Nenhuma luminária especificada no projeto. Vá até a aba Compliance LEED e adicione suas zonas e equipamentos.</td></tr>`;
+        return;
+    }
 
-                <div class="w-full lg:w-auto border-l border-slate-300 dark:border-slate-700 pl-6 hidden lg:flex items-end gap-2 transition-colors">
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Lighting Zone</label>
-                        <select onchange="window.state.leedProject.lightingZone = this.value; window.updateGlobalLeedSummary(); window.renderLeedProject();" class="bg-white dark:bg-slate-800 text-starlight dark:text-white border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold transition-colors">
-                            <option value="LZ0" ${s.lightingZone === 'LZ0' ? 'selected' : ''}>LZ0 (Natural)</option>
-                            <option value="LZ1" ${s.lightingZone === 'LZ1' ? 'selected' : ''}>LZ1 (Rural)</option>
-                            <option value="LZ2" ${s.lightingZone === 'LZ2' ? 'selected' : ''}>LZ2 (Residencial)</option>
-                            <option value="LZ3" ${s.lightingZone === 'LZ3' || !s.lightingZone ? 'selected' : ''}>LZ3 (Comercial)</option>
-                            <option value="LZ4" ${s.lightingZone === 'LZ4' ? 'selected' : ''}>LZ4 (Urbano)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1">Meta ASHRAE 90.1</label>
-                        <select onchange="window.updateLeedTargetMode(this.value)" class="bg-white dark:bg-slate-800 text-luminous-gold border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 font-bold text-[10px] uppercase outline-none w-full cursor-pointer focus:border-luminous-gold transition-colors">
-                            <option value="baseline" ${s.target === 'baseline' ? 'selected' : ''}>ASHRAE Base (0%)</option>
-                            <option value="certified" ${s.target === 'certified' ? 'selected' : ''}>Certified (-5%)</option>
-                            <option value="silver" ${s.target === 'silver' ? 'selected' : ''}>Silver (-10%)</option>
-                            <option value="gold" ${s.target === 'gold' ? 'selected' : ''}>Gold (-20%)</option>
-                            <option value="platinum" ${s.target === 'platinum' ? 'selected' : ''}>Platinum (-30%)</option>
-                            <option value="custom" ${s.target === 'custom' ? 'selected' : ''}>Customizado (Manual)</option>
-                        </select>
-                    </div>
-                    ${s.target === 'custom' ? `
-                    <div class="w-20 animate-fade-in">
-                        <label class="text-[10px] text-tech-cyan font-bold uppercase tracking-widest block mb-1">Redução</label>
-                        <div class="relative">
-                            <input type="number" value="${s.customReduction || 15}" oninput="window.updateCustomLeedReduction(parseFloat(this.value) || 0)" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2.5 text-[10px] text-tech-cyan font-black outline-none focus:border-luminous-gold text-right pr-6 transition-colors">
-                            <span class="absolute right-2 top-2.5 text-[10px] text-slate-500 dark:text-slate-400 font-bold">%</span>
-                        </div>
-                    </div>
-                    ` : ''}
-                </div>
-                
-                <div class="flex gap-2 w-full lg:w-auto">
-                    <button onclick="window.saveLeedProject()" id="btn-save-leed" class="flex-1 lg:flex-none bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-600"><i class="fas fa-save mr-2"></i> Salvar</button>
-                    <button onclick="window.generateLeedReport()" class="flex-1 lg:flex-none bg-luminous-gold hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i> Relatório</button>
-                </div>
-            </div>
-        `;
+    tbody.innerHTML = fixturesArray.map((f: any, i: number) => `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800/50">
+            <td class="p-3 font-black text-luminous-gold">L${String(i+1).padStart(2, '0')}</td>
+            <td class="p-3"><span class="font-bold">${f.typology || 'Downlight'}</span><br><span class="text-[9px] text-slate-400">${f.application || 'Geral'}</span></td>
+            <td class="p-3 truncate max-w-[150px]">${f.label}</td>
+            <td class="p-3">${f.finish || 'Padrão'}<br><span class="text-[9px] text-slate-400">${f.accessory || '-'}</span></td>
+            <td class="p-3">${f.source || 'LED'}</td>
+            <td class="p-3 text-center"><span class="font-bold">${f.power}W</span><br><span class="text-[9px] text-slate-400">${f.driver || 'Bivolt'}</span></td>
+            <td class="p-3 text-center"><span class="font-bold">${f.flux || 0}lm</span><br><span class="text-[9px] text-slate-400">${f.cct || '3000K'} | IRC >${f.irc || 80}</span></td>
+            <td class="p-3 text-center">${f.life || '50.000h'}</td>
+            <td class="p-3">${f.manufacturer || 'Genérico'}</td>
+            <td class="p-3 text-right font-bold text-emerald-600 dark:text-emerald-400">R$ ${f.cost ? parseFloat(f.cost).toFixed(2) : '0.00'}</td>
+            <td class="p-3 text-center text-slate-400 sticky right-0 bg-white dark:bg-slate-900 shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.05)]">
+                <button class="hover:text-luminous-gold mx-1 outline-none"><i class="fas fa-edit"></i></button>
+            </td>
+        </tr>
+    `).join('');
+};
+
+window.renderLeedProject = function() {
+    const container = document.getElementById('leed-project-container');
+    if(!container) return;
+    const s = window.state.leedProject;
+    
+    // LUXSINTAX: Sincronização da Interface Global
+    const projName = document.getElementById('global-proj-name') as HTMLInputElement;
+    if (projName && document.activeElement !== projName) projName.value = s.name || "Novo Projeto LEED";
+    
+    const loadSelect = document.getElementById('load-leed-select') as HTMLSelectElement;
+    if (loadSelect) {
+        const savedOptions = (window.userLeedProjects || []).map((p: any) => `<option value="${p.id}" ${s.db_id === p.id ? 'selected' : ''}>${p.project_name}</option>`).join('');
+        loadSelect.innerHTML = `<option value="" disabled selected>Selecionar...</option><option value="NEW" class="text-luminous-gold font-black">+ NOVO PROJETO</option>${savedOptions}`;
+    }
+
+    const lzSelect = document.getElementById('global-lz') as HTMLSelectElement;
+    if (lzSelect) lzSelect.value = s.lightingZone || 'LZ3';
+    
+    const targetSelect = document.getElementById('global-ashrae-target') as HTMLSelectElement;
+    if (targetSelect) targetSelect.value = s.target || 'baseline';
+
+    // Propaga os dados universalmente para o Master Data (Resolve a exibição em branco)
+    window.renderMasterData();
+
+    let html = ``;
 
     // LUXSINTAX: Agrupamento por Pavimento e Semaforização
     const groupedRooms = s.rooms.reduce((acc: any, room: any) => {
