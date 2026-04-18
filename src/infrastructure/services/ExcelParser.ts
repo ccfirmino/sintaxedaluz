@@ -14,9 +14,14 @@ const MasterFixtureSchema = z.object({
     flux: z.number().nullable().optional(),
     efficacy: z.number().nullable().optional(),
     cri: z.number().nullable().optional(),
-    beamAngle: z.number().nullable().optional(),
+    beamAngle: z.number().nullable().optional(),
+    dimensions: z.object({
+        height: z.number().optional(),
+        width: z.number().optional(),
+        length: z.number().optional()
+    }).optional(),
 
-    // Descritivos Físicos
+    // Descritivos Físicos
     mounting: z.string().nullable().optional(),
     lightSource: z.string().nullable().optional(),
     finish: z.string().nullable().optional(),
@@ -43,8 +48,42 @@ const MasterRoomSchema = z.object({
 const MasterProjectExportSchema = z.array(MasterRoomSchema);
 
 export class ExcelParser {
-    /**
-     * Extrai APENAS o cabeçalho da planilha (Necessário para o Wizard de Mapeamento - Fase 1)
+    /**
+     * Extrai propriedades físicas fotométricas aglutinadas em textos descritivos.
+     * Converte dimensões capturadas em milímetros (mm) diretamente para metros (m).
+     */
+    private static extractPhysicalAttributes(text: string) {
+        if (!text) return {};
+        const safeText = text.toUpperCase();
+
+        const parseNum = (match: RegExpMatchArray | null) => match ? parseFloat(match[1].replace(',', '.')) : undefined;
+
+        const powerMatch = safeText.match(/(\d+(?:\.\d+)?)\s?W\b/);
+        const cctMatch = safeText.match(/(\d{3,4})\s?K\b/);
+        const fluxMatch = safeText.match(/(\d+(?:\.\d+)?)\s?LM\b/);
+        const criMatch = safeText.match(/(?:IRC|CRI)\s?(\d{2,3})\b/);
+        const beamMatch = safeText.match(/(\d+(?:\.\d+)?)\s?[º°]/);
+
+        const h = parseNum(safeText.match(/H\s?(\d+(?:[.,]\d+)?)/));
+        const w = parseNum(safeText.match(/[L|W]\s?(\d+(?:[.,]\d+)?)/));
+        const l = parseNum(safeText.match(/C\s?(\d+(?:[.,]\d+)?)/));
+
+        return {
+            power: parseNum(powerMatch),
+            cct: parseNum(cctMatch),
+            flux: parseNum(fluxMatch),
+            cri: parseNum(criMatch),
+            beamAngle: parseNum(beamMatch),
+            dimensions: (h || w || l) ? {
+                height: h ? h / 1000 : undefined,
+                width: w ? w / 1000 : undefined,
+                length: l ? l / 1000 : undefined,
+            } : undefined
+        };
+    }
+
+    /**
+     * Extrai APENAS o cabeçalho da planilha (Necessário para o Wizard de Mapeamento - Fase 1)
      */
     static async extractHeaders(file: File): Promise<string[]> {
         return new Promise((resolve, reject) => {
@@ -125,10 +164,11 @@ export class ExcelParser {
                         const roomName = getVal('roomName', ['ambiente', 'sala', 'nome', 'room', 'espaco', 'space', 'area']) || "Ambiente Não Nomeado";
                         const code = getVal('code', ['cód', 'cod', 'código', 'id', 'tag', 'ref', 'code', 'type mark']) || "LUM-XX";
                         const description = getVal('label', ['luminaria', 'luminária', 'modelo', 'equipamento', 'descrição', 'description', 'fixture', 'produto', 'tipo']) || "Luminária Importada";
+                        const physData = ExcelParser.extractPhysicalAttributes(String(description));
                         
                         // 2. Dicionário Numérico Base (Força números)
                         const rawPower = getVal('power', ['potencia', 'potência', 'w', 'watts', 'carga', 'power', 'wattage', 'load']);
-                        const power = parseUniversalNumber(rawPower) || 0;
+                        const power = parseUniversalNumber(rawPower) || physData.power || 0;
                         
                         const rawQty = getVal('qty', ['qtd', 'qt', 'quantidade', 'quant', 'qtde', 'unid', 'unidades', 'peca', 'peça', 'pcs', 'pçs', 'qty', 'quantity', 'amount']);
                         let qty = 1;
@@ -140,13 +180,13 @@ export class ExcelParser {
                         const currentArea = parseUniversalNumber(getVal('area', ['area', 'área', 'm2', 'm²'])) || 0;
 
                         // 3. Dicionário Avançado (Física & Fotometria)
-                        let cct = parseUniversalNumber(getVal('cct', ['cct', 'temperatura', 'cor', 'kelvin', 'k', 'tonalidade', 'temp', 'tc', 'color temperature']));
-                        if (cct !== null && cct < 100 && cct > 0) cct = cct * 1000; // Trata "3k" ou "3.0" -> 3000
+                        let cct = parseUniversalNumber(getVal('cct', ['cct', 'temperatura', 'cor', 'kelvin', 'k', 'tonalidade', 'temp', 'tc', 'color temperature'])) || physData.cct;
+                        if (cct !== null && cct !== undefined && cct < 100 && cct > 0) cct = cct * 1000; // Trata "3k" ou "3.0" -> 3000
 
-                        const flux = parseUniversalNumber(getVal('flux', ['fluxo', 'lúmens', 'lumens', 'lm', 'emissão', 'luminoso', 'flux', 'output']));
+                        const flux = parseUniversalNumber(getVal('flux', ['fluxo', 'lúmens', 'lumens', 'lm', 'emissão', 'luminoso', 'flux', 'output'])) || physData.flux;
                         const efficacy = parseUniversalNumber(getVal('efficacy', ['eficiência', 'eficiencia', 'lm/w', 'rendimento', 'efficacy', 'efficiency']));
-                        const cri = parseUniversalNumber(getVal('cri', ['irc', 'cri', 'r9', 'reprodução', 'reproducao', 'índice', 'color rendering']));
-                        const beamAngle = parseUniversalNumber(getVal('beamAngle', ['facho', 'abertura', 'ângulo', 'angulo', 'graus', '°', 'feixe', 'beam', 'spread']));
+                        const cri = parseUniversalNumber(getVal('cri', ['irc', 'cri', 'r9', 'reprodução', 'reproducao', 'índice', 'color rendering'])) || physData.cri;
+                        const beamAngle = parseUniversalNumber(getVal('beamAngle', ['facho', 'abertura', 'ângulo', 'angulo', 'graus', '°', 'feixe', 'beam', 'spread'])) || physData.beamAngle;
 
                         // 4. Dicionário Avançado (Mercado & Custos)
                         const unitPrice = parseUniversalNumber(getVal('unitPrice', ['custo', 'valor', 'preço', 'preco', 'r$', 'unitário', 'unitario', 'orçamento', 'compra', 'cost', 'price', '$', 'usd']));
@@ -195,9 +235,10 @@ export class ExcelParser {
                             finish: finish ? String(finish).trim() : null,
                             controlGear: controlGear ? String(controlGear).trim() : null,
                             manufacturer: manufacturer ? String(manufacturer).trim() : null,
-                            unitPrice: unitPrice,
-                            link: link ? String(link).trim() : null
-                        });
+                            unitPrice: unitPrice,
+                            link: link ? String(link).trim() : null,
+                            dimensions: physData.dimensions
+                        });
                     });
 
                     // 6. Validação Zero Trust (Zod) da Planilha Mestra
