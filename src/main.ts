@@ -50,10 +50,8 @@ declare global {
         switchTool: (toolId: string) => void;
         switchProjectTab: (tabId: string) => void;
         renderMasterData: () => void;
-        switchProjectTab: (tabId: string) => void;
-        renderMasterData: () => void;
-        switchProjectTab: (tabId: string) => void;
-        setHCLViewMode: (mode: 'clock' | 'spd') => void;
+        addMasterRow: () => void;
+        setHCLViewMode: (mode: 'clock' | 'spd') => void;
         redrawAllCanvases: () => void;
         updateCalcMode: (mode: string) => void;
         toggleTheme: () => void;
@@ -1944,7 +1942,38 @@ window.renderMasterData = function() {
     }).join('');
 
     // Sincroniza a aba BOQ de forma reativa a qualquer mudança na Planilha Mestra
-    if (window.renderBOQ) window.renderBOQ();
+    if (window.renderBOQ) window.renderBOQ();
+};
+
+// LUXSINTAX: Adição de linha genérica pela Planilha Mestra (Fallback SSOT)
+window.addMasterRow = function() {
+    const s = window.state.leedProject;
+    if (!s.rooms) s.rooms = [];
+    
+    // SSOT: Se não há ambientes no projeto, cria um ambiente base para ancorar a luminária
+    if (s.rooms.length === 0) {
+        s.rooms.push({
+            id: Date.now(),
+            floor: "GERAL",
+            name: "Projeto Base",
+            area: 1,
+            baseLpd: 0,
+            typology: "",
+            leedCategory: "interior",
+            expanded: true,
+            fixtures: []
+        });
+    }
+
+    s.rooms[0].fixtures.push({ 
+        id: Date.now() + 1, 
+        label: "Nova Luminária", 
+        power: 0, 
+        qty: 1 
+    });
+
+    window.renderMasterData();
+    window.updateGlobalLeedSummary();
 };
 
 window.updateMasterFixtureData = function(matchKey: string, field: string, value: any) {
