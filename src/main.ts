@@ -1908,8 +1908,9 @@ window.renderMasterData = function() {
             <td class="p-2"><input type="text" value="${f.application || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'application', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
             <td class="p-2"><input type="text" value="${f.finish || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'finish', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
             <td class="p-2"><input type="text" value="${f.accessory || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'accessory', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
-            <td class="p-2"><input type="text" value="${f.source || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'source', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
-            <td class="p-2 text-center"><input type="number" value="${f.power || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'power', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px] font-bold ${!f.power ? 'text-amber-500' : 'text-starlight dark:text-white'}" placeholder="0"></td>
+            <td class="p-2"><input type="text" value="${f.source || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'source', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-full transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="text" value="${f.beam || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'beam', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
+            <td class="p-2 text-center"><input type="number" value="${f.power || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'power', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px] font-bold ${!f.power ? 'text-amber-500' : 'text-starlight dark:text-white'}" placeholder="0"></td>
             <td class="p-2 text-center"><input type="number" value="${f.flux || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'flux', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
             <td class="p-2 text-center"><input type="number" value="${f.fluxFinal || f.flux || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'fluxFinal', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
             <td class="p-2 text-center"><input type="number" value="${f.cdklm || ''}" onchange="window.updateMasterFixtureData('${f.matchKey}', 'cdklm', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-luminous-gold outline-none w-16 text-center transition-colors text-[10px]" placeholder="-"></td>
@@ -2204,10 +2205,13 @@ window.handleMasterIESUpload = async function(input: HTMLInputElement, matchKey:
                                 if (pWatts > 0) f.power = pWatts; 
                                 if (detectedCct) f.cct = detectedCct;
                                 
-                                // LUXSINTAX FIX: Extração de Intensidade Nadir e cálculo de cd/klm
+                                // LUXSINTAX FIX: Extração de Intensidade Nadir, cd/klm e Facho (Beam)
                                 const nadirIntensity = window.Photometrics.getIESIntensity(parsed, 0, 0) || 0;
                                 f.intensity = Math.round(nadirIntensity);
                                 f.cdklm = fNominal > 0 ? Math.round((nadirIntensity / fNominal) * 1000) : 0;
+                                
+                                const beamObj = window.Photometrics.getEffectiveBeam(parsed, 0);
+                                f.beam = beamObj.isOval ? `${Math.round(beamObj.c0)}°x${Math.round(beamObj.c90)}°` : `${Math.round(beamObj.c0)}°`;
                             }
                         });
                     }
@@ -3396,7 +3400,8 @@ window.renderMappingWizard = function(headers: string[]) {
         { id: 'code', label: 'Código (Ex: LUM-01)' },
         { id: 'cct', label: 'Temperatura Cor (CCT)' },
         { id: 'flux', label: 'Fluxo Luminoso (lm)' },
-        { id: 'unitPrice', label: 'Custo Unitário (R$)' },
+        { id: 'beam', label: 'Abertura de Facho (°)' },
+        { id: 'unitPrice', label: 'Custo Unitário (R$)' },
         { id: 'manufacturer', label: 'Fabricante / Marca' }
     ];
 
