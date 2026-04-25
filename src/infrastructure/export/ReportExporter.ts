@@ -112,6 +112,99 @@ export class ReportExporter {
     }
 
     /**
+     * Gera o Relatório de Orçamento Analítico (BOQ) em PDF
+     */
+    public static async createBOQPdf(PDFLib: any, project: any, userLogoBase64?: string | null): Promise<Blob> {
+        const lang = (window as any).currentLang || 'pt';
+        const dict = (window as any).i18n[lang] || (window as any).i18n['pt'];
+        const t = (key: string) => dict[key] || key;
+
+        const pdfDoc = await PDFLib.PDFDocument.create();
+        const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+        const fontRegular = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+
+        let page = pdfDoc.addPage([595.28, 841.89]);
+        const { width, height } = page.getSize();
+
+        const drawHeader = async (currentPage: any) => {
+            currentPage.drawRectangle({ x: 0, y: height - 55, width, height: 55, color: PDFLib.rgb(0.06, 0.09, 0.16) });
+            currentPage.drawRectangle({ x: 0, y: height - 57, width, height: 2, color: PDFLib.rgb(0.06, 0.46, 0.15) });
+            currentPage.drawText('LUXSINTAX', { x: 40, y: height - 32, size: 14, font: fontBold, color: PDFLib.rgb(0.06, 0.46, 0.15) });
+            currentPage.drawText('ORÇAMENTO ANALÍTICO (BILL OF QUANTITIES)', { x: 130, y: height - 32, size: 9, font: fontRegular, color: PDFLib.rgb(1, 1, 1) });
+            if (userLogoBase64) {
+                try {
+                    const logoImg = await pdfDoc.embedPng(userLogoBase64);
+                    const logoDims = logoImg.scaleToFit(100, 35);
+                    currentPage.drawImage(logoImg, { x: width - logoDims.width - 40, y: height - 10 - logoDims.height, width: logoDims.width, height: logoDims.height });
+                } catch(e) {}
+            }
+        };
+
+        await drawHeader(page);
+
+        page.drawText(`PROJETO: ${project.name.toUpperCase()}`, { x: 40, y: height - 75, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+        const dateStr = new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR');
+        page.drawText(`DATA: ${dateStr}`, { x: width - 150, y: height - 75, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+
+        let cy = height - 110;
+
+        const uniqueFixtures = new Map();
+        if (project && project.rooms) {
+            project.rooms.forEach((room: any) => {
+                if (room.fixtures) {
+                    room.fixtures.forEach((f: any) => {
+                        const safeLabel = f.label || "Luminária";
+                        const key = safeLabel.toLowerCase() + "_" + f.power;
+                        if (!uniqueFixtures.has(key)) {
+                            uniqueFixtures.set(key, { ...f, globalQty: f.qty || 1, label: safeLabel, unitPrice: f.unitPrice || 0 });
+                        } else {
+                            uniqueFixtures.get(key).globalQty += (f.qty || 1);
+                        }
+                    });
+                }
+            });
+        }
+
+        const fixturesArray = Array.from(uniqueFixtures.values());
+        let totalCapex = 0;
+
+        // Cabeçalho da Tabela
+        page.drawRectangle({ x: 40, y: cy - 4, width: width - 80, height: 16, color: PDFLib.rgb(0.95, 0.96, 0.98) });
+        page.drawText('CÓDIGO', { x: 45, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        page.drawText('PRODUTO / DESCRIÇÃO', { x: 100, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        page.drawText('QTD', { x: 350, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        page.drawText('CUSTO UNIT.', { x: 400, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        page.drawText('SUBTOTAL', { x: 480, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        cy -= 16;
+
+        for (let i = 0; i < fixturesArray.length; i++) {
+            const f = fixturesArray[i];
+            const price = parseFloat(f.unitPrice) || 0;
+            const subtotal = price * f.globalQty;
+            totalCapex += subtotal;
+
+            if (cy < 60) { page = pdfDoc.addPage([595.28, 841.89]); await drawHeader(page); cy = height - 80; }
+
+            page.drawText(`L${String(i+1).padStart(2, '0')}`, { x: 45, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.06, 0.46, 0.15) });
+            page.drawText(f.label.substring(0, 50), { x: 100, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.2, 0.2, 0.2) });
+            page.drawText(String(f.globalQty), { x: 350, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.2, 0.2, 0.2) });
+            page.drawText(`R$ ${price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, { x: 400, y: cy, size: 7, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+            page.drawText(`R$ ${subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, { x: 480, y: cy, size: 7, font: fontBold, color: PDFLib.rgb(0.06, 0.46, 0.15) });
+            
+            page.drawLine({ start: { x: 40, y: cy - 4 }, end: { x: width - 40, y: cy - 4 }, thickness: 0.5, color: PDFLib.rgb(0.9, 0.9, 0.9) });
+            cy -= 14;
+        }
+
+        cy -= 10;
+        page.drawRectangle({ x: 40, y: cy - 6, width: width - 80, height: 20, color: PDFLib.rgb(0.92, 0.98, 0.92) });
+        page.drawText('CAPEX TOTAL (ESTIMADO):', { x: 320, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+        page.drawText(`R$ ${totalCapex.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, { x: 450, y: cy, size: 10, font: fontBold, color: PDFLib.rgb(0.06, 0.46, 0.15) });
+
+        const bytes = await pdfDoc.save();
+        return new Blob([bytes], { type: 'application/pdf' });
+    }
+
+    /**
      * Gera a imagem PNG da Legenda de Cores Falsas (Heatmap)
      */
     public static getLegendPNG(colorScale: any[]): string {

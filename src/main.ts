@@ -2059,40 +2059,29 @@ window.updateBOQCost = function(matchKey: string, newCost: string) {
     window.renderMasterData();
 };
 
-// LUXSINTAX: Exportação de Excel (Download Nativo)
-window.exportBOQ = function() {
-    if (!(window as any).XLSX) return alert("Motor Excel não carregado. Aguarde um instante.");
-    
-    const tbody = document.getElementById('boq-table-body');
-    if (!tbody || tbody.innerText.includes('Aguardando')) return alert("Não há dados para exportar.");
-    
-    const rows: any[] = [['CÓDIGO', 'PRODUTO/DESCRIÇÃO', 'QTD TOTAL', 'CUSTO UNITÁRIO (R$)', 'SUBTOTAL (R$)']];
-    const uniqueFixtures = new Map();
-    
-    window.state.leedProject.rooms.forEach((r:any) => {
-        r.fixtures.forEach((f:any) => {
-            const key = (f.label || "Luminária").toLowerCase() + "_" + f.power;
-            if(!uniqueFixtures.has(key)) uniqueFixtures.set(key, {...f, globalQty: f.qty});
-            else uniqueFixtures.get(key).globalQty += f.qty;
-        });
-    });
-    
-    let total = 0;
-    Array.from(uniqueFixtures.values()).forEach((f:any, i) => {
-        const cost = parseFloat(f.unitPrice) || 0;
-        const sub = f.globalQty * cost;
-        total += sub;
-        rows.push([`L${String(i+1).padStart(2,'0')}`, f.label, f.globalQty, cost, sub]);
-    });
-    
-    rows.push(['', '', '', 'CAPEX TOTAL:', total]);
-    
-    const ws = (window as any).XLSX.utils.aoa_to_sheet(rows);
-    const wb = (window as any).XLSX.utils.book_new();
-    (window as any).XLSX.utils.book_append_sheet(wb, ws, "BOQ_LuxSintax");
-    
-    const safeName = window.state.leedProject.name.replace(/[^a-zA-Z0-9_]/g, '_');
-    (window as any).XLSX.writeFile(wb, `Orcamento_${safeName}_${Date.now()}.xlsx`);
+// LUXSINTAX: Exportação Analítica Financeira (PDF)
+window.exportBOQ = async function() {
+    try {
+        const PDFLib = (window as any).PDFLib;
+        if (!PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
+
+        const tbody = document.getElementById('boq-table-body');
+        if (!tbody || tbody.innerText.includes('Aguardando')) return alert("Não há dados para exportar.");
+
+        const s = window.state.leedProject;
+        const userLogoBase64 = localStorage.getItem('luxsintax_user_logo') || null;
+
+        const blob = await window.ReportExporter.createBOQPdf(PDFLib, s, userLogoBase64);
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const safeName = s.name ? s.name.replace(/\s+/g, '_') : 'Projeto';
+        link.download = `Orcamento_BOQ_${safeName}.pdf`;
+        link.click();
+    } catch (err: any) {
+        console.error("[LuxSintax] Erro no PDF BOQ:", err);
+        alert("Erro ao gerar o Orçamento em PDF: " + err.message);
+    }
 };
 
 // LUXSINTAX: Controle do Acordeão Drill-down na Planilha Mestra
