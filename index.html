@@ -801,9 +801,6 @@
                                         <i class="fas fa-file-excel mr-2"></i> Importar Mestra
                                     </label>
                                     <input type="file" id="leed-excel-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="window.handleExcelUpload(this)">
-                                    <button onclick="window.generateLeedReport()" class="bg-white dark:bg-slate-800 text-starlight dark:text-white px-4 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest border border-slate-200 dark:border-slate-700 hover:border-red-500 transition-all shadow-sm outline-none flex items-center">
-                                        <i class="fas fa-file-pdf text-red-500 mr-2"></i> Caderno Specs
-                                    </button>
                                 </div>
                             </div>
 
@@ -854,9 +851,12 @@
                                 <!-- Aba 1: Planilha Mestra -->
                                 <div id="ptab-content-equipments" class="w-full h-full animate-fade-in block flex flex-col">
                                     <div class="bg-slate-100 dark:bg-slate-800 p-2 flex justify-between items-center border border-slate-200 dark:border-slate-700 rounded-t-xl">
-                                        <h4 class="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest ml-2">Especificação e Quantitativos Globais</h4>
-                                        <button onclick="window.addMasterRow()" class="text-[9px] bg-white dark:bg-slate-700 text-starlight dark:text-white px-3 py-1.5 rounded border border-slate-200 dark:border-slate-600 font-black uppercase hover:text-luminous-gold transition-colors shadow-sm outline-none"><i class="fas fa-plus mr-1"></i> Nova Linha</button>
-                                    </div>
+                                        <h4 class="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest ml-2">Especificação e Quantitativos Globais</h4>
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="window.generateSpecsReport()" class="text-[9px] bg-white dark:bg-slate-700 text-starlight dark:text-white px-3 py-1.5 rounded border border-slate-200 dark:border-slate-600 font-black uppercase hover:border-red-500 transition-colors shadow-sm outline-none flex items-center gap-1"><i class="fas fa-file-pdf text-red-500"></i> Caderno Specs</button>
+                                            <button onclick="window.addMasterRow()" class="text-[9px] bg-white dark:bg-slate-700 text-starlight dark:text-white px-3 py-1.5 rounded border border-slate-200 dark:border-slate-600 font-black uppercase hover:text-luminous-gold transition-colors shadow-sm outline-none"><i class="fas fa-plus mr-1"></i> Nova Linha</button>
+                                        </div>
+                                    </div>
                                     <div class="overflow-x-auto overflow-y-auto custom-scrollbar flex-grow bg-white dark:bg-slate-900 border-b border-l border-r border-slate-200 dark:border-slate-700 rounded-b-xl max-h-[50vh]">
                                         <table class="w-full text-left border-collapse min-w-[2800px]">
                                             <thead class="bg-slate-50 dark:bg-slate-800 text-[9px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 whitespace-nowrap sticky top-0 z-10 shadow-sm">
@@ -923,9 +923,12 @@
                                 <!-- Aba 3: Compliance LEED -->
                                 <div id="ptab-content-leed" class="w-full h-full animate-fade-in hidden flex-col">
                                     <div class="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-4 w-full">
-                                        <h4 class="text-sm font-black text-leed-green uppercase tracking-widest flex items-center gap-2"><i class="fas fa-leaf"></i> Estruturação de Zonas ASHRAE</h4>
-                                        <button onclick="window.addLeedRoom()" class="text-[10px] bg-leed-green text-white px-4 py-2 rounded-lg font-black uppercase hover:bg-green-800 transition-colors shadow-sm outline-none whitespace-nowrap"><i class="fas fa-plus mr-1"></i> Adicionar Zona</button>
-                                    </div>
+                                        <h4 class="text-sm font-black text-leed-green uppercase tracking-widest flex items-center gap-2"><i class="fas fa-leaf"></i> Estruturação de Zonas ASHRAE</h4>
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="window.generateLeedReport()" class="text-[10px] bg-white dark:bg-slate-800 text-starlight dark:text-white border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-lg font-black uppercase hover:border-leed-green hover:text-leed-green transition-colors shadow-sm outline-none whitespace-nowrap flex items-center gap-2"><i class="fas fa-file-pdf text-red-500"></i> Relatório LEED</button>
+                                            <button onclick="window.addLeedRoom()" class="text-[10px] bg-leed-green text-white px-4 py-2 rounded-lg font-black uppercase hover:bg-green-800 transition-colors shadow-sm outline-none whitespace-nowrap"><i class="fas fa-plus mr-1"></i> Adicionar Zona</button>
+                                        </div>
+                                    </div>
                                     <div id="leed-project-container" class="space-y-4 mb-6">
                                         <!-- JS Injeta Aqui -->
                                     </div>

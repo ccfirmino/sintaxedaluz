@@ -1,10 +1,120 @@
 // src/infrastructure/export/ReportExporter.ts
 
 export class ReportExporter {
-    /**
-     * Gera a imagem PNG da Legenda de Cores Falsas (Heatmap)
-     */
-    public static getLegendPNG(colorScale: any[]): string {
+    /**
+     * Gera o Caderno de Especificações Técnicas (PDF) com Curvas Polares Dinâmicas
+     */
+    public static async createSpecsPdf(PDFLib: any, project: any, userLogoBase64?: string | null): Promise<Blob> {
+        const lang = (window as any).currentLang || 'pt';
+        const dict = (window as any).i18n[lang] || (window as any).i18n['pt'];
+        const t = (key: string) => dict[key] || key;
+
+        const pdfDoc = await PDFLib.PDFDocument.create();
+        const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+        const fontRegular = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+
+        // 1. Agrupar as luminárias idênticas (Fonte da Verdade: Planilha Mestra)
+        const uniqueFixtures = new Map();
+        if (project && project.rooms) {
+            project.rooms.forEach((room: any) => {
+                if (room.fixtures) {
+                    room.fixtures.forEach((f: any) => {
+                        const safeLabel = f.label || "Luminária";
+                        const key = safeLabel.toLowerCase() + "_" + f.power;
+                        if (!uniqueFixtures.has(key)) {
+                            uniqueFixtures.set(key, { ...f, globalQty: f.qty || 1, label: safeLabel });
+                        } else {
+                            uniqueFixtures.get(key).globalQty += (f.qty || 1);
+                        }
+                    });
+                }
+            });
+        }
+
+        const fixturesArray = Array.from(uniqueFixtures.values());
+
+        // 2. Gerar uma página detalhada para cada tipo de luminária
+        for (let i = 0; i < fixturesArray.length; i++) {
+            const f = fixturesArray[i];
+            const page = pdfDoc.addPage([595.28, 841.89]); // A4 Size
+            const { width, height } = page.getSize();
+
+            // Cabeçalho Padrão
+            page.drawRectangle({ x: 0, y: height - 55, width, height: 55, color: PDFLib.rgb(0.06, 0.09, 0.16) });
+            page.drawRectangle({ x: 0, y: height - 57, width, height: 2, color: PDFLib.rgb(0.85, 0.46, 0.02) });
+            page.drawText('LUXSINTAX', { x: 40, y: height - 32, size: 14, font: fontBold, color: PDFLib.rgb(0.85, 0.46, 0.02) });
+            page.drawText('CADERNO DE ESPECIFICAÇÕES TÉCNICAS', { x: 130, y: height - 32, size: 9, font: fontRegular, color: PDFLib.rgb(1, 1, 1) });
+
+            if (userLogoBase64) {
+                try {
+                    const logoImg = await pdfDoc.embedPng(userLogoBase64);
+                    const logoDims = logoImg.scaleToFit(100, 35);
+                    page.drawImage(logoImg, { x: width - logoDims.width - 40, y: height - 10 - logoDims.height, width: logoDims.width, height: logoDims.height });
+                } catch(e) { console.warn("Erro ao renderizar logo", e); }
+            }
+
+            page.drawText(`PROJETO: ${project.name.toUpperCase()}`, { x: 40, y: height - 75, size: 9, font: fontBold, color: PDFLib.rgb(0.1, 0.15, 0.2) });
+            const dateStr = new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR');
+            page.drawText(`DATA: ${dateStr}`, { x: width - 150, y: height - 75, size: 8, font: fontRegular, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+
+            let cy = height - 110;
+
+            // Identificação do Equipamento
+            page.drawRectangle({ x: 40, y: cy - 4, width: width - 80, height: 18, color: PDFLib.rgb(0.95, 0.96, 0.98) });
+            page.drawText(`L${String(i+1).padStart(2, '0')} - ${f.label.toUpperCase()}`, { x: 50, y: cy + 1, size: 9, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+            cy -= 25;
+
+            const drawField = (label: string, val: string, x: number, y: number) => {
+                page.drawText(label, { x, y, size: 8, font: fontBold, color: PDFLib.rgb(0.4, 0.4, 0.4) });
+                page.drawText(val, { x: x + 85, y, size: 8, font: fontBold, color: PDFLib.rgb(0.1, 0.1, 0.1) });
+            };
+
+            drawField('Fabricante:', f.manufacturer || 'A Definir', 50, cy);
+            drawField('Potência (W):', f.power ? String(f.power) : 'N/A', 320, cy); cy -= 15;
+            drawField('Temp. Cor (CCT):', f.cct ? `${f.cct} K` : 'N/A', 50, cy);
+            drawField('Fluxo Final (lm):', String(Math.round(f.fluxFinal || f.flux || 0)), 320, cy); cy -= 15;
+            drawField('IRC / CRI:', f.irc || 'N/A', 50, cy);
+            drawField('Eficácia (lm/W):', f.power > 0 ? String(Math.round((f.fluxFinal || f.flux || 0) / f.power)) : 'N/A', 320, cy); cy -= 15;
+            drawField('Aplicação:', f.application || 'N/A', 50, cy);
+            drawField('Quantidade Total:', `${f.globalQty} un`, 320, cy); cy -= 15;
+            drawField('Acabamento:', f.finish || 'N/A', 50, cy);
+            drawField('Driver / Auxiliar:', f.driver || 'N/A', 320, cy); cy -= 25;
+
+            // Injeção da Curva Polar Fotométrica Gerada Dinamicamente
+            if (f.iesData) {
+                page.drawRectangle({ x: 40, y: cy - 4, width: width - 80, height: 16, color: PDFLib.rgb(0.95, 0.96, 0.98) });
+                page.drawText('SÓLIDO FOTOMÉTRICO (CURVA POLAR E MÉTRICAS ZONAIS)', { x: 50, y: cy, size: 8, font: fontBold, color: PDFLib.rgb(0.2, 0.3, 0.4) });
+                cy -= 20;
+
+                const polarDataUrl = this.getPolarPNG(f.iesData, f.flux || 0, f.fluxFinal || 0);
+                const polarImg = await pdfDoc.embedPng(polarDataUrl);
+                const pDims = polarImg.scaleToFit(320, 320);
+                const px = (width - pDims.width) / 2;
+                
+                page.drawImage(polarImg, { x: px, y: cy - pDims.height, width: pDims.width, height: pDims.height });
+                
+                // Extração física usando o Engine do Domínio
+                if ((window as any).Photometrics) {
+                    const metrics = (window as any).Photometrics.extractZonalMetrics(f.iesData);
+                    page.drawText(`Ratio Uplight (Poluição Luminosa): ${metrics.uplightRatio.toFixed(1)}%`, { x: px, y: cy - pDims.height - 15, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+                    page.drawText(`Pico de Intensidade (Max Candela): ${Math.round(metrics.maxCandela)} cd`, { x: px, y: cy - pDims.height - 25, size: 8, font: fontRegular, color: PDFLib.rgb(0.3, 0.3, 0.3) });
+                }
+            } else {
+                page.drawText('Aviso: Arquivo IES/LDT não fornecido para traçado fotométrico.', { x: 50, y: cy, size: 8, font: fontRegular, color: PDFLib.rgb(0.8, 0.2, 0.2) });
+            }
+
+            // Disclaimer de Engenharia
+            page.drawText(t('pdf_disclaimer') || 'Nota: As curvas e valores fotométricos acima são representações teóricas extraídas de arquivos digitais e podem sofrer variações físicas.', { x: 40, y: 30, size: 6, font: fontRegular, color: PDFLib.rgb(0.6, 0.6, 0.6) });
+        }
+
+        const bytes = await pdfDoc.save();
+        return new Blob([bytes], { type: 'application/pdf' });
+    }
+
+    /**
+     * Gera a imagem PNG da Legenda de Cores Falsas (Heatmap)
+     */
+    public static getLegendPNG(colorScale: any[]): string {
         const c = document.createElement('canvas');
         c.width = 600; c.height = 60; 
         const ctx = c.getContext('2d')!;

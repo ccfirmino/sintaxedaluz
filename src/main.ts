@@ -1280,10 +1280,58 @@ window.handleGenerateReport = async (event: any) => {
     if (btn) btn.innerHTML = originalBtnHTML;
 };
 
+window.generateSpecsReport = async () => {
+    try {
+        const PDFLib = (window as any).PDFLib;
+        if (!PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
+
+        const s = window.state.leedProject;
+        if (!s.rooms || s.rooms.length === 0) {
+            return alert('Dados Incompletos: Adicione ao menos um ambiente ao projeto.');
+        }
+
+        let hasIncompleteFixtures = false;
+        let totalFixtures = 0;
+
+        s.rooms.forEach((room: any) => {
+            if (room.fixtures) {
+                room.fixtures.forEach((f: any) => {
+                    totalFixtures++;
+                    // Validação do Schema Físico Mínimo para Curva Polar e Especificação
+                    if (!f.power || f.power === 0 || !f.iesFileName || !f.cct) {
+                        hasIncompleteFixtures = true;
+                    }
+                });
+            }
+        });
+
+        if (totalFixtures === 0) {
+            return alert('Dados Incompletos: Nenhuma luminária especificada no projeto.');
+        }
+
+        if (hasIncompleteFixtures) {
+            return alert('Dados Incompletos: Existem luminárias sem Potência, CCT ou arquivo IES/LDT. Preencha estes dados na Planilha Mestra para prosseguir com o Caderno de Especificações.');
+        }
+
+        const userLogoBase64 = localStorage.getItem('luxsintax_user_logo') || null;
+        
+        const blob = await window.ReportExporter.createSpecsPdf(PDFLib, s, userLogoBase64);
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const safeName = s.name ? s.name.replace(/\s+/g, '_') : 'Projeto';
+        link.download = `Caderno_Especs_${safeName}.pdf`;
+        link.click();
+    } catch (err: any) {
+        console.error("[LuxSintax] Erro no Caderno de Especs:", err);
+        alert("Erro ao gerar o Caderno de Especificações: " + err.message);
+    }
+};
+
 window.generateLeedReport = async () => {
-    try {
-        const PDFLib = (window as any).PDFLib;
-        if (!PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
+    try {
+        const PDFLib = (window as any).PDFLib;
+        if (!PDFLib) return alert('Biblioteca PDF não carregada. Aguarde alguns segundos.');
 
         const s = window.state.leedProject;
         if (s.rooms.length === 0) return alert('Adicione ao menos um ambiente ao projeto.');
