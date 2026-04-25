@@ -2197,13 +2197,18 @@ window.handleMasterIESUpload = async function(input: HTMLInputElement, matchKey:
                         room.fixtures.forEach((f: any) => {
                             const currentKey = (f.label || "Luminária").toLowerCase() + "_" + f.power;
                             if (currentKey === matchKey) {
-                                f.iesData = parsed;
-                                f.iesFileName = file.name;
-                                f.fluxFinal = fFinal;
-                                f.flux = fNominal;
-                                if (pWatts > 0) f.power = pWatts; 
-                                if (detectedCct) f.cct = detectedCct;
-                            }
+                                f.iesData = parsed;
+                                f.iesFileName = file.name;
+                                f.fluxFinal = fFinal;
+                                f.flux = fNominal;
+                                if (pWatts > 0) f.power = pWatts; 
+                                if (detectedCct) f.cct = detectedCct;
+                                
+                                // LUXSINTAX FIX: Extração de Intensidade Nadir e cálculo de cd/klm
+                                const nadirIntensity = window.Photometrics.getIESIntensity(parsed, 0, 0) || 0;
+                                f.intensity = Math.round(nadirIntensity);
+                                f.cdklm = fNominal > 0 ? Math.round((nadirIntensity / fNominal) * 1000) : 0;
+                            }
                         });
                     }
                 });
