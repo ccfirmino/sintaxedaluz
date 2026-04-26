@@ -846,8 +846,8 @@
                                     <button onclick="window.switchProjectTab('analysis')" id="ptab-analysis" class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors whitespace-nowrap outline-none"><i class="fas fa-chart-pie mr-2 text-purple-500"></i>Análise Global</button>
                                 </div>
                                 <div class="flex items-center gap-2 w-full xl:w-auto overflow-x-auto custom-scrollbar pb-1 xl:pb-0">
-                                    <button onclick="window.generateSpecsReport()" class="text-[9px] bg-leed-green text-white px-3 py-2 rounded-lg font-black uppercase tracking-widest hover:bg-green-800 transition-colors shadow-sm outline-none flex items-center gap-1 whitespace-nowrap"><i class="fas fa-file-pdf"></i> Caderno Specs</button>
-                                    <button onclick="window.exportBOQ()" class="text-[9px] bg-leed-green text-white px-3 py-2 rounded-lg font-black uppercase tracking-widest hover:bg-green-800 transition-colors shadow-sm outline-none flex items-center gap-1 whitespace-nowrap"><i class="fas fa-file-excel"></i> Exportar Orçamento</button>
+                                    <button onclick="window.generateSpecsReport()" class="text-[9px] bg-leed-green text-white px-3 py-2 rounded-lg font-black uppercase tracking-widest hover:bg-green-800 transition-colors shadow-sm outline-none flex items-center gap-1 whitespace-nowrap"><i class="fas fa-file-pdf"></i> Especificação</button>
+                                    <button onclick="window.exportBOQ()" class="text-[9px] bg-leed-green text-white px-3 py-2 rounded-lg font-black uppercase tracking-widest hover:bg-green-800 transition-colors shadow-sm outline-none flex items-center gap-1 whitespace-nowrap"><i class="fas fa-file-excel"></i> Orçamento</button>
                                     <button onclick="window.generateLeedReport()" class="text-[9px] bg-leed-green text-white px-3 py-2 rounded-lg font-black uppercase tracking-widest hover:bg-green-800 transition-colors shadow-sm outline-none flex items-center gap-1 whitespace-nowrap"><i class="fas fa-file-pdf"></i> Relatório LEED</button>
                                 </div>
                             </div>
@@ -857,8 +857,8 @@
                                 
                                 <!-- Aba 1: Planilha Mestra -->
                                 <div id="ptab-content-equipments" class="w-full h-full animate-fade-in block flex flex-col">
-                                    <div class="bg-slate-100 dark:bg-slate-800 p-2 flex justify-between items-center border border-slate-200 dark:border-slate-700 rounded-t-xl">
-                                        <h4 class="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest ml-2">Especificação e Quantitativos Globais</h4>
+                                    <div class="bg-slate-100 dark:bg-slate-800 px-4 flex justify-between items-center border border-slate-200 dark:border-slate-700 rounded-t-xl h-[46px] shrink-0">
+                                        <h4 class="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">Especificação e Quantitativos Globais</h4>
                                         <div class="flex items-center gap-2">
                                             <button onclick="window.addMasterRow()" class="text-[9px] bg-starlight dark:bg-slate-700 text-white px-3 py-1.5 rounded border border-slate-900 dark:border-slate-600 font-black uppercase tracking-widest hover:bg-luminous-gold hover:border-luminous-gold transition-colors shadow-sm outline-none"><i class="fas fa-plus mr-1"></i> Nova Linha</button>
                                         </div>
@@ -899,8 +899,8 @@
 
                                 <!-- Aba 2: Orçamento (BOQ) -->
                                 <div id="ptab-content-boq" class="w-full h-full animate-fade-in hidden flex-col">
-                                    <div class="bg-slate-100 dark:bg-slate-800 p-2 flex justify-between items-center border border-slate-200 dark:border-slate-700 rounded-t-xl min-h-[38px]">
-                                        <h4 class="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest ml-2">Bill of Quantities (Orçamento Analítico)</h4>
+                                    <div class="bg-slate-100 dark:bg-slate-800 px-4 flex justify-between items-center border border-slate-200 dark:border-slate-700 rounded-t-xl h-[46px] shrink-0">
+                                        <h4 class="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">Bill of Quantities (Orçamento Analítico)</h4>
                                     </div>
                                     <div class="overflow-x-auto overflow-y-auto custom-scrollbar flex-grow bg-white dark:bg-slate-900 border-b border-l border-r border-slate-200 dark:border-slate-700 rounded-b-xl max-h-[50vh]">
                                         <table class="w-full text-left border-collapse min-w-[800px]">
@@ -928,8 +928,8 @@
 
                                 <!-- Aba 3: Compliance LEED -->
                                 <div id="ptab-content-leed" class="w-full h-full animate-fade-in hidden flex-col">
-                                    <div class="bg-slate-100 dark:bg-slate-800 p-2 flex justify-between items-center border border-slate-200 dark:border-slate-700 rounded-xl mb-4 shadow-sm">
-                                        <h4 class="text-[10px] font-black text-leed-green uppercase tracking-widest ml-2 flex items-center gap-2"><i class="fas fa-leaf"></i> Estruturação de Zonas ASHRAE</h4>
+                                    <div class="bg-slate-100 dark:bg-slate-800 px-4 flex justify-between items-center border border-slate-200 dark:border-slate-700 rounded-xl mb-4 shadow-sm h-[46px] shrink-0">
+                                        <h4 class="text-[10px] font-black text-leed-green uppercase tracking-widest flex items-center gap-2"><i class="fas fa-leaf"></i> Estruturação de Zonas ASHRAE</h4>
                                         <div class="flex items-center gap-2">
                                             <button onclick="window.addLeedRoom()" class="text-[9px] bg-starlight dark:bg-slate-700 text-white px-3 py-1.5 rounded border border-slate-900 dark:border-slate-600 font-black uppercase tracking-widest hover:bg-luminous-gold hover:border-luminous-gold transition-colors shadow-sm outline-none"><i class="fas fa-plus mr-1"></i> Adicionar Zona</button>
                                         </div>
