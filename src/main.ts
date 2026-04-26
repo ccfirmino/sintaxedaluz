@@ -19,6 +19,7 @@ import { ElectricalEngine } from './domain/electrical/ElectricalEngine';
 import { HCLEngine } from './domain/health/HCLEngine';
 import { ESGEngine } from './domain/standards/ESGEngine';
 import { ExcelParser } from './infrastructure/services/ExcelParser';
+import { SpdDatabase } from './domain/health/SpdDatabase'; // LUXSINTAX: Integração do Laboratório Espectral
 
 /**
  * Interface de Extensão do Objeto Window para TypeScript estrito
@@ -53,7 +54,8 @@ declare global {
         renderMasterData: () => void;
         addMasterRow: () => void;
         setHCLViewMode: (mode: 'clock' | 'spd') => void;
-        redrawAllCanvases: () => void;
+        handleSpdProfileChange: (profileId: string) => void; // LUXSINTAX: Manipulador Espectral Dinâmico
+        redrawAllCanvases: () => void;
         updateCalcMode: (mode: string) => void;
         toggleTheme: () => void;
         toggleLanguage: () => void;
@@ -148,9 +150,15 @@ async function initializeApp() {
         
         // Boot UI
         window.initNbrSelector();
-        window.setupInputBindings();
-        
-        // Infraestrutura PWA (Service Worker)
+        window.setupInputBindings();
+
+        // LUXSINTAX: População do Seletor de Perfis Espectrais
+        const spdSelect = document.getElementById('spd-profile-options');
+        if (spdSelect) {
+            spdSelect.innerHTML = SpdDatabase.map(p => `<option value="${p.id}" title="${p.description}">${p.label}</option>`).join('');
+        }
+        
+        // Infraestrutura PWA (Service Worker)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js')
                 .then(reg => console.log('[LuxSintax] Infraestrutura PWA armada.', reg.scope))
@@ -474,12 +482,13 @@ window.switchTool = function(toolId: string) {
         activeBtn.classList.add('tab-active', 'text-luminous-gold');
     }
 
-    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg');
-        document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
-        document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
-        document.getElementById('audit-tool')?.classList.toggle('hidden', toolId !== 'audit');
-        document.getElementById('driver-tool')?.classList.toggle('hidden', toolId !== 'driver');
-        document.getElementById('esg-tool')?.classList.toggle('hidden', toolId !== 'esg');
+    document.getElementById('visual-tools')?.classList.toggle('hidden', toolId === 'query' || toolId === 'cert' || toolId === 'leedProj' || toolId === 'audit' || toolId === 'driver' || toolId === 'esg');
+        document.getElementById('query-tool')?.classList.toggle('hidden', toolId !== 'query');
+        document.getElementById('cert-tool')?.classList.toggle('hidden', toolId !== 'cert'); // LUXSINTAX: Novo Módulo de Certificações
+        document.getElementById('leedProj-tool')?.classList.toggle('hidden', toolId !== 'leedProj');
+        document.getElementById('audit-tool')?.classList.toggle('hidden', toolId !== 'audit');
+        document.getElementById('driver-tool')?.classList.toggle('hidden', toolId !== 'driver');
+        document.getElementById('esg-tool')?.classList.toggle('hidden', toolId !== 'esg');
     
     const modeSelector = document.getElementById('calc-mode-selector');
     if(modeSelector) modeSelector.classList.toggle('hidden', toolId === 'driver' || toolId === 'grid' || toolId === 'leedProj');
@@ -528,6 +537,8 @@ window.switchTool = function(toolId: string) {
         window.updateCalculations();
     } else if (toolId === 'query') {
         window.switchQueryTab('nbr8995');
+    } else if (toolId === 'cert') {
+        window.switchCertTab('leed');
     } else if (toolId === 'leedProj') {
         window.renderLeedProject();
         // LUXSINTAX FIX: Força o estado da aba inicial e a ocultação dinâmica dos filtros
@@ -1515,16 +1526,16 @@ window.filterNorms = function() {
 };
 
 window.switchQueryTab = function(t: string) {
-    ['nbr8995','nbr5101','leed'].forEach(k => {
-        document.getElementById('content-'+k)?.classList.toggle('hidden', k!==t);
-        document.getElementById('btn-q-'+k)!.className = `query-tab-btn ${k===t ? 'query-tab-active' : ''}`;
-    });
-    const searchContainer = document.getElementById('search-container');
-    if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
+    ['nbr8995','nbr5101'].forEach(k => {
+        document.getElementById('content-'+k)?.classList.toggle('hidden', k!==t);
+        const btn = document.getElementById('btn-q-'+k);
+        if (btn) btn.className = `query-tab-btn ${k===t ? 'query-tab-active' : ''}`;
+    });
+    const searchContainer = document.getElementById('search-container');
+    if(searchContainer) searchContainer.classList.toggle('hidden', t !== 'nbr8995');
 
-    if(t==='nbr8995') window.filterNorms();
-    if(t==='nbr5101') window.calc5101();
-    if(t==='leed') window.updateLeedTargets();
+    if(t==='nbr8995') window.filterNorms();
+    if(t==='nbr5101') window.calc5101();
 };
 
 window.calc5101 = function() {
@@ -1546,7 +1557,16 @@ window.calc5101 = function() {
 };
 
 window.switchCertTab = function(t: string) {
-    ['leed','well'].forEach(k => { document.getElementById('pane-'+k)?.classList.toggle('hidden', k!==t); document.getElementById('cert-tab-'+k)!.className = `cert-tab ${k===t?'active':'inactive'}`; }); 
+    ['leed','well'].forEach(k => { 
+        const pane = document.getElementById('content-' + k);
+        if(pane) pane.classList.toggle('hidden', k !== t); 
+        
+        const tab = document.getElementById('cert-tab-' + k);
+        if(tab) tab.className = `cert-tab ${k === t ? 'active' : 'inactive'}`; 
+    });
+    
+    // LUXSINTAX: Reativa os cálculos estáticos se o usuário abrir a aba LEED
+    if(t === 'leed' && window.updateLeedTargets) window.updateLeedTargets();
 };
 
 window.updateLeedTargets = function() {
@@ -3470,15 +3490,42 @@ window.confirmExcelMapping = async function(event: any) {
         // 1. Salva a preferência (O sistema "aprende")
         localStorage.setItem('luxsintax_excel_mapping', JSON.stringify(newMapping));
 
-        // 2. Reprocessa o arquivo com o dicionário do usuário ativado
-        const parsedRooms = await ExcelParser.parseMasterSpreadsheet(window.pendingExcelFile, newMapping);
-        window.processParsedExcel(parsedRooms);
+        // 2. Reprocessa o arquivo com o dicionário do usuário ativado
+        const parsedRooms = await ExcelParser.parseMasterSpreadsheet(window.pendingExcelFile, newMapping);
+        window.processParsedExcel(parsedRooms);
 
-        document.getElementById('excel-mapping-modal')?.classList.add('hidden');
-        window.pendingExcelFile = null;
-    } catch (err: any) {
-        alert("Erro na importação: " + err.message);
-    } finally {
-        btn.innerHTML = originalText;
+        document.getElementById('excel-mapping-modal')?.classList.add('hidden');
+        window.pendingExcelFile = null;
+    } catch (err: any) {
+        alert("Erro na importação: " + err.message);
+    } finally {
+        btn.innerHTML = originalText;
+    }
+};
+
+// LUXSINTAX: Integração do Laboratório Espectral (Hub Circadiano)
+window.handleSpdProfileChange = (profileId: string) => {
+    const manualContainer = document.getElementById('manual-mratio-container');
+    
+    if (profileId === 'manual') {
+        if (manualContainer) manualContainer.classList.remove('hidden');
+        return;
+    }
+
+    if (manualContainer) manualContainer.classList.add('hidden');
+    
+    const profile = SpdDatabase.find(p => p.id === profileId);
+    if (profile && window.HCLEngine) {
+        // LUXSINTAX: Motor físico integra o SPD para calcular o Ratio Exato
+        const calculatedRatio = window.HCLEngine.calculateMelanopicRatio(profile.spd);
+        
+        // Atribui o ratio exato ao estado
+        window.state.audit.mRatio = calculatedRatio;
+        
+        // Bloqueia e atualiza o select visual para manter coerência, caso visível
+        const ratioSelect = document.getElementById('audit-mratio') as HTMLSelectElement;
+        if (ratioSelect) ratioSelect.value = String(Math.round(calculatedRatio * 100) / 100); 
+
+        window.updateCalculations();
     }
 };

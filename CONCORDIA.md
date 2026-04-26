@@ -110,8 +110,10 @@
 - [25/04/2026] Correção UI/UX e Tipagem do Exportador (Método Lúmens)
 - [25/04/2026] **View (`index.html`)**: Alterada a nomenclatura do botão de relatório para "DOWNLOAD ESTUDO". Adicionado o repasse do objeto `event` no `onclick="window.handleGenerateReport(event)"` para permitir manipulação de DOM (estado de loading).
 - [25/04/2026] **Orquestrador (`src/main.ts`)**: Declarada a assinatura `handleGenerateReport: (event: any) => Promise<void>;` na interface global `Window`, assegurando o contrato estrito do TypeScript para execução na infraestrutura.
-- [26/04/2026]: Padronização Estética e Estabilidade Visual (Project Hub): Fixação da altura dos cabeçalhos (`h-[46px]`) e alinhamento lateral (`px-4`) em todas as sub-abas do Gerenciador de Projetos para eliminar oscilações de espaçamento vertical durante a navegação. Unificação cromática dos botões de exportação (`bg-leed-green`) e reordenação ergonômica de títulos (esquerda) e botões de ação (direita).
+- [26/04/2026] Padronização Estética e Estabilidade Visual (Project Hub): Fixação da altura dos cabeçalhos (`h-[46px]`) e alinhamento lateral (`px-4`) em todas as sub-abas do Gerenciador de Projetos para eliminar oscilações de espaçamento vertical durante a navegação. Unificação cromática dos botões de exportação (`bg-leed-green`) e reordenação ergonômica de títulos (esquerda) e botões de ação (direita).
 - [26/04/2026] UI/UX ARCHITECTURE: Desacoplamento da camada de Certificações. Criação do módulo independente 'cert-tool' para isolar lógicas de LEED/WELL das consultas normativas NBR, respeitando o SRP (Single Responsibility Principle) na View. Renomeação da Auditoria Circadiana para 'Hub Circadiano', reorientando a funcionalidade para educação técnica e validação neurocientífica.
+- [26/04/2026] HCL DOMAIN: Implementação do motor de integração espectral no HCLEngine.ts (Cálculo dinâmico de M/P Ratio baseado em integrais de Riemann das curvas V(λ) e M(λ)). Criação do SpdDatabase.ts para padronização e comparação educacional de iluminantes (D65 vs LEDs).
+- [26/04/2026] MAIN.TS: Implementado 'handleSpdProfileChange' para delegar o cálculo de M/P Ratio ao motor físico a partir de arquivos SPD, em substituição à mera escolha manual.
 
 ## Estado Atual da Árvore de Arquivos
 - `index.html`: Apenas View (Tailwind + Estrutura). Proibido conter lógica de negócio.

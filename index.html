@@ -1150,15 +1150,25 @@
                                             </div>
                                         </div>
 
-                                        <div id="audit-cct-block" class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-2" data-i18n="spec_cct">Espectro da Fonte (CCT)</label>
-                                            <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors shadow-inner">
-                                                <option value="0.45">2700K (M/P: 0.45)</option>
-                                                <option value="0.52" selected>3000K (M/P: 0.52)</option>
-                                                <option value="0.68">4000K (M/P: 0.68)</option>
-                                                <option value="0.92">5000K (M/P: 0.92)</option>
-                                                <option value="1.10">6500K (M/P: 1.10)</option>
-                                            </select>
+                                        <div id="audit-cct-block" class="space-y-4">
+                                            <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Perfil Espectral (SPD)</label>
+                                                <select id="audit-spd-profile" onchange="window.handleSpdProfileChange(this.value)" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 transition-all cursor-pointer shadow-inner">
+                                                    <option value="manual">Ajuste Manual (M/P Ratio)</option>
+                                                    <optgroup label="Biblioteca LuxSintax" id="spd-profile-options">
+                                                        </optgroup>
+                                                </select>
+                                            </div>
+                                            <div id="manual-mratio-container" class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hidden">
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-2" data-i18n="spec_cct">Espectro da Fonte (CCT)</label>
+                                                <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors shadow-inner">
+                                                    <option value="0.45">2700K (M/P: 0.45)</option>
+                                                    <option value="0.52" selected>3000K (M/P: 0.52)</option>
+                                                    <option value="0.68">4000K (M/P: 0.68)</option>
+                                                    <option value="0.92">5000K (M/P: 0.92)</option>
+                                                    <option value="1.10">6500K (M/P: 1.10)</option>
+                                                </select>
+                                            </div>
                                         </div>
 
                                         <div class="flex items-center justify-between gap-4">

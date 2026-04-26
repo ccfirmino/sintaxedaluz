@@ -7,11 +7,68 @@ export const HCLEngine = {
      */
     getMelanopicActionCurve: () => {
         return [
-            { nm: 380, val: 0.0001 }, { nm: 400, val: 0.002 }, { nm: 420, val: 0.018 },
-            { nm: 440, val: 0.115 }, { nm: 460, val: 0.649 }, { nm: 480, val: 1.000 },
-            { nm: 500, val: 0.764 }, { nm: 520, val: 0.286 }, { nm: 540, val: 0.071 },
-            { nm: 560, val: 0.015 }, { nm: 580, val: 0.003 }, { nm: 600, val: 0.001 }
+            { nm: 380, val: 0.0000 }, { nm: 400, val: 0.0020 }, { nm: 420, val: 0.0180 },
+            { nm: 440, val: 0.1150 }, { nm: 460, val: 0.6490 }, { nm: 480, val: 1.0000 },
+            { nm: 500, val: 0.7640 }, { nm: 520, val: 0.2860 }, { nm: 540, val: 0.0710 },
+            { nm: 560, val: 0.0150 }, { nm: 580, val: 0.0030 }, { nm: 600, val: 0.0010 },
+            { nm: 620, val: 0.0000 }, { nm: 640, val: 0.0000 }, { nm: 660, val: 0.0000 },
+            { nm: 680, val: 0.0000 }, { nm: 700, val: 0.0000 }, { nm: 720, val: 0.0000 },
+            { nm: 740, val: 0.0000 }, { nm: 760, val: 0.0000 }, { nm: 780, val: 0.0000 }
         ];
+    },
+
+    getPhotopicCurve: () => {
+        return [
+            { nm: 380, val: 0.0000 }, { nm: 400, val: 0.0004 }, { nm: 420, val: 0.0040 },
+            { nm: 440, val: 0.0230 }, { nm: 460, val: 0.0600 }, { nm: 480, val: 0.1390 },
+            { nm: 500, val: 0.3230 }, { nm: 520, val: 0.7100 }, { nm: 540, val: 0.9540 },
+            { nm: 560, val: 0.9950 }, { nm: 580, val: 0.8700 }, { nm: 600, val: 0.6310 },
+            { nm: 620, val: 0.3810 }, { nm: 640, val: 0.1750 }, { nm: 660, val: 0.0610 },
+            { nm: 680, val: 0.0170 }, { nm: 700, val: 0.0041 }, { nm: 720, val: 0.0010 },
+            { nm: 740, val: 0.0003 }, { nm: 760, val: 0.0001 }, { nm: 780, val: 0.0000 }
+        ];
+    },
+
+    /**
+     * Integração Numérica Riemanniana: Calcula o Melanopic Ratio (M/P) a partir de um SPD bruto.
+     * @param spd Array de coordenadas {nm, val} representando a distribuição espectral de potência (W/nm).
+     */
+    calculateMelanopicRatio: (spd: Array<{nm: number, val: number}>) => {
+        const melCurve = HCLEngine.getMelanopicActionCurve();
+        const photCurve = HCLEngine.getPhotopicCurve();
+        
+        let melIntegral = 0;
+        let photIntegral = 0;
+
+        // Limpeza de ruído e normalização
+        const safeSpd = spd.filter(p => p.nm >= 380 && p.nm <= 780).sort((a, b) => a.nm - b.nm);
+        if (safeSpd.length < 2) return 0.52; // Fallback estrutural (3000K padrão)
+
+        for (let i = 0; i < safeSpd.length - 1; i++) {
+            const wl1 = safeSpd[i].nm;
+            const wl2 = safeSpd[i+1].nm;
+            const deltaWl = wl2 - wl1;
+
+            const v1 = safeSpd[i].val;
+            const v2 = safeSpd[i+1].val;
+            const avgVal = (v1 + v2) / 2;
+
+            const mel1 = melCurve.find(m => m.nm === Math.round(wl1 / 20) * 20)?.val || 0;
+            const mel2 = melCurve.find(m => m.nm === Math.round(wl2 / 20) * 20)?.val || 0;
+            const avgMel = (mel1 + mel2) / 2;
+
+            const phot1 = photCurve.find(p => p.nm === Math.round(wl1 / 20) * 20)?.val || 0;
+            const phot2 = photCurve.find(p => p.nm === Math.round(wl2 / 20) * 20)?.val || 0;
+            const avgPhot = (phot1 + phot2) / 2;
+
+            melIntegral += avgVal * avgMel * deltaWl;
+            photIntegral += avgVal * avgPhot * deltaWl;
+        }
+
+        if (photIntegral === 0) return 0;
+        
+        const CIE_SCALAR = 1.104; // Equivalência de D65
+        return (melIntegral / photIntegral) * CIE_SCALAR;
     },
 
     /**
