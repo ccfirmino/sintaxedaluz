@@ -46,8 +46,9 @@ declare global {
         HCLEngine: any;
         GlareEngine: any;
         leedTargets: any;
-        updateCalculations: () => void;
-        switchTool: (toolId: string) => void;
+        handleGenerateReport: (event: any) => Promise<void>;
+        updateCalculations: () => void;
+        switchTool: (toolId: string) => void;
         switchProjectTab: (tabId: string) => void;
         renderMasterData: () => void;
         addMasterRow: () => void;
