@@ -305,11 +305,12 @@
                         </div>
                     </div>
 
-                    <div class="flex-none w-full sm:w-1/2 xl:w-auto xl:flex-1 bg-white/50 dark:bg-slate-800/30 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm backdrop-blur-sm">
+                    <div class="flex-none w-full sm:w-1/2 xl:w-auto xl:flex-[1.5] bg-white/50 dark:bg-slate-800/30 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm backdrop-blur-sm">
                         <h3 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1 flex items-center gap-2"><i class="fas fa-book-medical"></i> <span data-i18n="pil_health">2. Compliance & Saúde</span></h3>
-                        <div class="grid grid-cols-2 gap-3 h-[calc(100%-28px)]">
-                            <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold"><i class="fas fa-search text-lg mb-1"></i><span data-i18n="tab_query">CONSULTA<br>(NBR/LEED)</span></button>
-                            <button onclick="window.switchTool('audit')" id="tab-audit" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-brain text-lg mb-1"></i><span data-i18n="tab_audit">AUDITORIA<br>CIRCADIANA</span></button>
+                        <div class="grid grid-cols-3 gap-3 h-[calc(100%-28px)]">
+                            <button onclick="window.switchTool('query')" id="tab-query" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-active whitespace-nowrap text-luminous-gold"><i class="fas fa-search text-lg mb-1"></i><span>CONSULTA<br>(NBR)</span></button>
+                            <button onclick="window.switchTool('cert')" id="tab-cert" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-leaf text-lg mb-1 text-leed-green"></i><span>LEED /<br>WELL</span></button>
+                            <button onclick="window.switchTool('audit')" id="tab-audit" class="mode-tab-btn !h-[90px] w-full min-w-0 !px-1 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase transition-all tab-inactive whitespace-nowrap"><i class="fas fa-graduation-cap text-lg mb-1 text-purple-500"></i><span>HUB<br>CIRCADIANO</span></button>
                         </div>
                     </div>
 
@@ -1117,9 +1118,9 @@
                             <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
                                 <div>
                                     <h3 class="text-xl text-starlight dark:text-white font-black tracking-widest flex items-center gap-2 uppercase">
-                                        <i class="fas fa-brain text-purple-500"></i> <span id="audit-title-text" data-i18n="hdr_audit">Auditoria Circadiana</span>
+                                        <i class="fas fa-graduation-cap text-purple-500"></i> <span id="audit-title-text">Hub Circadiano & Validação</span>
                                     </h3>
-                                    <p class="text-xs text-slate-500 mt-1 font-bold" data-i18n="audit_sub">Laboratório de Neurociência: Avaliação do ciclo de melatonina e certificação WELL v2.</p>
+                                    <p class="text-xs text-slate-500 mt-1 font-bold">Centro de aprendizado e validação neurocientífica (Ciclo de Melatonina e m-EDI).</p>
                                 </div>
                             </div>
 
@@ -1407,7 +1408,6 @@
                                 <div class="flex gap-2">
                                     <button onclick="window.switchQueryTab('nbr8995')" id="btn-q-nbr8995" class="query-tab-btn query-tab-active" data-i18n="tab_interiors">Interiores (NBR 8995)</button>
                                     <button onclick="window.switchQueryTab('nbr5101')" id="btn-q-nbr5101" class="query-tab-btn" data-i18n="tab_roadway">Viária (NBR 5101)</button>
-                                    <button onclick="window.switchQueryTab('leed')" id="btn-q-leed" class="query-tab-btn">LEED / WELL</button>
                                 </div>
                             </div>
 
@@ -1472,7 +1472,17 @@
                                 </div>
                             </div>
 
-                            <div id="content-leed" class="query-content hidden">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="cert-tool" class="w-full animate-fade-in-up col-span-12 hidden">
+                        <div class="glass-panel p-8 rounded-2xl">
+                            <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-slate-200 pb-4 gap-4">
+                                <div><h3 class="text-lg text-leed-green font-black tracking-widest flex items-center gap-2 uppercase"><i class="fas fa-leaf"></i> <span>Certificações de Desempenho</span></h3><p class="text-xs text-slate-500 mt-1 font-bold">Consultas e simuladores estruturados para selos LEED v4.1 e WELL v2.</p></div>
+                            </div>
+
+                            <div id="content-leed" class="query-content">
                                 <div class="flex gap-2 mb-4 border-b border-slate-200 pb-2">
                                     <span onclick="window.switchCertTab('leed')" id="cert-tab-leed" class="cert-tab active">LEED v4.1 (BD+C)</span>
                                     <span onclick="window.switchCertTab('well')" id="cert-tab-well" class="cert-tab inactive">WELL v2</span>
