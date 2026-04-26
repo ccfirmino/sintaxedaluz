@@ -114,6 +114,7 @@
 - [26/04/2026] UI/UX ARCHITECTURE: Desacoplamento da camada de Certificações. Criação do módulo independente 'cert-tool' para isolar lógicas de LEED/WELL das consultas normativas NBR, respeitando o SRP (Single Responsibility Principle) na View. Renomeação da Auditoria Circadiana para 'Hub Circadiano', reorientando a funcionalidade para educação técnica e validação neurocientífica.
 - [26/04/2026] HCL DOMAIN: Implementação do motor de integração espectral no HCLEngine.ts (Cálculo dinâmico de M/P Ratio baseado em integrais de Riemann das curvas V(λ) e M(λ)). Criação do SpdDatabase.ts para padronização e comparação educacional de iluminantes (D65 vs LEDs).
 - [26/04/2026] MAIN.TS: Implementado 'handleSpdProfileChange' para delegar o cálculo de M/P Ratio ao motor físico a partir de arquivos SPD, em substituição à mera escolha manual.
+- [26/04/2026] CANVAS: Atualizado o renderizador de Modo Espectral (SPD) no Canvas2DEngine.ts para desenhar dinamicamente gráficos com base em arrays reais de espectro de luz vs as curvas visuais fotópica e melanópica.
 
 ## Estado Atual da Árvore de Arquivos
 - `index.html`: Apenas View (Tailwind + Estrutura). Proibido conter lógica de negócio.
