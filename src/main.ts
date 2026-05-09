@@ -10,7 +10,7 @@ import { FalseColorEngine } from './domain/photometry/FalseColorEngine';
 import { StandardsEngine } from './domain/standards/StandardsEngine';
 import { ReportExporter } from './infrastructure/export/ReportExporter';
 import { Photometric3DEngine } from './infrastructure/three/Photometric3DEngine';
-import { i18nDictionary } from './presentation/i18n/Dictionary';
+import { i18nDictionary } from './infrastructure/i18n/Dictionary';
 import { normsDatabase } from './domain/standards/Nbr8995Database';
 import { lpdBaselines, exteriorLpdBaselines } from './domain/standards/AshraeDatabase';
 import { AuthManager } from './auth/AuthManager';
