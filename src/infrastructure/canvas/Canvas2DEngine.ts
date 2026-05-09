@@ -1097,9 +1097,8 @@ export class Canvas2DEngine {
 
     // ==========================================
     // LUXSINTAX: Super Canvas HCL (Neurociência Aplicada + Espectro Reativo)
-    // Movido do main.ts para respeitar a Clean Architecture
     // ==========================================
-    public static drawCircadianChart(bioResult: any, state: any) {
+    public static drawCircadianChart(bioResult: any, state: any, intersectionData: any[] = []) {
         const canvas = document.getElementById('circadianChart') as HTMLCanvasElement;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -1121,9 +1120,9 @@ export class Canvas2DEngine {
         ctx.clearRect(0, 0, w, h);
 
         // Design Tokens Dinâmicos baseados no Tema
-        const textColor = isDark ? "#94a3b8" : "#64748b";     
-        const gridColor = isDark ? "#334155" : "#e2e8f0";     
-        const accentColor = isDark ? "#f8fafc" : "#0f172a";   
+        const textColor = isDark ? "#94a3b8" : "#64748b";      
+        const gridColor = isDark ? "#334155" : "#e2e8f0";      
+        const accentColor = isDark ? "#f8fafc" : "#0f172a";    
         const primaryColor = isDark ? "#a855f7" : "#9333ea";  
 
         if (viewMode === 'clock') {
@@ -1248,44 +1247,19 @@ export class Canvas2DEngine {
             const userAge = parseInt((document.getElementById('audit-age') as HTMLInputElement)?.value) || 30;
             const lensFactor = userAge > 25 ? Math.max(0.3, 1.0 - (userAge - 25) * 0.015) : 1.0;
 
-            // LUXSINTAX: Carrega curvas fisiológicas reais
-            const melCurve = HCLEngine.getMelanopicActionCurve();
-            const photCurve = HCLEngine.getPhotopicCurve();
-            
             const spdSelect = document.getElementById('audit-spd-profile') as HTMLSelectElement;
             const profileId = spdSelect ? spdSelect.value : 'manual';
-            let activeSpd: {nm: number, val: number}[] = [];
-            let spdLabel = "";
+            const profile = SpdDatabase.find(p => p.id === profileId);
+            const spdLabel = profile ? `── ${profile.label}` : "── SPD Personalizado";
 
-            if (profileId !== 'manual') {
-                const profile = SpdDatabase.find(p => p.id === profileId);
-                if (profile) {
-                    activeSpd = profile.spd;
-                    spdLabel = `── ${profile.label}`;
-                }
-            }
-            
-            // Fallback Gerativo para Modo Manual (CCT)
-            if (activeSpd.length === 0) {
-                const mRatio = state.mRatio || 0.52;
-                const isSunLike = document.getElementById('audit-tm30') && (document.getElementById('audit-tm30') as HTMLSelectElement).value === 'sunlike';
-                const bluePower = 0.3 + (mRatio * 0.5); 
-                const yellowPower = 1.2 - (mRatio * 0.4);
-                
-                for(let nm=380; nm<=780; nm+=5) {
-                    const progress = (nm - 380) / 400;
-                    const lb = Math.exp(-Math.pow(progress - 0.2, 2) / 0.01) * bluePower;
-                    const ly = Math.exp(-Math.pow(progress - 0.6, 2) / 0.08) * yellowPower;
-                    const cf = isSunLike ? Math.exp(-Math.pow(progress - 0.35, 2) / 0.03) * (bluePower * 0.8) : 0;
-                    activeSpd.push({nm, val: lb + ly + cf});
-                }
-                spdLabel = isSunLike ? "── LED (SunLike Premium)" : "── LED (Ajuste Manual)";
-            }
+            // Fallback para assegurar dados
+            const data = intersectionData && intersectionData.length > 0 ? intersectionData : (state.spdIntersection || []);
 
-            // Normalização Matemática
+            // Normalização Matemática (Pico para caber no Canvas)
             let maxPeak = 0.1;
-            activeSpd.forEach(p => { if (p.val > maxPeak) maxPeak = p.val; });
-            if (1.0 * lensFactor > maxPeak) maxPeak = 1.0 * lensFactor;
+            if (data.length > 0) {
+                data.forEach((p: any) => { if (p.spdVal > maxPeak) maxPeak = p.spdVal; });
+            }
             const scaleY = 1 / (maxPeak * 1.1);
 
             const peakX = padding + ((w - padding - 10) * 0.25); 
@@ -1300,71 +1274,38 @@ export class Canvas2DEngine {
             ctx.fillText("Pico Melanópico", peakX, 15);
 
             const getX = (nm: number) => padding + ((nm - 380) / 400) * (w - padding - 10);
-            const getY = (val: number) => (h - padding) - (val * scaleY * (h - padding - 20));
+            const getY = (val: number) => (h - padding) - (Math.min(1.0, val * scaleY) * (h - padding - 20));
 
-            // Desenha a Curva Melanópica Base (Fundo)
-            ctx.beginPath();
-            ctx.moveTo(padding, h - padding);
-            for(let nm=380; nm<=780; nm+=20) {
-                const mVal = melCurve.find(m => m.nm === nm)?.val || 0;
-                ctx.lineTo(getX(nm), getY(mVal * 0.8 * lensFactor));
-            }
-            ctx.lineTo(w - 10, h - padding);
-            ctx.fillStyle = isDark ? "rgba(14, 165, 233, 0.15)" : "rgba(14, 165, 233, 0.08)";
-            ctx.fill();
-            ctx.strokeStyle = "#0ea5e9";
-            ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+            // Se ainda não temos os dados de intersecção, encerramos a pintura aqui
+            if (!data || data.length === 0) return;
 
             let ghostPoints: any[] = [];
             let ledPoints: any[] = [];
-            let photopicPoints: any[] = [];
+            let baseMelPoints: any[] = [];
             
-            activeSpd.forEach(point => {
-                const nm = point.nm;
-                const spdVal = point.val;
-                
-                ledPoints.push({x: getX(nm), py: getY(spdVal)});
-
-                const mRef = melCurve.find(m => m.nm === Math.round(nm/20)*20)?.val || 0;
-                const ghostVal = spdVal * mRef * lensFactor;
-                ghostPoints.push({x: getX(nm), py: getY(ghostVal)});
-
-                const pRef = photCurve.find(p => p.nm === Math.round(nm/20)*20)?.val || 0;
-                const photopicVal = spdVal * pRef;
-                photopicPoints.push({x: getX(nm), py: getY(photopicVal)});
+            data.forEach((point: any) => {
+                ledPoints.push({x: getX(point.nm), py: getY(point.spdVal)});
+                baseMelPoints.push({x: getX(point.nm), py: getY(point.melVal * 0.8 * lensFactor)});
+                // O fantasma é a área ativa que sofre a influência do envelhecimento
+                ghostPoints.push({x: getX(point.nm), py: getY(point.activeArea * lensFactor)});
             });
-            
-            // Área de Interseção (Fantasma Melanópico Estimulado)
+
+            // 1. Desenha a Curva Melanópica Base (A capacidade humana máxima na dada idade)
             ctx.beginPath();
-            ctx.moveTo(ghostPoints[0].x, ghostPoints[0].py);
-            ghostPoints.forEach(p => ctx.lineTo(p.x, p.py));
-            ctx.lineTo(ghostPoints[ghostPoints.length-1].x, h - padding);
-            ctx.lineTo(ghostPoints[0].x, h - padding);
-            ctx.closePath();
-            ctx.fillStyle = "rgba(6, 182, 212, 0.4)"; 
+            ctx.moveTo(baseMelPoints[0].x, baseMelPoints[0].py);
+            baseMelPoints.forEach(p => ctx.lineTo(p.x, p.py));
+            ctx.lineTo(baseMelPoints[baseMelPoints.length-1].x, h - padding);
+            ctx.lineTo(baseMelPoints[0].x, h - padding);
+            ctx.fillStyle = isDark ? "rgba(14, 165, 233, 0.08)" : "rgba(14, 165, 233, 0.05)";
             ctx.fill();
             
-            // Linha do Fantasma Melanópico
             ctx.beginPath();
-            ctx.moveTo(ghostPoints[0].x, ghostPoints[0].py);
-            ghostPoints.forEach(p => ctx.lineTo(p.x, p.py));
-            ctx.strokeStyle = "#06b6d4";
-            ctx.lineWidth = 1.5;
-            ctx.setLineDash([2, 2]);
-            ctx.stroke();
-            ctx.setLineDash([]);
+            ctx.moveTo(baseMelPoints[0].x, baseMelPoints[0].py);
+            baseMelPoints.forEach(p => ctx.lineTo(p.x, p.py));
+            ctx.strokeStyle = "rgba(14, 165, 233, 0.4)";
+            ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
 
-            // Linha da Curva Fotópica (V-Lambda)
-            ctx.beginPath();
-            ctx.moveTo(photopicPoints[0].x, photopicPoints[0].py);
-            photopicPoints.forEach(p => ctx.lineTo(p.x, p.py));
-            ctx.strokeStyle = "#84cc16"; 
-            ctx.lineWidth = 1.5;
-            ctx.setLineDash([2, 2]);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Área do Espectro da Fonte (SPD)
+            // 2. Área do Espectro da Fonte (SPD)
             ctx.beginPath();
             ctx.moveTo(ledPoints[0].x, ledPoints[0].py);
             ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
@@ -1384,6 +1325,28 @@ export class Canvas2DEngine {
             ledPoints.forEach(p => ctx.lineTo(p.x, p.py));
             ctx.strokeStyle = accentColor; ctx.lineWidth = 2.5; ctx.stroke();
 
+            // 3. Área de Interseção Didática (A Nutrição Biológica Real = SPD x Melanopica)
+            ctx.beginPath();
+            ctx.moveTo(ghostPoints[0].x, ghostPoints[0].py);
+            ghostPoints.forEach(p => ctx.lineTo(p.x, p.py));
+            ctx.lineTo(ghostPoints[ghostPoints.length-1].x, h - padding);
+            ctx.lineTo(ghostPoints[0].x, h - padding);
+            ctx.closePath();
+            
+            let bioGradient = ctx.createLinearGradient(0, h - padding, 0, 10);
+            bioGradient.addColorStop(0, "rgba(6, 182, 212, 0.1)");
+            bioGradient.addColorStop(1, "rgba(6, 182, 212, 0.6)");
+            ctx.fillStyle = bioGradient; 
+            ctx.fill();
+            
+            // Linha do Fantasma Melanópico Estimulado
+            ctx.beginPath();
+            ctx.moveTo(ghostPoints[0].x, ghostPoints[0].py);
+            ghostPoints.forEach(p => ctx.lineTo(p.x, p.py));
+            ctx.strokeStyle = "#06b6d4";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
             // Legendas Analíticas
             ctx.save();
             ctx.shadowColor = isDark ? "rgba(0, 0, 0, 0.9)" : "rgba(255, 255, 255, 0.9)";
@@ -1395,10 +1358,10 @@ export class Canvas2DEngine {
             ctx.fillText(spdLabel, w - 20, 25);
             
             ctx.fillStyle = "#06b6d4"; 
-            ctx.fillText(`- - Fantasma Melanópico (${userAge} anos)`, w - 20, 45);
+            ctx.fillText(`■ Intersecção Biológica (${userAge} anos)`, w - 20, 45);
             
-            ctx.fillStyle = "#84cc16"; 
-            ctx.fillText(`- - Retina Visão Fotópica`, w - 20, 65);
+            ctx.fillStyle = "rgba(14, 165, 233, 0.8)"; 
+            ctx.fillText(`- - Capacidade Melanópica Máxima`, w - 20, 65);
             ctx.restore();
         }
     }

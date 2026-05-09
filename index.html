@@ -1125,94 +1125,97 @@
                             </div>
 
                             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                <div class="lg:col-span-4 space-y-6 bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl relative group transition-colors">
+                                <div class="lg:col-span-4 flex flex-col gap-6">
                                     
-                                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2 mb-4">
-                                        <h4 class="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest" data-i18n="bio_vars">Variáveis Biológicas</h4>
-                                        <div class="flex items-center bg-slate-100 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 shadow-inner">
-                                            <button id="btn-audit-manual" onclick="window.setAuditMode('manual')" class="px-3 py-1 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white shadow-sm transition-all">Manual</button>
-                                            <button id="btn-audit-ies" onclick="window.setAuditMode('ies')" class="px-3 py-1 text-[9px] font-black uppercase rounded-md text-slate-500 dark:text-slate-500 hover:text-luminous-gold dark:hover:text-luminous-gold transition-all">IES/LDT</button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="space-y-5">
-                                        <div id="audit-ies-block" class="hidden bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                            <label class="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest block mb-2" data-i18n="lbl_load_ies_opt">FONTE LUMINOSA (IES/LDT)</label>
-                                            <div class="flex items-center gap-2">
-                                                <label for="a-ies-input" class="bg-black dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white dark:text-white px-3 py-1.5 rounded text-[9px] font-black uppercase cursor-pointer transition-colors shadow-sm whitespace-nowrap" data-i18n="btn_choose_file">UPLOAD IES</label>
-                                                <input type="file" id="a-ies-input" accept=".ies,.ldt" class="hidden" onchange="window.handleIESUpload(this)">
-                                                <div class="flex-1 flex items-center justify-between bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded px-2 py-1.5 min-w-0 shadow-inner">
-                                                    <span id="a-ies-status" class="text-[9px] font-bold text-slate-400 truncate">Nenhum arquivo.</span>
-                                                    <button id="a-ies-clear" onclick="window.clearAuditIES()" class="hidden text-slate-400 hover:text-red-500 ml-2 transition-colors" title="Remover IES">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div id="audit-cct-block" class="space-y-4">
-                                            <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Perfil Espectral (SPD)</label>
-                                                <select id="audit-spd-profile" onchange="window.handleSpdProfileChange(this.value)" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 transition-all cursor-pointer shadow-inner">
-                                                    <option value="manual">Ajuste Manual (M/P Ratio)</option>
-                                                    <optgroup label="Biblioteca LuxSintax" id="spd-profile-options">
-                                                        </optgroup>
-                                                </select>
-                                            </div>
-                                            <div id="manual-mratio-container" class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hidden">
-                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-2" data-i18n="spec_cct">Espectro da Fonte (CCT)</label>
-                                                <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors shadow-inner">
-                                                    <option value="0.45">2700K (M/P: 0.45)</option>
-                                                    <option value="0.52" selected>3000K (M/P: 0.52)</option>
-                                                    <option value="0.68">4000K (M/P: 0.68)</option>
-                                                    <option value="0.92">5000K (M/P: 0.92)</option>
-                                                    <option value="1.10">6500K (M/P: 1.10)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="flex items-center justify-between gap-4">
-                                            <div class="w-1/2">
-                                                <label title="Para uso geral, considere que o Lux no olho é aproximadamente METADE do Lux na mesa." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max" data-i18n="lux_vert">Lux Vertical (Ev)</label>
-                                                <input type="number" id="audit-visual-lux" value="500" min="10" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right shadow-inner">
-                                            </div>
-                                            <div class="w-1/2">
-                                                <label title="A opacidade do cristalino afeta a absorção de luz azul." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max" data-i18n="age_yrs">Idade (Anos)</label>
-                                                <input type="number" id="audit-age" value="30" min="10" max="90" oninput="window.updateCalculations()" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right shadow-inner">
+                                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl transition-colors">
+                                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">
+                                            <h4 class="text-xs font-black text-luminous-gold uppercase tracking-widest flex items-center gap-2"><i class="fas fa-lightbulb"></i> A Fonte de Luz</h4>
+                                            <div class="flex items-center bg-slate-100 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 shadow-inner">
+                                                <button id="btn-audit-manual" onclick="window.setAuditMode('manual')" class="px-3 py-1 text-[9px] font-black uppercase rounded-md bg-luminous-gold text-white shadow-sm transition-all">Manual</button>
+                                                <button id="btn-audit-ies" onclick="window.setAuditMode('ies')" class="px-3 py-1 text-[9px] font-black uppercase rounded-md text-slate-500 dark:text-slate-500 hover:text-luminous-gold dark:hover:text-luminous-gold transition-all">IES/LDT</button>
                                             </div>
                                         </div>
                                         
-                                        <div class="flex flex-col space-y-4">
-                                            <div class="w-full">
-                                                <label title="Capacidade do LED de reproduzir cores reais." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max" data-i18n="qual_tm30">Qualidade (TM-30)</label>
-                                                <select id="audit-tm30" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-[#0f172a] rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer uppercase shadow-inner">
-                                                    <option value="cri80" selected data-i18n="opt_tm30_80">Padrão (Rf 78)</option>
-                                                    <option value="cri90" data-i18n="opt_tm30_90">Alta Fid. (Rf 90)</option>
-                                                    <option value="sunlike" data-i18n="opt_tm30_sun">SunLike (Rf 96)</option>
-                                                </select>
+                                        <div class="space-y-4">
+                                            <div id="audit-ies-block" class="hidden bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                                <label class="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest block mb-2">Upload da Fotometria (Opcional)</label>
+                                                <div class="flex items-center gap-2">
+                                                    <label for="a-ies-input" class="bg-black dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white px-3 py-1.5 rounded text-[9px] font-black uppercase cursor-pointer transition-colors shadow-sm whitespace-nowrap">ARQUIVO IES</label>
+                                                    <input type="file" id="a-ies-input" accept=".ies,.ldt" class="hidden" onchange="window.handleIESUpload(this)">
+                                                    <div class="flex-1 flex items-center justify-between bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded px-2 py-1.5 min-w-0 shadow-inner">
+                                                        <span id="a-ies-status" class="text-[9px] font-bold text-slate-400 truncate">Nenhum arquivo.</span>
+                                                        <button id="a-ies-clear" onclick="window.clearAuditIES()" class="hidden text-slate-400 hover:text-red-500 ml-2 transition-colors" title="Remover IES"><i class="fas fa-times"></i></button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="w-full">
-                                                <label title="O flicker invisível anula os ganhos de concentração (SVM)." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max" data-i18n="mod_tlm">Modulação (TLM)</label>
-                                                <select id="audit-flicker" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-[#0f172a] rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer uppercase shadow-inner">
-                                                    <option value="low" selected data-i18n="opt_tlm_low">Flicker Free</option>
-                                                    <option value="medium" data-i18n="opt_tlm_med">Aceitável</option>
-                                                    <option value="high" data-i18n="opt_tlm_high">Risco / Baixo</option>
-                                                </select>
+
+                                            <div id="audit-cct-block" class="space-y-4">
+                                                <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Perfil Espectral (Conteúdo Azul)</label>
+                                                    <select id="audit-spd-profile" onchange="window.handleSpdProfileChange(this.value)" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 transition-all cursor-pointer shadow-inner">
+                                                        <option value="manual">Ajuste Rápido (M/P Ratio)</option>
+                                                        <optgroup label="Biblioteca LuxSintax" id="spd-profile-options"></optgroup>
+                                                    </select>
+                                                </div>
+                                                <div id="manual-mratio-container" class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hidden">
+                                                    <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-2">Simular Temperatura de Cor (CCT)</label>
+                                                    <select id="audit-mratio" onchange="window.updateCalculations()" class="w-full bg-white dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors shadow-inner">
+                                                        <option value="0.45">2700K (M/P: 0.45) - Aconchego</option>
+                                                        <option value="0.52" selected>3000K (M/P: 0.52) - Relaxamento</option>
+                                                        <option value="0.68">4000K (M/P: 0.68) - Trabalho/Foco</option>
+                                                        <option value="0.92">5000K (M/P: 0.92) - Alerta</option>
+                                                        <option value="1.10">6500K (M/P: 1.10) - Terapia Máx</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div class="w-full">
+                                                    <label title="Capacidade do LED de reproduzir cores reais." class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Fidelidade (TM-30)</label>
+                                                    <select id="audit-tm30" onchange="window.updateCalculations()" class="w-full bg-slate-50 dark:bg-deep-blue border border-slate-200 dark:border-[#0f172a] rounded-lg px-2 py-1.5 text-[10px] font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer uppercase shadow-inner">
+                                                        <option value="cri80" selected>Comercial (Rf 78)</option>
+                                                        <option value="cri90">Alta Fid. (Rf 90)</option>
+                                                        <option value="sunlike">SunLike (Rf 96)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="w-full">
+                                                    <label title="O flicker invisível anula os ganhos de concentração (SVM)." class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Flicker (TLM)</label>
+                                                    <select id="audit-flicker" onchange="window.updateCalculations()" class="w-full bg-slate-50 dark:bg-deep-blue border border-slate-200 dark:border-[#0f172a] rounded-lg px-2 py-1.5 text-[10px] font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer uppercase shadow-inner">
+                                                        <option value="low" selected>Flicker Free</option>
+                                                        <option value="medium">Aceitável</option>
+                                                        <option value="high">Risco Enxaqueca</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div>
-                                            <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1" data-i18n="hcl_use">Uso / Horário</label>
-                                            <div class="flex gap-2">
-                                                <select id="audit-use-type" onchange="window.updateCalculations()" class="w-1/2 bg-white dark:bg-deep-blue border border-slate-200 dark:border-[#0f172a] rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors shadow-inner">
-                                                    <option value="office" data-i18n="opt_use_office">Trabalho</option>
-                                                    <option value="residential" data-i18n="opt_use_res">Residencial</option>
-                                                    <option value="hospital" data-i18n="opt_use_hosp">Saúde</option>
-                                                </select>
-                                                <select id="audit-time" onchange="window.updateCalculations()" class="w-1/2 bg-white dark:bg-deep-blue border border-slate-200 dark:border-[#0f172a] rounded-lg px-3 py-2.5 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors shadow-inner">
-                                                    <option value="morning" data-i18n="opt_time_day">Dia (08h-17h)</option>
-                                                    <option value="night" data-i18n="opt_time_night">Noite (>18h)</option>
-                                                </select>
+                                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl transition-colors">
+                                        <h4 class="text-xs font-black text-tech-cyan uppercase tracking-widest border-b border-slate-200 dark:border-slate-700 pb-3 mb-4 flex items-center gap-2"><i class="fas fa-eye"></i> O Observador (Retina)</h4>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between gap-4">
+                                                <div class="w-1/2">
+                                                    <label title="A luz que realmente entra no olho. Baseie-se na iluminância Vertical (Ev)." class="text-[10px] text-tech-cyan font-black uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-tech-cyan w-max">Lux Cornea (E_v)</label>
+                                                    <input type="number" id="audit-visual-lux" value="500" min="10" oninput="window.updateCalculations()" class="w-full bg-slate-50 dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2 text-sm font-black text-tech-cyan outline-none focus:border-tech-cyan text-right shadow-inner">
+                                                </div>
+                                                <div class="w-1/2">
+                                                    <label title="A opacidade do cristalino filtra o espectro azul com o envelhecimento." class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-400 w-max">Idade do Usuário</label>
+                                                    <input type="number" id="audit-age" value="30" min="10" max="90" oninput="window.updateCalculations()" class="w-full bg-slate-50 dark:bg-deep-blue border border-slate-200 dark:border-deep-border rounded-lg px-3 py-2 text-sm font-bold text-starlight dark:text-white outline-none focus:border-purple-500 text-right shadow-inner">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest block mb-2">Relógio Biológico (Alvo)</label>
+                                                <div class="flex gap-2">
+                                                    <select id="audit-time" onchange="window.updateCalculations()" class="w-1/2 bg-slate-50 dark:bg-deep-blue border border-slate-200 dark:border-[#0f172a] rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors shadow-inner">
+                                                        <option value="morning">Dia (Alta Estimulação)</option>
+                                                        <option value="night">Noite (Proteção Sono)</option>
+                                                    </select>
+                                                    <select id="audit-use-type" onchange="window.updateCalculations()" class="w-1/2 bg-slate-50 dark:bg-deep-blue border border-slate-200 dark:border-[#0f172a] rounded-lg px-3 py-2 text-xs font-bold text-starlight dark:text-white outline-none focus:border-purple-500 cursor-pointer transition-colors shadow-inner">
+                                                        <option value="office">Escritório/Foco</option>
+                                                        <option value="residential">Residencial</option>
+                                                        <option value="hospital">Saúde/Plantão</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1221,12 +1224,12 @@
                                 <div class="lg:col-span-8 flex flex-col gap-6">
                                     <div class="bg-white dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-xl overflow-hidden relative flex flex-col h-full">
                                         
-                                        <div class="relative z-10 mt-1 mb-3 flex bg-slate-200/50 dark:bg-black/40 p-1 rounded-lg border border-slate-200 dark:border-white/5 w-full max-w-sm mx-auto">
+                                        <div class="relative z-10 mt-1 mb-3 flex bg-slate-200/50 dark:bg-black/40 p-1 rounded-lg border border-slate-200 dark:border-white/5 w-full max-w-sm mx-auto shadow-inner">
                                             <button id="btn-hcl-clock" onclick="window.setHCLViewMode('clock')" class="flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-white dark:bg-white/20 text-starlight dark:text-white shadow-sm transition-all">
-                                                <i class="fas fa-map-marked-alt mr-1"></i> <span data-i18n="hcl_fatigue">Mapa de Fadiga</span>
+                                                <i class="fas fa-clock mr-1 text-purple-500"></i> <span>Relógio Biológico</span>
                                             </button>
                                             <button id="btn-hcl-spd" onclick="window.setHCLViewMode('spd')" class="flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all">
-                                                <i class="fas fa-ghost mr-1"></i> <span data-i18n="hcl_ghost">Fantasma do Ciano</span>
+                                                <i class="fas fa-eye mr-1 text-tech-cyan"></i> <span>Intersecção (Retina)</span>
                                             </button>
                                         </div>
 

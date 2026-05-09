@@ -2852,7 +2852,8 @@ window.updateAuditUI = function() {
 
         if (window.Canvas2DEngine && window.Canvas2DEngine.drawCircadianChart) {
             // LUXSINTAX: Delegação estrita para a infraestrutura de Canvas (Clean Architecture)
-            window.Canvas2DEngine.drawCircadianChart(bioResult, s);
+            // Passamos s.spdIntersection que foi gerado pelo manipulador de SPD
+            window.Canvas2DEngine.drawCircadianChart(bioResult, s, s.spdIntersection);
         }
         if (alertBox && alertEl) {
             alertBox.classList.remove('hidden');
@@ -3516,11 +3517,12 @@ window.handleSpdProfileChange = (profileId: string) => {
     
     const profile = SpdDatabase.find(p => p.id === profileId);
     if (profile && window.HCLEngine) {
-        // LUXSINTAX: Motor físico integra o SPD para calcular o Ratio Exato
-        const calculatedRatio = window.HCLEngine.calculateMelanopicRatio(profile.spd);
+        // LUXSINTAX: Motor físico integra o SPD para calcular o Ratio Exato e a Intersecção
+        const metrics = window.HCLEngine.calculateMelanopicMetrics(profile.spd);
         
-        // Atribui o ratio exato ao estado
-        window.state.audit.mRatio = calculatedRatio;
+        // Atribui o ratio exato e a curva didática ao estado
+        window.state.audit.mRatio = metrics.ratio;
+        window.state.audit.spdIntersection = metrics.intersection;
         
         // Bloqueia e atualiza o select visual para manter coerência, caso visível
         const ratioSelect = document.getElementById('audit-mratio') as HTMLSelectElement;

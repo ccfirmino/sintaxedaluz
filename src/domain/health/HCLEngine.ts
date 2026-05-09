@@ -33,42 +33,56 @@ export const HCLEngine = {
      * Integração Numérica Riemanniana: Calcula o Melanopic Ratio (M/P) a partir de um SPD bruto.
      * @param spd Array de coordenadas {nm, val} representando a distribuição espectral de potência (W/nm).
      */
-    calculateMelanopicRatio: (spd: Array<{nm: number, val: number}>) => {
+    /**
+     * Integração Numérica com Interpolação Linear de Alta Precisão.
+     * Retorna o M/P Ratio e o polígono de intersecção biológica para renderização didática.
+     */
+    calculateMelanopicMetrics: (spd: Array<{nm: number, val: number}>) => {
         const melCurve = HCLEngine.getMelanopicActionCurve();
         const photCurve = HCLEngine.getPhotopicCurve();
         
         let melIntegral = 0;
         let photIntegral = 0;
+        const intersectionCurve: Array<{nm: number, spdVal: number, melVal: number, activeArea: number}> = [];
 
-        // Limpeza de ruído e normalização
         const safeSpd = spd.filter(p => p.nm >= 380 && p.nm <= 780).sort((a, b) => a.nm - b.nm);
-        if (safeSpd.length < 2) return 0.52; // Fallback estrutural (3000K padrão)
+        if (safeSpd.length < 2) return { ratio: 0.52, intersection: [] };
+
+        const interpolate = (curve: Array<{nm: number, val: number}>, targetNm: number) => {
+            const exact = curve.find(p => p.nm === targetNm);
+            if (exact) return exact.val;
+            const lower = curve.slice().reverse().find(p => p.nm < targetNm);
+            const upper = curve.find(p => p.nm > targetNm);
+            if (!lower || !upper) return 0;
+            const t = (targetNm - lower.nm) / (upper.nm - lower.nm);
+            return lower.val + t * (upper.val - lower.val);
+        };
 
         for (let i = 0; i < safeSpd.length - 1; i++) {
             const wl1 = safeSpd[i].nm;
             const wl2 = safeSpd[i+1].nm;
             const deltaWl = wl2 - wl1;
 
-            const v1 = safeSpd[i].val;
-            const v2 = safeSpd[i+1].val;
-            const avgVal = (v1 + v2) / 2;
-
-            const mel1 = melCurve.find(m => m.nm === Math.round(wl1 / 20) * 20)?.val || 0;
-            const mel2 = melCurve.find(m => m.nm === Math.round(wl2 / 20) * 20)?.val || 0;
-            const avgMel = (mel1 + mel2) / 2;
-
-            const phot1 = photCurve.find(p => p.nm === Math.round(wl1 / 20) * 20)?.val || 0;
-            const phot2 = photCurve.find(p => p.nm === Math.round(wl2 / 20) * 20)?.val || 0;
-            const avgPhot = (phot1 + phot2) / 2;
+            const avgVal = (safeSpd[i].val + safeSpd[i+1].val) / 2;
+            const avgMel = (interpolate(melCurve, wl1) + interpolate(melCurve, wl2)) / 2;
+            const avgPhot = (interpolate(photCurve, wl1) + interpolate(photCurve, wl2)) / 2;
 
             melIntegral += avgVal * avgMel * deltaWl;
             photIntegral += avgVal * avgPhot * deltaWl;
+
+            intersectionCurve.push({
+                nm: wl1,
+                spdVal: safeSpd[i].val,
+                melVal: interpolate(melCurve, wl1),
+                activeArea: safeSpd[i].val * interpolate(melCurve, wl1)
+            });
         }
 
-        if (photIntegral === 0) return 0;
-        
-        const CIE_SCALAR = 1.104; // Equivalência de D65
-        return (melIntegral / photIntegral) * CIE_SCALAR;
+        const CIE_SCALAR = 1.104;
+        return {
+            ratio: photIntegral === 0 ? 0 : (melIntegral / photIntegral) * CIE_SCALAR,
+            intersection: intersectionCurve
+        };
     },
 
     /**

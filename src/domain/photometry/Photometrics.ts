@@ -288,4 +288,42 @@ export class Photometrics {
         }
         return { lux: maxLux, yMetric: bestY };
     }
+
+    /**
+     * Calcula a iluminância no plano cornal (E_v) do observador.
+     * Exige o vetor de visão. Se a fonte luminosa estiver além da visão periférica, o E_v é nulo.
+     * @param distXY Distância em planta (m) do observador à luminária.
+     * @param deltaZ Altura da luminária - Altura do olho do observador (m).
+     * @param gazeAngleDeg Ângulo do rosto em relação à fonte (0 = olhando direto para a luminária).
+     */
+    public static calculateObserverEv(
+        data: IesData | null | undefined,
+        distXY: number,
+        deltaZ: number,
+        gazeAngleDeg: number,
+        tilt: number = 0,
+        spin: number = 0
+    ): number {
+        if (!data || distXY <= 0 || deltaZ <= 0) return 0;
+        
+        // Corte de visão periférica (Campo visual humano horizontal médio)
+        if (Math.abs(gazeAngleDeg) > 90) return 0;
+
+        const angleVRad = Math.atan2(distXY, deltaZ);
+        const angleVDeg = angleVRad * (180 / Math.PI);
+        
+        const intensity = this.getIESIntensity(data, Math.abs(angleVDeg - tilt), spin);
+
+        const sinTheta = Math.sin(angleVRad);
+        const cosTheta = Math.cos(angleVRad);
+        
+        // E_v máximo (Rosto estritamente alinhado com o azimute da luminária)
+        const baseLux = (intensity * sinTheta * Math.pow(cosTheta, 2)) / (deltaZ * deltaZ);
+        
+        // Atenuação Corretiva de Lambert (Plano Vertical da Córnea)
+        const gazeRad = gazeAngleDeg * (Math.PI / 180);
+        const eyeLux = baseLux * Math.cos(gazeRad);
+
+        return Math.max(0, eyeLux);
+    }
 }
