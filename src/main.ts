@@ -20,6 +20,7 @@ import { HCLEngine } from './domain/health/HCLEngine';
 import { ESGEngine } from './domain/standards/ESGEngine';
 import { ExcelParser } from './infrastructure/services/ExcelParser';
 import { SpdDatabase } from './domain/health/SpdDatabase'; // LUXSINTAX: Integração do Laboratório Espectral
+import { setLocale, t } from './infrastructure/i18n/i18nEngine'; // LUXSINTAX: O Novo Motor de Idiomas
 
 /**
  * Interface de Extensão do Objeto Window para TypeScript estrito
@@ -147,9 +148,10 @@ async function initializeApp() {
         
         window.supabase = createClient(env.url, env.key);
         if (window.AuthManager) await window.AuthManager.init(window.supabase);
-        
-        // Boot UI
-        window.initNbrSelector();
+        
+        // Boot UI
+        setLocale('pt'); // LUXSINTAX: Liga o motor, define 'pt' como padrão e traduz todo o HTML estático
+        window.initNbrSelector();
         window.setupInputBindings();
 
         // LUXSINTAX: População do Seletor de Perfis Espectrais
@@ -371,54 +373,43 @@ window.updateInputsForLanguage = function() {
 };
 
 window.toggleLanguage = function() { 
+    // 1. Alterna a variável global
     window.currentLang = window.currentLang === 'pt' ? 'en' : 'pt'; 
+    
+    // 2. Aciona o Novo Motor (Ele varre o DOM e traduz tudo instantaneamente)
+    setLocale(window.currentLang as 'pt' | 'en');
+
+    // 3. Atualiza os botões visuais
     document.querySelectorAll('.lang-display').forEach(e => (e as HTMLElement).innerText = window.currentLang === 'pt' ? 'PT / EN' : 'EN / PT');
-    document.querySelectorAll('[data-i18n]').forEach(el => { 
-        const key = el.getAttribute('data-i18n'); 
-        if (key && window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
-            el.innerHTML = window.i18n[window.currentLang][key]; 
-        } 
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { 
-        const key = el.getAttribute('data-i18n-placeholder'); 
-        if (key && window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
-            (el as HTMLInputElement).placeholder = window.i18n[window.currentLang][key]; 
-        } 
-    });
-    document.querySelectorAll('[data-i18n-title]').forEach(el => { 
-            const key = el.getAttribute('data-i18n-title'); 
-            if (key && window.i18n[window.currentLang] && window.i18n[window.currentLang][key]) { 
-                (el as HTMLElement).title = window.i18n[window.currentLang][key]; 
-            } 
-        });
-        window.updateInputsForLanguage();
+    window.updateInputsForLanguage();
         
-        // LUXSINTAX: Sincroniza dinamicamente as dropdowns da NBR 8995-1 sem perder o valor selecionado
-        const catSelect = document.getElementById('nbr-cat-select') as HTMLSelectElement;
-        const roomSelect = document.getElementById('nbr-room-select') as HTMLSelectElement;
-        const catFilter = document.getElementById('category-filter') as HTMLSelectElement;
+    // 4. Sincroniza dinamicamente as dropdowns da NBR 8995-1 sem perder o valor
+    const catSelect = document.getElementById('nbr-cat-select') as HTMLSelectElement;
+    const roomSelect = document.getElementById('nbr-room-select') as HTMLSelectElement;
+    const catFilter = document.getElementById('category-filter') as HTMLSelectElement;
         
-        const oldCat = catSelect ? catSelect.value : null;
-        const oldRoom = roomSelect ? roomSelect.value : null;
-        const oldFilter = catFilter ? catFilter.value : null;
+    const oldCat = catSelect ? catSelect.value : null;
+    const oldRoom = roomSelect ? roomSelect.value : null;
+    const oldFilter = catFilter ? catFilter.value : null;
         
-        if (window.initNbrSelector) window.initNbrSelector();
-        if (oldCat && catSelect) {
-            catSelect.value = oldCat;
-            if (window.updateNbrRooms) window.updateNbrRooms();
-            if (oldRoom && roomSelect) roomSelect.value = oldRoom;
-        }
+    if (window.initNbrSelector) window.initNbrSelector();
+    if (oldCat && catSelect) {
+        catSelect.value = oldCat;
+        if (window.updateNbrRooms) window.updateNbrRooms();
+        if (oldRoom && roomSelect) roomSelect.value = oldRoom;
+    }
 
-        if (catFilter && window.populateCategoryFilter) {
-            const msgAll = window.i18n[window.currentLang]?.filter_all || (window.currentLang === 'en' ? 'All Categories' : 'Todas as Categorias');
-            catFilter.innerHTML = `<option value="all" data-i18n="filter_all">${msgAll}</option>`;
-            window.populateCategoryFilter();
-            if (oldFilter) catFilter.value = oldFilter;
-        }
-        if (window.filterNorms) window.filterNorms();
+    if (catFilter && window.populateCategoryFilter) {
+        // Usa o t() direto do motor em vez da antiga busca manual
+        const msgAll = t('filter_all'); 
+        catFilter.innerHTML = `<option value="all" data-i18n="filter_all">${msgAll}</option>`;
+        window.populateCategoryFilter();
+        if (oldFilter) catFilter.value = oldFilter;
+    }
+    if (window.filterNorms) window.filterNorms();
 
-        window.updateCalculations(); 
-    };
+    window.updateCalculations(); 
+};
 
 // LUXSINTAX: Orquestração de Abas do Project Hub (Master Data, BOQ, LEED, Análise)
 window.switchProjectTab = function(tabId: string) {
@@ -3370,13 +3361,14 @@ window.handleExcelUpload = async function(input: HTMLInputElement) {
 
         // Fluxo Otimizado (Sucesso de Primeira)
         window.processParsedExcel(parsedRooms);
-        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> Importar Mestra';
-        input.value = ""; 
+        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> Importar Mestra';
+        input.value = ""; 
 
-    } catch (err: any) {
-        alert(err.message);
-        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> Importar Mestra';
-    }
+    } catch (err: any) {
+        alert(t(err.message)); // Puxa a mensagem traduzida via i18n
+        if (btnLabel) btnLabel.innerHTML = '<i class="fas fa-file-excel mr-2"></i> Importar Mestra';
+        input.value = "";
+    }
 };
 
 // Responsável por injetar os dados aprovados no State e renderizar
@@ -3498,7 +3490,7 @@ window.confirmExcelMapping = async function(event: any) {
         document.getElementById('excel-mapping-modal')?.classList.add('hidden');
         window.pendingExcelFile = null;
     } catch (err: any) {
-        alert("Erro na importação: " + err.message);
+        alert(t("errors.read_error") + ": " + t(err.message));
     } finally {
         btn.innerHTML = originalText;
     }

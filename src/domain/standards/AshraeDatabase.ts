@@ -1,39 +1,39 @@
 // src/domain/standards/AshraeDatabase.ts
 
 export interface LpdBaseline {
-    type: string;
+    typeKey: string; // Trocado de 'type' para 'typeKey' para indicar que é uma chave de tradução
     base: number;
 }
 
 export const lpdBaselines: LpdBaseline[] =[
-    { type: "Armazém/Estoque (Bulky/Medium)", base: 6.2 },
-    { type: "Banheiros (Restrooms)", base: 10.5 },
-    { type: "Biblioteca (Acervo/Stacks)", base: 18.4 },
-    { type: "Biblioteca (Área de Leitura)", base: 10.0 },
-    { type: "Corredor/Transição", base: 7.1 },
-    { type: "Cozinha/Preparo de Alimentos", base: 10.7 },
-    { type: "Escadas (Stairway)", base: 7.4 },
-    { type: "Escritório Aberto (Open Plan)", base: 10.5 },
-    { type: "Escritório Fechado (Enclosed)", base: 11.9 },
-    { type: "Estacionamento (Garage Area)", base: 2.0 },
-    { type: "Hospital (Exame/Tratamento)", base: 17.9 },
-    { type: "Hospital (Quarto de Paciente)", base: 6.7 },
-    { type: "Hospital (Sala de Cirurgia)", base: 20.3 },
-    { type: "Indústria (Manufatura Detalhada)", base: 13.9 },
-    { type: "Laboratório", base: 13.8 },
-    { type: "Lobby / Recepção", base: 9.7 },
-    { type: "Refeitório (Dining Area)", base: 7.0 },
-    { type: "Sala de Aula/Treinamento", base: 13.3 },
-    { type: "Sala de Reunião/Conferência", base: 13.2 },
-    { type: "Varejo (Área de Vendas)", base: 18.1 },
-    { type: "Varejo (Circulação de Mall)", base: 11.8 },
-    { type: "Área Técnica / Máquinas (Electrical/Mechanical)", base: 10.2 },
-    { type: "Depósito Ativo (Active Storage)", base: 6.8 },
-    { type: "Depósito Inativo (Inactive Storage)", base: 4.6 },
-    { type: "Vestiário (Locker Room)", base: 8.1 },
-    { type: "Copa / Descanso (Lounge/Breakroom)", base: 7.8 },
-    { type: "Oficina / Manutenção (Workshop)", base: 17.1 },
-    { type: "Átrio (Atrium - Altura padrão)", base: 4.3 }
+    { typeKey: "ashrae.baselines.warehouseMedium", base: 6.2 },
+    { typeKey: "ashrae.baselines.restrooms", base: 10.5 },
+    { typeKey: "ashrae.baselines.libraryStacks", base: 18.4 },
+    { typeKey: "ashrae.baselines.libraryReading", base: 10.0 },
+    { typeKey: "ashrae.baselines.corridor", base: 7.1 },
+    { typeKey: "ashrae.baselines.kitchen", base: 10.7 },
+    { typeKey: "ashrae.baselines.stairway", base: 7.4 },
+    { typeKey: "ashrae.baselines.officeOpen", base: 10.5 },
+    { typeKey: "ashrae.baselines.officeEnclosed", base: 11.9 },
+    { typeKey: "ashrae.baselines.garage", base: 2.0 },
+    { typeKey: "ashrae.baselines.hospExam", base: 17.9 },
+    { typeKey: "ashrae.baselines.hospRoom", base: 6.7 },
+    { typeKey: "ashrae.baselines.hospSurg", base: 20.3 },
+    { typeKey: "ashrae.baselines.indManuf", base: 13.9 },
+    { typeKey: "ashrae.baselines.lab", base: 13.8 },
+    { typeKey: "ashrae.baselines.lobby", base: 9.7 },
+    { typeKey: "ashrae.baselines.dining", base: 7.0 },
+    { typeKey: "ashrae.baselines.classRoom", base: 13.3 },
+    { typeKey: "ashrae.baselines.confRoom", base: 13.2 },
+    { typeKey: "ashrae.baselines.retailSales", base: 18.1 },
+    { typeKey: "ashrae.baselines.retailCirc", base: 11.8 },
+    { typeKey: "ashrae.baselines.techRoom", base: 10.2 },
+    { typeKey: "ashrae.baselines.storageAct", base: 6.8 },
+    { typeKey: "ashrae.baselines.storageInact", base: 4.6 },
+    { typeKey: "ashrae.baselines.lockerRoom", base: 8.1 },
+    { typeKey: "ashrae.baselines.lounge", base: 7.8 },
+    { typeKey: "ashrae.baselines.workshop", base: 17.1 },
+    { typeKey: "ashrae.baselines.atrium", base: 4.3 }
 ];
 
 // --- DOMÍNIO DE EXTERIORES (ASHRAE 90.1) ---
@@ -44,19 +44,19 @@ export type LightingZone = 'LZ0' | 'LZ1' | 'LZ2' | 'LZ3' | 'LZ4';
 export interface ExteriorBaseAllowance {
     zone: LightingZone;
     baseWattage: number; // W (Potência Base do Terreno)
-    description: string;
+    descKey: string; // Trocado de 'description' para 'descKey'
 }
 
 export const exteriorBaseAllowances: ExteriorBaseAllowance[] = [
-    { zone: 'LZ0', baseWattage: 0, description: 'Áreas Naturais / Parques Nacionais' },
-    { zone: 'LZ1', baseWattage: 400, description: 'Áreas Rurais / Parques Desenvolvidos' },
-    { zone: 'LZ2', baseWattage: 600, description: 'Áreas Residenciais / Comercial Leve' },
-    { zone: 'LZ3', baseWattage: 750, description: 'Áreas Comerciais / Industriais Padrão' },
-    { zone: 'LZ4', baseWattage: 1300, description: 'Centros Urbanos de Alta Atividade' }
+    { zone: 'LZ0', baseWattage: 0, descKey: 'ashrae.zones.lz0Desc' },
+    { zone: 'LZ1', baseWattage: 400, descKey: 'ashrae.zones.lz1Desc' },
+    { zone: 'LZ2', baseWattage: 600, descKey: 'ashrae.zones.lz2Desc' },
+    { zone: 'LZ3', baseWattage: 750, descKey: 'ashrae.zones.lz3Desc' },
+    { zone: 'LZ4', baseWattage: 1300, descKey: 'ashrae.zones.lz4Desc' }
 ];
 
 export interface ExteriorLpdBaseline {
-    type: string;
+    typeKey: string; // Trocado de 'type' para 'typeKey'
     unit: 'W/m²' | 'W/m'; // Tipagem Estrita: Área vs Linear
     zoneAllowances: Record<LightingZone, number>;
     isTradable: boolean;
@@ -64,31 +64,31 @@ export interface ExteriorLpdBaseline {
 
 export const exteriorLpdBaselines: ExteriorLpdBaseline[] = [
     {
-        type: "Estacionamento Aberto (Asfalto/Piso)",
+        typeKey: "ashrae.baselines.extParking",
         unit: "W/m²",
         zoneAllowances: { LZ0: 0, LZ1: 0.22, LZ2: 0.54, LZ3: 0.81, LZ4: 1.08 },
         isTradable: true
     },
     {
-        type: "Passarelas e Calçadas (< 3m largura)",
+        typeKey: "ashrae.baselines.extWalkway",
         unit: "W/m",
         zoneAllowances: { LZ0: 0, LZ1: 2.3, LZ2: 2.3, LZ3: 2.6, LZ4: 2.6 },
         isTradable: true
     },
     {
-        type: "Entrada Principal (Largura da Porta)",
+        typeKey: "ashrae.baselines.extEntrance",
         unit: "W/m",
         zoneAllowances: { LZ0: 0, LZ1: 66, LZ2: 66, LZ3: 98, LZ4: 98 },
         isTradable: true
     },
     {
-        type: "Fachada de Edifício (Área Iluminada)",
+        typeKey: "ashrae.baselines.extFacade",
         unit: "W/m²",
         zoneAllowances: { LZ0: 0, LZ1: 0, LZ2: 1.1, LZ3: 1.6, LZ4: 2.2 },
         isTradable: false // Regra estrita de Não-Compensação de carga
     },
     {
-        type: "Marquise / Drive-through (Canopy)",
+        typeKey: "ashrae.baselines.extCanopy",
         unit: "W/m²",
         zoneAllowances: { LZ0: 0, LZ1: 6.8, LZ2: 6.8, LZ3: 10.8, LZ4: 10.8 },
         isTradable: true

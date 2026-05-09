@@ -115,6 +115,9 @@
 - [26/04/2026] HCL DOMAIN: Implementação do motor de integração espectral no HCLEngine.ts (Cálculo dinâmico de M/P Ratio baseado em integrais de Riemann das curvas V(λ) e M(λ)). Criação do SpdDatabase.ts para padronização e comparação educacional de iluminantes (D65 vs LEDs).
 - [26/04/2026] MAIN.TS: Implementado 'handleSpdProfileChange' para delegar o cálculo de M/P Ratio ao motor físico a partir de arquivos SPD, em substituição à mera escolha manual.
 - [26/04/2026] CANVAS: Atualizado o renderizador de Modo Espectral (SPD) no Canvas2DEngine.ts para desenhar dinamicamente gráficos com base em arrays reais de espectro de luz vs as curvas visuais fotópica e melanópica.
+- [09/05/2026] DOMAIN (Saúde e Fotometria): Evolução da fundação física. Implementação de integração numérica de alta precisão no `HCLEngine.ts` para exportar o polígono real de intersecção biológica. Injeção do método vetorial `calculateObserverEv` no `Photometrics.ts` para cálculo preciso da iluminância na córnea com base no Gaze Angle e teia fotométrica (IES).
+- [09/05/2026] INFRASTRUCTURE & ORCHESTRATION: Otimização do `Canvas2DEngine.ts` e `main.ts` para o Hub Circadiano. Remoção do espectro visual cosmético. O gráfico SPD agora plota rigorosamente os arrays de intersecção entre a fonte luminosa e a sensibilidade melanópica (ipRGC).
+- [09/05/2026] VIEW (UI/UX): Reestruturação Pedagógica do Hub Circadiano (`index.html`). Reorganização dos inputs no modelo "Causa e Efeito", segregando os dados de Emissão (A Fonte Luminosa: IES/SPD/TM-30) dos dados de Recepção (O Observador: Ev, Idade, Relógio Biológico). Renomeação dos controles de Canvas para claridade didática.
 
 ## Estado Atual da Árvore de Arquivos
 - `index.html`: Apenas View (Tailwind + Estrutura). Proibido conter lógica de negócio.

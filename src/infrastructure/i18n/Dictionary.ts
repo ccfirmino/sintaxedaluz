@@ -1,7 +1,8 @@
-// src/presentation/i18n/Dictionary.ts
+// src/infrastructure/i18n/Dictionary.ts
 
 export const i18nDictionary = {
     pt: {
+        // --- SUAS CHAVES ATUAIS (MANTIDAS INTACTAS) ---
         nav_home: "INÍCIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "PONTO A PONTO<br>HORIZONTAL", tab_vert: "PONTO A PONTO<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "TOPOLOGIA<br>& DRIVERS", tab_esg: "VIABILIDADE<br>& ROI",
         pil_eng: "1. Engenharia & Física", pil_health: "2. Saúde (HCL)", pil_esg: "3. Viabilidade & ESG", pil_market: "4. Mercado",
         tab_smart: "BUSCA<br>INTELIGENTE", tag_soon: "EM BREVE",
@@ -79,19 +80,80 @@ export const i18nDictionary = {
         pdf_cat_interior: "ILUMINAÇÃO INTERNA (ASHRAE INTERIOR)", pdf_cat_facade: "ILUMINAÇÃO DE FACHADA (ASHRAE FACADE)", pdf_cat_exterior: "ÁREAS EXTERNAS (ASHRAE EXTERIOR)",
         pdf_zone_pass: "ZONA APROVADA", pdf_zone_fail: "REPROVADO (EXCESSO DE CARGA)", pdf_zone_sub: "SUBTOTAL DA ZONA", pdf_zone_allow: "PERMITIDO",
         dr_load_src: "Carga e Fonte", dr_power_m: "Potência (W/m)", dr_len: "Metragem (m)", dr_real_load: "Potência Real (Carga):", dr_rec_src: "Fonte Recomendada (+20%)", dr_safety: "Mantenha sempre 20% de folga térmica para estender a vida útil do driver.",
-        dr_rec_power: "Potência Recomendada (+20%)", dr_target_cap: "Capacidade da Fonte Alvo", dr_custom_opt: "Outro / Customizado...", dr_req_units: "Unidades Necessárias:",
-        dr_guard: "Guardião Elétrico", dr_dist: "Distância (m)", dr_gauge: "Bitola (mm²)", dr_drop: "Queda (ΔV)", dr_top: "Topologia Sugerida",
+        dr_rec_power: "Potência Recomendada (+20%)", dr_target_cap: "Capacidade da Fonte Alvo", dr_custom_opt: "Outro / Customizado...", dr_req_units: "Unidades Necessárias:",
+        dr_guard: "Guardião Elétrico", dr_dist: "Distância (m)", dr_gauge: "Bitola (mm²)", dr_drop: "Queda (ΔV)", dr_top: "Topologia Sugerida",
         hcl_ev: "Lux Vertical no Olho (Ev)", hcl_use: "Uso do Espaço", hcl_time: "Horário de Exposição", hcl_medi: "Estímulo Melanópico (m-EDI)",
         opt_use_office: "Trabalho / Foco", opt_use_res: "Residencial / Lazer", opt_use_hosp: "Clínico / Saúde",
         opt_time_day: "Diurno (08h - 17h)", opt_time_night: "Noturno (Após 18h)",
         esg_input: "Dados de Entrada", esg_base_w: "Carga Atual (W)", esg_prop_w: "Carga Nova (W)", esg_capex: "Custo Instalação (R$)", esg_tariff: "Tarifa (R$/kWh)", esg_hrs: "Uso Diário (Horas)", esg_days: "Dias/Ano", esg_ac: "Incluir Bônus Ar Condicionado",
         esg_save_yr: "Economia Financeira (Ano)", esg_pb: "Payback (Retorno)", esg_roi: "ROI (5 Anos)", esg_save_e: "Economia de Energia", esg_impact: "Impacto Ambiental",
-        // LUXSINTAX: Chaves Avançadas (CFO Mode, Zonas ASHRAE, Relatórios Híbridos)
         esg_cfo_title: "Premissas Financeiras (CFO Mode)", esg_inflation: "Inflação Energia (a.a.)", esg_discount: "Taxa Desconto/SELIC", esg_years: "Anos de Análise LCC",
         leed_lz0: "LZ0 (Natural)", leed_lz1: "LZ1 (Rural)", leed_lz2: "LZ2 (Residencial)", leed_lz3: "LZ3 (Comercial)", leed_lz4: "LZ4 (Urbano)",
-        pdf_measure: "MEDIDA", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Área)", pdf_target_lpd: "ALVO LPD"
+        pdf_measure: "MEDIDA", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Área)", pdf_target_lpd: "ALVO LPD",
+        
+        // --- LUXSINTAX: NOVAS CHAVES DE SISTEMA (SISTEMAS E ERROS) ---
+        errors: {
+            qty_min: "A quantidade deve ser no mínimo 1",
+            power_neg: "A potência não pode ser negativa",
+            area_neg: "A área não pode ser negativa",
+            xlsx_missing: "Motor XLSX não carregado. Tente novamente.",
+            file_corrupted: "Falha na importação. O arquivo pode estar corrompido ou o formato não é suportado.",
+            read_error: "Erro ao ler o arquivo físico.",
+            zod_invalid: "A planilha contém formatos inválidos nas colunas numéricas."
+        },
+        ashrae: {
+            baselines: {
+                warehouseMedium: "Armazém/Estoque (Bulky/Medium)",
+                restrooms: "Banheiros (Restrooms)",
+                libraryStacks: "Biblioteca (Acervo/Stacks)",
+                libraryReading: "Biblioteca (Área de Leitura)",
+                corridor: "Corredor/Transição",
+                kitchen: "Cozinha/Preparo de Alimentos",
+                stairway: "Escadas (Stairway)",
+                officeOpen: "Escritório Aberto (Open Plan)",
+                officeEnclosed: "Escritório Fechado (Enclosed)",
+                garage: "Estacionamento (Garage Area)",
+                hospExam: "Hospital (Exame/Tratamento)",
+                hospRoom: "Hospital (Quarto de Paciente)",
+                hospSurg: "Hospital (Sala de Cirurgia)",
+                indManuf: "Indústria (Manufatura Detalhada)",
+                lab: "Laboratório",
+                lobby: "Lobby / Recepção",
+                dining: "Refeitório (Dining Area)",
+                classRoom: "Sala de Aula/Treinamento",
+                confRoom: "Sala de Reunião/Conferência",
+                retailSales: "Varejo (Área de Vendas)",
+                retailCirc: "Varejo (Circulação de Mall)",
+                techRoom: "Área Técnica / Máquinas",
+                storageAct: "Depósito Ativo (Active Storage)",
+                storageInact: "Depósito Inativo (Inactive Storage)",
+                lockerRoom: "Vestiário (Locker Room)",
+                lounge: "Copa / Descanso (Lounge/Breakroom)",
+                workshop: "Oficina / Manutenção (Workshop)",
+                atrium: "Átrio (Atrium - Altura padrão)",
+                extParking: "Estacionamento Aberto (Asfalto/Piso)",
+                extWalkway: "Passarelas e Calçadas (< 3m largura)",
+                extEntrance: "Entrada Principal (Largura da Porta)",
+                extFacade: "Fachada de Edifício (Área Iluminada)",
+                extCanopy: "Marquise / Drive-through (Canopy)"
+            },
+            zones: {
+                lz0Desc: "Áreas Naturais / Parques Nacionais",
+                lz1Desc: "Áreas Rurais / Parques Desenvolvidos",
+                lz2Desc: "Áreas Residenciais / Comercial Leve",
+                lz3Desc: "Áreas Comerciais / Industriais Padrão",
+                lz4Desc: "Centros Urbanos de Alta Atividade"
+            }
+        },
+        mapping: {
+            title: "Mapeamento de Colunas",
+            subtitle: "O sistema não reconheceu algumas colunas cruciais. Ensine a plataforma associando-as aos campos do sistema.",
+            btn_cancel: "Cancelar",
+            btn_import: "Ensinar e Importar"
+        }
     },
     en: {
+        // --- SUAS CHAVES ATUAIS (MANTIDAS INTACTAS) ---
         nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "TOPOLOGY<br>& DRIVERS", tab_esg: "FEASIBILITY<br>& ROI",
         pil_eng: "1. Engineering & Physics", pil_health: "2. Health (HCL)", pil_esg: "3. Feasibility & ESG", pil_market: "4. Market",
         tab_smart: "SMART<br>SPECIFIER", tag_soon: "COMING SOON",
@@ -168,18 +230,77 @@ export const i18nDictionary = {
         pdf_leed_avg: "Projected Average LPD:", pdf_leed_pass: "COMPLIANCE REACHED (APPROVED)", pdf_leed_fail: "REJECTED (EXCEEDS LIMITS)",
         pdf_cat_interior: "INTERIOR LIGHTING (ASHRAE INTERIOR)", pdf_cat_facade: "FACADE LIGHTING (ASHRAE FACADE)", pdf_cat_exterior: "OUTDOOR AREAS (ASHRAE EXTERIOR)",
         pdf_zone_pass: "ZONE APPROVED", pdf_zone_fail: "REJECTED (LOAD EXCEEDED)", pdf_zone_sub: "ZONE SUBTOTAL", pdf_zone_allow: "ALLOWED",
-        // LUXSINTAX: Novas Chaves - Sprint Polimento
-        dr_load_src: "Load and Power Supply", dr_power_m: "Power (W/m)", dr_len: "Length (m)", dr_real_load: "Real Power (Load):", dr_rec_src: "Recommended Driver (+20%)", dr_safety: "Always maintain a 20% thermal margin to extend driver lifespan.",
-        dr_rec_power: "Recommended Power (+20%)", dr_target_cap: "Target Driver Capacity", dr_custom_opt: "Other / Custom...", dr_req_units: "Required Units:",
-        dr_guard: "Electrical Guardian", dr_dist: "Distance (m)", dr_gauge: "Wire Gauge (mm²)", dr_drop: "Voltage Drop (ΔV)", dr_top: "Suggested Topology",
+        dr_load_src: "Load and Power Supply", dr_power_m: "Power (W/m)", dr_len: "Length (m)", dr_real_load: "Real Power (Load):", dr_rec_src: "Recommended Driver (+20%)", dr_safety: "Always maintain a 20% thermal margin to extend driver lifespan.",
+        dr_rec_power: "Recommended Power (+20%)", dr_target_cap: "Target Driver Capacity", dr_custom_opt: "Other / Custom...", dr_req_units: "Required Units:",
+        dr_guard: "Electrical Guardian", dr_dist: "Distance (m)", dr_gauge: "Wire Gauge (mm²)", dr_drop: "Voltage Drop (ΔV)", dr_top: "Suggested Topology",
         hcl_ev: "Vertical Lux at Eye (Ev)", hcl_use: "Space Usage", hcl_time: "Exposure Time", hcl_medi: "Melanopic Stimulus (m-EDI)",
         opt_use_office: "Work / Focus", opt_use_res: "Residential / Leisure", opt_use_hosp: "Clinical / Healthcare",
         opt_time_day: "Daytime (08h - 17h)", opt_time_night: "Nighttime (After 18h)",
         esg_input: "Input Data", esg_base_w: "Current Load (W)", esg_prop_w: "New Load (W)", esg_capex: "Installation Cost", esg_tariff: "Tariff", esg_hrs: "Daily Usage (Hours)", esg_days: "Days/Year", esg_ac: "Include AC Bonus",
         esg_save_yr: "Financial Savings (Yearly)", esg_pb: "Payback (Return)", esg_roi: "ROI (5 Years)", esg_save_e: "Energy Savings", esg_impact: "Environmental Impact",
-        // LUXSINTAX: Advanced Keys (CFO Mode, ASHRAE Zones, Hybrid Reports)
         esg_cfo_title: "Financial Assumptions (CFO Mode)", esg_inflation: "Energy Inflation (p.a.)", esg_discount: "Discount Rate (WACC)", esg_years: "LCC Analysis Years",
         leed_lz0: "LZ0 (Natural)", leed_lz1: "LZ1 (Rural)", leed_lz2: "LZ2 (Residential)", leed_lz3: "LZ3 (Commercial)", leed_lz4: "LZ4 (Urban)",
-        pdf_measure: "MEASURE", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Area)", pdf_target_lpd: "TARGET LPD"
+        pdf_measure: "MEASURE", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Area)", pdf_target_lpd: "TARGET LPD",
+
+        // --- LUXSINTAX: NEW SYSTEM KEYS (SYSTEMS AND ERRORS) ---
+        errors: {
+            qty_min: "Quantity must be at least 1",
+            power_neg: "Power cannot be negative",
+            area_neg: "Area cannot be negative",
+            xlsx_missing: "XLSX Engine not loaded. Try again.",
+            file_corrupted: "Import failed. File may be corrupted or format not supported.",
+            read_error: "Error reading physical file.",
+            zod_invalid: "Spreadsheet contains invalid formats in numeric columns."
+        },
+        ashrae: {
+            baselines: {
+                warehouseMedium: "Warehouse/Storage (Bulky/Medium)",
+                restrooms: "Restrooms",
+                libraryStacks: "Library (Stacks)",
+                libraryReading: "Library (Reading Area)",
+                corridor: "Corridor/Transition",
+                kitchen: "Kitchen/Food Prep",
+                stairway: "Stairway",
+                officeOpen: "Open Plan Office",
+                officeEnclosed: "Enclosed Office",
+                garage: "Parking (Garage Area)",
+                hospExam: "Hospital (Exam/Treatment)",
+                hospRoom: "Hospital (Patient Room)",
+                hospSurg: "Hospital (Operating Room)",
+                indManuf: "Industry (Detailed Manufacturing)",
+                lab: "Laboratory",
+                lobby: "Lobby / Reception",
+                dining: "Dining Area",
+                classRoom: "Classroom/Training",
+                confRoom: "Meeting/Conference Room",
+                retailSales: "Retail (Sales Area)",
+                retailCirc: "Retail (Mall Circulation)",
+                techRoom: "Technical / Electrical Room",
+                storageAct: "Active Storage",
+                storageInact: "Inactive Storage",
+                lockerRoom: "Locker Room",
+                lounge: "Lounge/Breakroom",
+                workshop: "Workshop / Maintenance",
+                atrium: "Atrium (Standard height)",
+                extParking: "Open Parking (Asphalt/Paving)",
+                extWalkway: "Walkways and Sidewalks (< 3m wide)",
+                extEntrance: "Main Entrance (Door Width)",
+                extFacade: "Building Facade (Illuminated Area)",
+                extCanopy: "Canopy / Drive-through"
+            },
+            zones: {
+                lz0Desc: "Natural Areas / National Parks",
+                lz1Desc: "Rural Areas / Developed Parks",
+                lz2Desc: "Residential / Light Commercial",
+                lz3Desc: "Standard Commercial / Industrial",
+                lz4Desc: "High Activity Urban Centers"
+            }
+        },
+        mapping: {
+            title: "Column Mapping",
+            subtitle: "The system did not recognize some crucial columns. Teach the platform by associating them with system fields.",
+            btn_cancel: "Cancel",
+            btn_import: "Teach and Import"
+        }
     }
 };
