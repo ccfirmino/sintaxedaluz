@@ -2,7 +2,6 @@
 
 export const i18nDictionary = {
     pt: {
-        // --- SUAS CHAVES ATUAIS (MANTIDAS INTACTAS) ---
         nav_home: "INÍCIO", nav_about: "SOBRE", tab_query: "CONSULTA<br>(NBR/LEED)", tab_horiz: "PONTO A PONTO<br>HORIZONTAL", tab_vert: "PONTO A PONTO<br>VERTICAL", tab_dist: "ESTUDO DE<br>FACHO", tab_grid: "MÉTODO<br>LÚMENS", tab_driver: "TOPOLOGIA<br>& DRIVERS", tab_esg: "VIABILIDADE<br>& ROI",
         pil_eng: "1. Engenharia & Física", pil_health: "2. Saúde (HCL)", pil_esg: "3. Viabilidade & ESG", pil_market: "4. Mercado",
         tab_smart: "BUSCA<br>INTELIGENTE", tag_soon: "EM BREVE",
@@ -91,7 +90,6 @@ export const i18nDictionary = {
         leed_lz0: "LZ0 (Natural)", leed_lz1: "LZ1 (Rural)", leed_lz2: "LZ2 (Residencial)", leed_lz3: "LZ3 (Comercial)", leed_lz4: "LZ4 (Urbano)",
         pdf_measure: "MEDIDA", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Área)", pdf_target_lpd: "ALVO LPD",
         
-        // --- LUXSINTAX: NOVAS CHAVES DE SISTEMA (SISTEMAS E ERROS) ---
         errors: {
             qty_min: "A quantidade deve ser no mínimo 1",
             power_neg: "A potência não pode ser negativa",
@@ -153,7 +151,6 @@ export const i18nDictionary = {
         }
     },
     en: {
-        // --- SUAS CHAVES ATUAIS (MANTIDAS INTACTAS) ---
         nav_home: "HOME", nav_about: "ABOUT", tab_query: "QUERY<br>(STD/LEED)", tab_horiz: "POINT-BY-POINT<br>HORIZONTAL", tab_vert: "POINT-BY-POINT<br>VERTICAL", tab_dist: "BEAM<br>STUDY", tab_grid: "LUMEN<br>METHOD", tab_driver: "TOPOLOGY<br>& DRIVERS", tab_esg: "FEASIBILITY<br>& ROI",
         pil_eng: "1. Engineering & Physics", pil_health: "2. Health (HCL)", pil_esg: "3. Feasibility & ESG", pil_market: "4. Market",
         tab_smart: "SMART<br>SPECIFIER", tag_soon: "COMING SOON",
@@ -241,8 +238,7 @@ export const i18nDictionary = {
         esg_cfo_title: "Financial Assumptions (CFO Mode)", esg_inflation: "Energy Inflation (p.a.)", esg_discount: "Discount Rate (WACC)", esg_years: "LCC Analysis Years",
         leed_lz0: "LZ0 (Natural)", leed_lz1: "LZ1 (Rural)", leed_lz2: "LZ2 (Residential)", leed_lz3: "LZ3 (Commercial)", leed_lz4: "LZ4 (Urban)",
         pdf_measure: "MEASURE", pdf_linear: "m (Linear)", pdf_area_unit: "m² (Area)", pdf_target_lpd: "TARGET LPD",
-
-        // --- LUXSINTAX: NEW SYSTEM KEYS (SYSTEMS AND ERRORS) ---
+        
         errors: {
             qty_min: "Quantity must be at least 1",
             power_neg: "Power cannot be negative",

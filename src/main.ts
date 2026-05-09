@@ -1883,10 +1883,10 @@ window.renderMasterData = function() {
     }
     
     const fixturesArray = Array.from(uniqueFixtures.values());
-    if (fixturesArray.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="20" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">Nenhuma luminária especificada no projeto. Vá até a aba Compliance LEED e adicione suas zonas e equipamentos.</td></tr>`;
-        return;
-    }
+    if (fixturesArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="20" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">${t('master_empty')}</td></tr>`;
+        return;
+    }
 
     tbody.innerHTML = fixturesArray.map((f: any, i: number) => {
         // LUXSINTAX: Semaforização de Completude (Data Validation)
@@ -2038,13 +2038,13 @@ window.renderBOQ = function() {
     }
     
     const fixturesArray = Array.from(uniqueFixtures.values());
-    let totalCapex = 0;
+    let totalCapex = 0;
 
-    if (fixturesArray.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">Aguardando inserção de luminárias no projeto.</td></tr>`;
-        document.getElementById('boq-total-capex')!.innerText = 'R$ 0,00';
-        return;
-    }
+    if (fixturesArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest">${t('boq_empty')}</td></tr>`;
+        document.getElementById('boq-total-capex')!.innerText = 'R$ 0,00';
+        return;
+    }
 
     tbody.innerHTML = fixturesArray.map((f: any, i: number) => {
         const price = parseFloat(f.unitPrice) || 0;
