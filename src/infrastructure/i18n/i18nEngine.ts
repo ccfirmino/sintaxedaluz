@@ -1,5 +1,5 @@
 // src/infrastructure/i18n/i18nEngine.ts
-import { Dictionary } from './Dictionary';
+import { i18nDictionary } from './Dictionary'; // Correção: importando o nome exato
 
 export type SupportedLanguage = 'pt' | 'en';
 
@@ -11,7 +11,7 @@ let currentLocale: SupportedLanguage = 'pt';
  */
 export function t(key: string): string {
     const keys = key.split('.');
-    let value: any = Dictionary[currentLocale];
+    let value: any = i18nDictionary[currentLocale]; // Correção: usando o nome exato
     
     for (const k of keys) {
         if (value && value[k] !== undefined) {
@@ -40,7 +40,7 @@ export function setLocale(locale: SupportedLanguage) {
             if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
                 el.placeholder = t(key);
             } else {
-                el.textContent = t(key);
+                el.innerHTML = t(key); // Alterado para innerHTML para suportar ícones e formatação
             }
         }
     });
