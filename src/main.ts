@@ -2391,10 +2391,10 @@ window.renderLeedProject = function() {
                                 <select onchange="window.updateLeedRoomData(${room.id}, 'typology', this.value)" class="custom-select w-[140px] md:w-[220px] truncate text-[10px] bg-transparent font-bold text-starlight dark:text-white outline-none cursor-pointer focus:text-luminous-gold uppercase">
                                     <option value="" disabled ${!room.typology ? 'selected' : ''}>TIPOLOGIA ASHRAE...</option>
                                     <optgroup label="Interiores (W/m²)">
-                                        ${[...window.lpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
+                                        ${[...window.lpdBaselines].sort((a: any, b: any) => String(a?.type || '').localeCompare(String(b?.type || ''))).map((b: any) => `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${b.base} W/m²)</option>`).join('')}
                                     </optgroup>
                                     <optgroup label="Exteriores & Fachadas">
-                                        ${window.exteriorLpdBaselines ? [...window.exteriorLpdBaselines].sort((a: any, b: any) => a.type.localeCompare(b.type)).map((b: any) => {
+                                        ${window.exteriorLpdBaselines ? [...window.exteriorLpdBaselines].sort((a: any, b: any) => String(a?.type || '').localeCompare(String(b?.type || ''))).map((b: any) => {
                                             const z = window.state.leedProject.lightingZone || 'LZ3';
                                             const limit = b.zoneAllowances ? b.zoneAllowances[z] : 0;
                                             return `<option value="${b.type}" ${room.typology === b.type ? 'selected' : ''}>${b.type} (${limit} ${b.unit})</option>`;
