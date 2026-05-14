@@ -89,12 +89,13 @@ if (window.i18n) {
     if (!window.i18n.pt) window.i18n.pt = {};
     if (!window.i18n.en) window.i18n.en = {};
     Object.assign(window.i18n.pt, {
-        pil_health: "2. Pesquisa",
-        tool_query: "NBR 8995 | 5101",
-        tool_cert: "LEED | WELL",
-        tab_audit: "HUB CIRCADIANO",
-        tab_leedProj: "ANÁLISE DE DADOS",
-        hdr_audit: "Auditoria Circadiana", audit_sub: "Laboratório de Neurociência: Avaliação do ciclo de melatonina e certificação WELL v2.",
+        pil_health: "2. Pesquisa",
+        pil_esg: "3. Análise",
+        tool_query: "NBR 8995 | 5101",
+        tool_cert: "LEED | WELL",
+        tab_audit: "HCL",
+        tab_leedProj: "DADOS",
+        hdr_audit: "Auditoria Circadiana", audit_sub: "Laboratório de Neurociência: Avaliação do ciclo de melatonina e certificação WELL v2.",
         bio_vars: "Variáveis Biológicas", lux_vert: "Lux Vertical (Ev)", age_yrs: "Idade (Anos)", spec_cct: "Espectro da Fonte (CCT)",
         qual_tm30: "Qualidade (TM-30)", mod_tlm: "Modulação (TLM)", hcl_status: "Status Circadiano", hcl_score: "WELL Performance Score", 
         hcl_fatigue: "Mapa de Fadiga", hcl_ghost: "Fantasma do Ciano", hud_opt_sim: "Simulação Óptica", lens: "Lente", trans: "Transmissão", lbl_load_ies_opt: "OU EXTRAIR DE IES/LDT",
@@ -104,12 +105,13 @@ if (window.i18n) {
         tip_tm30: "Capacidade do LED de reproduzir cores reais.", tip_tlm: "O flicker invisível anula os ganhos de concentração (SVM)."
     });
     Object.assign(window.i18n.en, {
-        pil_health: "2. Research",
-        tool_query: "NBR 8995 | 5101",
-        tool_cert: "LEED | WELL",
-        tab_audit: "CIRCADIAN HUB",
-        tab_leedProj: "DATA ANALYSIS",
-        hdr_audit: "Circadian Audit", audit_sub: "Neuroscience Lab: Melatonin cycle evaluation and WELL v2 certification.",
+        pil_health: "2. Research",
+        pil_esg: "3. Analysis",
+        tool_query: "NBR 8995 | 5101",
+        tool_cert: "LEED | WELL",
+        tab_audit: "HCL",
+        tab_leedProj: "DATA",
+        hdr_audit: "Circadian Audit", audit_sub: "Neuroscience Lab: Melatonin cycle evaluation and WELL v2 certification.",
         bio_vars: "Biological Variables", lux_vert: "Vertical Lux (Ev)", age_yrs: "Age (Years)", spec_cct: "Source Spectrum (CCT)",
         qual_tm30: "Quality (TM-30)", mod_tlm: "Modulation (TLM)", hcl_status: "Circadian Status", hcl_score: "WELL Performance Score",
         hcl_fatigue: "Fatigue Map", hcl_ghost: "Cyan Phantom", hud_opt_sim: "Optical Simulation", lens: "Lens", trans: "Transmission", lbl_load_ies_opt: "OR EXTRACT FROM IES/LDT",
