@@ -2559,10 +2559,39 @@ window.loadSpecificLeedProject = () => {
     if (proj) {
         try {
             let rawData = proj.project_data;
-            if (typeof rawData === 'string') rawData = JSON.parse(rawData);
-            if (!rawData.rooms || !Array.isArray(rawData.rooms)) rawData.rooms = [];
+            
+            // 1. Prevenção de Parsing Fatal (String corrompida do DB)
+            if (typeof rawData === 'string') {
+                try {
+                    rawData = JSON.parse(rawData);
+                } catch (parseError) {
+                    console.warn("[LuxSintax] Payload não é um JSON válido. Instanciando objeto em branco.", parseError);
+                    rawData = {};
+                }
+            }
+            
+            // 2. Blindagem contra Null/Undefined (Quebra de Contrato do Supabase)
+            if (!rawData || typeof rawData !== 'object') {
+                rawData = {};
+            }
+
+            // 3. Normalização Estrutural Severa (Evita quebras de UI no map/forEach)
+            if (!rawData.rooms || !Array.isArray(rawData.rooms)) {
+                rawData.rooms = [];
+            } else {
+                // Remove ambientes e luminárias nulas que possam ter vindo de um cache antigo
+                rawData.rooms = rawData.rooms
+                    .filter((r: any) => r !== null && typeof r === 'object')
+                    .map((r: any) => ({
+                        ...r,
+                        fixtures: Array.isArray(r.fixtures) ? r.fixtures.filter((f: any) => f !== null && typeof f === 'object') : []
+                    }));
+            }
+
             if (!rawData.target) rawData.target = 'baseline';
-            if (!rawData.name) rawData.name = proj.project_name;
+            if (!rawData.name) rawData.name = proj.project_name || "Projeto Recuperado";
+
+            // 4. Injeção Profunda Segura
             window.state.leedProject = JSON.parse(JSON.stringify(rawData));
             window.state.leedProject.db_id = proj.id;
             window.renderLeedProject();
