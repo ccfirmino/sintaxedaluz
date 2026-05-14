@@ -1863,10 +1863,10 @@ window.renderMasterData = function() {
     const uniqueFixtures = new Map();
     if (s && s.rooms) {
         s.rooms.forEach((room: any) => {
-            if (room.fixtures) {
-                room.fixtures.forEach((f: any) => {
-                    const safeLabel = f.label || "Luminária";
-                    const key = safeLabel.toLowerCase() + "_" + f.power;
+            if (room.fixtures) {
+                room.fixtures.forEach((f: any) => {
+                    const safeLabel = String(f.label || "Luminária");
+                    const key = safeLabel.toLowerCase() + "_" + f.power;
                     
                     const instanceData = { roomId: room.id, roomName: room.name, floor: room.floor, fixtureId: f.id, qty: f.qty || 1 };
 
@@ -2267,8 +2267,8 @@ window.renderLeedProject = function() {
     let html = ``;
 
     // LUXSINTAX: Agrupamento por Pavimento e Semaforização
-    const groupedRooms = s.rooms.reduce((acc: any, room: any) => {
-        const floor = (room.floor || 'GERAL').trim().toUpperCase();
+    const groupedRooms = s.rooms.reduce((acc: any, room: any) => {
+        const floor = String(room.floor || 'GERAL').trim().toUpperCase();
         if (!acc[floor]) acc[floor] = [];
         acc[floor].push(room);
         return acc;
@@ -2556,62 +2556,53 @@ window.loadSpecificLeedProject = () => {
     const select = document.getElementById('load-leed-select') as HTMLSelectElement;
     if (!select || !select.value || select.value === 'NEW') return;
     const proj = window.userLeedProjects.find((p: any) => p.id === select.value);
-    if (proj) {
-        try {
-            let rawData = proj.project_data;
-            
-            // 1. Prevenção de Parsing Fatal (String corrompida do DB)
-            if (typeof rawData === 'string') {
-                try {
-                    rawData = JSON.parse(rawData);
-                } catch (parseError) {
-                    console.warn("[LuxSintax] Payload não é um JSON válido. Instanciando objeto em branco.", parseError);
-                    rawData = {};
-                }
-            }
-            
-            // 2. Blindagem contra Null/Undefined (Quebra de Contrato do Supabase)
-            if (!rawData || typeof rawData !== 'object') {
-                rawData = {};
-            }
+    if (!proj) return;
 
-            // 3. Normalização Estrutural Severa (Evita quebras de UI no map/forEach)
-            if (!rawData.rooms || !Array.isArray(rawData.rooms)) {
-                rawData.rooms = [];
-            } else {
-                // Remove ambientes e luminárias nulas que possam ter vindo de um cache antigo
-                rawData.rooms = rawData.rooms
-                    .filter((r: any) => r !== null && typeof r === 'object')
-                    .map((r: any) => ({
-                        ...r,
-                        fixtures: Array.isArray(r.fixtures) ? r.fixtures.filter((f: any) => f !== null && typeof f === 'object') : []
-                    }));
-            }
-
-            if (!rawData.target) rawData.target = 'baseline';
-            if (!rawData.name) rawData.name = proj.project_name || "Projeto Recuperado";
-
-            // 4. Injeção Profunda Segura
-            window.state.leedProject = JSON.parse(JSON.stringify(rawData));
-            window.state.leedProject.db_id = proj.id;
-            window.renderLeedProject();
-            window.renderMasterData(); // LUXSINTAX FIX: Força atualização da aba Planilha Mestra após o Load
-            const btn = document.getElementById('btn-save-leed');
-            if (btn) {
-                const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Carregado!';
-                btn.classList.remove('bg-slate-800');
-                btn.classList.add('bg-leed-green');
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.classList.add('bg-slate-800');
-                    btn.classList.remove('bg-leed-green');
-                }, 2500);
-            }
-        } catch (err) {
-            console.error("[LuxSintax] Erro ao processar dados salvos:", err);
-            alert("Falha ao ler as informações do projeto. Os dados podem estar corrompidos.");
+    let rawData;
+    try {
+        rawData = proj.project_data;
+        if (typeof rawData === 'string') rawData = JSON.parse(rawData);
+        if (!rawData || typeof rawData !== 'object') rawData = {};
+        if (!rawData.rooms || !Array.isArray(rawData.rooms)) rawData.rooms = [];
+        else {
+            rawData.rooms = rawData.rooms
+                .filter((r: any) => r !== null && typeof r === 'object')
+                .map((r: any) => ({
+                    ...r,
+                    fixtures: Array.isArray(r.fixtures) ? r.fixtures.filter((f: any) => f !== null && typeof f === 'object') : []
+                }));
         }
+        if (!rawData.target) rawData.target = 'baseline';
+        if (!rawData.name) rawData.name = proj.project_name || "Projeto Recuperado";
+    } catch (parseError) {
+        console.error("[LuxSintax] Erro de DB:", parseError);
+        return alert("Falha na leitura do banco de dados.");
+    }
+
+    // Aplica o estado de forma segura (Fora do Try-Catch de DB)
+    window.state.leedProject = JSON.parse(JSON.stringify(rawData));
+    window.state.leedProject.db_id = proj.id;
+
+    // Renderiza a UI em um Try-Catch separado para exibir erros estruturais (F12)
+    try {
+        window.renderLeedProject();
+        if (window.renderMasterData) window.renderMasterData(); 
+        
+        const btn = document.getElementById('btn-save-leed');
+        if (btn) {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Carregado!';
+            btn.classList.remove('bg-slate-800');
+            btn.classList.add('bg-leed-green');
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.classList.add('bg-slate-800');
+                btn.classList.remove('bg-leed-green');
+            }, 2500);
+        }
+    } catch (renderError) {
+        console.error("[LuxSintax] Erro Crítico ao desenhar a interface:", renderError);
+        alert("O projeto foi carregado, mas ocorreu um erro ao desenhar a tela. Verifique o F12 (Console).");
     }
 };
 
